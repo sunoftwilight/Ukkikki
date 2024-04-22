@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Profile extends BaseEntity {
 
 
@@ -31,8 +33,7 @@ public class Profile extends BaseEntity {
     @Column(name = "nickname")
     private String nickname;
 
-    @Lob
-    @Column(name = "profile_url", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "profile_url")
     private String profileUrl;
 
     @JoinColumn(name = "user_id")

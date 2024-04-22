@@ -10,13 +10,12 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import project.domain.group.entity.Article;
-import project.domain.group.entity.Chat;
+import project.domain.party.entity.Article;
+import project.domain.party.entity.Chat;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.DownloadLog;
 import project.domain.photo.entity.mediatable.Favorite;
@@ -29,6 +28,7 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Member extends BaseEntity {
 
     @Id
@@ -39,8 +39,7 @@ public class Member extends BaseEntity {
     @Column(name = "user_name")
     private String userName;
 
-    @Lob
-    @Column(name = "profile_url", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "profile_url")
     private String profileUrl;
 
     @Column(name = "is_deactivate")
@@ -57,7 +56,7 @@ public class Member extends BaseEntity {
     private List<Chat> chatList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<MemberRoom> memberRoomList = new ArrayList<>();
+    private List<MemberParty> memberPartyList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Photo> photoList = new ArrayList<>();

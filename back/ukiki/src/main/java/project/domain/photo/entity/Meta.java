@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Meta extends BaseEntity {
 
     @Id

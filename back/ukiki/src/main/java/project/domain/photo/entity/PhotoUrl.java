@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,21 +14,19 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PhotoUrl {
-    @Lob
-    @Column(name = "photo_url", columnDefinition = "MEDIUMTEXT")
+
+    @Column(name = "photo_url")
     // 원본 사진 url
     private String photoUrl;
 
-    @Lob
-    @Column(name = "thumb_url1", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "thumb_url1")
     private String thumb_url1;
 
-    @Lob
-    @Column(name = "thumb_url2", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "thumb_url2")
     private String thumb_url2;
 
-    @Lob
-    @Column(name = "thumb_url3", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "thumb_url3")
     private String thumb_url3;
 }

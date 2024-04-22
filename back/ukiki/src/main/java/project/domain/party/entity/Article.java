@@ -1,5 +1,6 @@
-package project.domain.group.entity;
+package project.domain.party.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,11 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import project.domain.member.entity.Member;
 import project.global.baseEntity.BaseEntity;
 
@@ -21,25 +25,29 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Chat extends BaseEntity {
+@Builder
+public class Article extends BaseEntity {
 
     @Id
-    @Column(name = "chat_id")
+    @Column(name = "article_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "title")
+    private String title;
 
     @Column(name = "content")
     private String content;
 
-    @Column(name = "is_delete")
-    @ColumnDefault(value = "0")
-    private boolean isDelete;
-
-    @JoinColumn(name = "room_id")
+    // 연관관계
+    @JoinColumn(name = "party_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Room room;
+    private Party party;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ArticlePhoto> articlePhotoList= new ArrayList<>();
 }

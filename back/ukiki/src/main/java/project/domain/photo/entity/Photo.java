@@ -14,11 +14,12 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project.domain.group.entity.ArticlePhoto;
-import project.domain.group.entity.Room;
+import project.domain.party.entity.ArticlePhoto;
+import project.domain.party.entity.Party;
 import project.domain.member.entity.Member;
 import project.domain.photo.entity.mediatable.DownloadLog;
 import project.domain.photo.entity.mediatable.Favorite;
@@ -31,6 +32,7 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Photo extends BaseEntity {
 
     @Id
@@ -46,9 +48,9 @@ public class Photo extends BaseEntity {
 
 
     // 연관관계 촐 10개
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "party_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Room room;
+    private Party party;
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
