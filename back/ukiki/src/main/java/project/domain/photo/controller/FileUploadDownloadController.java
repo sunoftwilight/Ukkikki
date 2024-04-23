@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.photo.service.FileUploadDownloadService;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
 @RestController
 @Slf4j
 @RequestMapping("/file")
@@ -19,8 +22,8 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     private final FileUploadDownloadService fileUploadDownloadService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> fileUpload(@RequestParam("files") MultipartFile[] files) {
-        fileUploadDownloadService.fileUpload(files);
+    public ResponseEntity<?> fileUpload(@RequestParam("files") List<MultipartFile> files, @RequestParam("key") String key) throws Exception {
+        fileUploadDownloadService.fileUpload(files, key);
 
         return null;
     }
