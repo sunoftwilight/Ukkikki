@@ -8,4 +8,6 @@ import project.domain.party.dto.response.PartyLinkDto;
 public interface PartyService {
 
     public PartyLinkDto createParty(CreateGroupDto createGroupDto, MultipartFile photo);
+
+    public PartyLinkDto createLink(Long partyId);
 }

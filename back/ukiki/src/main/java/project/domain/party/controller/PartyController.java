@@ -17,4 +17,8 @@ public interface PartyController {
     @Operation(summary = "그룹 생성")
     public ResponseEntity<ResultResponse> createParty(CreateGroupDto createGroupDto,  MultipartFile photo);
 
+    @Operation(summary = "그룹 링크 생성")
+    public ResponseEntity<ResultResponse> makePartyLink(Long partyId);
+
+
 }

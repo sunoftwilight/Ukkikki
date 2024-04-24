@@ -1,4 +1,4 @@
-package project.domain.member.entity;
+package project.domain.party.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +15,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project.domain.party.entity.Party;
+import project.domain.member.entity.Member;
+import project.domain.member.entity.MemberRole;
 import project.global.baseEntity.BaseEntity;
 
 @Entity

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.Member;
-import project.domain.member.entity.MemberParty;
+import project.domain.party.entity.MemberParty;
 import project.domain.member.entity.MemberRole;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.dto.request.CreateGroupDto;
@@ -47,7 +47,7 @@ public class PartyServiceImpl implements PartyService {
         log.info(createGroupDto.getPartyName());
         log.info(createGroupDto.getPassword());
 
-        Pattern namePattern = Pattern.compile("^[0-9a-zA-Z가-힣\\/!\\-_.*\\'\\(\\)\\s]{1,10}$");	// 따옴표 안에 있는 패턴 추출.
+        Pattern namePattern = Pattern.compile("^[0-9a-zA-Z가-힣\\\\/!\\\\-_.*'()\\\\s]{1,10}$");	// 따옴표 안에 있는 패턴 추출.
         Matcher matcher = namePattern.matcher(createGroupDto.getPartyName());
         if (!matcher.matches()){
             throw new BusinessLogicException(ErrorCode.PARTY_NAME_INVALID);
@@ -91,9 +91,36 @@ public class PartyServiceImpl implements PartyService {
         return new PartyLinkDto("http://localhost:8081/api/party/enter/"+party.getId()+"/"+partyLink.getPartyLink());
     }
 
+    @Override
+    public PartyLinkDto createLink(Long partyId) {
 
+        // TODO 유저 아이디를 토큰에서 받아야 함
+        Member member = memberRepository.findById(1L)
+            .orElseThrow (() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
 
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
+        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime twoHourLater = now.plusHours(2);
+        // TODO Redis 연결 안됨
+//        PartyLink partyLink = partyLinkRedisRepository.findById(partyId)
+//            .orElseGet(() ->
+//                 PartyLink.builder()
+//                    .partyId(party.getId())
+//                .build()
+//            );
+        // 임시 객체
+        PartyLink partyLink = PartyLink.builder().partyId(party.getId()).build();
+            partyLink.setPartyLink(makeLink());
+        partyLink.setDeadLine(twoHourLater);
+//        partyLinkRedisRepository.save(partyLink);
+
+        return new PartyLinkDto("http://localhost:8081/api/party/enter/"+party.getId()+"/"+partyLink.getPartyLink());
+    }
 
 
     public String makeLink(){
