@@ -8,6 +8,7 @@ public enum EndPoints {
     DELETE_ASSISTANT("/assistants/{assistant_id}"),
     POST_RUN("/threads/{thread_id}/runs"),
     GET_RUN_STATUS("/threads/{thread_id}/runs/{run_id}"),
+    POST_CHAT("/chat/completions");
 
     ;
 

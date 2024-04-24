@@ -2,7 +2,9 @@ package project.global.util.gptutil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,8 @@ import project.global.util.gptutil.enums.EndPoints;
 @Component
 @Slf4j
 public class GptUtilImpl implements GptUtil {
+
+    private static String instruction = "사진 유형을 분류해줘,음식 = 1,풍경 = 2,개인 = 3,단체 = 4,동물 = 5,단 중복으로 분류될 경우 List 형식으로 묶어서 반환해줘";
 
     private HttpHeaders headers;
     @Value("${openai.api.key}")
@@ -167,6 +171,67 @@ public class GptUtilImpl implements GptUtil {
         );
         log.info("(OpenAiUtil) {}", response);
         return this.getId(response);
+    }
+
+    @Override
+    public String postChat(String imageUrl) throws Exception {
+        // ObjectMapper 인스턴스 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // content 리스트 생성 (내부에 text와 image_url 객체 포함)
+        List<Map<String, Object>> contentList = new ArrayList<>();
+
+        // Text 객체 생성 및 content 리스트에 추가
+        Map<String, Object> textContent = new HashMap<>();
+        textContent.put("type", "text");
+        textContent.put("text", "사진 유형을 분류해줘,음식 = 1,풍경 = 2,개인 = 3,단체 = 4,동물 = 5,단 중복으로 분류될 경우 List 형식으로 묶어서 반환해줘");
+        contentList.add(textContent);
+
+        // Image 객체 생성 및 content 리스트에 추가 (올바른 중첩된 구조로)
+        Map<String, Object> imageContent = new HashMap<>();
+        Map<String, String> imageObject = new HashMap<>();
+        imageObject.put("url", imageUrl);
+        imageContent.put("type", "image_url");
+        imageContent.put("image_url", imageObject); // 중첩된 객체로 'url' 추가
+        contentList.add(imageContent);
+
+        // 사용자 메시지 객체 생성
+        Map<String, Object> userMessage = new HashMap<>();
+        userMessage.put("role", "user");
+        userMessage.put("content", contentList);
+
+        // 메시지를 포함하는 리스트 생성
+        List<Map<String, Object>> messages = new ArrayList<>();
+        messages.add(userMessage);
+
+        // 최상위 map 생성 및 model, messages, max_tokens 추가
+        Map<String, Object> map = new HashMap<>();
+        map.put("model", "gpt-4-turbo");
+        map.put("messages", messages);
+        map.put("temperature", 0.2);
+        map.put("frequency_penalty", 0.5); // API가 허용하는 범위 내로 설정
+        map.put("max_tokens", 300);
+
+        // JSON 문자열로 변환
+        String jsonBody = objectMapper.writeValueAsString(map);
+
+        // 로깅
+        System.out.println(jsonBody);
+
+        // 요청 헤더 설정
+        HttpEntity<String> request = new HttpEntity<>(jsonBody, this.baseHttpHeader());
+
+        // RestTemplate 생성 및 요청 보내기
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.postForObject(
+            EndPoints.POST_CHAT.getUrl(),
+            request,
+            String.class
+        );
+
+        // 응답 로깅 및 반환
+        System.out.println(response);
+        return response;
     }
 
 

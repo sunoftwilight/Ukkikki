@@ -14,6 +14,6 @@ public interface GptUtil {
     String getId(String response) throws Exception;
     String getStatus(String response) throws Exception;
     String getMessageContent(String response) throws Exception;
-
     String postAssistance() throws Exception;
+    String postChat(String imageUrl) throws Exception;
 }
