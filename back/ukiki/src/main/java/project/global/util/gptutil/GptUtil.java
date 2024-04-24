@@ -1,5 +1,6 @@
 package project.global.util.gptutil;
 
+import java.util.List;
 import org.springframework.http.HttpHeaders;
 
 public interface GptUtil {
@@ -15,5 +16,6 @@ public interface GptUtil {
     String getStatus(String response) throws Exception;
     String getMessageContent(String response) throws Exception;
     String postAssistance() throws Exception;
-    String postChat(String imageUrl) throws Exception;
+    List<Integer> postChat(String imageUrl) throws Exception;
+    List<Integer> getMeta(String response) throws Exception;
 }

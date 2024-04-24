@@ -1,9 +1,11 @@
 package project.domain.test;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import project.domain.photo.entity.MetaCode;
 import project.global.util.gptutil.GptUtil;
 
 @RestController
@@ -56,8 +58,10 @@ public class TestController {
     }
 
     @GetMapping("/test/post_chat")
-    public String testController8() throws Exception {
-        String response = gptUtil.postChat("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg");
+    public List<Integer> testController8() throws Exception {
+        List<Integer> response = gptUtil.postChat(
+            "https://http.dog/103.jpg"
+        );
         return response;
     }
 

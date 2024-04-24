@@ -2,11 +2,13 @@ package project.domain.photo.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import javax.swing.plaf.metal.MetalFileChooserUI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.photo.entity.MetaCode;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.PhotoUrl;
 
@@ -22,6 +24,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.security.MessageDigest;
+import project.global.util.gptutil.GptUtil;
 
 @Slf4j
 @Service
@@ -31,6 +34,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucketName}")
     private static String bucketName;
+    private final GptUtil gptUtil;
 
     //커스텀 SSE KEY 인코딩
     private String generateSSEKey(String inputKey) {
