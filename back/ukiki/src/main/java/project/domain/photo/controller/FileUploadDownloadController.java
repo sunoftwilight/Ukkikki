@@ -23,8 +23,9 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     private final FileUploadDownloadService fileUploadDownloadService;
 
     @PostMapping("/upload")
-    public ResponseEntity<List<String>> fileUpload(@RequestParam("files") List<MultipartFile> files, @RequestParam("key") String key, @RequestParam("partyId") int partyId) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).body(fileUploadDownloadService.fileUpload(files, key, partyId));
+    public ResponseEntity<?> fileUpload(@RequestParam("files") List<MultipartFile> files, @RequestParam("key") String key, @RequestParam("partyId") int partyId) throws Exception {
+        fileUploadDownloadService.uploadProcess(files, key, partyId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
