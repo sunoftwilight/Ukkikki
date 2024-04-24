@@ -55,4 +55,10 @@ public class TestController {
         return response;
     }
 
+    @GetMapping("/test/post_chat")
+    public String testController8() throws Exception {
+        String response = gptUtil.postChat("https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg");
+        return response;
+    }
+
 }
