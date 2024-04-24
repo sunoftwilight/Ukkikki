@@ -3,23 +3,6 @@ server:
   servlet:
     context-path: /api
 
-#S3 key
-cloud :
-  aws :
-    credentials :
-      accessKey : ENC(DMrxWMB7HK4CUX05ct2a3ltIEyE6WXCWbM6PjsAUsRc=)
-      secretKey : ENC(JvFCxy8PXNGV3ClIf7e6sykNnaC7tcYSPJ5jnvInVsxwEYGuo9sO5mqCJ2Av+fyNqnxXo62uk0w=)
-
-    #S3 bucketName
-    s3 :
-      bucketName : ENC(2j/G1rFMmHH9MFgSx4fwfQ==)
-    #S3 location
-    region :
-      static : ENC(E5aWo1K77RUoLWpsi4kxGUxAd4mKBDI5)
-    #cloud formation ??? ???? ?? ??.
-    stack :
-      auto : false
-
 spring:
 #  ?? ? ??? ?? ???? ?? => local
   profiles:

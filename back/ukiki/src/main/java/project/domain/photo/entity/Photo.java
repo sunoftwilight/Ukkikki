@@ -40,6 +40,8 @@ public class Photo extends BaseEntity {
     @Column(name = "photo_id")
     private Long id;
 
+    private String fileName;
+
     @Embedded
     private PhotoUrl photoUrl;
 
