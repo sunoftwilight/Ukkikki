@@ -17,8 +17,12 @@ public enum ErrorCode {
     ENTITY_NOT_FOUNT(500, "존재하지 않는 Entity입니다."),
     FORBIDDEN_ERROR(403, "작업을 수행하기 위한 권한이 없습니다."),
 
-    //회원 관련
-    USER_NOT_FOUND(404, "해당하는 회원이 존재하지 않습니다.")
+    // 회원 관련
+    USER_NOT_FOUND(404, "해당하는 회원이 존재하지 않습니다."),
+
+    // 파티 관련
+    PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),
+    PARTY_PASSWORD_INVALID(400, "암호키 입력이 유효하지 않습니다."),
 
     ;
 
