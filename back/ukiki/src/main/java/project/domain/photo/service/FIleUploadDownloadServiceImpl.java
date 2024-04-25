@@ -15,10 +15,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.security.MessageDigest;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -166,6 +165,8 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             urls.setThumb_url2(bufferedImageUpload(resizeImage(file, 2), sseKey, file));
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
             + ", " + photo.getFileName());
+            photo.setPhotoUrl(urls);
+            photoRepository.save(photo);
 
             //GPT API
 
@@ -174,16 +175,60 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     }
 
     public S3Object fileDownload(String inputKey, long fileId) {
-        String fileName = photoRepository.findById(fileId).getFileName();
+        String fileName = photoRepository.findById(fileId).get().getFileName();
         SSECustomerKey sseKey = new SSECustomerKey(generateSSEKey(inputKey));
 
         GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
         S3Object object = amazonS3.getObject(getObjectRequest);
 
-        log.info("object : " + object.getKey());
-        log.info("object : " + object.getObjectMetadata().getContentType());
-        log.info("object : " + object.getObjectMetadata().getContentLength());
-
         return object;
+    }
+
+    public Map<String, List<File>> multiFileDownload(String inputKey, List<Long> fileId, String prefix) {
+        List<S3Object> objects = new ArrayList<>();
+        List<File> files = new ArrayList<>();
+        SSECustomerKey sseKey = new SSECustomerKey(generateSSEKey(inputKey));
+        String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
+        File tempDir = new File(tempPath);  // 임시 디렉터리 경로
+        log.info("tempDir : " + tempDir.getAbsolutePath());
+        tempDir.mkdirs();
+
+        for(long id : fileId){
+            String fileName = photoRepository.findById(id).get().getFileName();
+            GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
+            S3Object object = amazonS3.getObject(getObjectRequest);
+            objects.add(object);
+        }
+
+        int i = 0;
+
+        for(S3Object object : objects){
+            i++;
+            InputStream inputStream = object.getObjectContent();
+            String type = object.getObjectMetadata().getContentType().split("/")[1];
+            File tempFile = null;
+            tempFile = new File(tempDir, prefix + i + "." + type);
+            log.info("tempFile : " + tempFile.getAbsolutePath());
+            tempFile.deleteOnExit();
+            copyInputStreamToFile(inputStream, tempFile);
+            files.add(tempFile);
+        }
+
+        HashMap<String, List<File>> returnMap = new HashMap<>();
+        returnMap.put(tempPath, files);
+        return returnMap;
+    }
+
+    private static void copyInputStreamToFile(InputStream inputStream, File file) {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            int readCount;
+            byte[] bytes = new byte[1024];
+
+            while ((readCount = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, readCount);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

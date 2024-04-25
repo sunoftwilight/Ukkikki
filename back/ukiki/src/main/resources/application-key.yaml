@@ -1,7 +1,7 @@
 my-db:
-  url: jdbc:mysql://localhost:3306/ukiki_db?useSSL=false&serverTimezone=UTC
+  url: jdbc:mysql://localhost:3306/ukkikki?useSSL=false&serverTimezone=UTC
   username: root
-  password: '0000'
+  password: ssafy
   driver-class-name: com.mysql.cj.jdbc.Driver
 
 # jasypt key

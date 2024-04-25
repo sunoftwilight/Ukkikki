@@ -4,17 +4,20 @@ import com.amazonaws.services.s3.model.S3Object;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.photo.service.FileUploadDownloadService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static java.lang.System.out;
 
@@ -33,8 +36,8 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     }
 
     @GetMapping("/download")
-    public void fileDownload(@RequestParam("key") String key, @RequestParam("fileId") long fildId, @RequestParam("saveName") String saveName,HttpServletResponse response) {
-        S3Object object = fileUploadDownloadService.fileDownload(key, fildId);
+    public void fileDownload(@RequestParam("key") String key, @RequestParam("fileId") long fileId, @RequestParam("saveName") String saveName,HttpServletResponse response) {
+        S3Object object = fileUploadDownloadService.fileDownload(key, fileId);
         String contentType = object.getObjectMetadata().getContentType().split("/")[1];
         InputStream inputStream = object.getObjectContent();
         response.setHeader("Content-Disposition", "attachment; filename=\"" + saveName + "." + contentType + "\"");
@@ -55,6 +58,36 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/multi-select-download")
+    public void multiSelectDownload(@RequestParam("key") String key, @RequestParam("fileId") List<Long> fileIds, @RequestParam("prefix") String prefix,HttpServletResponse response) throws Exception {
+        HashMap<String, List<File>> map = (HashMap<String, List<File>>) fileUploadDownloadService.multiFileDownload(key, fileIds, prefix);
+        String path = map.keySet().iterator().next();
+        List<File> files = map.get(path);
+        response.setHeader("Content-type", "application/zip");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + "ukkikki.zip" + "\"");
+        ZipOutputStream out = new ZipOutputStream(response.getOutputStream());
+        FileInputStream fis = null;
+
+        for (File file : files) {
+            out.putNextEntry(new ZipEntry(file.getName()));
+            fis = new FileInputStream(file);
+            StreamUtils.copy(fis, out);
+            fis.close();
+            out.closeEntry();
+        }
+
+        out.close();
+
+        File folder = new File(path);
+        if (folder.exists()) {
+            FileUtils.cleanDirectory(folder);//하위 폴더와 파일 모두 삭제
+
+            if (folder.isDirectory()) {
+                folder.delete(); // 대상폴더 삭제
+            }
         }
     }
 }

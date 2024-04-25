@@ -32,6 +32,23 @@ openai:
   api:
     key: ENC(/SrX6Kd5v3lr+0NOTKzm8gbQ4IWEVTYKsN5tmyo3gCVUzFNKJmpWq/XzSqF2+gtKryYlR5PbUERirkjSWuVag1MU7BG7eh1j)
 
+#S3 key
+cloud :
+  aws :
+    credentials :
+      accessKey : ENC(DMrxWMB7HK4CUX05ct2a3ltIEyE6WXCWbM6PjsAUsRc=)
+      secretKey : ENC(JvFCxy8PXNGV3ClIf7e6sykNnaC7tcYSPJ5jnvInVsxwEYGuo9sO5mqCJ2Av+fyNqnxXo62uk0w=)
+
+    #S3 bucketName
+    s3 :
+      bucketName : ENC(6nlRvB9W3Q1YoHb3cnk/1Q==)
+    #S3 location
+    region :
+      static : ENC(E5aWo1K77RUoLWpsi4kxGUxAd4mKBDI5)
+    #cloud formation ??? ???? ?? ??.
+    stack :
+      auto : false
+
 ---
 # local ???? ?? ?
 spring:
