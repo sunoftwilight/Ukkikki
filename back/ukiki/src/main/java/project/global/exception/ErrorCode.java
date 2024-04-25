@@ -28,6 +28,10 @@ public enum ErrorCode {
     INPUT_NUMBER_EXCEED(400, "입력횟수가 초과 되었습니다."),
     NOT_ROLE_MASTER(400, "마스터 권한이 아닙니다."),
 
+    // 사진 업로드, 다운로드 관련
+    META_CODE_NOT_FOUND(404, "해당 메타코드 분류가 존재하지 않습니다."),
+    BASE64_ENCODING_FAIL(400, "Base64 인코딩에 실패했습니다."),
+
     ;
 
     private final int status;

@@ -24,9 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.photo.entity.Meta;
+import project.domain.photo.entity.MetaCode;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.PhotoUrl;
+import project.domain.photo.repository.MetaRepository;
 import project.domain.photo.repository.PhotoRepository;
+import project.global.util.gptutil.GptUtil;
 
 @Slf4j
 @Service
@@ -37,6 +41,9 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     private final PhotoRepository photoRepository;
     @Value("${cloud.aws.s3.bucketName}")
     private static String bucketName;
+    // GptUtil
+    private final GptUtil gptUtil;
+    private final MetaRepository metaRepository;
 
     //커스텀 SSE KEY 인코딩
     private String generateSSEKey(String inputKey) {
@@ -159,7 +166,8 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         return outputImage;
     }
 
-    public void uploadProcess(List<MultipartFile> files, String inputKey, long partyId) {
+    public void uploadProcess(List<MultipartFile> files, String inputKey, long partyId)
+        throws Exception {
 
         //S3업로드 커스텀 키 생성
         SSECustomerKey sseKey = new SSECustomerKey(generateSSEKey(inputKey));
@@ -176,9 +184,18 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             urls.setThumb_url2(bufferedImageUpload(resizeImage(file, 2), sseKey, file));
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
             + ", " + photo.getFileName());
-
+            // save photo(이부분 알아서 영속성 관리 되도록 변경해야됨)
+            photoRepository.save(photo);
             //GPT API
-
+            for (Integer code : gptUtil.postChat(file)) {
+                // 받은 메타 코드 저장 Meta 테이블에 저장
+                metaRepository.save(
+                    Meta.builder()
+                        .photo(photo)
+                        .metaCode(MetaCode.getEnumByCode(code))
+                        .build()
+                );
+            }
             //MongoDB 업데이트
         }
     }

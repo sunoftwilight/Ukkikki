@@ -1,5 +1,10 @@
 package project.domain.photo.entity;
 
+import lombok.Getter;
+import project.global.exception.BusinessLogicException;
+import project.global.exception.ErrorCode;
+
+@Getter
 public enum MetaCode {
     // 사람
     PORTRAIT(100), INDIVIDUAL(101), GROUP(102), FULL_BODY_SHOT(103), CANDID(
@@ -16,6 +21,15 @@ public enum MetaCode {
 
     MetaCode(int code) {
         this.code = code;
+    }
+
+    public static MetaCode getEnumByCode(int code) {
+        for (MetaCode mc : MetaCode.values()) {
+            if (mc.getCode() == code) {
+                return mc;
+            }
+        }
+        throw new BusinessLogicException(ErrorCode.META_CODE_NOT_FOUND);
     }
 
 }
