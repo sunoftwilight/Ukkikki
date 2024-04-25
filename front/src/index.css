@@ -1,0 +1,65 @@
+@config "../tailwind.config.js";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'gtr-B';
+    src: url('./fonts/GamtanRoadDotum-TTF/GTR-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'gtr-R';
+    src: url('./fonts/GamtanRoadDotum-TTF/GTR-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'gtr-T';
+    src: url('./fonts/GamtanRoadDotum-TTF/GTR-Thin.ttf');
+}
+
+@font-face {
+    font-family: 'pre-Black';
+    src: url('./fonts/pretendard/Pretendard-Black.ttf');
+}
+
+@font-face {
+    font-family: 'pre-B';
+    src: url('./fonts/pretendard/Pretendard-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'pre-EB';
+    src: url('./fonts/pretendard/Pretendard-ExtraBold.ttf');
+}
+
+@font-face {
+    font-family: 'pre-EL';
+    src: url('./fonts/pretendard/Pretendard-ExtraLight.ttf');
+}
+
+@font-face {
+    font-family: 'pre-L';
+    src: url('./fonts/pretendard/Pretendard-Light.ttf');
+}
+
+@font-face {
+    font-family: 'pre-M';
+    src: url('./fonts/pretendard/Pretendard-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'pre-R';
+    src: url('./fonts/pretendard/Pretendard-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'pre-SB';
+    src: url('./fonts/pretendard/Pretendard-SemiBold.ttf');
+}
+
+@font-face {
+    font-family: 'pre-T';
+    src: url('./fonts/pretendard/Pretendard-Thin.ttf');
+}
