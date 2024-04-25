@@ -4,19 +4,16 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.PhotoUrl;
+import project.domain.photo.repository.PhotoRepository;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
@@ -29,8 +26,7 @@ import java.security.MessageDigest;
 public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
     private final AmazonS3 amazonS3;
-    @Value("${cloud.aws.s3.bucketName}")
-    private static String bucketName;
+    private final PhotoRepository photoRepository;
 
     //커스텀 SSE KEY 인코딩
     private String generateSSEKey(String inputKey) {
@@ -157,6 +153,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
         //S3업로드 커스텀 키 생성
         SSECustomerKey sseKey = new SSECustomerKey(generateSSEKey(inputKey));
+        log.info("sseKey : " + sseKey.getKey());
 
         for(MultipartFile file : files){
             Photo photo = new Photo();
@@ -164,13 +161,29 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             PhotoUrl urls = new PhotoUrl();
             //S3 파일 업로드 후 저장
             urls.setPhotoUrl(fileUpload(file, sseKey));
+            photo.setFileName(urls.getPhotoUrl().split("/")[3]);
             urls.setThumb_url1(bufferedImageUpload(resizeImage(file, 1), sseKey, file));
             urls.setThumb_url2(bufferedImageUpload(resizeImage(file, 2), sseKey, file));
-            log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2());
+            log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
+            + ", " + photo.getFileName());
 
             //GPT API
 
             //MongoDB 업데이트
         }
+    }
+
+    public S3Object fileDownload(String inputKey, long fileId) {
+        String fileName = photoRepository.findById(fileId).getFileName();
+        SSECustomerKey sseKey = new SSECustomerKey(generateSSEKey(inputKey));
+
+        GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
+        S3Object object = amazonS3.getObject(getObjectRequest);
+
+        log.info("object : " + object.getKey());
+        log.info("object : " + object.getObjectMetadata().getContentType());
+        log.info("object : " + object.getObjectMetadata().getContentLength());
+
+        return object;
     }
 }
