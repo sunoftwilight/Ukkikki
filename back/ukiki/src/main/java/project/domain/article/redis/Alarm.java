@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @RedisHash(value = "alarm")
-public class Alarm extends BaseEntity {
+public class Alarm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

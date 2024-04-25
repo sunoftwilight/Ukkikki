@@ -17,7 +17,7 @@ import project.global.baseEntity.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @RedisHash(value = "partyLink")
-public class PartyLink extends BaseEntity {
+public class PartyLink {
 
     @Id
     private String partyLink;
