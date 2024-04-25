@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
+import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
 import project.domain.party.service.PartyService;
@@ -55,16 +56,24 @@ public class PartyController implements PartyDocs {
 
     @Override
     @PostMapping("/enter/member")  // 멤버로 로그인
-    public ResponseEntity<ResultResponse> MemberPartyEnter(@RequestBody EnterPartyDto enterPartyDto) {
+    public ResponseEntity<ResultResponse> memberPartyEnter(@RequestBody EnterPartyDto enterPartyDto) {
         PartyEnterDto partyEnterDto = partyService.memberPartyEnter(enterPartyDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_ENTER_SUCCESS, partyEnterDto));
     }
 
     @Override
     @GetMapping("/enter/guest")   // 게스트 로그인
-    public ResponseEntity<ResultResponse> GuestPartyEnter(@RequestBody EnterPartyDto enterPartyDto) {
+    public ResponseEntity<ResultResponse> guestPartyEnter(@RequestBody EnterPartyDto enterPartyDto) {
         PartyEnterDto partyEnterDto = partyService.guestPartyEnter(enterPartyDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GUEST_ENTER_SUCCESS, partyEnterDto));
     }
+
+    @Override
+    @PostMapping("/change/password/{partyId}")
+    public ResponseEntity<ResultResponse> changePartyPassword(@PathVariable Long partyId, @RequestBody PartyPasswordDto partyPasswordDto) {
+        partyService.changePassword(partyId, partyPasswordDto);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS));
+    }
+
 
 }

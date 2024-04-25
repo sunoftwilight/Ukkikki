@@ -4,6 +4,7 @@ package project.domain.party.service;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
+import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
 
@@ -20,5 +21,6 @@ public interface PartyService {
     PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
     PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
 
+    void changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
 }

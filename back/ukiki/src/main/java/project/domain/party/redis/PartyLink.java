@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 import project.domain.party.entity.Party;
+import project.global.baseEntity.BaseEntity;
 
 
 @Data
@@ -16,7 +17,7 @@ import project.domain.party.entity.Party;
 @AllArgsConstructor
 @NoArgsConstructor
 @RedisHash(value = "partyLink")
-public class PartyLink {
+public class PartyLink extends BaseEntity {
 
     @Id
     private String partyLink;

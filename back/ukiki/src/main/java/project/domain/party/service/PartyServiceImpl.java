@@ -1,12 +1,17 @@
 package project.domain.party.service;
 
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.article.redis.Alarm;
+import project.domain.article.redis.AlarmType;
+import project.domain.article.repository.AlarmRedisRepository;
 import project.domain.member.entity.Member;
 import project.domain.party.dto.request.EnterPartyDto;
+import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.entity.MemberParty;
 import project.domain.member.entity.MemberRole;
@@ -37,6 +42,7 @@ public class PartyServiceImpl implements PartyService {
     private final PartyRepository partyRepository;
     private final MemberpartyRepository memberpartyRepository;
     private final PartyLinkRedisRepository partyLinkRedisRepository;
+    private final AlarmRedisRepository alarmRedisRepository;
     private final PartyLinkMapper partyLinkMapper;
 
     private final BcryptUtil bcryptUtil;
@@ -48,17 +54,11 @@ public class PartyServiceImpl implements PartyService {
         Member member = memberRepository.findById(1L)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
 
-        Pattern namePattern = Pattern.compile("^[0-9a-zA-Z가-힣\\\\/!\\\\-_.*'()\\\\s]{1,10}$");    // 따옴표 안에 있는 패턴 추출.
-        Matcher matcher = namePattern.matcher(createPartyDto.getPartyName());
-        if (!matcher.matches()) {
-            throw new BusinessLogicException(ErrorCode.PARTY_NAME_INVALID);
-        }
-
-        Pattern passwordPattern = Pattern.compile("^[0-9a-zA-Z\\!@#$%^*+=-]{8,15}$");    // 따옴표 안에 있는 패턴 추출.
-        Matcher matcher2 = passwordPattern.matcher(createPartyDto.getPassword());
-        if (!matcher2.matches()) {
-            throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
-        }
+        // 파티 이름 규칙 확인
+        checkPartyName(createPartyDto.getPartyName());
+        
+        // 비밀번호 규칙 확인
+        checkPassword(createPartyDto.getPassword());
 
         // TODO 이미지 저장 해야함
         // String partyThumbnail = imageUploader.upload(photo);
@@ -105,7 +105,7 @@ public class PartyServiceImpl implements PartyService {
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
-        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
+        memberpartyRepository.findByMemberAndParty(member, party)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
 
 
@@ -181,6 +181,10 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto) {
+        // TODO 유저 아이디를 토큰에서 받아야 함
+        Member member = memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+
 
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
@@ -194,9 +198,58 @@ public class PartyServiceImpl implements PartyService {
         return res;
     }
 
+    @Override
+    public void changePassword(Long partyId, PartyPasswordDto partyPasswordDto) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        Member member = memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+        // 파티확인
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+        // 내 권한 존재 확인
+        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
+
+        // 마스터 권한 확인
+        if(!memberParty.getMemberRole().equals(MemberRole.MASTER)){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER);
+        }
+
+        // 기존 비밀번호가 확인
+        if (!bcryptUtil.matchesBcrypt(partyPasswordDto.getBeforePassword(), party.getPassword())) {
+            throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
+        }
+        // 바뀔 비밀번호 유효성 체크
+        checkPassword(partyPasswordDto.getAfterPassword());
+        
+        // 바뀐 party에 비밀번호 적용
+        party.setPassword(bcryptUtil.encodeBcrypt(partyPasswordDto.getAfterPassword()));
+        partyRepository.save(party);
+        
+        // 알람 보내기
+        List<MemberParty> memberParties = memberpartyRepository.findAllByParty(party);
+        for (MemberParty memberParty1 : memberParties){
+            // 마스터라면 넘어가기
+            if (memberParty1.getMemberRole().equals(MemberRole.MASTER)){
+                continue;
+            }
+            Alarm alarm = Alarm.builder()
+                .partyId(party.getId())
+                .memberId(member.getId())
+                .alarmType(AlarmType.PASSWORD)
+                .content("비밀번호가 변경 되었습니다.")
+                .identifier(String.valueOf(party.getId()))
+                .build();
+            alarmRedisRepository.save(alarm);
+            //TODO SSE 보내기 . . .
+        }
+
+        //TODO S3 이미지 암호 키 바꾸기 ( partyPasswordDto.getAfterPassword() 데이터로)
+
+    }
 
 
-    public String makeLink() {
+    public String makeLink() { // 링크를 만들어 주는
 
         Map<Integer, List<Integer>> numsRange = new HashMap<>() {{
             put(0, new ArrayList<>(List.of(10, 48)));
@@ -213,5 +266,23 @@ public class PartyServiceImpl implements PartyService {
         }
 
         return returnValue;
+    }
+    
+    // 비밀번호 유효성 확인 함수
+    public void checkPassword(String password){ 
+        Pattern passwordPattern = Pattern.compile("^[0-9a-zA-Z\\!@#$%^*+=-]{8,15}$");    // 따옴표 안에 있는 패턴 추출.
+        Matcher matcher2 = passwordPattern.matcher(password);
+        if (!matcher2.matches()) {
+            throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
+        }
+    }
+
+    // 파티이름 유효성 확인 함수
+    public void checkPartyName(String partyName){
+        Pattern namePattern = Pattern.compile("^[0-9a-zA-Z가-힣\\\\/!\\\\-_.*'()\\\\s]{1,10}$");    // 따옴표 안에 있는 패턴 추출.
+        Matcher matcher = namePattern.matcher(partyName);
+        if (!matcher.matches()) {
+            throw new BusinessLogicException(ErrorCode.PARTY_NAME_INVALID);
+        }
     }
 }

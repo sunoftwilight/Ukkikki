@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
+import project.domain.party.dto.request.PartyPasswordDto;
 import project.global.result.ResultResponse;
 
 
@@ -28,8 +29,12 @@ public interface PartyDocs {
     ResponseEntity<ResultResponse> checkPartyKey(EnterPartyDto checkPartyEnterDto);
 
     @Operation(summary = "회원 파티 참가하기")
-    ResponseEntity<ResultResponse> MemberPartyEnter(EnterPartyDto checkPartyEnterDto);
+    ResponseEntity<ResultResponse> memberPartyEnter(EnterPartyDto checkPartyEnterDto);
 
     @Operation(summary = "게스트 파티 참가하기")
-    ResponseEntity<ResultResponse> GuestPartyEnter(EnterPartyDto enterPartyDto);
+    ResponseEntity<ResultResponse> guestPartyEnter(EnterPartyDto enterPartyDto);
+
+    @Operation(summary = "파티 암호 바꾸기")
+    ResponseEntity<ResultResponse> changePartyPassword(Long partyId, PartyPasswordDto partyPasswordDto);
+
 }
