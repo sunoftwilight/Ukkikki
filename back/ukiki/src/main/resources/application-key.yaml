@@ -4,6 +4,6 @@ my-db:
   password: '0000'
   driver-class-name: com.mysql.cj.jdbc.Driver
 
-# jasypt key
+# jasypt key-new
 encryptor:
   key: 'I*EsAlz4Hwjnhd+jP6doEu-IgOM!+8'
