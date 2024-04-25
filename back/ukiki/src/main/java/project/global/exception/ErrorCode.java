@@ -27,6 +27,7 @@ public enum ErrorCode {
     PARTY_LINK_INVALID(400, "파티링크가 유효하지 않습니다."),
     INPUT_NUMBER_EXCEED(400, "입력횟수가 초과 되었습니다."),
     NOT_ROLE_MASTER(400, "마스터 권한이 아닙니다."),
+    NOT_EXIST_PARTY_USER(404, "존재하지 않는 파티 유저입니다."),
 
     ;
 

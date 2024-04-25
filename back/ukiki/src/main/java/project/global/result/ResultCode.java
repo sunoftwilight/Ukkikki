@@ -19,7 +19,7 @@ public enum ResultCode {
     GUEST_ENTER_SUCCESS(200, "게스트 파티 입장에 성공하였습니다."),
     CHANGE_PASSWORD_SUCCESS(200, "파티 암호 변경에 성공하였습니다."),
     CHANGE_PARTY_NAME_SUCCESS(200, "파티 이름 변경에 성공하였습니다."),
-
+    GRANT_TARGET_SUCCESS(200, "권한 부여에 성공하였습니다."),
 
     ;
 
