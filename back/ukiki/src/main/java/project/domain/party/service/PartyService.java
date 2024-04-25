@@ -2,12 +2,25 @@ package project.domain.party.service;
 
 
 import org.springframework.web.multipart.MultipartFile;
-import project.domain.party.dto.request.CreateGroupDto;
+import project.domain.party.dto.request.EnterPartyDto;
+import project.domain.party.dto.request.CreatePartyDto;
+import project.domain.party.dto.request.PartyPasswordDto;
+import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
 
 public interface PartyService {
 
-    public PartyLinkDto createParty(CreateGroupDto createGroupDto, MultipartFile photo);
+    PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo);
 
-    public PartyLinkDto createLink(Long partyId);
+    PartyLinkDto createLink(Long partyId);
+
+    void enterParty(String partyLink);
+
+    void checkPassword(EnterPartyDto enterPartyDto);
+
+    PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
+    PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
+
+    void changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
+
 }
