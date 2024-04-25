@@ -3,6 +3,7 @@ package project.global.util.gptutil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import project.global.exception.BusinessLogicException;
+import project.global.exception.ErrorCode;
 import project.global.util.gptutil.enums.EndPoints;
 
 @Component
@@ -181,7 +185,7 @@ public class GptUtilImpl implements GptUtil {
     }
 
     @Override
-    public List<Integer> postChat(String imageUrl) throws Exception{
+    public List<Integer> postChat(MultipartFile file) throws Exception {
         // ObjectMapper 인스턴스 생성
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -197,7 +201,7 @@ public class GptUtilImpl implements GptUtil {
         // Image 객체 생성 및 content 리스트에 추가 (올바른 중첩된 구조로)
         Map<String, Object> imageContent = new HashMap<>();
         Map<String, String> imageObject = new HashMap<>();
-        imageObject.put("url", imageUrl);
+        imageObject.put("url", fileToBase64(file));
         imageContent.put("type", "image_url");
         imageContent.put("image_url", imageObject); // 중첩된 객체로 'url' 추가
         contentList.add(imageContent);
@@ -311,6 +315,17 @@ public class GptUtilImpl implements GptUtil {
         return contentNode.asText();
     }
 
-
-
+    @Override
+    public String fileToBase64(MultipartFile file) {
+        String base64Encoded = "";
+        try {
+            byte[] fileContent = file.getBytes(); // 파일의 바이트 데이터를 가져옴
+            base64Encoded = Base64.getEncoder()
+                .encodeToString(fileContent); // 바이트 데이터를 Base64 문자열로 인코딩
+            base64Encoded = "data:image/jpeg;base64," + base64Encoded;
+        } catch (Exception e) {
+            throw new BusinessLogicException(ErrorCode.BASE64_ENCODING_FAIL);
+        }
+        return base64Encoded;
+    }
 }

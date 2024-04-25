@@ -25,6 +25,10 @@ public enum ErrorCode {
     PARTY_PASSWORD_INVALID(400, "암호키 입력이 유효하지 않습니다."),
     PARTY_NOT_FOUND(404, "파티가 존재하지 않습니다."),
 
+    // 사진 업로드, 다운로드 관련
+    META_CODE_NOT_FOUND(404, "해당 메타코드 분류가 존재하지 않습니다."),
+    BASE64_ENCODING_FAIL(400, "Base64 인코딩에 실패했습니다."),
+
     ;
 
     private final int status;

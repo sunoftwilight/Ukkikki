@@ -2,21 +2,22 @@ package project.domain.photo.controller;
 
 import com.amazonaws.services.s3.model.S3Object;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.photo.service.FileUploadDownloadService;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-
-import static java.lang.System.out;
 
 @RestController
 @Slf4j
@@ -27,6 +28,7 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     private final FileUploadDownloadService fileUploadDownloadService;
 
     @PostMapping("/upload")
+    @Transactional
     public ResponseEntity<?> fileUpload(@RequestParam("files") List<MultipartFile> files, @RequestParam("key") String key, @RequestParam("partyId") int partyId) throws Exception {
         fileUploadDownloadService.uploadProcess(files, key, partyId);
         return new ResponseEntity<>(HttpStatus.OK);
