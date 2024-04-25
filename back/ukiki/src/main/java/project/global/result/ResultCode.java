@@ -13,6 +13,10 @@ public enum ResultCode {
     //Party
     CREATE_PARTY_SUCCESS(201, "그룹 생성에 성공하였습니다."),
     GET_PARTY_LINK_SUCCESS(201, "참가 링크 생성에 성공하였습니다. "),
+    PARTY_LINK_VALID(200, "그룹 링크가 유효합니다."),
+    PASSWORD_CORRECT(200, "비밀번호가 일치합니다"),
+    MEMBER_ENTER_SUCCESS(200, "멤버 파티 입장에 성공하였습니다."),
+    GUEST_ENTER_SUCCESS(200, "게스트 파티 입장에 성공하였습니다."),
     ;
 
     private final int status;
