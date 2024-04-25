@@ -1,27 +1,9 @@
 package project.domain.photo.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.SSECustomerKey;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
-import javax.imageio.ImageIO;
+import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.photo.entity.Meta;
@@ -32,6 +14,15 @@ import project.domain.photo.repository.MetaRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.util.gptutil.GptUtil;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -39,8 +30,6 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
     private final AmazonS3 amazonS3;
     private final PhotoRepository photoRepository;
-    @Value("${cloud.aws.s3.bucketName}")
-    private static String bucketName;
     // GptUtil
     private final GptUtil gptUtil;
     private final MetaRepository metaRepository;
@@ -201,16 +190,60 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     }
 
     public S3Object fileDownload(String inputKey, long fileId) {
-        String fileName = photoRepository.findById(fileId).getFileName();
+        String fileName = photoRepository.findById(fileId).get().getFileName();
         SSECustomerKey sseKey = new SSECustomerKey(generateSSEKey(inputKey));
 
         GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
         S3Object object = amazonS3.getObject(getObjectRequest);
 
-        log.info("object : " + object.getKey());
-        log.info("object : " + object.getObjectMetadata().getContentType());
-        log.info("object : " + object.getObjectMetadata().getContentLength());
-
         return object;
+    }
+
+    public Map<String, List<File>> multiFileDownload(String inputKey, List<Long> fileId, String prefix) {
+        List<S3Object> objects = new ArrayList<>();
+        List<File> files = new ArrayList<>();
+        SSECustomerKey sseKey = new SSECustomerKey(generateSSEKey(inputKey));
+        String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
+        File tempDir = new File(tempPath);  // 임시 디렉터리 경로
+        log.info("tempDir : " + tempDir.getAbsolutePath());
+        tempDir.mkdirs();
+
+        for(long id : fileId){
+            String fileName = photoRepository.findById(id).get().getFileName();
+            GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
+            S3Object object = amazonS3.getObject(getObjectRequest);
+            objects.add(object);
+        }
+
+        int i = 0;
+
+        for(S3Object object : objects){
+            i++;
+            InputStream inputStream = object.getObjectContent();
+            String type = object.getObjectMetadata().getContentType().split("/")[1];
+            File tempFile = null;
+            tempFile = new File(tempDir, prefix + i + "." + type);
+            log.info("tempFile : " + tempFile.getAbsolutePath());
+            tempFile.deleteOnExit();
+            copyInputStreamToFile(inputStream, tempFile);
+            files.add(tempFile);
+        }
+
+        HashMap<String, List<File>> returnMap = new HashMap<>();
+        returnMap.put(tempPath, files);
+        return returnMap;
+    }
+
+    private static void copyInputStreamToFile(InputStream inputStream, File file) {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            int readCount;
+            byte[] bytes = new byte[1024];
+
+            while ((readCount = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, readCount);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
