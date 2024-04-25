@@ -1,6 +1,6 @@
 import React from "react";
 
-const Group: React.FC = () => {
+const Alaram: React.FC = () => {
   return (
     <div>
       Hi
@@ -8,4 +8,4 @@ const Group: React.FC = () => {
   )
 };
 
-export default Group;
+export default Alaram;
