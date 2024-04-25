@@ -9,10 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface FileUploadDownloadService {
-    public String fileUpload(MultipartFile file, SSECustomerKey sseKey) throws Exception;
-    public void updateDatabase(int partyId, List<String> urls);
-    public BufferedImage resizeImage(MultipartFile file, int thumbnailNum) throws Exception;
+    public S3Object fileDownload(String inputKey, long fileId);
     public void uploadProcess(List<MultipartFile> files, String inputKey, long partyId) throws Exception;
-    public S3Object fileDownload(String inputKey, long partyId);
     public Map<String, List<File>> multiFileDownload(String inputKey, List<Long> fileId, String prefix);
 }
