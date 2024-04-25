@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 
 ### yaml ####
-src\main\resources\application-key.yaml
+application-key.yaml
 
 ### STS ###
 .apt_generated
