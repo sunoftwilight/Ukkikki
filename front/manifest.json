@@ -3,8 +3,8 @@
   "short_name": "우끼끼",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#007BFF",
-  "theme_color": "#FFFFFF",
+  "background_color": "#007bff",
+  "theme_color": "#ffffff",
   "description": "우리끼리, 끼리끼리 공유하는 추억. 우끼끼",
   "icons": [
     {

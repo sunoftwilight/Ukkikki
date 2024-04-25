@@ -1,11 +1,11 @@
 import { BrowserRouter as RouterProvider } from 'react-router-dom'
-import './App.css'
+import Router from './Router'
 
 function App() {
 
   return (
     <RouterProvider>
-      
+      <Router/>
     </RouterProvider>
   )
 }
