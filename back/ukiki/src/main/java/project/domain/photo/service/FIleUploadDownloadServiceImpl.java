@@ -1,24 +1,32 @@
 package project.domain.photo.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.SSECustomerKey;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
+import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.repository.PhotoRepository;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
-import java.security.MessageDigest;
 
 @Slf4j
 @Service
@@ -27,6 +35,8 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
     private final AmazonS3 amazonS3;
     private final PhotoRepository photoRepository;
+    @Value("${cloud.aws.s3.bucketName}")
+    private static String bucketName;
 
     //커스텀 SSE KEY 인코딩
     private String generateSSEKey(String inputKey) {

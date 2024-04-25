@@ -21,7 +21,14 @@ import project.global.util.gptutil.enums.EndPoints;
 @Slf4j
 public class GptUtilImpl implements GptUtil {
 
-    private static String instruction = "사진 유형을 분류해줘,음식 = 1,풍경 = 2,개인 = 3,단체 = 4,동물 = 5,단 중복으로 분류될 경우 List 형식으로 묶어서 반환해줘";
+    private static String instruction =
+        "사진 유형에 맞는 숫자를 응답해,"
+        + "PORTRAIT = 100, INDIVIDUAL = 101, GROUP = 102, FULL_BODY_SHOT = 103, CANDID = 104, ENVIRONMENTAL_PORTRAIT= 105, "
+        + "WILDLIFE = 200, PET = 201, BIRD = 202, MICRO_ANIMAL = 203,"
+        + "LANDSCAPE = 300, SEASCAPE = 301, ASTRO = 302, CITYSCAPE = 303,"
+        + "WESTERN_FOOD = 400, KOREAN_FOOD = 401, CHINESE_FOOD = 402, JAPANESE_FOOD = 403,"
+        + "NON_CLASSIFICATION = 500"
+        + "단 List 형식으로 응답해 think step by step";
 
     private HttpHeaders headers;
     @Value("${openai.api.key}")
@@ -174,7 +181,7 @@ public class GptUtilImpl implements GptUtil {
     }
 
     @Override
-    public String postChat(String imageUrl) throws Exception {
+    public List<Integer> postChat(String imageUrl) throws Exception{
         // ObjectMapper 인스턴스 생성
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -184,7 +191,7 @@ public class GptUtilImpl implements GptUtil {
         // Text 객체 생성 및 content 리스트에 추가
         Map<String, Object> textContent = new HashMap<>();
         textContent.put("type", "text");
-        textContent.put("text", "사진 유형을 분류해줘,음식 = 1,풍경 = 2,개인 = 3,단체 = 4,동물 = 5,단 중복으로 분류될 경우 List 형식으로 묶어서 반환해줘");
+        textContent.put("text", instruction);
         contentList.add(textContent);
 
         // Image 객체 생성 및 content 리스트에 추가 (올바른 중첩된 구조로)
@@ -231,7 +238,7 @@ public class GptUtilImpl implements GptUtil {
 
         // 응답 로깅 및 반환
         System.out.println(response);
-        return response;
+        return getMeta(response);
     }
 
 
@@ -257,6 +264,40 @@ public class GptUtilImpl implements GptUtil {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(response);
         return rootNode.path("status").asText();
+    }
+
+    @Override
+    public List<Integer> getMeta(String response) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode rootNode = mapper.readTree(response);
+        JsonNode choicesNode = rootNode.path("choices");
+
+        // 반환할 정수 리스트를 초기화
+        List<Integer> contentValues = new ArrayList<>();
+
+        // "choices" 배열을 순회하며 content List화
+        if (choicesNode.isArray()) {
+            for (JsonNode choice : choicesNode) {
+                JsonNode contentNode = choice.path("message").path("content");
+                // "content"가 문자열로 정수를 포함하고 있다면, 해당 정수를 리스트에 추가합니다.
+                if (!contentNode.isMissingNode() && contentNode.isTextual()) {
+                    String content = contentNode.asText();
+                    // "content" 문자열을 정수로 변환하여 리스트에 추가합니다.
+                    content = content.replaceAll("[\\[\\]]", ""); // 대괄호 제거
+                    String[] numbers = content.split(","); // 쉼표로 분할
+                    for (String number : numbers) {
+                        try {
+                            contentValues.add(Integer.parseInt(number.trim())); // 공백 제거 및 정수로 변환하여 추가
+                        } catch (NumberFormatException e) {
+                            // 숫자로 변환할 수 없는 경우 예외 처리
+                            System.err.println("NumberFormatException: " + e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+
+        return contentValues;
     }
 
     @Override
