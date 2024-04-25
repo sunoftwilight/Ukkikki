@@ -2,6 +2,7 @@ package project.domain.party.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,4 +38,7 @@ public interface PartyDocs {
     @Operation(summary = "파티 암호 바꾸기")
     ResponseEntity<ResultResponse> changePartyPassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
+    @Operation(summary = "파티 이름 바꾸기")
+    @Parameter(name = "partyName", description = "바꿀 파티 이름")
+    ResponseEntity<ResultResponse> changePartyName(Long partyId, String partyName);
 }

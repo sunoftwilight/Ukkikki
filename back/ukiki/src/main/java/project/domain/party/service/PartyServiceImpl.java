@@ -248,6 +248,30 @@ public class PartyServiceImpl implements PartyService {
 
     }
 
+    @Override
+    @Transactional
+    public void changePartyName(Long partyId, String partyName) {
+
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        Member member = memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+        // 파티확인
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+        // 그룹원 + 마스터 여부 확인
+        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
+        
+        if (!memberParty.getMemberRole().equals(MemberRole.MASTER)){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER);
+        }
+        // 이름 체크
+        checkPartyName(partyName);
+
+        party.setPartyName(partyName);
+        partyRepository.save(party);
+    }
+
 
     public String makeLink() { // 링크를 만들어 주는
 

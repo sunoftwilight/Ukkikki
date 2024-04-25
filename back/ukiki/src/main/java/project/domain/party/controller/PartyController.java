@@ -75,5 +75,12 @@ public class PartyController implements PartyDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS));
     }
 
+    @Override
+    @PatchMapping("/change/name/{partyId}")
+    public ResponseEntity<ResultResponse> changePartyName(@PathVariable Long partyId, @RequestParam(name = "partyName") String partyName) {
+        partyService.changePartyName(partyId, partyName);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PARTY_NAME_SUCCESS));
+    }
+
 
 }

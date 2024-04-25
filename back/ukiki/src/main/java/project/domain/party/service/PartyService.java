@@ -19,8 +19,10 @@ public interface PartyService {
     void checkPassword(EnterPartyDto enterPartyDto);
 
     PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
+
     PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
 
     void changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
+    void changePartyName(Long partyId, String partyName);
 }
