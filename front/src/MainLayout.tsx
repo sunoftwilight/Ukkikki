@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import Header from './pages/Header';
+import Header from './components/commons/Header';
 
 // 헤더가 필요한 곳에 대한 설정
 function App() {
