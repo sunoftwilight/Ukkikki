@@ -17,6 +17,7 @@ public enum ResultCode {
     PASSWORD_CORRECT(200, "비밀번호가 일치합니다"),
     MEMBER_ENTER_SUCCESS(200, "멤버 파티 입장에 성공하였습니다."),
     GUEST_ENTER_SUCCESS(200, "게스트 파티 입장에 성공하였습니다."),
+    CHANGE_PASSWORD_SUCCESS(200, "파티 암호 변경에 성공하였습니다."),
     ;
 
     private final int status;
