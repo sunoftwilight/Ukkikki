@@ -1,9 +1,10 @@
+import { BrowserRouter } from 'react-router-dom'
 import './App.css'
 
 function App() {
 
   return (
-    <>
+    <BrowserRouter>
       <div style={{width:150, height: 150}} className='bg-main-blue font-gtr-B'>
         Test Words
       </div>
@@ -40,7 +41,7 @@ function App() {
       <div style={{width:150, height: 150}} className='bg-green font-pre-R'>
         Test Words
       </div>
-    </>
+    </BrowserRouter>
   )
 }
 
