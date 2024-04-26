@@ -71,7 +71,7 @@ public class PartyServiceImpl implements PartyService {
             .build();
         partyRepository.save(party);
 
-        MemberParty memberParty = MemberParty.builder()
+        MemberParty memberParty = MemberParty.customBuilder()
             .memberRole(MemberRole.MASTER)
             .party(party)
             .member(member)
@@ -167,7 +167,7 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
 
         // 파티에 유저 뷰어 권한으로 넣어주기
-        MemberParty memberParty = MemberParty.builder()
+        MemberParty memberParty = MemberParty.customBuilder()
             .party(partyLink.getParty())
             .member(member)
             .memberRole(MemberRole.VIEWER)

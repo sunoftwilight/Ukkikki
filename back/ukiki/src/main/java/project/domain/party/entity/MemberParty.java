@@ -24,7 +24,6 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class MemberParty extends BaseEntity {
 
     @Id
@@ -44,5 +43,34 @@ public class MemberParty extends BaseEntity {
     @JoinColumn(name = "party_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Party party;
+
+    // 빌더를 사용한 객체 생성 방법을 재정의 (커스텀 빌더 사용)
+    @Builder(builderMethodName = "customBuilder")
+    public static MemberParty create(Party party, Member member, MemberRole memberRole) {
+        MemberParty memberParty = new MemberParty();
+        memberParty.setMemberRole(memberRole);
+        memberParty.setParty(party);
+        memberParty.setMember(member);
+        return memberParty;
+    }
+
+    // 생성 관련 영속성 관리
+    public void setMember(Member member) {
+        this.member = member;
+        member.getMemberPartyList().add(this);
+    }
+
+    public void setParty(Party party) {
+        this.party = party;
+        party.getMemberPartyList().add(this);
+    }
+
+    // 삭제 메서드
+    public void delete() {
+        this.getMember().getMemberPartyList().remove(this);
+        this.getParty().getMemberPartyList().remove(this);
+        this.party = null;
+        this.member = null;
+    }
 
 }
