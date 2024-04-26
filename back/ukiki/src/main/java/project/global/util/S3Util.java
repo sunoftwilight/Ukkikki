@@ -40,15 +40,14 @@ public class S3Util {
         byte[] hash = digest.digest(inputKey.getBytes());
 
         // Encode the hash using Base64
-        String base64EncodedKey = Base64.getEncoder().encodeToString(hash);
-
-        return base64EncodedKey;
+        return Base64.getEncoder().encodeToString(hash);
     }
 
     //이름 중복 방지를 위해 랜덤으로 생성
     private String changedImageName(String originName) {
         String random = UUID.randomUUID().toString();
-        return random + originName;
+        String ext = originName.substring(originName.lastIndexOf("."));
+        return random + "." + ext;
     }
 
     //단일 파일 업로드
@@ -74,7 +73,6 @@ public class S3Util {
             //이미지 업로드 전체 읽기 권한 허용, 데이터는 유저키로 암호화, 버킷 정책에 의해 유저키 없이 접근 불가
             amazonS3.putObject(new PutObjectRequest("ukkikki", changedName, file.getInputStream(), metadata
             ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(sseKey));
-            log.info("S3 file uploaded : " + originName + " to " + changedName);
         } catch (IOException e) {
             log.error("file upload error " + e.getMessage());
         }
@@ -111,16 +109,42 @@ public class S3Util {
         amazonS3.putObject(new PutObjectRequest("ukkikki", changedName, inputStream, metadata
         ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(sseKey));
 
-        log.info("S3 file uploaded : " + originName + " to " + changedName);
-
         return amazonS3.getUrl("ukkikki", changedName).toString();
     }
 
+    //단일 파일 다운로드
     public S3Object fileDownload(SSECustomerKey sseKey, String fileName) {
 
         GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
         S3Object object = amazonS3.getObject(getObjectRequest);
 
         return object;
+    }
+
+    //키값 변경 원본 사진 삭제
+    public void fileDelete(SSECustomerKey sseKey, String fileName) {
+        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest("ukkikki", fileName);
+        amazonS3.deleteObject(deleteObjectRequest);
+    }
+
+    //sse-c 키값 변경
+    public String changeKey(String originKey, String newKey, String fileName){
+        SSECustomerKey originSseKey = new SSECustomerKey(generateSSEKey(originKey));
+        SSECustomerKey newSseKey = new SSECustomerKey(generateSSEKey(newKey));
+
+        S3Object object = fileDownload(originSseKey, fileName);
+        InputStream inputStream = object.getObjectContent();
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(object.getObjectMetadata().getContentLength());
+        metadata.setContentType(object.getObjectMetadata().getContentType());
+        String changedName = changedImageName(fileName);
+
+        amazonS3.putObject(new PutObjectRequest("ukkikki", changedName, inputStream, metadata
+        ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(newSseKey));
+
+        fileDelete(originSseKey, fileName);
+
+        return amazonS3.getUrl("ukkikki", changedName).toString();
     }
 }
