@@ -1,9 +1,0 @@
-my-db:
-  url: jdbc:mysql://localhost:3306/ukiki_db?useSSL=false&serverTimezone=UTC
-  username: root
-  password: '0000'
-  driver-class-name: com.mysql.cj.jdbc.Driver
-
-# jasypt key
-encryptor:
-  key: 'I*EsAlz4Hwjnhd+jP6doEu-IgOM!+8'

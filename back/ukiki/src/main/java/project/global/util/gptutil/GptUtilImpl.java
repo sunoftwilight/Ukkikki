@@ -26,13 +26,13 @@ import project.global.util.gptutil.enums.EndPoints;
 public class GptUtilImpl implements GptUtil {
 
     private static String instruction =
-        "사진 유형에 맞는 숫자를 응답해,"
-        + "PORTRAIT = 100, INDIVIDUAL = 101, GROUP = 102, FULL_BODY_SHOT = 103, CANDID = 104, ENVIRONMENTAL_PORTRAIT= 105, "
-        + "WILDLIFE = 200, PET = 201, BIRD = 202, MICRO_ANIMAL = 203,"
-        + "LANDSCAPE = 300, SEASCAPE = 301, ASTRO = 302, CITYSCAPE = 303,"
-        + "WESTERN_FOOD = 400, KOREAN_FOOD = 401, CHINESE_FOOD = 402, JAPANESE_FOOD = 403,"
-        + "NON_CLASSIFICATION = 500"
-        + "단 List 형식으로 응답해 think step by step";
+        new StringBuilder().append("사진 유형에 맞는 숫자를 응답해,").append(
+                "PORTRAIT = 100, INDIVIDUAL = 101, GROUP = 102, FULL_BODY_SHOT = 103, CANDID = 104, ENVIRONMENTAL_PORTRAIT= 105, ")
+            .append("WILDLIFE = 200, PET = 201, BIRD = 202, MICRO_ANIMAL = 203,")
+            .append("LANDSCAPE = 300, SEASCAPE = 301, ASTRO = 302, CITYSCAPE = 303,").append(
+                "WESTERN_FOOD = 400, KOREAN_FOOD = 401, CHINESE_FOOD = 402, JAPANESE_FOOD = 403,")
+            .append("NON_CLASSIFICATION = 500").append("단 List 형식으로 응답해 think step by step")
+            .toString();
 
     private HttpHeaders headers;
     @Value("${openai.api.key}")

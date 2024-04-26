@@ -2,6 +2,7 @@ package project.domain.party.service;
 
 
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.member.entity.MemberRole;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
@@ -19,8 +20,12 @@ public interface PartyService {
     void checkPassword(EnterPartyDto enterPartyDto);
 
     PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
+
     PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
 
     void changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
+    void changePartyName(Long partyId, String partyName);
+
+    void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole);
 }

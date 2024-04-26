@@ -19,6 +19,19 @@ spring:
     multipart:
       max-file-size: -1
       max-request-size : -1
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+openai:
+  api:
+    key: ENC(/SrX6Kd5v3lr+0NOTKzm8gbQ4IWEVTYKsN5tmyo3gCVUzFNKJmpWq/XzSqF2+gtKryYlR5PbUERirkjSWuVag1MU7BG7eh1j)
+
 #S3 key
 cloud :
   aws :
@@ -35,18 +48,6 @@ cloud :
     #cloud formation ??? ???? ?? ??.
     stack :
       auto : false
-
-springdoc:
-  api-docs:
-    enabled: true
-    path: /api-docs
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-
-openai:
-  api:
-    key: ENC(/SrX6Kd5v3lr+0NOTKzm8gbQ4IWEVTYKsN5tmyo3gCVUzFNKJmpWq/XzSqF2+gtKryYlR5PbUERirkjSWuVag1MU7BG7eh1j)
 
 ---
 # local ???? ?? ?

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import project.domain.member.entity.MemberRole;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
@@ -73,6 +74,20 @@ public class PartyController implements PartyDocs {
     public ResponseEntity<ResultResponse> changePartyPassword(@PathVariable Long partyId, @RequestBody PartyPasswordDto partyPasswordDto) {
         partyService.changePassword(partyId, partyPasswordDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS));
+    }
+
+    @Override
+    @PatchMapping("/change/name/{partyId}")
+    public ResponseEntity<ResultResponse> changePartyName(@PathVariable Long partyId, @RequestParam(name = "partyName") String partyName) {
+        partyService.changePartyName(partyId, partyName);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PARTY_NAME_SUCCESS));
+    }
+
+    @Override
+    @PatchMapping("/grant/{partyId}/{opponentId}")
+    public ResponseEntity<ResultResponse> grantAuthority(@PathVariable Long partyId, @PathVariable Long opponentId, @RequestParam(name = "memberRole") MemberRole memberRole) {
+        partyService.grantPartyUser(partyId, opponentId, memberRole);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GRANT_TARGET_SUCCESS));
     }
 
 
