@@ -21,11 +21,10 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class ArticlePhoto extends BaseEntity {
 
     @Id
-    @Column(name = "aritlce_photo_id")
+    @Column(name = "article_photo_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -38,4 +37,39 @@ public class ArticlePhoto extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Article article;
 
+    // 빌더를 사용한 객체 생성 방법을 재정의 (커스텀 빌더 사용)
+    @Builder(builderMethodName = "customBuilder")
+    public static ArticlePhoto create(Photo photo, Article article) {
+        ArticlePhoto articlePhoto = new ArticlePhoto();
+        articlePhoto.setArticle(article);
+        articlePhoto.setPhoto(photo);
+        return articlePhoto;
+    }
+
+    // 생성 관련 영속성 관리
+    public void setArticle(Article article) {
+        this.article = article;
+        if (!article.getArticlePhotoList().contains(this)) {
+            article.getArticlePhotoList().add(this);
+        }
+    }
+
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
+        if (!photo.getArticlePhotoList().contains(this)) {
+            photo.getArticlePhotoList().add(this);
+        }
+    }
+
+    // 삭제 메서드
+    public void delete() {
+        if (this.article != null) {
+            this.article.getArticlePhotoList().remove(this);
+            this.article = null;
+        }
+        if (this.photo != null) {
+            this.photo.getArticlePhotoList().remove(this);
+            this.photo = null;
+        }
+    }
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,4 +39,34 @@ public class Memo {
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    // 빌더를 사용한 객체 생성 방법을 재정의 (커스텀 빌더 사용)
+    @Builder(builderMethodName = "customBuilder")
+    public static Memo create(Photo photo, Member member, String content) {
+        Memo memo = new Memo();
+        memo.setContent(content);
+        memo.setPhoto(photo);
+        memo.setMember(member);
+        return memo;
+    }
+
+    // 생성 관련 영속성 관리
+    public void setMember(Member member) {
+        this.member = member;
+        member.getMemoList().add(this);
+    }
+
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
+        photo.getMemoList().add(this);
+    }
+
+    // 삭제 메서드
+    public void delete() {
+        this.getMember().getMemoList().remove(this);
+        this.getPhoto().getMemoList().remove(this);
+        this.photo = null;
+        this.member = null;
+        this.content = null;
+    }
 }
