@@ -18,6 +18,8 @@ import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.entity.mediatable.DownloadLog;
 import project.domain.photo.repository.MetaRepository;
 import project.domain.photo.repository.PhotoRepository;
+import project.global.exception.BusinessLogicException;
+import project.global.exception.ErrorCode;
 import project.global.util.FileUtil;
 import project.global.util.ImageUtil;
 import project.global.util.S3Util;
@@ -47,7 +49,6 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
         //S3업로드 커스텀 키 생성
         SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileUploadDto.getKey()));
-        log.info("sseKey : " + sseKey.getKey());
 
         for(MultipartFile file : files){
             Photo photo = new Photo();
@@ -61,6 +62,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
             + ", " + photo.getFileName());
 
+            photoRepository.save(photo);
             //GPT API
             for (Integer code : gptUtil.postChat(file)) {
                 // 받은 메타 코드 저장 Meta 테이블에 저장
@@ -71,19 +73,29 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                         .build()
                 );
             }
-            photoRepository.save(photo);
+
             //MongoDB 업데이트
         }
     }
 
     public S3Object fileDownload(FileDownloadDto fileDownloadDto) {
-        Photo photo = photoRepository.findById(fileDownloadDto.getFileId()).get();
-        Member member = memberRepository.findById(1L).get();
+        Photo photo = photoRepository.findById(fileDownloadDto.getFileId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+
+        Member member = memberRepository.findById(1L)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         String fileName = photo.getFileName();
         SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileDownloadDto.getKey()));
 
-        GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
-        S3Object object = amazonS3.getObject(getObjectRequest);
+        S3Object object = null;
+
+        try {
+            GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
+            object = amazonS3.getObject(getObjectRequest);
+        }catch (Exception e){
+            throw new BusinessLogicException(ErrorCode.FILE_NOT_FOUND);
+        }
 
         DownloadLog.customBuilder()
                 .photo(photo)
@@ -97,19 +109,29 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         List<S3Object> objects = new ArrayList<>();
         List<File> files = new ArrayList<>();
         List<Long> fileIds = multiFileDownloadDto.getFileIdList();
-        Member member = memberRepository.findById(1L).get();
+
+        Member member = memberRepository.findById(1L)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(multiFileDownloadDto.getKey()));
 
         String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
         File tempDir = new File(tempPath);  // 임시 디렉터리 경로
-        log.info("tempDir : " + tempDir.getAbsolutePath());
         tempDir.mkdirs();
 
         for(long id : fileIds){
-            Photo photo = photoRepository.findById(id).get();
+            Photo photo = photoRepository.findById(id)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+
             String fileName = photo.getFileName();
-            GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
-            S3Object object = amazonS3.getObject(getObjectRequest);
+            S3Object object = null;
+            try{
+                GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
+                object = amazonS3.getObject(getObjectRequest);
+            }catch (Exception e){
+                throw new BusinessLogicException(ErrorCode.FILE_NOT_FOUND);
+            }
+
             objects.add(object);
 
             DownloadLog.customBuilder()
@@ -125,7 +147,6 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             InputStream inputStream = object.getObjectContent();
             String type = object.getObjectMetadata().getContentType().split("/")[1];
             File tempFile = new File(tempDir, multiFileDownloadDto.getPrefix() + i + "." + type);
-            log.info("tempFile : " + tempFile.getAbsolutePath());
             tempFile.deleteOnExit();
             fileUtil.copyInputStreamToFile(inputStream, tempFile);
             files.add(tempFile);
