@@ -367,6 +367,11 @@ public class PartyServiceImpl implements PartyService {
 
     }
 
+    @Override
+    public void memberBlock(Long partyId, Long targetId) {
+
+    }
+
 
     public String makeLink() { // 링크를 만들어 주는
 
