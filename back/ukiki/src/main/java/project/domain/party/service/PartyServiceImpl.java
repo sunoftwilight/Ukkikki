@@ -287,6 +287,13 @@ public class PartyServiceImpl implements PartyService {
         // 타겟 권한 가지고 오기
         MemberParty targetMemberParty = memberpartyRepository.findByMemberAndParty(member, party)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
+        // 마스터 권한 부여할 때 -> 사용자 에디터로 변경 저장
+        if (memberRole.equals(MemberRole.MASTER)){
+            memberParty.setMemberRole(MemberRole.EDITOR);
+            memberpartyRepository.save(memberParty);
+        }
+        
         // 권한 변경 후 저장
         targetMemberParty.setMemberRole(memberRole);
         memberpartyRepository.save(targetMemberParty);
