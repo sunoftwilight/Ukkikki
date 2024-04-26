@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.photo.dto.request.FileDownloadDto;
+import project.domain.photo.dto.request.FileUploadDto;
+import project.domain.photo.dto.request.MultiFileDownloadDto;
 import project.domain.photo.entity.Meta;
 import project.domain.photo.entity.MetaCode;
 import project.domain.photo.entity.Photo;
@@ -37,11 +40,11 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
 
 
-    public void uploadProcess(List<MultipartFile> files, String inputKey, long partyId)
+    public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto)
         throws Exception {
 
         //S3업로드 커스텀 키 생성
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(inputKey));
+        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileUploadDto.getKey()));
         log.info("sseKey : " + sseKey.getKey());
 
         for(MultipartFile file : files){
@@ -71,9 +74,9 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         }
     }
 
-    public S3Object fileDownload(String inputKey, long fileId) {
-        String fileName = photoRepository.findById(fileId).get().getFileName();
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(inputKey));
+    public S3Object fileDownload(FileDownloadDto fileDownloadDto) {
+        String fileName = photoRepository.findById(fileDownloadDto.getFileId()).get().getFileName();
+        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileDownloadDto.getKey()));
 
         GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
         S3Object object = amazonS3.getObject(getObjectRequest);
@@ -81,16 +84,17 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         return object;
     }
 
-    public Map<String, List<File>> multiFileDownload(String inputKey, List<Long> fileId, String prefix) {
+    public Map<String, List<File>> multiFileDownload(MultiFileDownloadDto multiFileDownloadDto) {
         List<S3Object> objects = new ArrayList<>();
         List<File> files = new ArrayList<>();
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(inputKey));
+        List<Long> fileIds = multiFileDownloadDto.getFileIdList();
+        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(multiFileDownloadDto.getKey()));
         String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
         File tempDir = new File(tempPath);  // 임시 디렉터리 경로
         log.info("tempDir : " + tempDir.getAbsolutePath());
         tempDir.mkdirs();
 
-        for(long id : fileId){
+        for(long id : fileIds){
             String fileName = photoRepository.findById(id).get().getFileName();
             GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
             S3Object object = amazonS3.getObject(getObjectRequest);
@@ -103,8 +107,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             i++;
             InputStream inputStream = object.getObjectContent();
             String type = object.getObjectMetadata().getContentType().split("/")[1];
-            File tempFile = null;
-            tempFile = new File(tempDir, prefix + i + "." + type);
+            File tempFile = new File(tempDir, multiFileDownloadDto.getPrefix() + i + "." + type);
             log.info("tempFile : " + tempFile.getAbsolutePath());
             tempFile.deleteOnExit();
             fileUtil.copyInputStreamToFile(inputStream, tempFile);
