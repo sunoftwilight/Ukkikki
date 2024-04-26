@@ -28,4 +28,6 @@ public interface PartyService {
     void changePartyName(Long partyId, String partyName);
 
     void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole);
+
+    void exitParty(Long partyId, String key);
 }

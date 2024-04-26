@@ -1,6 +1,7 @@
 package project.domain.party.service;
 
 
+import com.amazonaws.services.s3.model.SSECustomerKey;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,13 @@ import project.domain.party.redis.PartyLink;
 
 import project.domain.party.repository.PartyLinkRedisRepository;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Photo;
+import project.domain.photo.entity.PhotoUrl;
+import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 import project.global.util.BcryptUtil;
+import project.global.util.S3Util;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -43,8 +48,9 @@ public class PartyServiceImpl implements PartyService {
     private final MemberpartyRepository memberpartyRepository;
     private final PartyLinkRedisRepository partyLinkRedisRepository;
     private final AlarmRedisRepository alarmRedisRepository;
+    private final PhotoRepository photoRepository;
     private final PartyLinkMapper partyLinkMapper;
-
+    private final S3Util s3Util;
     private final BcryptUtil bcryptUtil;
 
     @Override
@@ -56,19 +62,23 @@ public class PartyServiceImpl implements PartyService {
 
         // 파티 이름 규칙 확인
         checkPartyName(createPartyDto.getPartyName());
-        
+
         // 비밀번호 규칙 확인
         checkPassword(createPartyDto.getPassword());
 
-        // TODO 이미지 저장 해야함
-        // String partyThumbnail = imageUploader.upload(photo);
-        String partyThumbnail = "TEST-ADDRESS";
-
         Party party = Party.builder()
             .partyName(createPartyDto.getPartyName())
-            .thumbnail(partyThumbnail)
             .password(bcryptUtil.encodeBcrypt(createPartyDto.getPassword()))
             .build();
+
+        // 이미지 저장 해야함
+
+        if (!photo.isEmpty()){
+            String partyThumbnailImg = s3Util.fileUpload(photo,
+                new SSECustomerKey(s3Util.generateSSEKey(createPartyDto.getPassword())));
+            party.setThumbnail(partyThumbnailImg);
+        }
+
         partyRepository.save(party);
 
         MemberParty memberParty = MemberParty.builder()
@@ -80,16 +90,16 @@ public class PartyServiceImpl implements PartyService {
 
 //        //TODO Redis에 링크 저장
         String link = makeLink(); // 고유한 link가 나오도록 반복
-//        while (partyLinkRedisRepository.findById(link).isPresent()){
-//            link = makeLink();
-//        }
+        while (partyLinkRedisRepository.findById(link).isPresent()){
+            link = makeLink();
+        }
 
         PartyLink partyLink = PartyLink.builder()
             .partyLink(link)
             .party(party)
             .build();
 
-//        partyLinkRedisRepository.save(partyLink);
+        partyLinkRedisRepository.save(partyLink);
 
         return partyLinkMapper.toPartyLinkDto(partyLink);
     }
@@ -108,23 +118,21 @@ public class PartyServiceImpl implements PartyService {
         memberpartyRepository.findByMemberAndParty(member, party)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
 
-
-        // TODO Redis 연결 안됨
         // 기존 경로는 삭제
         Optional<PartyLink> existLink = partyLinkRedisRepository.findByParty(party);
         existLink.ifPresent(partyLinkRedisRepository::delete);
 
         String link = makeLink(); // 고유한 link가 나오도록 반복
-//        while (partyLinkRedisRepository.findById(link).isPresent()){
-//            link = makeLink();
-//        }
+        while (partyLinkRedisRepository.findById(link).isPresent()){
+            link = makeLink();
+        }
 
         PartyLink partyLink = PartyLink.builder()
             .partyLink(link)
             .party(party)
             .build();
 
-//        partyLinkRedisRepository.save(partyLink);
+        partyLinkRedisRepository.save(partyLink);
 
         return partyLinkMapper.toPartyLinkDto(partyLink);
     }
@@ -208,10 +216,10 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         // 내 권한 존재 확인
         MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
-            .orElseThrow(()-> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
 
         // 마스터 권한 확인
-        if(!memberParty.getMemberRole().equals(MemberRole.MASTER)){
+        if (!memberParty.getMemberRole().equals(MemberRole.MASTER)) {
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER);
         }
 
@@ -221,16 +229,16 @@ public class PartyServiceImpl implements PartyService {
         }
         // 바뀔 비밀번호 유효성 체크
         checkPassword(partyPasswordDto.getAfterPassword());
-        
+
         // 바뀐 party에 비밀번호 적용
         party.setPassword(bcryptUtil.encodeBcrypt(partyPasswordDto.getAfterPassword()));
         partyRepository.save(party);
-        
+
         // 알람 보내기
         List<MemberParty> memberParties = memberpartyRepository.findAllByParty(party);
-        for (MemberParty memberParty1 : memberParties){
+        for (MemberParty memberParty1 : memberParties) {
             // 마스터라면 넘어가기
-            if (memberParty1.getMemberRole().equals(MemberRole.MASTER)){
+            if (memberParty1.getMemberRole().equals(MemberRole.MASTER)) {
                 continue;
             }
             Alarm alarm = Alarm.builder()
@@ -243,8 +251,18 @@ public class PartyServiceImpl implements PartyService {
             alarmRedisRepository.save(alarm);
             //TODO SSE 보내기 . . .
         }
+        // S3 이미지 비밀번호 바꾸기
+        List<Photo> photos = party.getPhotoList();
+        for (Photo photo : photos) {
+            for (String url : photo.getPhotoUrl().photoUrls()){
+                String fileName = url.substring(
+                    url.lastIndexOf("/"),
+                    url.lastIndexOf(".") - 1);
+                s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
+            }
+        }
+        
 
-        //TODO S3 이미지 암호 키 바꾸기 ( partyPasswordDto.getAfterPassword() 데이터로)
 
     }
 
@@ -260,9 +278,9 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         // 그룹원 + 마스터 여부 확인
         MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
-            .orElseThrow(()-> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
-        
-        if (!memberParty.getMemberRole().equals(MemberRole.MASTER)){
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
+
+        if (!memberParty.getMemberRole().equals(MemberRole.MASTER)) {
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER);
         }
         // 이름 체크
@@ -289,14 +307,64 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // 마스터 권한 부여할 때 -> 사용자 에디터로 변경 저장
-        if (memberRole.equals(MemberRole.MASTER)){
+        if (memberRole.equals(MemberRole.MASTER)) {
             memberParty.setMemberRole(MemberRole.EDITOR);
             memberpartyRepository.save(memberParty);
         }
-        
+
         // 권한 변경 후 저장
         targetMemberParty.setMemberRole(memberRole);
         memberpartyRepository.save(targetMemberParty);
+    }
+
+    @Override
+    public void exitParty(Long partyId, String key) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        Member member = memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+        MemberParty memberParty = memberpartyRepository.findByMemberAndPartyId(member, partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
+        // 파티에 남아있는 유저 수
+        int partyMemberCount = memberpartyRepository.countAllByPartyIdAndMemberRoleIsNot(partyId, MemberRole.VIEWER);
+
+        // 1명 이상이 존재하고 마스터라면 불가능
+        if (partyMemberCount != 1 && memberParty.getMemberRole().equals(MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.MASTER_CANT_EXIT);
+        }
+
+        // 자신 파티에서 삭제
+        memberpartyRepository.delete(memberParty);
+
+        // 자신 밖에 없을 때 party 데이터 삭제
+        if (partyMemberCount == 1) {
+            // S3 key
+            SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(key));
+
+            Party party = partyRepository.findById(partyId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+            // 파티 썸네일 삭제
+            String thumbnail = party.getThumbnail();
+            s3Util.fileDelete(sseKey, thumbnail.substring(
+                thumbnail.lastIndexOf("/"),
+                thumbnail.lastIndexOf(".") - 1));
+            // 파티 내 사진 삭제
+            List<Photo> photos = party.getPhotoList();
+            for (Photo photo : photos) {
+                for (String url : photo.getPhotoUrl().photoUrls()){
+                    String fileName = url.substring(
+                        url.lastIndexOf("/"),
+                        url.lastIndexOf(".") - 1);
+                    s3Util.fileDelete(sseKey, fileName);
+                }
+            }
+            // 파티 삭제
+            partyRepository.delete(party);
+
+            // TODO directory, comment 삭제 코드 추가해야함
+        }
+
     }
 
 
@@ -318,9 +386,9 @@ public class PartyServiceImpl implements PartyService {
 
         return returnValue;
     }
-    
+
     // 비밀번호 유효성 확인 함수
-    public void checkPassword(String password){ 
+    public void checkPassword(String password) {
         Pattern passwordPattern = Pattern.compile("^[0-9a-zA-Z\\!@#$%^*+=-]{8,15}$");    // 따옴표 안에 있는 패턴 추출.
         Matcher matcher2 = passwordPattern.matcher(password);
         if (!matcher2.matches()) {
@@ -329,7 +397,7 @@ public class PartyServiceImpl implements PartyService {
     }
 
     // 파티이름 유효성 확인 함수
-    public void checkPartyName(String partyName){
+    public void checkPartyName(String partyName) {
         Pattern namePattern = Pattern.compile("^[0-9a-zA-Z가-힣\\\\/!\\\\-_.*'()\\\\s]{1,10}$");    // 따옴표 안에 있는 패턴 추출.
         Matcher matcher = namePattern.matcher(partyName);
         if (!matcher.matches()) {

@@ -70,7 +70,7 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
-    @PostMapping("/change/password/{partyId}")
+    @PatchMapping("/change/password/{partyId}")
     public ResponseEntity<ResultResponse> changePartyPassword(@PathVariable Long partyId, @RequestBody PartyPasswordDto partyPasswordDto) {
         partyService.changePassword(partyId, partyPasswordDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS));
@@ -90,5 +90,11 @@ public class PartyController implements PartyDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.GRANT_TARGET_SUCCESS));
     }
 
+    @Override
+    @DeleteMapping("/exit/{partyId}")
+    public ResponseEntity<ResultResponse> exitParty(@PathVariable Long partyId, @RequestParam(name = "key")String key){
+        partyService.exitParty(partyId, key);
+        return null;
+    }
 
 }

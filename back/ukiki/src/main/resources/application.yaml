@@ -19,6 +19,10 @@ spring:
     multipart:
       max-file-size: -1
       max-request-size : -1
+  data:
+    redis:
+      host: ENC(98Nib9DtJwOEJvIP3CBIysw0X14E/CRGk61zNwVjTrE=)
+      password: ENC(Q9ZQLmy0sa/53pyJLsNJrfJpWKwDHll7)
 
 springdoc:
   api-docs:
@@ -72,10 +76,7 @@ spring:
     username: ENC(Nd9hps8Hr207vp8fZgjt+w==)
     password: ENC(MteBDlIIwXGZRw7gjOVX97iyvl1oLNru)
     driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    redis:
-      host: ENC(98Nib9DtJwOEJvIP3CBIysw0X14E/CRGk61zNwVjTrE=)
-      password: ENC(Q9ZQLmy0sa/53pyJLsNJrfJpWKwDHll7)
+
     mongodb:
       uri: ENC(Bf33id/NT451ymS94xr23Mp5TlZShmuy5ZUIbPwoMMUMIPAg124BRIetV//M+JsYauF4DT7mZ1bsjJtb1sWsifi42+jcs/lidtGhNvE/R2RqGwHioOtZ2A==)
 

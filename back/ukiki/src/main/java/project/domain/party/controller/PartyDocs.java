@@ -45,4 +45,7 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 권한 주기")
     ResponseEntity<ResultResponse> grantAuthority(Long partyId, Long opponentId, MemberRole memberRole);
+
+    @Operation(summary = "파티 나가기")
+    ResponseEntity<ResultResponse> exitParty(Long partyId, String key);
 }
