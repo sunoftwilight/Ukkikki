@@ -30,4 +30,6 @@ public interface PartyService {
     void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole);
 
     void exitParty(Long partyId, String key);
+
+    void memberBlock(Long partyId, Long targetId);
 }

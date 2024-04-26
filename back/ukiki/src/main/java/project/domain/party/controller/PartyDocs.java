@@ -48,4 +48,7 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 나가기")
     ResponseEntity<ResultResponse> exitParty(Long partyId, String key);
+
+    @Operation(summary = "파티원 차단하기")
+    ResponseEntity<ResultResponse> memberBlock(Long partyId, Long targetId);
 }

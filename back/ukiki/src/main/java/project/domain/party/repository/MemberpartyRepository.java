@@ -16,7 +16,9 @@ public interface MemberpartyRepository extends JpaRepository<MemberParty, Long> 
 
     Optional<MemberParty> findByMemberAndPartyAndMemberRoleIs(Member member, Party party, MemberRole memberRole);
 
-    Optional<MemberParty> findByMemberAndPartyId(Member member, Long partyId);
+    Optional<MemberParty> findByMemberIdAndPartyIdAndMemberRoleIs(Long memberId, Long partyId, MemberRole memberRole);
+
+    Optional<MemberParty> findByMemberIdAndPartyId(Long memberid, Long partyId);
 
     int countAllByPartyIdAndMemberRoleIsNot(Long partyId, MemberRole memberRole);
 

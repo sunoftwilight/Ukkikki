@@ -322,7 +322,7 @@ public class PartyServiceImpl implements PartyService {
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
-        MemberParty memberParty = memberpartyRepository.findByMemberAndPartyId(member, partyId)
+        MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(1L, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // 파티에 남아있는 유저 수
@@ -367,6 +367,21 @@ public class PartyServiceImpl implements PartyService {
 
     }
 
+    @Override
+    public void memberBlock(Long partyId, Long targetId) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, targetId, MemberRole.MASTER)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
+
+        MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+        // 멤버 차단 시켜 버리기
+        targetParty.setMemberRole(MemberRole.BLOCK);
+    }
+
 
     public String makeLink() { // 링크를 만들어 주는
 
@@ -389,7 +404,7 @@ public class PartyServiceImpl implements PartyService {
 
     // 비밀번호 유효성 확인 함수
     public void checkPassword(String password) {
-        Pattern passwordPattern = Pattern.compile("^[0-9a-zA-Z\\!@#$%^*+=-]{8,15}$");    // 따옴표 안에 있는 패턴 추출.
+        Pattern passwordPattern = Pattern.compile("^[0-9a-zA-Z]{6}$");    // 따옴표 안에 있는 패턴 추출.
         Matcher matcher2 = passwordPattern.matcher(password);
         if (!matcher2.matches()) {
             throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);

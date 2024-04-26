@@ -97,4 +97,11 @@ public class PartyController implements PartyDocs {
         return null;
     }
 
+    @Override
+    @PatchMapping("/block/{partyId}/{targetId")
+    public ResponseEntity<ResultResponse> memberBlock(@PathVariable(name = "partyId") Long partyId, @PathVariable(name = "targetId") Long targetId) {
+        partyService.memberBlock(partyId, targetId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_BLOCK_SUCCESS));
+    }
+
 }
