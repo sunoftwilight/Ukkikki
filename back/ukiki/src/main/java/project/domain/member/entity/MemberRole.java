@@ -1,5 +1,5 @@
 package project.domain.member.entity;
 
 public enum MemberRole {
-    MASTER, EDITOR, VIEWER;
+    MASTER, EDITOR, VIEWER, BLOCK;
 }
