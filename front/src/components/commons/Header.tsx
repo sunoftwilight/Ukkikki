@@ -5,6 +5,7 @@ import timeOut from "@/assets/header/timeOut.png"
 import alaram from "@/assets/header/alaram.png"
 import noAlaram from "@/assets/header/noAlaram.png"
 import hamburger from "@/assets/header/hamburger.png"
+import ModalBackground from "./modals/ModalBackground";
 
 const DefaultHeader: React.FC = () => {
   const isBack = false
