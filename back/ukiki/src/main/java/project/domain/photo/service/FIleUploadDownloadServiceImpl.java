@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.member.entity.Member;
+import project.domain.member.repository.MemberRepository;
 import project.domain.photo.dto.request.FileDownloadDto;
 import project.domain.photo.dto.request.FileUploadDto;
 import project.domain.photo.dto.request.MultiFileDownloadDto;
@@ -13,6 +15,7 @@ import project.domain.photo.entity.Meta;
 import project.domain.photo.entity.MetaCode;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.PhotoUrl;
+import project.domain.photo.entity.mediatable.DownloadLog;
 import project.domain.photo.repository.MetaRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.util.FileUtil;
@@ -31,14 +34,13 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
     private final AmazonS3 amazonS3;
     private final PhotoRepository photoRepository;
+    private final MemberRepository memberRepository;
+    private final MetaRepository metaRepository;
     // GptUtil
     private final GptUtil gptUtil;
-    private final MetaRepository metaRepository;
     private final S3Util s3Util;
     private final ImageUtil imageUtil;
     private final FileUtil fileUtil;
-
-
 
     public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto)
         throws Exception {
@@ -58,8 +60,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             urls.setThumb_url2(s3Util.bufferedImageUpload(imageUtil.resizeImage(file, 2), sseKey, file));
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
             + ", " + photo.getFileName());
-            // save photo(이부분 알아서 영속성 관리 되도록 변경해야됨)
-            photoRepository.save(photo);
+
             //GPT API
             for (Integer code : gptUtil.postChat(file)) {
                 // 받은 메타 코드 저장 Meta 테이블에 저장
@@ -70,16 +71,24 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                         .build()
                 );
             }
+            photoRepository.save(photo);
             //MongoDB 업데이트
         }
     }
 
     public S3Object fileDownload(FileDownloadDto fileDownloadDto) {
-        String fileName = photoRepository.findById(fileDownloadDto.getFileId()).get().getFileName();
+        Photo photo = photoRepository.findById(fileDownloadDto.getFileId()).get();
+        Member member = memberRepository.findById(1L).get();
+        String fileName = photo.getFileName();
         SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileDownloadDto.getKey()));
 
         GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
         S3Object object = amazonS3.getObject(getObjectRequest);
+
+        DownloadLog.customBuilder()
+                .photo(photo)
+                .member(member)
+                .build();
 
         return object;
     }
@@ -88,17 +97,25 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         List<S3Object> objects = new ArrayList<>();
         List<File> files = new ArrayList<>();
         List<Long> fileIds = multiFileDownloadDto.getFileIdList();
+        Member member = memberRepository.findById(1L).get();
         SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(multiFileDownloadDto.getKey()));
+
         String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
         File tempDir = new File(tempPath);  // 임시 디렉터리 경로
         log.info("tempDir : " + tempDir.getAbsolutePath());
         tempDir.mkdirs();
 
         for(long id : fileIds){
-            String fileName = photoRepository.findById(id).get().getFileName();
+            Photo photo = photoRepository.findById(id).get();
+            String fileName = photo.getFileName();
             GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
             S3Object object = amazonS3.getObject(getObjectRequest);
             objects.add(object);
+
+            DownloadLog.customBuilder()
+                    .photo(photo)
+                    .member(member)
+                    .build();
         }
 
         int i = 0;
