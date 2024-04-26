@@ -369,7 +369,17 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public void memberBlock(Long partyId, Long targetId) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, targetId, MemberRole.MASTER)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
+
+        MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 멤버 차단 시켜 버리기
+        targetParty.setMemberRole(MemberRole.BLOCK);
     }
 
 
