@@ -27,7 +27,6 @@ import project.domain.party.redis.PartyLink;
 import project.domain.party.repository.PartyLinkRedisRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
-import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
@@ -58,7 +57,7 @@ public class PartyServiceImpl implements PartyService {
     public PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo) {
         // TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 파티 이름 규칙 확인
         checkPartyName(createPartyDto.getPartyName());
@@ -110,7 +109,7 @@ public class PartyServiceImpl implements PartyService {
 
         // TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
@@ -169,7 +168,7 @@ public class PartyServiceImpl implements PartyService {
     public PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto) {
         // TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
@@ -191,7 +190,7 @@ public class PartyServiceImpl implements PartyService {
     public PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto) {
         // TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
 
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
@@ -210,7 +209,7 @@ public class PartyServiceImpl implements PartyService {
     public void changePassword(Long partyId, PartyPasswordDto partyPasswordDto) {
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
@@ -272,7 +271,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
@@ -295,7 +294,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
@@ -321,7 +320,7 @@ public class PartyServiceImpl implements PartyService {
     public void exitParty(Long partyId, String key) {
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         MemberParty memberParty = memberpartyRepository.findByMemberAndPartyId(member, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
