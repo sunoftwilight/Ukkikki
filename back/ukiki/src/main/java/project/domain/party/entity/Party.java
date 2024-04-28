@@ -49,6 +49,7 @@ public class Party extends BaseEntity {
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photoList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<MemberParty> memberPartyList = new ArrayList<>();
 }
