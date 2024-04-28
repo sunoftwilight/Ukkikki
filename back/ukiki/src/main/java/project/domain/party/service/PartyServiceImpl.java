@@ -174,12 +174,17 @@ public class PartyServiceImpl implements PartyService {
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
 
-        // 파티에 유저 뷰어 권한으로 넣어주기
-        MemberParty memberParty = MemberParty.customBuilder()
-            .party(partyLink.getParty())
-            .member(member)
-            .memberRole(MemberRole.VIEWER)
-            .build();
+        // 파티에 유저 찾고 없으면 새로 만들기
+        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, partyLink.getParty())
+            .orElseGet(() -> MemberParty.customBuilder()
+                .party(partyLink.getParty())
+                .member(member)
+                .memberRole(MemberRole.VIEWER)
+                .build());
+        // 차단 당한 유저라면?
+        if (memberParty.getMemberRole().equals(MemberRole.BLOCK)){
+            throw new BusinessLogicException(ErrorCode.ENTER_DENIED_BLOCK_USER);
+        }
 
         memberpartyRepository.save(memberParty);
 
@@ -373,13 +378,29 @@ public class PartyServiceImpl implements PartyService {
         memberRepository.findById(1L)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, targetId, MemberRole.MASTER)
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
 
         MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 멤버 차단 시켜 버리기
         targetParty.setMemberRole(MemberRole.BLOCK);
+    }
+
+    @Override
+    public void kickMember(Long partyId, Long targetId) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 마스터 권한 확인
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
+        // 상대방 찾기
+        MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 상대방 삭제
+        memberpartyRepository.delete(targetParty);
+        
     }
 
 

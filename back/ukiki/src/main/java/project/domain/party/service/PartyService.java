@@ -32,4 +32,6 @@ public interface PartyService {
     void exitParty(Long partyId, String key);
 
     void memberBlock(Long partyId, Long targetId);
+
+    void kickMember(Long partyId, Long targetId);
 }
