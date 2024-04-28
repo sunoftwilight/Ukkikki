@@ -1,10 +1,10 @@
 import React from "react";
-import logo from "@/assets/header/headerLogo.png"
-import back from "@/assets/header/back.png"
-import timeOut from "@/assets/header/timeOut.png"
-import alarm from "@/assets/header/alarm.png"
-import noAlarm from "@/assets/header/noAlarm.png"
-import hamburger from "@/assets/header/hamburger.png"
+import logo from "@/assets/Header/headerLogo.png"
+import back from "@/assets/Header/back.png"
+import timeOut from "@/assets/Header/timeOut.png"
+import alarm from "@/assets/Header/alarm.png"
+import noAlarm from "@/assets/Header/noAlarm.png"
+import hamburger from "@/assets/Header/hamburger.png"
 import headerStore from "../../stores/headerStore";
 
 const DefaultHeader: React.FC = () => {

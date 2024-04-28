@@ -1,5 +1,5 @@
 import React from "react";
-import close from '@/assets/hamburger/close.png'
+import close from '@/assets/Hamburger/close.png'
 import ModalBackground from "./ModalBackground";
 import headerStore from "../../stores/headerStore";
 

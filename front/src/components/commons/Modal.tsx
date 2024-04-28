@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ModalProps } from "../../types/Modal";
-import warn from "@/assets/modal/warn.png";
-import done from "@/assets/modal/done.png";
+import warn from "@/assets/Modal/warn.png";
+import done from "@/assets/Modal/done.png";
 import ModalBackground from "./ModalBackground";
 
 const OneBtnModal: React.FC<ModalProps> = ({ modalItems }) => {
