@@ -2,14 +2,18 @@ import React from "react";
 import logo from "@/assets/header/headerLogo.png"
 import back from "@/assets/header/back.png"
 import timeOut from "@/assets/header/timeOut.png"
-import alaram from "@/assets/header/alaram.png"
-import noAlaram from "@/assets/header/noAlaram.png"
+import alarm from "@/assets/header/alarm.png"
+import noAlarm from "@/assets/header/noAlarm.png"
 import hamburger from "@/assets/header/hamburger.png"
+import headerStore from "../../stores/headerStore";
 
 const DefaultHeader: React.FC = () => {
   const isBack = false
   const isGuest = false
   const isAlaram = false
+
+  const { setAlarmOpen } = headerStore()
+  const { setMenuOpen } = headerStore()
 
   return (
     <div className="fixed flex justify-between items-center px-4 w-full h-14 bg-white">
@@ -24,11 +28,11 @@ const DefaultHeader: React.FC = () => {
             <div className="font-pre-R text-black">13 : 28</div>
           </div>
           : isAlaram ?
-            <img src={alaram} />
-            : <img src={noAlaram} />
+            <img src={alarm} onClick={() => setAlarmOpen()} />
+            : <img src={noAlarm} onClick={() => setAlarmOpen()} />
         }
 
-        <img src={hamburger} />
+        <img src={hamburger} onClick={() => setMenuOpen()} />
       </div>
     </div>
   )
