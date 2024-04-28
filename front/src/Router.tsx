@@ -3,6 +3,7 @@ import MainLayout from './MainLayout'
 import Main from './pages/Main';
 import Login from './pages/Login';
 import Camera from './pages/Camera';
+import GroupMain from './pages/GroupMain';
 
 export default function Router() {
   return (
@@ -10,6 +11,7 @@ export default function Router() {
       {/* 헤더 & 네브를 넣을 페이지 */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Main />} />
+        <Route path="/group" element={<GroupMain />} />
       </Route>
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}
