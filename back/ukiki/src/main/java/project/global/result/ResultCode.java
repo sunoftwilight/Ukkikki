@@ -21,6 +21,9 @@ public enum ResultCode {
     CHANGE_PARTY_NAME_SUCCESS(200, "파티 이름 변경에 성공하였습니다."),
     GRANT_TARGET_SUCCESS(200, "권한 부여에 성공하였습니다."),
 
+    //File
+    FILE_UPLOAD_SUCCESS(200, "파일이 정상적으로 업로드 되었습니다."),
+    FILE_DOWNLOAD_SUCCESS(200, "파일이 정상적으로 다운로드 되었습니다.")
     ;
 
     private final int status;

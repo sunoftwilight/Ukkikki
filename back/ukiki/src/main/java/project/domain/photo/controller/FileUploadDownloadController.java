@@ -22,6 +22,8 @@ import project.domain.photo.dto.request.FileDownloadDto;
 import project.domain.photo.dto.request.FileUploadDto;
 import project.domain.photo.dto.request.MultiFileDownloadDto;
 import project.domain.photo.service.FileUploadDownloadService;
+import project.global.result.ResultCode;
+import project.global.result.ResultResponse;
 
 import java.io.*;
 import java.util.HashMap;
@@ -37,10 +39,10 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     private final FileUploadDownloadService fileUploadDownloadService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> fileUpload(@RequestPart("files") List<MultipartFile> files,
-                                        @RequestPart("key") @Valid FileUploadDto fileUploadDto) throws Exception {
+    public ResponseEntity<ResultResponse> fileUpload(@RequestPart("files") List<MultipartFile> files,
+                                                     @RequestPart("key") @Valid FileUploadDto fileUploadDto) throws Exception {
         fileUploadDownloadService.uploadProcess(files, fileUploadDto);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
     }
 
     @GetMapping("/download")
