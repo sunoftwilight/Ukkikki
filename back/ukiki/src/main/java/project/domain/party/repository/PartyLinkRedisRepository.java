@@ -11,7 +11,7 @@ import java.util.Optional;
 @EnableRedisRepositories
 public interface PartyLinkRedisRepository extends CrudRepository<PartyLink, String> {
 
-    Optional<PartyLink> findByParty(Party party);
+    Optional<PartyLink> findByParty(Long party);
 
-
+    Optional<PartyLink> findByPartyLink(String link);
 }

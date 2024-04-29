@@ -3,12 +3,14 @@ package project.domain.party.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import project.domain.member.entity.MemberRole;
+import project.domain.party.dto.request.ChangeThumbDto;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequestMapping("/party")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class PartyController implements PartyDocs {
 
     private final PartyService partyService;
@@ -43,17 +46,19 @@ public class PartyController implements PartyDocs {
         PartyLinkDto response = partyService.createLink(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_PARTY_LINK_SUCCESS, response));
     }
-    
+
     @Override
     @GetMapping("/enter/{partyLink}")  //파티 링크 유효 여부를 확인
     public ResponseEntity<ResultResponse> enterParty(@PathVariable(name = "partyLink") String partyLink) {
         partyService.enterParty(partyLink);
         return ResponseEntity.ok(new ResultResponse(ResultCode.PARTY_LINK_VALID));
     }
-    
+
     @Override
     @PostMapping("/check/password")  // 그룹 비밀번호를 대조 확인
     public ResponseEntity<ResultResponse> checkPartyKey(@RequestBody EnterPartyDto enterPartyDto) {
+        log.info("HELLO WORLD:? ");
+        log.info(enterPartyDto.getLink());
         partyService.checkPassword(enterPartyDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.PASSWORD_CORRECT));
     }
@@ -95,7 +100,7 @@ public class PartyController implements PartyDocs {
 
     @Override
     @DeleteMapping("/exit/{partyId}")
-    public ResponseEntity<ResultResponse> exitParty(@PathVariable Long partyId, @RequestParam(name = "key")String key){
+    public ResponseEntity<ResultResponse> exitParty(@PathVariable Long partyId, @RequestParam(name = "key") String key) {
         partyService.exitParty(partyId, key);
         return null;
     }
@@ -122,9 +127,19 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
-    public ResponseEntity<ResultResponse> getUserList(Long partyId) {
+    @GetMapping("/user-list/{partyId}")
+    public ResponseEntity<ResultResponse> getUserList(@PathVariable(name = "partyId") Long partyId) {
         List<SimpleMemberPartyDto> response = partyService.getUserList(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERLIST_SUCCESS, response));
+    }
+
+    @Override
+    @PatchMapping(value = "/change/thumb/{partyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResultResponse> changePartyThumb(@PathVariable(name = "partyId") Long partyId,
+                                                           @RequestPart @Valid ChangeThumbDto changeThumbDto,
+                                                           @RequestPart MultipartFile photo) {
+        partyService.changePartyThumb(partyId, changeThumbDto, photo);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_THUMB_SUCCESS));
     }
 
 }

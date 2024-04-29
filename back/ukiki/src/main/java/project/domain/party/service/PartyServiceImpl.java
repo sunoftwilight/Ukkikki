@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.SSECustomerKey;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +13,7 @@ import project.domain.article.redis.Alarm;
 import project.domain.article.redis.AlarmType;
 import project.domain.article.repository.AlarmRedisRepository;
 import project.domain.member.entity.Member;
+import project.domain.party.dto.request.ChangeThumbDto;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
@@ -38,8 +40,10 @@ import project.global.util.BcryptUtil;
 import project.global.util.S3Util;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -56,6 +60,7 @@ public class PartyServiceImpl implements PartyService {
     private final MemberPartyMapper memberPartyMapper;
     private final S3Util s3Util;
     private final BcryptUtil bcryptUtil;
+    private final RedisTemplate redisTemplate;
 
     @Override
     @Transactional
@@ -94,9 +99,9 @@ public class PartyServiceImpl implements PartyService {
 
 //        //TODO Redis에 링크 저장
         String link = makeLink(); // 고유한 link가 나오도록 반복
-//        while (partyLinkRedisRepository.findById(link).isPresent()){
-//            link = makeLink();
-//        }
+        while (partyLinkRedisRepository.findById(link).isPresent()){
+            link = makeLink();
+        }
 
         PartyLink partyLink = PartyLink.builder()
             .partyLink(link)
@@ -123,8 +128,14 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
 
         // 기존 경로는 삭제
-        Optional<PartyLink> existLink = partyLinkRedisRepository.findByParty(party);
-        existLink.ifPresent(partyLinkRedisRepository::delete);
+        Optional<PartyLink> existLink = partyLinkRedisRepository.findByParty(party.getId());
+        log.info("TEST1");
+        existLink.ifPresent(link ->
+        {
+            log.info(link.getCount() + " ");
+            partyLinkRedisRepository.delete(link);
+        });
+        log.info("TEST2");
 
         String link = makeLink(); // 고유한 link가 나오도록 반복
         while (partyLinkRedisRepository.findById(link).isPresent()){
@@ -152,11 +163,13 @@ public class PartyServiceImpl implements PartyService {
     @Override
     @Transactional
     public void checkPassword(EnterPartyDto enterPartyDto) {
-        PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
+        PartyLink partyLink = partyLinkRedisRepository.findByPartyLink(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
+        log.info("TEST LINK SUCESS");
         // 파티확인
         Party party = partyRepository.findById(partyLink.getParty())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+        log.info("TEST PARTY SUCESS");
         // 비밀번호 비교
         if (!bcryptUtil.matchesBcrypt(enterPartyDto.getPassword(), party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거
@@ -441,6 +454,73 @@ public class PartyServiceImpl implements PartyService {
         List<SimpleMemberPartyDto> res = memberPartyMapper.toSimplePartyMemberDtoList(memberPartyList);
 
         return res;
+    }
+
+    @Override
+    public void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 마스터 권한 확인
+        MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
+        // 암호 확인
+        if (!bcryptUtil.matchesBcrypt(changeThumbDto.getKey(), memberParty.getParty().getPassword())){
+            throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
+        }
+
+        // 썸네일 변경
+        String thumbUrl = memberParty.getParty().getThumbnail();
+        String generatedKey = s3Util.generateSSEKey(changeThumbDto.getKey());
+        SSECustomerKey sseKey = new SSECustomerKey(generatedKey);
+        s3Util.fileDelete(sseKey, thumbUrl.substring(
+            thumbUrl.lastIndexOf("/"),
+            thumbUrl.lastIndexOf(".") - 1));
+        String newThumbUrl = s3Util.fileUpload(photo, sseKey);
+
+        memberParty.getParty().setThumbnail(newThumbUrl);
+
+    }
+
+    @Override
+    public void linkDelete() {
+        String linkPattern = "partyLink:*:idx";
+        String idPattern = "partyLink:party:*";
+
+        // 패턴으로 해당 set KEY값 추출 -> Map으로 바꿔준다.
+        Set<String> linkkeys = redisTemplate.keys(linkPattern);
+        Map<String, String> linkKeyMap = linkkeys.stream()
+            .collect(Collectors.toMap(
+                key -> key.split(":")[1], // splitValue
+                Function.identity() // key
+            ));
+
+        Set<String> idKeys = redisTemplate.keys(idPattern);
+        Map<Long, String> idMap = idKeys.stream()
+            .collect(Collectors.toMap(
+                key -> Long.parseLong(key.split(":")[2]),
+                Function.identity()
+            ));
+        List<String> linkList = new ArrayList<>(linkKeyMap.keySet());
+        List<Long> idList = new ArrayList<>(idMap.keySet());
+        // 해당 key를 돌면서 hash 값이 없다면 삭제 -> ttl로 자동제거가 안됨
+        for (int i=0; i< linkList.size();i++) {
+
+            Optional<PartyLink> partyLink = partyLinkRedisRepository.findByPartyLink(linkList.get(i));
+            if(!partyLink.isPresent()){
+                try {
+                    redisTemplate.delete(linkKeyMap.get(linkList.get(i)));
+                    redisTemplate.opsForSet().remove("partyLink", linkList.get(i));
+                }catch (Exception ignore){}
+            }
+            Optional<PartyLink> partyId = partyLinkRedisRepository.findByParty(idList.get(i));
+            if(!partyId.isPresent()){
+                try {
+                    redisTemplate.delete(idMap.get(idList.get(i)));
+
+                }catch (Exception ignore){}
+            }
+        }
     }
 
 

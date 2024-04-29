@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Profile;
     info = @Info(title = "ukiki API", version = "v1", description = "SSAFY 자율 프로젝트"),
 //    security = @SecurityRequirement(name = "Authorization"),
     servers = {
-        @Server(url="http://localhost:8081/api", description = "Local Swagger")
+        @Server(url="http://localhost:5000/api", description = "Local Swagger")
     }
 )
 //@SecurityScheme(name = "Authorization",
