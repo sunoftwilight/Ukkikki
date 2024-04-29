@@ -22,7 +22,16 @@ public enum ResultCode {
     GRANT_TARGET_SUCCESS(200, "권한 부여에 성공하였습니다."),
     MEMBER_BLOCK_SUCCESS(200, "멤버 차단에 성공하였습니다."),
     MEMBER_KICK_SUCCESS(200, "멤버 추방에 성공하였습니다."),
-    GET_BLOCK_USER_LIST_SUCCESS(200, "차단유저리스트 검색에 성공하였습니다.")
+    GET_BLOCK_USER_LIST_SUCCESS(200, "차단유저리스트 검색에 성공하였습니다."),
+
+    // Directory
+    GET_DIRECTORY_SUCCESS(200, "폴더 조회에 성공하였습니다."),
+    CREATE_DIRECTORY_SUCCESS(201, "폴더 생성에 성공하였습니다."),
+    MOVE_DIRECTORY_SUCCESS(200, "폴더 이동에 성공하였습니다."),
+    RENAME_DIRECTORY_SUCCESS(200, "폴더 이름 수정에 성공하였습니다."),
+    DELETE_DIRECTORY_SUCCESS(204, "폴더 삭제에 성공하였습니다."),
+    RESTORED_DIRECTORY_SUCCESS(201, "폴더 복원에 성공하였습니다."),
+
     ;
 
     private final int status;
