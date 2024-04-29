@@ -1,10 +1,10 @@
 import React from "react";
-import logo from "@/assets/header/headerLogo.png"
-import back from "@/assets/header/back.png"
-import timeOut from "@/assets/header/timeOut.png"
-import alaram from "@/assets/header/alaram.png"
-import noAlaram from "@/assets/header/noAlaram.png"
-import hamburger from "@/assets/header/hamburger.png"
+import logo from "@/assets/Header/headerLogo.png"
+import back from "@/assets/Header/back.png"
+import timeOut from "@/assets/Header/timeOut.png"
+import alaram from "@/assets/Header/alaram.png"
+import noAlaram from "@/assets/Header/noAlaram.png"
+import hamburger from "@/assets/Header/hamburger.png"
 
 const DefaultHeader: React.FC = () => {
   const isBack = false
