@@ -11,7 +11,7 @@ function App() {
       <div className="w-screen h-screen">
         <Header />
 
-        <div className="fixed top-14 w-full h-full overflow-scroll scrollbar-hide">
+        <div className="fixed top-14 w-full h-[calc(100%-56px)] overflow-scroll scrollbar-hide">
           <Outlet />
           <Hamburger />
           <InviteModal />

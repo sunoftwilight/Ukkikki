@@ -9,7 +9,7 @@ const GroupMenu: React.FC = () => {
   return (
     <div className="flex flex-col gap-[10px]">
       <Link to='/album' className={btnStyle}>앨범</Link>
-      <div className={btnStyle}>피드</div>
+      <Link to='/feed' className={btnStyle}>피드</Link>
       <div className={btnStyle}>채팅</div>
       <div className={btnStyle} onClick={() => setInviteOpen()}>초대</div>
     </div>

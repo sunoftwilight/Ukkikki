@@ -18,7 +18,7 @@ const DefaultHeader: React.FC = () => {
   }
 
   const basicPath = ['/', '/group', '/mypage',]
-  const backPath = ['/grouplist', '/setting',]
+  const backPath = ['/grouplist', '/setting', '/feed',]
   const albumPath = ['/album', ]
 
   const isGuest = false

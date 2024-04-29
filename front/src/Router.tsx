@@ -8,6 +8,7 @@ import MyPage from './pages/MyPage';
 import Setting from './pages/Setting';
 import GroupList from './pages/GroupList';
 import Album from './pages/Album';
+import Feed from './pages/Feed';
 
 export default function Router() {
   return (
@@ -20,6 +21,7 @@ export default function Router() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/album" element={<Album />} />
+        <Route path="/feed" element={<Feed />} />
       </Route>
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}
