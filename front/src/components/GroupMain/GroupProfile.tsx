@@ -1,6 +1,7 @@
 import React from "react";
 import edit from "@/assets/GroupMain/edit.png"
 import etc from "@/assets/GroupMain/etc.png"
+import { memberStore } from "../../stores/ModalStore";
 
 const groupInfo = {
   img: 'https://pbs.twimg.com/profile_images/1044938826727055361/_2tCfp7B_400x400.jpg',
@@ -16,20 +17,33 @@ const groupInfo = {
 }
 
 const GroupProfile: React.FC = () => { 
+  const { setMemberOpen } = memberStore()
+
+  const memberThumb = () => {
+    const memberThumbs = []
+
+    for (let i = 0; i < 5; i++) {
+      memberThumbs.push(
+        <img key={i} src={groupInfo.member[i].profile} className="rounded-full object-cover w-8 h-8 border-white border-2 -mr-2" />
+    )}
+
+    return memberThumbs
+  }
+
   return (
     <div className="flex flex-col justify-center items-center gap-4">
       <div className="w-[90px] h-[90px] rounded-full border-disabled-gray border-[1px] flex justify-center items-center">
         <img src={groupInfo.img} className="w-[84px] h-[84px] rounded-full" />
       </div>
+
       <div className="flex items-center gap-4">
         <div className="text-black text-xl font-gtr-B">{groupInfo.name}</div>
         <img src={edit} className="w-3 h-3" />
       </div>
-      <div className="flex">
-        { groupInfo.member.map((item, idx) => (
-          <img key={idx} src={item.profile} className="rounded-full object-cover w-7 h-7 border-white border-2" />
-        ))}
-        <div className="w-7 h-7 rounded-full bg-gray flex justify-center items-center border-white border-2">
+
+      <div className="flex" onClick={() => setMemberOpen()}>
+        { memberThumb() }
+        <div className="w-8 h-8 rounded-full bg-gray flex justify-center items-center border-white border-2">
           <img src={etc} className="w-[13px]" />
         </div>
       </div>

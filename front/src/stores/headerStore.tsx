@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import headerType from '../types/storeTypes/HeaderType';
+import { headerType } from '../types/StoreType';
 
 const headerStore = create(
   persist<headerType>((set) => ({

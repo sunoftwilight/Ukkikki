@@ -2,8 +2,7 @@ import React from "react";
 import close from '@/assets/Hamburger/close.png'
 import ModalBackground from "./ModalBackground";
 import headerStore from "../../stores/headerStore";
-
-const menuDummy = ['카메라', '마이 앨범', '참여 중인 그룹', '설정']
+import { Link } from "react-router-dom";
 
 const alarmDummy = [
   {
@@ -33,6 +32,13 @@ const alarmDummy = [
 ]
 
 const Hamburger: React.FC = () => {
+  const menuList = [
+    { name: '카메라', router: '/camera'},
+    { name: '마이 앨범', router: '/mypage'},
+    { name: '참여 중인 그룹', router: '/grouplist'},
+    { name: '설정', router: '/setting'}
+  ]
+
   const { alarmOpen, setAlarmOpen } = headerStore()
   const { menuOpen, setMenuOpen } = headerStore()
 
@@ -48,7 +54,7 @@ const Hamburger: React.FC = () => {
     <>
     { (alarmOpen || menuOpen) && 
       <div className="fixed top-0 start-0 h-screen w-screen flex justify-end">
-        <ModalBackground />
+          <ModalBackground />
         <div className="h-full w-72 z-20 bg-white p-4 flex flex-col gap-y-7">
           {/* 햄버거 제목 & 닫기 버튼 */}
           <div className="flex justify-between items-center">
@@ -61,10 +67,15 @@ const Hamburger: React.FC = () => {
           {/* 메뉴바 */}
             { menuOpen &&
               <div>
-                {menuDummy.map((menuItem, idx) => (
-                  <div key={idx} className="w-full h-12 flex items-center px-1">
-                    {menuItem}
-                  </div>
+                {menuList.map((menuItem, idx) => (
+                  <Link 
+                    onClick={() => closeHandler()}
+                    to={menuItem.router} 
+                    key={idx} 
+                    className="w-full h-12 flex items-center px-1"
+                  >
+                    {menuItem.name}
+                  </Link>
                 ))}
               </div>
             }

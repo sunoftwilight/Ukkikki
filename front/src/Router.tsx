@@ -4,6 +4,9 @@ import Main from './pages/Main';
 import Login from './pages/Login';
 import Camera from './pages/Camera';
 import GroupMain from './pages/GroupMain';
+import MyPage from './pages/MyPage';
+import Setting from './pages/Setting';
+import GroupList from './pages/GroupList';
 
 export default function Router() {
   return (
@@ -12,6 +15,9 @@ export default function Router() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Main />} />
         <Route path="/group" element={<GroupMain />} />
+        <Route path="/grouplist" element={<GroupList />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/setting" element={<Setting />} />
       </Route>
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}

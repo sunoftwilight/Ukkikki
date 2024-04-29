@@ -6,6 +6,7 @@ import alarm from "@/assets/Header/alarm.png"
 import noAlarm from "@/assets/Header/noAlarm.png"
 import hamburger from "@/assets/Header/hamburger.png"
 import headerStore from "../../stores/headerStore";
+import { Link } from "react-router-dom";
 
 const DefaultHeader: React.FC = () => {
   const isBack = false
@@ -19,7 +20,10 @@ const DefaultHeader: React.FC = () => {
     <div className="fixed flex justify-between items-center px-4 w-full h-14 bg-white">
       { isBack ?
         <img src={back} />
-        : <img src={logo} />
+        : 
+        <Link to={'/'}>
+          <img src={logo} />
+        </Link>
       }
       <div className="flex gap-6">
         { isGuest ?
