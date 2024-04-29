@@ -7,7 +7,7 @@ import selectedTimerNone from "@/assets/Camera/selectedTimer.png";
 import selectedTimer3s from "@/assets/Camera/selectedTimer3s.png";
 import selectedTimer5s from "@/assets/Camera/selectedTimer5s.png";
 import selectedTimer10s from "@/assets/Camera/selectedTimer10s.png";
-import changeCamera from "@/assets/Camera/changeCamera.png";
+import changeView from "@/assets/Camera/changeCamera.png";
 
 import photo from "@/assets/Camera/photo.png";
 import video from "@/assets/Camera/video.png"
@@ -18,14 +18,31 @@ const Cam: React.FC = () => {
   const [openTimerList, setOpenTimerList] = useState<boolean>(false);
   const [openScaleList, setOpenScaleList] = useState<boolean>(false);
   const [openOptList, setOpenOptList] = useState<boolean>(true);
-  const [selectedQual, setSelectedQual] = useState<boolean>(true);
+  const [selectedQual, setSelectedQual] = useState<string>('12M');
   const [selectedPV, setSelectedPV] = useState<boolean>(true);
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
   const [cameras, setCameras] = useState<string[]>([]);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
 
-  const [selectedRatio, setSelectedRatio] = useState<{ width: number, height: number }>({ width: 3, height: 4 }); // 기본 비율은 3:4로 설정
-  
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
+  const qualities: Record<string, Record<string, {width:number, height:number}>> = {
+    '12M': {
+      '3:4': { width: 4000, height: 3000 },
+      '9:16': { width: 4000, height: 2252 },
+      '1:1': { width: 2992, height: 2992 },
+      'full': { width: 4000, height: 1848 }
+    },
+    '50M': {
+      '3:4': { width: 8160, height: 6120 },
+      '9:16': { width: 8160, height: 4592 },
+      '1:1': { width: 6112, height: 6112 },
+      'full': { width: 8160, height: 3768 }
+    }
+  }
+
   const changeTimer = (type : string) => {
     if (type === 'None') setSelectedTimer(timerNone);
     else if (type === '3sec') setSelectedTimer(timer3s);
@@ -44,15 +61,24 @@ const Cam: React.FC = () => {
   }
 
   const changeQual = () => {
-    setSelectedQual(!selectedQual)
+    if (selectedQual === '12M') setSelectedQual('50M');
+    else setSelectedQual('12M');
+    
   }
 
   const changePV = () => {
     setSelectedPV(!selectedPV)
   }
 
+  const changeCamera = () => {
+    if (selectedCamera === cameras[0]) {
+      setSelectedCamera(cameras[3]);
+    } else {
+      setSelectedCamera(cameras[0]);
+    }
+  }
+
   const openList = (type:string) => {
-    console.log(type)
     if (type === 'timer') {
       setOpenOptList(false);
       setOpenTimerList(true);
@@ -66,54 +92,6 @@ const Cam: React.FC = () => {
     console.log(videoRef.current)
   }
 
-
-
-  // async function switchCamera(deviceId: string) {
-  //   setSelectedCamera(deviceId);
-  //   try {
-  //     const stream = await navigator.mediaDevices.getUserMedia({
-  //       video: { deviceId: { exact: deviceId } }
-  //     });
-  //     if (videoRef.current) {
-  //       videoRef.current.srcObject = stream;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error switching camera:', error);
-  //   }
-  // }
-
-  // const startCamera = async () => {
-  //   try {
-  //     if (cameras.length > 0) {
-  //       // Start with the first camera found
-  //       console.log(3)
-  //       await switchCamera(cameras[0]);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error accessing camera:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const fetchCameras = async () => {
-  //     try {
-  //       const devices = await navigator.mediaDevices.enumerateDevices();
-  //       const videoDevices = devices.filter(device => device.kind === 'videoinput');
-  //       setCameras(videoDevices.map(device => device.deviceId));
-  //     } catch (error) {
-  //       console.error('Error fetching cameras:', error);
-  //     }
-  //   };
-
-  //   fetchCameras();
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log(1)
-  //   startCamera(); // 컴포넌트가 마운트되었을 때 자동으로 카메라 열기
-  //   console.log(2)
-  // }, []);
-
   const fetchCameras = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -125,16 +103,21 @@ const Cam: React.FC = () => {
     }
   }
 
-  async function switchCamera(deviceId: string) {
+  async function switchCamera(deviceId: string, qual: string, scale: string) {
     setSelectedCamera(deviceId);
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const width = qualities[qual][scale].width;
+      const height = qualities[qual][scale].height;
+
+      const constaints: MediaStreamConstraints = {
         video: {
-          deviceId: { exact: deviceId },
-          width: { ideal: 3000 },
-          height: { ideal: 4000 }
+          deviceId: {exact: deviceId},
+          width: width,
+          height: height
         }
-      });
+      }
+      const stream = await navigator.mediaDevices.getUserMedia(constaints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
@@ -148,10 +131,12 @@ const Cam: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    console.log(cameras)
-    switchCamera(cameras[0]);
+    switchCamera(cameras[2], selectedQual, selectedScale);
   }, [cameras])
 
+  useEffect(() => {
+    if(selectedCamera && selectedQual && selectedScale) switchCamera(selectedCamera, selectedQual, selectedScale);
+  }, [selectedCamera, selectedQual, selectedScale])
 
 
 
@@ -167,7 +152,7 @@ const Cam: React.FC = () => {
               <p onClick={() => openList('scale')}>{selectedScale}</p>
             </div>
             <div className='w-6 h-6 font-pre-B text-white' >
-              {selectedQual ? <p onClick={changeQual}>12M</p> : <p onClick={changeQual}>50M</p>}
+              <p onClick={changeQual}>{selectedQual}</p>
             </div>
           </div>
         )}
@@ -191,20 +176,20 @@ const Cam: React.FC = () => {
         )}
       </div>
 
-  
-      <div className='min-w-full max-w-full'>
-        <video ref={videoRef} autoPlay muted style={{ width: '100%', maxWidth: '600px' }} />
+      <div className=''>
+        <video ref={videoRef} autoPlay muted style={{ width: '100%' }} />
       </div>
 
-      <div className='min-h-40 max-h-40 min-w-full max-w-full fixed bottom-0 flex justify-evenly items-center'>
+      <div className='min-h-40 max-h-40 min-w-full max-w-full fixed bottom-0 flex justify-evenly items-center bg-black/50'>
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
-        <img src={selectedPV ? photo : video} className='object-cover w-6 h-6' onClick={changePV}/>
+          <img src={!selectedPV ? photo : video} className='object-cover w-6 h-6' onClick={changePV}/>
         </div>
-        <div className='w-20 h-20 bg-white rounded-full' onClick={testLogic}>
-          
+        <div className='w-20 h-20 bg-white rounded-full flex items-center justify-center' onClick={testLogic}>
+          <div className={!selectedPV ? 'w-12 h-12 bg-red rounded-full' : ''}>
+          </div>
         </div>
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
-          <img src={changeCamera} className='object-cover w-6 h-6'/>
+          <img src={changeView} className='object-cover w-6 h-6' onClick={changeCamera}/>
         </div>
       </div>
     </div>
