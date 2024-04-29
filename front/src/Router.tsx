@@ -7,6 +7,7 @@ import GroupMain from './pages/GroupMain';
 import MyPage from './pages/MyPage';
 import Setting from './pages/Setting';
 import GroupList from './pages/GroupList';
+import Album from './pages/Album';
 
 export default function Router() {
   return (
@@ -18,6 +19,7 @@ export default function Router() {
         <Route path="/grouplist" element={<GroupList />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
+        <Route path="/album" element={<Album />} />
       </Route>
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}
