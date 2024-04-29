@@ -63,7 +63,7 @@ const FeedMain: React.FC = () => {
   return (
     <div className="flex flex-col w-full h-full overflow-scroll scrollbar-hide">
       { articleList.map((item, idx) => (        
-        <div className="px-4 py-2 flex flex-col gap-2">
+        <div key={idx} className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex gap-3 items-center">
             <img src={item.writerImg} className="rounded-full w-12 h-12 object-cover" />
             <div className="flex flex-col gap-1">
