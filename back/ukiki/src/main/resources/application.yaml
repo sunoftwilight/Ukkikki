@@ -21,7 +21,9 @@ spring:
       max-request-size : -1
   data:
     redis:
-      host: ENC(98Nib9DtJwOEJvIP3CBIysw0X14E/CRGk61zNwVjTrE=)
+      host: ENC(bpvQWREaT+PKGlhOg/jv8cYQcmwENp5zvN+2MUe47mM=)
+      port: ENC(Khu6v//bNi7/6cl0mr519g==)
+      username:
       password: ENC(Q9ZQLmy0sa/53pyJLsNJrfJpWKwDHll7)
 
 springdoc:

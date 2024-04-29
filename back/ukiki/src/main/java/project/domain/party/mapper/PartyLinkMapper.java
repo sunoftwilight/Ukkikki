@@ -13,7 +13,7 @@ import project.domain.party.redis.PartyLink;
 public interface PartyLinkMapper {
 
     //PartyLink -> party -> id 를 뽑아서 partyEnterDto -> partyId 에 대입
-    @Mapping(source = "party.id", target = "partyId")
+    @Mapping(source = "party", target = "partyId")
     PartyEnterDto toPartyEnterDto(PartyLink partyLink);
 
     PartyLinkDto toPartyLinkDto(PartyLink partyLink);

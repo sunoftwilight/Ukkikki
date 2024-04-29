@@ -8,6 +8,9 @@ import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
+import project.domain.party.dto.response.SimpleMemberPartyDto;
+
+import java.util.List;
 
 public interface PartyService {
 
@@ -34,4 +37,7 @@ public interface PartyService {
     void memberBlock(Long partyId, Long targetId);
 
     void kickMember(Long partyId, Long targetId);
+
+    List<SimpleMemberPartyDto> getBlockUserList(Long partyId);
+    List<SimpleMemberPartyDto> getUserList(Long partyId);
 }

@@ -2,6 +2,7 @@ package project.domain.party.service;
 
 
 import com.amazonaws.services.s3.model.SSECustomerKey;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,14 @@ import project.domain.member.entity.Member;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
+import project.domain.party.dto.response.SimpleMemberPartyDto;
 import project.domain.party.entity.MemberParty;
 import project.domain.member.entity.MemberRole;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.response.PartyLinkDto;
 import project.domain.party.entity.Party;
+import project.domain.party.mapper.MemberPartyMapper;
 import project.domain.party.mapper.PartyLinkMapper;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.redis.PartyLink;
@@ -50,6 +53,7 @@ public class PartyServiceImpl implements PartyService {
     private final AlarmRedisRepository alarmRedisRepository;
     private final PhotoRepository photoRepository;
     private final PartyLinkMapper partyLinkMapper;
+    private final MemberPartyMapper memberPartyMapper;
     private final S3Util s3Util;
     private final BcryptUtil bcryptUtil;
 
@@ -73,7 +77,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 이미지 저장 해야함
 
-        if (!photo.isEmpty()){
+        if (photo != null){
             String partyThumbnailImg = s3Util.fileUpload(photo,
                 new SSECustomerKey(s3Util.generateSSEKey(createPartyDto.getPassword())));
             party.setThumbnail(partyThumbnailImg);
@@ -90,17 +94,17 @@ public class PartyServiceImpl implements PartyService {
 
 //        //TODO Redis에 링크 저장
         String link = makeLink(); // 고유한 link가 나오도록 반복
-        while (partyLinkRedisRepository.findById(link).isPresent()){
-            link = makeLink();
-        }
+//        while (partyLinkRedisRepository.findById(link).isPresent()){
+//            link = makeLink();
+//        }
 
         PartyLink partyLink = PartyLink.builder()
             .partyLink(link)
-            .party(party)
+            .party(party.getId())
             .build();
 
         partyLinkRedisRepository.save(partyLink);
-
+        log.info("TEST HERE??");
         return partyLinkMapper.toPartyLinkDto(partyLink);
     }
 
@@ -129,7 +133,7 @@ public class PartyServiceImpl implements PartyService {
 
         PartyLink partyLink = PartyLink.builder()
             .partyLink(link)
-            .party(party)
+            .party(party.getId())
             .build();
 
         partyLinkRedisRepository.save(partyLink);
@@ -150,9 +154,11 @@ public class PartyServiceImpl implements PartyService {
     public void checkPassword(EnterPartyDto enterPartyDto) {
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
-
+        // 파티확인
+        Party party = partyRepository.findById(partyLink.getParty())
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         // 비밀번호 비교
-        if (!bcryptUtil.matchesBcrypt(enterPartyDto.getPassword(), partyLink.getParty().getPassword())) {
+        if (!bcryptUtil.matchesBcrypt(enterPartyDto.getPassword(), party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거
                 partyLinkRedisRepository.delete(partyLink);
                 throw new BusinessLogicException(ErrorCode.INPUT_NUMBER_EXCEED);
@@ -173,11 +179,13 @@ public class PartyServiceImpl implements PartyService {
 
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
-
+// 파티확인
+        Party party = partyRepository.findById(partyLink.getParty())
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         // 파티에 유저 찾고 없으면 새로 만들기
-        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, partyLink.getParty())
+        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
             .orElseGet(() -> MemberParty.customBuilder()
-                .party(partyLink.getParty())
+                .party(party)
                 .member(member)
                 .memberRole(MemberRole.VIEWER)
                 .build());
@@ -401,6 +409,38 @@ public class PartyServiceImpl implements PartyService {
         // 상대방 삭제
         memberpartyRepository.delete(targetParty);
         
+    }
+
+    @Override
+    public List<SimpleMemberPartyDto> getBlockUserList(Long partyId) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 마스터 권한 확인
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
+
+        // BLOCK USER 조회
+        List<MemberParty> memberPartyList = memberpartyRepository.findAllByPartyIdAndMemberRoleIs(partyId, MemberRole.BLOCK);
+        List<SimpleMemberPartyDto> res = memberPartyMapper.toSimplePartyMemberDtoList(memberPartyList);
+
+        return res;
+    }
+
+    @Override
+    public List<SimpleMemberPartyDto> getUserList(Long partyId) {
+        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        memberRepository.findById(1L)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        memberpartyRepository.findByMemberIdAndPartyId(1L, partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
+        // Party User 조회
+        List<MemberParty> memberPartyList = memberpartyRepository.findMemberList(partyId);
+        List<SimpleMemberPartyDto> res = memberPartyMapper.toSimplePartyMemberDtoList(memberPartyList);
+
+        return res;
     }
 
 

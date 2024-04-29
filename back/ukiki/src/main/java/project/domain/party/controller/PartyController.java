@@ -14,9 +14,12 @@ import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
+import project.domain.party.dto.response.SimpleMemberPartyDto;
 import project.domain.party.service.PartyService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
+
+import java.util.List;
 
 
 @RequestMapping("/party")
@@ -58,15 +61,15 @@ public class PartyController implements PartyDocs {
     @Override
     @PostMapping("/enter/member")  // 멤버로 로그인
     public ResponseEntity<ResultResponse> memberPartyEnter(@RequestBody EnterPartyDto enterPartyDto) {
-        PartyEnterDto partyEnterDto = partyService.memberPartyEnter(enterPartyDto);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_ENTER_SUCCESS, partyEnterDto));
+        PartyEnterDto response = partyService.memberPartyEnter(enterPartyDto);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_ENTER_SUCCESS, response));
     }
 
     @Override
     @GetMapping("/enter/guest")   // 게스트 로그인
     public ResponseEntity<ResultResponse> guestPartyEnter(@RequestBody EnterPartyDto enterPartyDto) {
-        PartyEnterDto partyEnterDto = partyService.guestPartyEnter(enterPartyDto);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.GUEST_ENTER_SUCCESS, partyEnterDto));
+        PartyEnterDto response = partyService.guestPartyEnter(enterPartyDto);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GUEST_ENTER_SUCCESS, response));
     }
 
     @Override
@@ -109,6 +112,19 @@ public class PartyController implements PartyDocs {
     public ResponseEntity<ResultResponse> kickMember(@PathVariable(name = "partyId") Long partyId, @PathVariable(name = "targetId") Long targetId) {
         partyService.kickMember(partyId, targetId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_KICK_SUCCESS));
+    }
+
+    @Override
+    @GetMapping("/block/user-list/{partyId}")
+    public ResponseEntity<ResultResponse> getBlockUserList(@PathVariable(name = "partyId") Long partyId) {
+        List<SimpleMemberPartyDto> response = partyService.getBlockUserList(partyId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_BLOCK_USER_LIST_SUCCESS, response));
+    }
+
+    @Override
+    public ResponseEntity<ResultResponse> getUserList(Long partyId) {
+        List<SimpleMemberPartyDto> response = partyService.getUserList(partyId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERLIST_SUCCESS, response));
     }
 
 }

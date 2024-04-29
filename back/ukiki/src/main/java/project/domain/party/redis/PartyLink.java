@@ -22,7 +22,7 @@ public class PartyLink {
     @Id
     private String partyLink;
 
-    private Party party;
+    private Long party;
 
     @TimeToLive
     @Builder.Default

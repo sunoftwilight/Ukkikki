@@ -54,4 +54,10 @@ public interface PartyDocs {
     
     @Operation(summary = "파티원 추방하기")
     ResponseEntity<ResultResponse> kickMember(Long partyId, Long targetId);
+
+    @Operation(summary = "차단 유저 목록 조회")
+    ResponseEntity<ResultResponse> getBlockUserList(Long partyId);
+
+    @Operation(summary = "유저 목록 조회")
+    ResponseEntity<ResultResponse> getUserList(Long partyId);
 }
