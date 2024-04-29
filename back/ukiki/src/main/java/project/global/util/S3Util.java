@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import project.global.exception.BusinessLogicException;
+import project.global.exception.ErrorCode;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -75,6 +77,7 @@ public class S3Util {
             ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(sseKey));
         } catch (IOException e) {
             log.error("file upload error " + e.getMessage());
+            throw new BusinessLogicException(ErrorCode.FILE_UPLOAD_ERROR);
         }
 
         return amazonS3.getUrl("ukkikki", changedName).toString();
@@ -106,8 +109,13 @@ public class S3Util {
         String changedName = changedImageName(originName); //새로 생성된 이미지 이름
 
         //이미지 업로드 전체 읽기 권한 허용, 데이터는 유저키로 암호화, 버킷 정책에 의해 유저키 없이 접근 불가
-        amazonS3.putObject(new PutObjectRequest("ukkikki", changedName, inputStream, metadata
-        ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(sseKey));
+        try {
+            amazonS3.putObject(new PutObjectRequest("ukkikki", changedName, inputStream, metadata
+            ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(sseKey));
+        }catch (Exception e){
+            log.error("file upload error " + e.getMessage());
+            throw new BusinessLogicException(ErrorCode.FILE_UPLOAD_ERROR);
+        }
 
         return amazonS3.getUrl("ukkikki", changedName).toString();
     }
