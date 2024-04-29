@@ -185,7 +185,7 @@ public class GptUtilImpl implements GptUtil {
     }
 
     @Override
-    public List<Integer> postChat(MultipartFile file) throws Exception {
+    public List<Integer> postChat(MultipartFile file){
         // ObjectMapper 인스턴스 생성
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -224,8 +224,12 @@ public class GptUtilImpl implements GptUtil {
         map.put("max_tokens", 300);
 
         // JSON 문자열로 변환
-        String jsonBody = objectMapper.writeValueAsString(map);
-
+        String jsonBody;
+        try {
+            jsonBody = objectMapper.writeValueAsString(map);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ErrorCode.JSON_PARSE_EXCEPTION);
+        }
         // 로깅
         System.out.println(jsonBody);
 
@@ -247,7 +251,7 @@ public class GptUtilImpl implements GptUtil {
 
 
     @Override
-    public HttpHeaders baseHttpHeader() throws Exception {
+    public HttpHeaders baseHttpHeader() {
         HttpHeaders headers = new HttpHeaders();
         // 헤더 생성
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -271,9 +275,14 @@ public class GptUtilImpl implements GptUtil {
     }
 
     @Override
-    public List<Integer> getMeta(String response) throws Exception {
+    public List<Integer> getMeta(String response) {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode rootNode = mapper.readTree(response);
+        JsonNode rootNode;
+        try {
+            rootNode = mapper.readTree(response);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ErrorCode.JSON_PARSE_EXCEPTION);
+        }
         JsonNode choicesNode = rootNode.path("choices");
 
         // 반환할 정수 리스트를 초기화

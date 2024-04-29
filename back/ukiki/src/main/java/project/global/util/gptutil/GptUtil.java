@@ -18,7 +18,7 @@ public interface GptUtil {
      * @return
      * @throws Exception
      */
-    HttpHeaders baseHttpHeader() throws Exception;
+    HttpHeaders baseHttpHeader();
     String getId(String response) throws Exception;
     String getStatus(String response) throws Exception;
     String getMessageContent(String response) throws Exception;
@@ -31,7 +31,7 @@ public interface GptUtil {
      * @return : 정수 형태의 사진 분류 code 리스트를 반환 ex) [101, 203, ...]
      * @throws Exception
      */
-    List<Integer> postChat(MultipartFile file) throws Exception;
+    List<Integer> postChat(MultipartFile file);
 
     /**
      * GPT 응답에서 content value 추출하는 메서드
@@ -40,7 +40,7 @@ public interface GptUtil {
      * @return : 분류코드 리스트
      * @throws Exception
      */
-    List<Integer> getMeta(String response) throws Exception;
+    List<Integer> getMeta(String response);
 
     /**
      * client에서 전달 받은 Binary jpg 데이터를 Base64로 인코딩

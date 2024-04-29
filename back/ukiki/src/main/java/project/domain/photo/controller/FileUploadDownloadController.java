@@ -38,7 +38,7 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> fileUpload(@RequestPart("files") List<MultipartFile> files,
-                                        @RequestPart("key") @Valid FileUploadDto fileUploadDto) throws Exception {
+                                        @RequestPart("key") @Valid FileUploadDto fileUploadDto){
         fileUploadDownloadService.uploadProcess(files, fileUploadDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -44,8 +44,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     private final ImageUtil imageUtil;
     private final FileUtil fileUtil;
 
-    public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto)
-        throws Exception {
+    public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) {
 
         //S3업로드 커스텀 키 생성
         SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileUploadDto.getKey()));

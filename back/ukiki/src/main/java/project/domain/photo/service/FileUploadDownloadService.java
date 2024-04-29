@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface FileUploadDownloadService {
-    public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) throws Exception;
+    public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto);
     public S3Object fileDownload(FileDownloadDto fileDownloadDto);
     public Map<String, List<File>> multiFileDownload(MultiFileDownloadDto multiFileDownloadDto);
 }

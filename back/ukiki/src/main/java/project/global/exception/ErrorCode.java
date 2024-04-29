@@ -34,7 +34,11 @@ public enum ErrorCode {
     // 사진 업로드, 다운로드 관련
     META_CODE_NOT_FOUND(404, "해당 메타코드 분류가 존재하지 않습니다."),
     BASE64_ENCODING_FAIL(400, "Base64 인코딩에 실패했습니다."),
-    FILE_NOT_FOUND(404, "해당 파일을 찾을 수 없습니다.")
+    FILE_NOT_FOUND(404, "해당 파일을 찾을 수 없습니다."),
+
+    // GptUtil 관련
+    JSON_PARSE_EXCEPTION(400, "JSON 파싱에 실패했습니다."),
+
     ;
 
     private final int status;
