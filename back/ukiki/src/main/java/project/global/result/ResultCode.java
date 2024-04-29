@@ -22,7 +22,12 @@ public enum ResultCode {
     GRANT_TARGET_SUCCESS(200, "권한 부여에 성공하였습니다."),
     MEMBER_BLOCK_SUCCESS(200, "멤버 차단에 성공하였습니다."),
     MEMBER_KICK_SUCCESS(200, "멤버 추방에 성공하였습니다."),
-    GET_BLOCK_USER_LIST_SUCCESS(200, "차단유저리스트 검색에 성공하였습니다.")
+    GET_BLOCK_USER_LIST_SUCCESS(200, "차단유저리스트 검색에 성공하였습니다."),
+
+    //File
+    FILE_UPLOAD_SUCCESS(200, "파일이 정상적으로 업로드 되었습니다."),
+    FILE_DOWNLOAD_SUCCESS(200, "파일이 정상적으로 다운로드 되었습니다.")
+
     ;
 
     private final int status;
