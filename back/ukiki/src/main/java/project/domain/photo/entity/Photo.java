@@ -58,21 +58,21 @@ public class Photo extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @OneToMany(mappedBy = "photo", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArticlePhoto> articlePhotoList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "photo", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Likes> likesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "photo", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memo> memoList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "photo", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DownloadLog> downloadLogList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "photo", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favoriteList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "photo", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meta> metaList = new ArrayList<>();
 }

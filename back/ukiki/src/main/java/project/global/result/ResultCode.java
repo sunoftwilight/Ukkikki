@@ -20,7 +20,8 @@ public enum ResultCode {
     CHANGE_PASSWORD_SUCCESS(200, "파티 암호 변경에 성공하였습니다."),
     CHANGE_PARTY_NAME_SUCCESS(200, "파티 이름 변경에 성공하였습니다."),
     GRANT_TARGET_SUCCESS(200, "권한 부여에 성공하였습니다."),
-
+    MEMBER_BLOCK_SUCCESS(200, "멤버 차단에 성공하였습니다."),
+    MEMBER_KICK_SUCCESS(200, "멤버 추방에 성공하였습니다."),
     ;
 
     private final int status;

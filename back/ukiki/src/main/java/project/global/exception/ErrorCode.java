@@ -18,7 +18,7 @@ public enum ErrorCode {
     FORBIDDEN_ERROR(403, "작업을 수행하기 위한 권한이 없습니다."),
 
     // 회원 관련
-    USER_NOT_FOUND(404, "해당하는 회원이 존재하지 않습니다."),
+    MEMBER_NOT_FOUND(404, "해당하는 회원이 존재하지 않습니다."),
 
     // 파티 관련
     PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),
@@ -28,11 +28,13 @@ public enum ErrorCode {
     INPUT_NUMBER_EXCEED(400, "입력횟수가 초과 되었습니다."),
     NOT_ROLE_MASTER(400, "마스터 권한이 아닙니다."),
     NOT_EXIST_PARTY_USER(404, "존재하지 않는 파티 유저입니다."),
+    MASTER_CANT_EXIT(400, "마스터는 파티방을 나갈 수 없습니다."),
+    ENTER_DENIED_BLOCK_USER(400, "가입 거부 차단된 유저입니다."),
 
     // 사진 업로드, 다운로드 관련
     META_CODE_NOT_FOUND(404, "해당 메타코드 분류가 존재하지 않습니다."),
     BASE64_ENCODING_FAIL(400, "Base64 인코딩에 실패했습니다."),
-
+    FILE_NOT_FOUND(404, "해당 파일을 찾을 수 없습니다.")
     ;
 
     private final int status;

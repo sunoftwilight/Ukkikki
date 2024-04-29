@@ -40,13 +40,13 @@ public class Party extends BaseEntity {
     private String password;
 
     // 연관관계 총 4개
-    @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Article> arrayList = new ArrayList<>();
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Chat> chatList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)

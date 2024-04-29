@@ -45,4 +45,13 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 권한 주기")
     ResponseEntity<ResultResponse> grantAuthority(Long partyId, Long opponentId, MemberRole memberRole);
+
+    @Operation(summary = "파티 나가기")
+    ResponseEntity<ResultResponse> exitParty(Long partyId, String key);
+
+    @Operation(summary = "파티원 차단하기")
+    ResponseEntity<ResultResponse> memberBlock(Long partyId, Long targetId);
+    
+    @Operation(summary = "파티원 추방하기")
+    ResponseEntity<ResultResponse> kickMember(Long partyId, Long targetId);
 }

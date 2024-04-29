@@ -48,6 +48,6 @@ public class Article extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArticlePhoto> articlePhotoList= new ArrayList<>();
 }

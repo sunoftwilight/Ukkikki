@@ -6,18 +6,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.photo.dto.request.FileDownloadDto;
+import project.domain.photo.dto.request.FileUploadDto;
+import project.domain.photo.dto.request.MultiFileDownloadDto;
 import project.domain.photo.service.FileUploadDownloadService;
 
 import java.io.*;
@@ -33,18 +36,19 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
 
     private final FileUploadDownloadService fileUploadDownloadService;
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> fileUpload(@RequestParam("files") List<MultipartFile> files, @RequestParam("key") String key, @RequestParam("partyId") int partyId) throws Exception {
-        fileUploadDownloadService.uploadProcess(files, key, partyId);
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> fileUpload(@RequestPart("files") List<MultipartFile> files,
+                                        @RequestPart("key") @Valid FileUploadDto fileUploadDto) throws Exception {
+        fileUploadDownloadService.uploadProcess(files, fileUploadDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/download")
-    public void fileDownload(@RequestParam("key") String key, @RequestParam("fileId") long fileId, @RequestParam("saveName") String saveName,HttpServletResponse response) {
-        S3Object object = fileUploadDownloadService.fileDownload(key, fileId);
+    public void fileDownload(@RequestBody @Valid FileDownloadDto fileDownloadDto, HttpServletResponse response) {
+        S3Object object = fileUploadDownloadService.fileDownload(fileDownloadDto);
         String contentType = object.getObjectMetadata().getContentType().split("/")[1];
         InputStream inputStream = object.getObjectContent();
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + saveName + "." + contentType + "\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileDownloadDto.getPrefix() + "." + contentType + "\"");
         response.setHeader("content-transfer-encoding", "binary");
         response.setHeader("Content-Type", contentType);
         response.setHeader("Content-Length", String.valueOf(object.getObjectMetadata().getContentLength()));
@@ -66,8 +70,8 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     }
 
     @GetMapping("/multi-select-download")
-    public void multiSelectDownload(@RequestParam("key") String key, @RequestParam("fileId") List<Long> fileIds, @RequestParam("prefix") String prefix,HttpServletResponse response) throws Exception {
-        HashMap<String, List<File>> map = (HashMap<String, List<File>>) fileUploadDownloadService.multiFileDownload(key, fileIds, prefix);
+    public void multiSelectDownload(@RequestBody @Valid MultiFileDownloadDto multiFileDownloadDto, HttpServletResponse response) throws Exception {
+        HashMap<String, List<File>> map = (HashMap<String, List<File>>) fileUploadDownloadService.multiFileDownload(multiFileDownloadDto);
         String path = map.keySet().iterator().next();
         List<File> files = map.get(path);
         response.setHeader("Content-type", "application/zip");

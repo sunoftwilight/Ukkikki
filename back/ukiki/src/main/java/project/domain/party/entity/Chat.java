@@ -22,7 +22,6 @@ import project.global.baseEntity.BaseEntity;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class Chat extends BaseEntity {
 
     @Id
@@ -34,8 +33,7 @@ public class Chat extends BaseEntity {
     private String content;
 
     @Column(name = "is_delete")
-    @ColumnDefault(value = "0")
-    private boolean isDelete;
+    private Boolean isDelete = false;
 
     @JoinColumn(name = "party_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,4 +42,42 @@ public class Chat extends BaseEntity {
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    // 빌더를 사용한 객체 생성 방법을 재정의 (커스텀 빌더 사용)
+    @Builder(builderMethodName = "customBuilder")
+    public static Chat create(String content, Party party, Member member) {
+        Chat chat = new Chat();
+        chat.setParty(party);
+        chat.setMember(member);
+        chat.setContent(content);
+        return chat;
+    }
+
+    // 생성 관련 영속성 관리
+    public void setMember(Member member) {
+        this.member = member;
+        if (!member.getChatList().contains(this)) {
+            member.getChatList().add(this);
+        }
+    }
+
+    public void setParty(Party party) {
+        this.party = party;
+        if (!party.getChatList().contains(this)) {
+            party.getChatList().add(this);
+        }
+    }
+
+    // 삭제 메서드
+    public void delete() {
+        if (this.member != null) {
+            this.member.getChatList().remove(this);
+        }
+        if (this.party != null) {
+            this.party.getChatList().remove(this);
+        }
+        this.isDelete = true;  // 삭제 플래그 설정
+        this.party = null;
+        this.member = null;
+    }
 }
