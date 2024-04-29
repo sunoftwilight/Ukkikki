@@ -105,7 +105,7 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
-    @DeleteMapping("/kick/{partyId}/{targetId")
+    @DeleteMapping("/kick/{partyId}/{targetId}")
     public ResponseEntity<ResultResponse> kickMember(@PathVariable(name = "partyId") Long partyId, @PathVariable(name = "targetId") Long targetId) {
         partyService.kickMember(partyId, targetId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_KICK_SUCCESS));
