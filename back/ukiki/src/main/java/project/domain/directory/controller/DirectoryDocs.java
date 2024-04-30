@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +16,11 @@ import project.global.result.ResultResponse;
 
 public interface DirectoryDocs {
 
-    public ResponseEntity<ResultResponse> initDir(Long partyId);
+    @PostMapping()
+    public ResponseEntity<ResultResponse> initDirParty(@PathVariable Long partyId);
 
-    public ResponseEntity<ResultResponse> getDir(String dirId);
+    @GetMapping()
+    public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId);
 
     @Operation(summary = "폴더 생성 요청", description = "Body로 parentDirId, dirName을 받아 현재 위치 폴더 Dto 반환")
     @ApiResponse(responseCode = "201", description = "폴더 생성에 성공하였습니다.")

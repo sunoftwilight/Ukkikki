@@ -2,7 +2,13 @@ package project.domain.party.service;
 
 
 import com.amazonaws.services.s3.model.SSECustomerKey;
-import jakarta.validation.constraints.Null;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,35 +17,32 @@ import org.springframework.web.multipart.MultipartFile;
 import project.domain.article.redis.Alarm;
 import project.domain.article.redis.AlarmType;
 import project.domain.article.repository.AlarmRedisRepository;
+import project.domain.directory.collection.Directory;
+import project.domain.directory.repository.DirectoryRepository;
+import project.domain.directory.service.DirectoryService;
 import project.domain.member.entity.Member;
-import project.domain.party.dto.request.EnterPartyDto;
-import project.domain.party.dto.request.PartyPasswordDto;
-import project.domain.party.dto.response.PartyEnterDto;
-import project.domain.party.dto.response.SimpleMemberPartyDto;
-import project.domain.party.entity.MemberParty;
 import project.domain.member.entity.MemberRole;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.dto.request.CreatePartyDto;
+import project.domain.party.dto.request.EnterPartyDto;
+import project.domain.party.dto.request.PartyPasswordDto;
+import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
+import project.domain.party.dto.response.SimpleMemberPartyDto;
+import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.mapper.MemberPartyMapper;
 import project.domain.party.mapper.PartyLinkMapper;
-import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.redis.PartyLink;
-
+import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyLinkRedisRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
-import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 import project.global.util.BcryptUtil;
 import project.global.util.S3Util;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -50,8 +53,11 @@ public class PartyServiceImpl implements PartyService {
     private final PartyRepository partyRepository;
     private final MemberpartyRepository memberpartyRepository;
     private final PartyLinkRedisRepository partyLinkRedisRepository;
+    private final DirectoryRepository directoryRepository;
     private final AlarmRedisRepository alarmRedisRepository;
     private final PhotoRepository photoRepository;
+    private final DirectoryService directoryService;
+
     private final PartyLinkMapper partyLinkMapper;
     private final MemberPartyMapper memberPartyMapper;
     private final S3Util s3Util;
@@ -82,6 +88,15 @@ public class PartyServiceImpl implements PartyService {
                 new SSECustomerKey(s3Util.generateSSEKey(createPartyDto.getPassword())));
             party.setThumbnail(partyThumbnailImg);
         }
+
+        // 파티의 rootDirId 부여하기
+        Directory rootDir = directoryRepository.save(Directory.builder()
+            .id(directoryService.generateId())
+            .dirName("root")
+            .parentDirId(null)
+            .build());
+        // party에 rootDirId 저장
+        party.setRootDirId(rootDir.getId());
 
         partyRepository.save(party);
 

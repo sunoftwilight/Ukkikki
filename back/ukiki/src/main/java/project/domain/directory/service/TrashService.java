@@ -8,7 +8,9 @@ public interface TrashService {
 
     public Trash save(Directory directory);
 
-    public Boolean realDelete();
+    public Integer realDelete();
 
     public Trash findById(String directoryId);
+
+    public Boolean isOutOfRecoveryPeriod(Trash deletedDir);
 }

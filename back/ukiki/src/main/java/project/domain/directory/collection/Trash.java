@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @Document(collection = "trash")
 public class Trash {
+
     @Id
     private String directoryId;
     private LocalDateTime deadLine;
@@ -28,5 +29,4 @@ public class Trash {
     private List<String> childDirIdList = new ArrayList<>();
     @Builder.Default
     private List<Long> photoList = new ArrayList<>();
-
 }

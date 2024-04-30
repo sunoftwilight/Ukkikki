@@ -39,6 +39,9 @@ public class Party extends BaseEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "root_dir_id")
+    private String rootDirId;
+
     // 연관관계 총 4개
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Article> arrayList = new ArrayList<>();
