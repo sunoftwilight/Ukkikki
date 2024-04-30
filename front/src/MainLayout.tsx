@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import Header from "./components/commons/Header";
+import Header from "./pages/Header";
 import Hamburger from "./components/commons/Hamburger";
 import InviteModal from "./components/commons/InviteModal";
 import GroupMemberModal from "./components/GroupMain/GroupMemberModal";
