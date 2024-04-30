@@ -3,6 +3,7 @@ package project.domain.party.service;
 
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
+import project.domain.party.dto.request.ChangeThumbDto;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
@@ -40,4 +41,8 @@ public interface PartyService {
 
     List<SimpleMemberPartyDto> getBlockUserList(Long partyId);
     List<SimpleMemberPartyDto> getUserList(Long partyId);
+
+    void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
+
+    void linkDelete();
 }
