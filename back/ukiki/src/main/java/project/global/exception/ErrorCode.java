@@ -37,6 +37,9 @@ public enum ErrorCode {
     FILE_NOT_FOUND(404, "해당 파일을 찾을 수 없습니다."),
     FILE_UPLOAD_ERROR(500, "파일 업로드에 실패하였습니다."),
 
+    // 폴더 관련
+    DIRECTORY_NOE_FOUND(404, "해당 폴더를 찾을 수 없습니다."),
+
     // GptUtil 관련
     JSON_PARSE_EXCEPTION(400, "JSON 파싱에 실패했습니다."),
 

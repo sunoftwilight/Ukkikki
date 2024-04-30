@@ -1,25 +1,20 @@
-package project.domain.photo.document;
+package project.domain.directory.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Data
-@Builder
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@Setter
 @NoArgsConstructor
-@ToString
-@Document(collection = "ukkikki")
-public class directory {
-
-    @Id
+@AllArgsConstructor
+@Builder
+public class InitDirDto {
     private String id;
     private String dirName;
     private String parentDirId;
