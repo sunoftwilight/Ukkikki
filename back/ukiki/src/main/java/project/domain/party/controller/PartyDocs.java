@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
+import project.domain.party.dto.request.ChangeThumbDto;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
@@ -60,4 +61,7 @@ public interface PartyDocs {
 
     @Operation(summary = "유저 목록 조회")
     ResponseEntity<ResultResponse> getUserList(Long partyId);
+
+    @Operation(summary = "파티 썸네일 변경")
+    ResponseEntity<ResultResponse> changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 }

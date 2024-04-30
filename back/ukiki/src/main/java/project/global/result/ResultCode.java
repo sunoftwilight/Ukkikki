@@ -23,6 +23,7 @@ public enum ResultCode {
     MEMBER_BLOCK_SUCCESS(200, "멤버 차단에 성공하였습니다."),
     MEMBER_KICK_SUCCESS(200, "멤버 추방에 성공하였습니다."),
     GET_BLOCK_USER_LIST_SUCCESS(200, "차단유저리스트 검색에 성공하였습니다."),
+    CHANGE_THUMB_SUCCESS(200, "썸네일 변경에 성공하였습니다."),
 
     //File
     FILE_UPLOAD_SUCCESS(200, "파일이 정상적으로 업로드 되었습니다."),
@@ -35,6 +36,8 @@ public enum ResultCode {
     RENAME_DIRECTORY_SUCCESS(200, "폴더 이름 수정에 성공하였습니다."),
     DELETE_DIRECTORY_SUCCESS(204, "폴더 삭제에 성공하였습니다."),
     RESTORED_DIRECTORY_SUCCESS(201, "폴더 복원에 성공하였습니다."),
+
+
 
     ;
 

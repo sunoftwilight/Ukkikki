@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Index;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
+import org.springframework.data.redis.core.index.Indexed;
 import project.domain.party.entity.Party;
 import project.global.baseEntity.BaseEntity;
 
@@ -22,11 +24,12 @@ public class PartyLink {
     @Id
     private String partyLink;
 
+    @Indexed
     private Long party;
 
     @TimeToLive
     @Builder.Default
-    private long ttl = 7200;
+    private long ttl = 20;
 
     @Builder.Default
     int count = 403;
