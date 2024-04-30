@@ -14,3 +14,9 @@ export interface memberListType {
   memberOpen : boolean;
   setMemberOpen: () => void;
 }
+
+export interface detailImgType {
+  currentImg: number
+  currentUrl: string
+  setCurrentImg: (pk: number, url: string) => void;
+}

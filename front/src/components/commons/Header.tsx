@@ -19,7 +19,7 @@ const DefaultHeader: React.FC = () => {
 
   const basicPath = ['/', '/group', '/mypage',]
   const backPath = ['/grouplist', '/setting', '/feed',]
-  const albumPath = ['/album', ]
+  const albumPath = ['/album', '/album/:pk']
 
   const isGuest = false
   const isAlaram = false
@@ -71,7 +71,7 @@ const DefaultHeader: React.FC = () => {
     )
   }
 
-  else if (albumPath.includes(location.pathname)) {
+  else if (albumPath.includes(location.pathname) || location.pathname.startsWith('/album')) {
     return (
       <div className="fixed flex justify-between items-center px-4 w-full h-14 bg-white">
         <img src={back} onClick={() => goBackHandler()} />

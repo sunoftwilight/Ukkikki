@@ -9,8 +9,13 @@ import Setting from './pages/Setting';
 import GroupList from './pages/GroupList';
 import Album from './pages/Album';
 import Feed from './pages/Feed';
+import DetailImg from './pages/DetailImg';
+import { useStore } from 'zustand';
+import { DetailImgStore } from './stores/DetailImgStore';
 
 export default function Router() {
+  const { currentImg, currentUrl } = useStore(DetailImgStore)
+
   return (
     <Routes>
       {/* 헤더 & 네브를 넣을 페이지 */}
@@ -21,6 +26,7 @@ export default function Router() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/album" element={<Album />} />
+        <Route path={`/album/${currentImg}`} element={<DetailImg url={currentUrl} />} />
         <Route path="/feed" element={<Feed />} />
       </Route>
 
