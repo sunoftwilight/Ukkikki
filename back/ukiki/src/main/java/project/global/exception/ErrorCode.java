@@ -43,6 +43,9 @@ public enum ErrorCode {
     DIRECTORY_NOE_FOUND(404, "해당 폴더를 찾을 수 없습니다."),
     DIRECTORY_OUT_OF_DEADLINE(403, "유효 기간이 만료된 폴더입니다."),
 
+    // 사진 파일 관련
+    PHOTO_FILE_NOT_FOUND(404, "해당 사진 파일을 찾을 수 없습니다."),
+
     // GptUtil 관련
     JSON_PARSE_EXCEPTION(400, "JSON 파싱에 실패했습니다."),
 

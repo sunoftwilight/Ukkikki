@@ -13,5 +13,5 @@ public class DirWithChildsNameDto {
     private String parentDirId;
     private List<String> childDirIdList = new ArrayList<>();
     private List<String> childDirNameList = new ArrayList<>();
-    private List<Long> photoList = new ArrayList<>();
+    private List<String> fileIdList = new ArrayList<>();
 }

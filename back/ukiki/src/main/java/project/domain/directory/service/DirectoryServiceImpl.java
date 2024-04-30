@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.request.CreateDirDto;
@@ -93,7 +95,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         parentDir.getChildDirIdList().remove(dirId);
         directoryRepository.save(parentDir);
         // child 는 그대로 휴지통으로 임시 저장
-        trashService.save(dir);
+        trashService.saveDir(dir);
         // child 삭제
         directoryRepository.deleteById(dirId);
 
@@ -102,30 +104,37 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     @Transactional
-    public DirWithChildsNameDto restoreDir(String deletedDirId) {
+    public DirWithChildsNameDto restoreDir(String deletedDataId) {
         // 뒤진 놈 가저오기
-        Trash deletedDir = trashService.findById(deletedDirId);
+        Trash deletedData = trashService.findById(deletedDataId);
         // 오늘이 deadLine보다 크다면 복구 불가능
-        if(trashService.isOutOfRecoveryPeriod(deletedDir)) {
+        if(trashService.isOutOfRecoveryPeriod(deletedData)) {
             throw new BusinessLogicException(ErrorCode.DIRECTORY_OUT_OF_DEADLINE);
         }
-
+        ModelMapper modelMapper = new ModelMapper();
         // 새롭게 태어나기
-        Directory restoredDir = Directory.builder()
-            .id(deletedDir.getDirectoryId())
-            .dirName(deletedDir.getDirName())
-            .parentDirId(deletedDir.getParentDirId())
-            .childDirIdList(deletedDir.getChildDirIdList())
-            .photoList(deletedDir.getPhotoList())
-            .build();
-        // 부모에 이어붙여주기 => 부모가 directory에 있으면 진행 없으면 찾기
-        Directory parentDir = findById(deletedDir.getParentDirId());
-        parentDir.getChildDirIdList().add(deletedDir.getDirectoryId());
+        if(deletedData.getDataType() == DataType.DIRECTORY) {
+            // json to class
+            Directory deletedDir = modelMapper.map(deletedData.getContent(), Directory.class);
+            Directory restoredDir = Directory.builder()
+                .id(deletedDir.getId())
+                .dirName(deletedDir.getDirName())
+                .parentDirId(deletedDir.getParentDirId())
+                .childDirIdList(deletedDir.getChildDirIdList())
+                .fileIdList(deletedDir.getFileIdList())
+                .build();
+            // 부모에 이어붙여주기 => 부모가 directory에 있으면 진행 없으면 찾기
+            Directory parentDir = findById(deletedDir.getParentDirId());
+            parentDir.getChildDirIdList().add(deletedDir.getId());
+            directoryRepository.saveAll(toList(restoredDir, parentDir));
+            // 기존 휴지통에 있었던 그놈 삭제하기
+            trashRepository.delete(deletedData);
+            return dirWithChildsNameMapper.toDirWithChildsNameDto(restoredDir, getChildNameList(restoredDir));
+        } else if (deletedData.getDataType() == DataType.FILE) {
+            return null;
+        }
         // 저장하기
-        directoryRepository.saveAll(toList(restoredDir, parentDir));
-        // 기존 휴지통에 있었던 그놈 삭제하기
-        trashRepository.delete(deletedDir);
-        return dirWithChildsNameMapper.toDirWithChildsNameDto(restoredDir, getChildNameList(restoredDir));
+        return null;
     }
 
     @Override

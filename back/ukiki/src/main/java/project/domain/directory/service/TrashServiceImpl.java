@@ -3,10 +3,13 @@ package project.domain.directory.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
+import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.repository.TrashRepository;
 import project.domain.photo.entity.Photo;
@@ -22,14 +25,22 @@ public class TrashServiceImpl implements TrashService{
     private final PhotoRepository photoRepository;
 
     @Override
-    public Trash save(Directory directory) {
+    public Trash saveDir(Directory dir) {
         return trashRepository.save(Trash.builder()
-            .directoryId(directory.getId())
-            .dirName(directory.getDirName())
-            .deadLine(LocalDateTime.now().plusWeeks(2))
-            .parentDirId(directory.getParentDirId())
-            .childDirIdList(directory.getChildDirIdList())
-            .photoList(directory.getPhotoList())
+            .id(dir.getId())
+            .dataType(DataType.DIRECTORY)
+            .content(dir)
+            .deadLine(LocalDate.now().plusWeeks(2))
+            .build());
+    }
+
+    @Override
+    public Trash saveFile(File file) {
+        return trashRepository.save(Trash.builder()
+            .id(file.getFileId())
+            .dataType(DataType.FILE)
+            .content(file)
+            .deadLine(LocalDate.now().plusWeeks(2))
             .build());
     }
 
@@ -37,19 +48,7 @@ public class TrashServiceImpl implements TrashService{
     public Integer realDelete() {
         LocalDateTime now = LocalDateTime.now();
         List<Trash> trashes = trashRepository.deleteTrashesByDeadLineIsBefore(now);
-        for (Trash dir : trashes) {
-            List<Long> photoList = dir.getPhotoList();
-            for (Long photoId : photoList) {
-                Photo photo = photoRepository.findById(photoId).orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
-                int photoNum = photo.getPhotoNum();
-                photo.setPhotoNum(photoNum - 1);
-                if (photoNum - 1 == 0) {
-                    //S3 삭제 요청
-
-                    photoRepository.delete(photo);
-                }
-            }
-        }
+        // 삭제 로직 보충 필요!!
         return trashes.size();
     }
 
@@ -59,10 +58,17 @@ public class TrashServiceImpl implements TrashService{
     }
 
     @Override
-    public Boolean isOutOfRecoveryPeriod(Trash deletedDir) {
-        LocalDate deadLine = deletedDir.getDeadLine().toLocalDate();
+    public Boolean isOutOfRecoveryPeriod(Trash deletedDate) {
+        LocalDate deadLine = deletedDate.getDeadLine();
         LocalDate now = LocalDate.now();
-        return deadLine.isAfter(now);
+        return deadLine.isBefore(now);
+    }
+
+    @Override
+    public String generateId() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(UUID.randomUUID()).append(LocalDateTime.now());
+        return String.valueOf(sb);
     }
 
 }

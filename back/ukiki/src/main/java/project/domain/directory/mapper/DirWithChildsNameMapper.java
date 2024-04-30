@@ -19,7 +19,7 @@ public interface DirWithChildsNameMapper {
         @Mapping(source = "directory.parentDirId", target = "parentDirId"),
         @Mapping(source = "directory.childDirIdList", target = "childDirIdList"),
         @Mapping(target  = "childDirNameList", ignore = true),
-        @Mapping(source = "directory.photoList", target = "photoList")
+        @Mapping(source = "directory.fileIdList", target = "fileIdList")
     })
     DirWithChildsNameDto toDirWithChildsNameDto(Directory directory, List<String> childDirNameList);
 
