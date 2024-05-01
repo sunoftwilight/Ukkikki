@@ -9,7 +9,7 @@ export default {
     extend: {
       colors: {
         "main-blue"     : "#007BFF",
-        "soft-blue"     : "#8CC4FF",
+        "soft-blue"     : "#88C6FF",
         "soft-brown"    : "#D4A174",
         "yellow"        : "#FFCE21",
         "soft-gray"     : "#F2F2F2",
@@ -18,7 +18,7 @@ export default {
         "point-gray"    : "#5C5C5C",
         "white"         : "#FFFFFF",
         "red"           : "#E71C1C",
-        "black"         : "#2E2E2E",
+        "black"         : "#373737",
         "green"         : "#52DD22",
       },
       fontFamily:{
