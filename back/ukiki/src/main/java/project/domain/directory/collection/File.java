@@ -22,7 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class File {
     @Id
     private String fileId;
-    private Long photoId;
+    private Object photo;
     @Builder.Default
     private List<String> dirIdList = new ArrayList<>();
 }

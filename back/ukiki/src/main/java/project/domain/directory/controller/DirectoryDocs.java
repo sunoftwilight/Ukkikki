@@ -17,7 +17,7 @@ import project.global.result.ResultResponse;
 public interface DirectoryDocs {
 
     @PostMapping()
-    public ResponseEntity<ResultResponse> initDirParty(@PathVariable Long partyId);
+    public ResponseEntity<ResultResponse> initDirPartyTest(@PathVariable Long partyId);
 
     @GetMapping()
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId);

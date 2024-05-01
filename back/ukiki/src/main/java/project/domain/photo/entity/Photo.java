@@ -46,7 +46,8 @@ public class Photo extends BaseEntity {
     private PhotoUrl photoUrl;
 
     @Column(name = "photo_num")
-    private int photoNum;
+    @Builder.Default
+    private int photoNum = 1;
 
 
     // 연관관계 촐 10개

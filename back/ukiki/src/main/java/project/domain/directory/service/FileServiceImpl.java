@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.Directory;
@@ -13,6 +14,8 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Photo;
+import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -26,20 +29,20 @@ public class FileServiceImpl implements FileService{
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
+    private final PhotoRepository photoRepository;
 
 
     @Override
     @Transactional
-    public void createFile(Long partyId, Long photoId) {
-        // file객체 생성하기
-        File newFile = File.builder()
-            .fileId(generateId())
-            .photoId(photoId)
-            .build();
-
+    public void createFile(Long partyId, Photo photo) {
         // 파티에서 rootDirId 찾기
         Party findParty = partyRepository.findById(partyId).orElseThrow(() -> new BusinessLogicException(
             ErrorCode.PARTY_NOT_FOUND));
+        // file객체 생성하기
+        File newFile = File.builder()
+            .fileId(generateId())
+            .photo(photo)
+            .build();
 
         String rootDirId = findParty.getRootDirId();
         String newFileId = newFile.getFileId();
@@ -49,6 +52,15 @@ public class FileServiceImpl implements FileService{
     @Override
     public void copyFile(String targetDirId, String fileId) {
         setDirFileRelation(targetDirId, fileId);
+        // photo num ++1
+        File findFile = findById(fileId);
+        ModelMapper modelMapper = new ModelMapper();
+        Photo photo = modelMapper.map(findFile.getPhoto(), Photo.class);
+        Long photoId = photo.getId();
+        Photo findPhoto = photoRepository.findById(photoId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+        int photoNum = findPhoto.getPhotoNum();
+        findPhoto.setPhotoNum(photoNum + 1);
     }
 
     @Override

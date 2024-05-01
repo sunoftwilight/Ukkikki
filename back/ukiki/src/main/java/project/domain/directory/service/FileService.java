@@ -2,11 +2,12 @@ package project.domain.directory.service;
 
 import java.util.List;
 import project.domain.directory.collection.File;
+import project.domain.photo.entity.Photo;
 
 public interface FileService {
 
     // file생성
-    void createFile(Long partyId, Long photoId);
+    void createFile(Long partyId, Photo photo);
 
     // 사진 복사
     void copyFile(String targetDirId, String fileId);

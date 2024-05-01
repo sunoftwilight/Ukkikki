@@ -6,7 +6,9 @@ import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.MoveDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.DirWithChildsNameDto;
+import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.RenameDirDto;
+import project.domain.party.entity.Party;
 
 public interface DirectoryService {
 
@@ -17,7 +19,9 @@ public interface DirectoryService {
      * @param partyId : 파티 식별자
      * @return : 폴더정보 DTO
      */
-    public DirDto initDirParty(Long partyId);
+    public DirDto initDirPartyTest(Long partyId);
+
+    public void initDirParty(Party party);
 //    public InitDirDto initDirMember(Long memberId);
 
     /**
@@ -33,15 +37,15 @@ public interface DirectoryService {
      * @param dirId
      * @return : 조회하려는 폴더의 정보 전부
      */
-    public DirWithChildsNameDto getDir(String dirId);
+    public GetDirDto getDir(String dirId);
 
-    public DirWithChildsNameDto createDir(CreateDirDto request);
+    public GetDirDto createDir(CreateDirDto request);
 
     // 폴더 이동
-    public DirWithChildsNameDto moveDir(MoveDirDto request);
+    public GetDirDto moveDir(MoveDirDto request);
 
     // 폴더 삭제
-    public DirWithChildsNameDto deleteDir(String dirId);
+    public GetDirDto deleteDir(String dirId);
 
     // 폴더 복구
     public DirWithChildsNameDto restoreDir(String dirId);
@@ -56,4 +60,8 @@ public interface DirectoryService {
     public List<Directory> toList(Directory... directories);
     // 해당 파일의 자식 폴더의 이름 리스트 제공
     public List<String> getChildNameList(Directory dir);
+    String getParentDirName(Directory directory);
+    List<String> getChildDirNameList(Directory directory);
+    List<String> getPhotoUrlList(Directory directory);
+
 }
