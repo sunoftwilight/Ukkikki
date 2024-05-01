@@ -1,5 +1,5 @@
 import React from "react";
-import Cam from "@/components/Camera/Cam";
+import Cam from "../components/Camera/cam";
 
 const Camera: React.FC = () => {
   return (

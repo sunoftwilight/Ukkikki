@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { upLoadPhoto } from '../../api/camera';
-import ImageCompressor from 'image-compressor.js';
 // Image
 import timerNone from "@/assets/Camera/timer.png";
 import timer3s from "@/assets/Camera/timer3s.png";
@@ -27,12 +26,12 @@ const Cam: React.FC = () => {
   const [selectedPV, setSelectedPV] = useState<boolean>(true);
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
   const [cameras, setCameras] = useState<string[]>([]);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+  // const [isRecording, setIsRecording] = useState<boolean>(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  // const canvasRef = useRef<HTMLCanvasElement>(null);
+  // const chunksRef = useRef<Blob[]>([]);
+  // const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const qualities: Record<string, {width:number, height:number}> = {
     '3:4': { width: 3600, height: 2700 },
@@ -87,27 +86,27 @@ const Cam: React.FC = () => {
     capturePhoto();
   }
 
-  const startRecording = (stream: MediaStream) => {
-    mediaRecorderRef.current = new MediaRecorder(stream);
+  // const startRecording = (stream: MediaStream) => {
+  //   mediaRecorderRef.current = new MediaRecorder(stream);
 
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      chunksRef.current.push(event.data);
-    };
+  //   mediaRecorderRef.current.ondataavailable = (event) => {
+  //     chunksRef.current.push(event.data);
+  //   };
 
-    mediaRecorderRef.current.onstop = () => {
-      const videoBlob = new Blob(chunksRef.current, { type: 'video/mp4' });
-      // 녹화된 비디오를 다운로드하거나 서버에 업로드하는 등의 작업을 수행할 수 있습니다.
-      // 예시: window.URL.createObjectURL(videoBlob)
-    };
+  //   mediaRecorderRef.current.onstop = () => {
+  //     const videoBlob = new Blob(chunksRef.current, { type: 'video/mp4' });
+  //     // 녹화된 비디오를 다운로드하거나 서버에 업로드하는 등의 작업을 수행할 수 있습니다.
+  //     // 예시: window.URL.createObjectURL(videoBlob)
+  //   };
 
-    mediaRecorderRef.current.start();
-  };
+  //   mediaRecorderRef.current.start();
+  // };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
-    }
-  };
+  // const stopRecording = () => {
+  //   if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+  //     mediaRecorderRef.current.stop();
+  //   }
+  // };
 
   const capturePhoto = () => {
     // Check if video stream is available
@@ -284,8 +283,8 @@ const Cam: React.FC = () => {
           <img src={!selectedPV ? photo : video} className='object-cover w-6 h-6' onClick={changePV}/>
         </div>
         <div className='w-20 h-20 bg-white rounded-full flex items-center justify-center' onClick={testLogic}>
-          <div className={!selectedPV ? !isRecording ? 'w-10 h-10 bg-red rounded-full' : 'w-8 h-8 bg-red rounded-sm' : ''}>
-          </div>
+          {/* <div className={!selectedPV ? !isRecording ? 'w-10 h-10 bg-red rounded-full' : 'w-8 h-8 bg-red rounded-sm' : ''}>
+          </div> */}
         </div>
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
           <img src={changeView} className='object-cover w-6 h-6' onClick={changeCamera}/>
