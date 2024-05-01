@@ -1,4 +1,6 @@
 import { Routes, Route  } from 'react-router-dom';
+import { useStore } from 'zustand';
+import { DetailImgStore } from './stores/DetailImgStore';
 import MainLayout from './MainLayout'
 import Main from './pages/Main';
 import Login from './pages/Login';
@@ -10,8 +12,7 @@ import GroupList from './pages/GroupList';
 import Album from './pages/Album';
 import Feed from './pages/Feed';
 import DetailImg from './pages/DetailImg';
-import { useStore } from 'zustand';
-import { DetailImgStore } from './stores/DetailImgStore';
+import Write from './pages/Write';
 
 export default function Router() {
   const { currentImg, currentUrl } = useStore(DetailImgStore)
@@ -28,6 +29,7 @@ export default function Router() {
         <Route path="/album" element={<Album />} />
         <Route path={`/album/${currentImg}`} element={<DetailImg url={currentUrl} />} />
         <Route path="/feed" element={<Feed />} />
+        <Route path="/write" element={<Write />} />
       </Route>
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}
