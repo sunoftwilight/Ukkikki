@@ -1,4 +1,6 @@
 import React from "react";
+import write from "@/assets/DetailImg/write.png"
+import { Link } from "react-router-dom";
 
 const articleList = [
   {
@@ -62,6 +64,11 @@ const articleList = [
 const FeedMain: React.FC = () => {
   return (
     <div className="flex flex-col w-full h-full overflow-scroll scrollbar-hide">
+      <div className="px-4 justify-end flex">
+        <Link to={'/write'}>
+          <img src={write} className="w-6" />
+        </Link>
+      </div>
       { articleList.map((item, idx) => (        
         <div key={idx} className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex gap-3 items-center">
