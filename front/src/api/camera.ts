@@ -1,12 +1,12 @@
 import { AxiosResponse } from "axios";
 import { formDataApi } from "../utils/http-common";
-import { RequestData, ResponseData } from "../types/Camera";
+import { ResponseData } from "../types/Camera";
 
 export const upLoadPhoto = async (
-    params: RequestData,
+    params: FormData,
     Response: (Response: AxiosResponse<ResponseData>) => void,
     Error: (Error: AxiosResponse<ResponseData>) => void) => {
-        await formDataApi('')
+        await formDataApi.post('/file/upload',params)
         .then(Response)
         .catch(Error)
 };

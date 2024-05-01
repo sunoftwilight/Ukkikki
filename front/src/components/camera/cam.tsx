@@ -1,4 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { upLoadPhoto } from '../../api/camera';
+import ImageCompressor from 'image-compressor.js';
+// Image
 import timerNone from "@/assets/Camera/timer.png";
 import timer3s from "@/assets/Camera/timer3s.png";
 import timer5s from "@/assets/Camera/timer5s.png";
@@ -12,6 +15,7 @@ import singleShot from "@/assets/Camera/singleShot.png";
 import multiShot from "@/assets/Camera/multiShot.png";
 import photo from "@/assets/Camera/photo.png";
 import video from "@/assets/Camera/video.png"
+
 
 const Cam: React.FC = () => {
   const [selectedTimer, setSelectedTimer] = useState<string>(timerNone);
@@ -31,7 +35,7 @@ const Cam: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const qualities: Record<string, {width:number, height:number}> = {
-    '3:4': { width: 4000, height: 3000 },
+    '3:4': { width: 3600, height: 2700 },
     '9:16': { width: 4000, height: 2252 },
     '1:1': { width: 2992, height: 2992 },
   }
@@ -116,15 +120,36 @@ const Cam: React.FC = () => {
       const context = canvas.getContext('2d');
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // const imageCompressor = new ImageCompressor();
         // Convert canvas to base64 or blob and save as needed
         canvas.toBlob(async blob => {
           if (blob) {
+            // const compressFile = await imageCompressor.compress(blob);
+
             const formData = new FormData();
-            formData.append('image', blob, 'd.jpg');
-            console.log(formData)
+
+            const key = new Blob([JSON.stringify({key:'Parkyd', partyId:1})], {type: 'application/json',});
+
+            const file = new File([blob], 'image.jpeg', {type: 'image/jpeg'});
+            // 바이트 단위로 파일 크기 가져오기
+            const fileSizeInBytes = file.size;
+            // 바이트를 메가바이트로 변환
+            const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
+
+            console.log(fileSizeInMegabytes + " MB"); // 파일 크기 (메가바이트 단위)
+
+            formData.append('key', key);
+            formData.append('files', file);
+
+            upLoadPhoto(formData,
+               (response) => {
+                console.log(response)
+               }, (error)=> {
+                console.log(error)
+            })
           }
         })
-        
       }
     }
   };
@@ -142,7 +167,10 @@ const Cam: React.FC = () => {
 
   async function switchCamera(deviceId: string, scale: string) {
     setSelectedCamera(deviceId);
-  
+
+    console.log("device", deviceId);
+    console.log("scale", scale);
+
     try {
 
       if (videoRef.current && videoRef.current.srcObject) {
@@ -249,7 +277,6 @@ const Cam: React.FC = () => {
 
       <div className=''>
         <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%' }} />
-        
       </div>
 
       <div className='min-h-40 max-h-40 min-w-full max-w-full fixed bottom-0 flex justify-evenly items-center bg-black/50'>
