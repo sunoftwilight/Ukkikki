@@ -165,11 +165,11 @@ public class PartyServiceImpl implements PartyService {
     public void checkPassword(EnterPartyDto enterPartyDto) {
         PartyLink partyLink = partyLinkRedisRepository.findByPartyLink(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
-        log.info("TEST LINK SUCESS");
+
         // 파티확인
         Party party = partyRepository.findById(partyLink.getParty())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
-        log.info("TEST PARTY SUCESS");
+
         // 비밀번호 비교
         if (!bcryptUtil.matchesBcrypt(enterPartyDto.getPassword(), party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거

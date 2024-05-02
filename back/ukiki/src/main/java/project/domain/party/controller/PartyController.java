@@ -27,7 +27,6 @@ import java.util.List;
 @RequestMapping("/party")
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 public class PartyController implements PartyDocs {
 
     private final PartyService partyService;
@@ -57,8 +56,6 @@ public class PartyController implements PartyDocs {
     @Override
     @PostMapping("/check/password")  // 그룹 비밀번호를 대조 확인
     public ResponseEntity<ResultResponse> checkPartyKey(@RequestBody EnterPartyDto enterPartyDto) {
-        log.info("HELLO WORLD:? ");
-        log.info(enterPartyDto.getLink());
         partyService.checkPassword(enterPartyDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.PASSWORD_CORRECT));
     }
