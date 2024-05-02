@@ -4,50 +4,66 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
+import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.MoveDirDto;
 import project.domain.directory.dto.response.DirDto;
+import project.domain.directory.dto.response.DirWithChildsNameDto;
+import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.directory.mapper.DirMapper;
+import project.domain.directory.mapper.DirWithChildsNameMapper;
+import project.domain.directory.mapper.GetDirMapper;
 import project.domain.directory.mapper.RenameDirMapper;
 import project.domain.directory.repository.DirectoryRepository;
+import project.domain.directory.repository.FileRepository;
+import project.domain.directory.repository.TrashRepository;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Photo;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
-//@Id
-//private String id;
-//private String dirName;
-//private String parentDirId;
-//@Builder.Default
-//private List<String> childDirIdList = new ArrayList<>();
-//@Builder.Default
-//private List<Long> photoList = new ArrayList<>();
 @Service
 @AllArgsConstructor
+@Slf4j
 public class DirectoryServiceImpl implements DirectoryService {
 
 
     private final TrashService trashService;
+    private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
+    private final TrashRepository trashRepository;
     private final DirMapper dirMapper;
+    private final DirWithChildsNameMapper dirWithChildsNameMapper;
     private final RenameDirMapper renameDirMapper;
+    private final GetDirMapper getDirMapper;
 
     @Override
-    public DirDto getDir(String dirId) {
-        return dirMapper.toDirDto(findById(dirId));
+    public GetDirDto getDir(String dirId) {
+        Directory dir = findById(dirId);
+        return getDirMapper.toGetDirDto(
+            dir,
+            getParentDirName(dir),
+            getChildNameList(dir),
+            getPhotoUrlList(dir)
+            );
     }
 
     @Override
-    public DirDto createDir(CreateDirDto request) {
+    @Transactional
+    public GetDirDto createDir(CreateDirDto request) {
         // 새로운 dir 생성
         Directory childDir = Directory.builder()
             .id(generateId())
@@ -60,11 +76,17 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         directoryRepository.saveAll(toList(childDir, parentDir));
 
-        return dirMapper.toDirDto(parentDir);
+        return getDirMapper.toGetDirDto(
+            parentDir,
+            getParentDirName(parentDir),
+            getChildNameList(parentDir),
+            getPhotoUrlList(parentDir)
+        );
     }
 
     @Override
-    public DirDto moveDir(MoveDirDto request) {
+    @Transactional
+    public GetDirDto moveDir(MoveDirDto request) {
         String dirId = request.getDirId();
         String toDirId = request.getToDirId();
 
@@ -79,45 +101,72 @@ public class DirectoryServiceImpl implements DirectoryService {
         dir.setParentDirId(toDirId);
 
         directoryRepository.saveAll(toList(dir, fromDir, toDir));
-        return dirMapper.toDirDto(fromDir);
+        return getDirMapper.toGetDirDto(
+            fromDir,
+            getParentDirName(fromDir),
+            getChildNameList(fromDir),
+            getPhotoUrlList(fromDir)
+        );
     }
 
     @Override
-    public DirDto deleteDir(String dirId) {
+    @Transactional
+    public GetDirDto deleteDir(String dirId) {
         // 부모의 child list에서 해당 dirId 제거
         Directory dir = findById(dirId);
         Directory parentDir = findById(dir.getParentDirId());
         parentDir.getChildDirIdList().remove(dirId);
         directoryRepository.save(parentDir);
         // child 는 그대로 휴지통으로 임시 저장
-        trashService.save(dir);
+        trashService.saveDir(dir);
         // child 삭제
         directoryRepository.deleteById(dirId);
 
-        return dirMapper.toDirDto(parentDir);
+        return getDirMapper.toGetDirDto(
+            parentDir,
+            getParentDirName(parentDir),
+            getChildNameList(parentDir),
+            getPhotoUrlList(parentDir)
+        );
     }
 
     @Override
-    public DirDto restoreDir(String deletedDirId) {
-        // 뒤진 놈 가저오기
-        Trash deletedDir = trashService.findById(deletedDirId);
+    @Transactional
+    public DirWithChildsNameDto restoreDir(String deletedDataId) {
+        // 쓰레기 통에서 가져오기
+        Trash deletedData = trashService.findById(deletedDataId);
+        // 오늘이 deadLine보다 크다면 복구 불가능
+        if(trashService.isOutOfRecoveryPeriod(deletedData)) {
+            throw new BusinessLogicException(ErrorCode.DIRECTORY_OUT_OF_DEADLINE);
+        }
+        ModelMapper modelMapper = new ModelMapper();
         // 새롭게 태어나기
-        Directory restoredDir = Directory.builder()
-            .id(deletedDir.getDirectoryId())
-            .dirName(deletedDir.getDirName())
-            .parentDirId(deletedDir.getParentDirId())
-            .childDirIdList(deletedDir.getChildDirIdList())
-            .photoList(deletedDir.getPhotoList())
-            .build();
-        // 뒤진놈의 엄마에 이어붙여주기 => 뒤진놈의 엄마가 directory에 있으면 진행 없으면 찾기
-        Directory parentDir = findById(deletedDir.getParentDirId());
-        parentDir.getChildDirIdList().add(deletedDir.getDirectoryId());
+        if(deletedData.getDataType() == DataType.DIRECTORY) {
+            // json to class
+            Directory deletedDir = modelMapper.map(deletedData.getContent(), Directory.class);
+            Directory restoredDir = Directory.builder()
+                .id(deletedDir.getId())
+                .dirName(deletedDir.getDirName())
+                .parentDirId(deletedDir.getParentDirId())
+                .childDirIdList(deletedDir.getChildDirIdList())
+                .fileIdList(deletedDir.getFileIdList())
+                .build();
+            // 부모에 이어붙여주기 => 부모가 directory에 있으면 진행 없으면 찾기
+            Directory parentDir = findById(deletedDir.getParentDirId());
+            parentDir.getChildDirIdList().add(deletedDir.getId());
+            directoryRepository.saveAll(toList(restoredDir, parentDir));
+            // 기존 휴지통에 있었던 그놈 삭제하기
+            trashRepository.delete(deletedData);
+            return dirWithChildsNameMapper.toDirWithChildsNameDto(restoredDir, getChildNameList(restoredDir));
+        } else if (deletedData.getDataType() == DataType.FILE) {
+            return null;
+        }
         // 저장하기
-        directoryRepository.saveAll(toList(restoredDir, parentDir));
-        return dirMapper.toDirDto(restoredDir);
+        return null;
     }
 
     @Override
+    @Transactional
     public RenameDirDto renameDir(project.domain.directory.dto.request.RenameDirDto request) {
         String dirId = request.getDirId();
         String newName = request.getNewName();
@@ -141,19 +190,95 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public DirDto initDirParty(Long partyId) {
-        Optional<Party> findParty = partyRepository.findById(partyId);
+    @Transactional
+    public DirDto initDirPartyTest(Long partyId) {
+        Party findParty = partyRepository.findById(partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+        // 만약 party에 이미 rootDir이 있다면 나가리
+        if(findParty.getRootDirId() != null) {
+            throw new BusinessLogicException(ErrorCode.PARTY_ALREADY_HAVE_ROOT_DIR);
+        }
+
         // 기본 폴더 생성 및 저장
-        Directory rootDir = directoryRepository.save(Directory.builder()
-            .id(generateId())
-            .dirName("root")
-            .parentDirId(null)
-            .build());
+        Directory rootDir = directoryRepository.save(
+            Directory.builder()
+                .id(generateId())
+                .dirName("root")
+                .parentDirId("")
+                .build());
+        // party에 rootDirId 저장
+        findParty.setRootDirId(rootDir.getId());
         return dirMapper.toDirDto(rootDir);
+    }
+
+    @Override
+    @Transactional
+    public void initDirParty(Party party) {
+        // 만약 party에 이미 rootDir이 있다면 나가리
+        if(party.getRootDirId() != null) {
+            throw new BusinessLogicException(ErrorCode.PARTY_ALREADY_HAVE_ROOT_DIR);
+        }
+
+        // 기본 폴더 생성 및 저장
+        Directory rootDir = directoryRepository.save(
+            Directory.builder()
+                .id(generateId())
+                .dirName("root")
+                .parentDirId("")
+                .build());
+        // party에 rootDirId 저장
+        party.setRootDirId(rootDir.getId());
     }
 
     @Override
     public List<Directory> toList(Directory... directories) {
         return new ArrayList<>(Arrays.asList(directories));
     }
+
+    @Override
+    public List<String> getChildNameList(Directory dir) {
+        List<String> childNameList = new ArrayList<>();
+        List<String> childIdList = dir.getChildDirIdList();
+        for (String childId : childIdList) {
+            // child 가져와서 이름 채우기
+            Directory childDir = findById(childId);
+            childNameList.add(childDir.getDirName());
+        }
+
+        return childNameList;
+    }
+
+    @Override
+    public String getParentDirName(Directory directory) {
+        if (Objects.equals(directory.getParentDirId(), "")) {
+            return "";  // 또는 ""로 반환
+        }
+        log.info("여기");
+        Directory parentDir = findById(directory.getParentDirId());
+        return parentDir != null ? parentDir.getDirName() : "No Parent";
+    }
+
+    @Override
+    public List<String> getChildDirNameList(Directory directory) {
+        List<String> childDirNameList = new ArrayList<>();
+        List<Directory> childDirList = directoryRepository.findAllById(directory.getChildDirIdList());
+        for (Directory childDir : childDirList) {
+            childDirNameList.add(childDir.getDirName());
+        }
+
+        return childDirNameList;
+    }
+
+    @Override
+    public List<String> getPhotoUrlList(Directory directory) {
+        List<String> photoUrlList = new ArrayList<>();
+        List<File> FileList =  fileRepository.findAllById(directory.getChildDirIdList());
+        ModelMapper modelMapper = new ModelMapper();
+        for (File file : FileList) {
+            Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
+            photoUrlList.add(photo.getPhotoUrl().getPhotoUrl());
+        }
+        return photoUrlList;
+    }
+
 }

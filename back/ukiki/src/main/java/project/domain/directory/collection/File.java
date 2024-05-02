@@ -18,15 +18,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @ToString
-@Document(collection = "directory")
-public class Directory {
-
+@Document(collection = "file")
+public class File {
     @Id
-    private String id;
-    private String dirName;
-    private String parentDirId;
+    private String fileId;
+    private Object photo;
     @Builder.Default
-    private List<String> childDirIdList = new ArrayList<>();
-    @Builder.Default
-    private List<String> fileIdList = new ArrayList<>();
+    private List<String> dirIdList = new ArrayList<>();
 }

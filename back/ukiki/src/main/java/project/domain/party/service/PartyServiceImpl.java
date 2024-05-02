@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.domain.article.redis.Alarm;
 import project.domain.article.redis.AlarmType;
 import project.domain.article.repository.AlarmRedisRepository;
+import project.domain.directory.service.DirectoryService;
 import project.domain.member.entity.Member;
 import project.domain.party.dto.request.ChangeThumbDto;
 import project.domain.party.dto.request.EnterPartyDto;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PartyServiceImpl implements PartyService {
 
+    private final DirectoryService directoryService;
     private final MemberRepository memberRepository;
     private final PartyRepository partyRepository;
     private final MemberpartyRepository memberpartyRepository;
@@ -87,8 +89,10 @@ public class PartyServiceImpl implements PartyService {
                 new SSECustomerKey(s3Util.generateSSEKey(createPartyDto.getPassword())));
             party.setThumbnail(partyThumbnailImg);
         }
-
         partyRepository.save(party);
+
+        // 해당 파티에 초기 공유 앨범 디렉토리 부여
+        directoryService.initDirParty(party);
 
         MemberParty memberParty = MemberParty.customBuilder()
             .memberRole(MemberRole.MASTER)

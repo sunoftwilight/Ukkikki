@@ -1,8 +1,7 @@
 package project.domain.directory.collection;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.Enumerated;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,14 +18,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @Document(collection = "trash")
 public class Trash {
-    @Id
-    private String directoryId;
-    private LocalDateTime deadLine;
-    private String dirName;
-    private String parentDirId;
-    @Builder.Default
-    private List<String> childDirIdList = new ArrayList<>();
-    @Builder.Default
-    private List<Long> photoList = new ArrayList<>();
 
+    @Id
+    private String id;
+    @Enumerated
+    private DataType dataType;
+    private Object content;
+    private LocalDate deadLine;
 }

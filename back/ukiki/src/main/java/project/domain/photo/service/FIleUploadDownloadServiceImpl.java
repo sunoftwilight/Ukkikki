@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.directory.service.FileService;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.photo.dto.request.FileDownloadDto;
@@ -35,6 +36,7 @@ import java.util.*;
 public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
     private final AmazonS3 amazonS3;
+    private final FileService fileService;
     private final PhotoRepository photoRepository;
     private final MemberRepository memberRepository;
     private final MetaRepository metaRepository;
@@ -60,8 +62,11 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             urls.setThumb_url2(s3Util.bufferedImageUpload(imageUtil.resizeImage(file, 2), sseKey, file));
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
             + ", " + photo.getFileName());
-
             photoRepository.save(photo);
+
+            //MongoDB 업데이트
+            fileService.createFile(1L, photo);
+
             //GPT API
             for (Integer code : gptUtil.postChat(file)) {
                 // 받은 메타 코드 저장 Meta 테이블에 저장
@@ -72,8 +77,6 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                         .build()
                 );
             }
-
-            //MongoDB 업데이트
         }
     }
 
