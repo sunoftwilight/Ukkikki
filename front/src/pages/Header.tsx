@@ -9,7 +9,7 @@ const Header: React.FC = () => {
   const location = useLocation()
 
   const basicPath = ['/', '/group', '/mypage',]
-  const backPath = ['/grouplist', '/setting', '/feed',]
+  const backPath = ['/grouplist', '/setting', '/feed','/groupcreate', ]
   const albumPath = ['/album']
 
   if (basicPath.includes(location.pathname)) return <LogoHeader />
