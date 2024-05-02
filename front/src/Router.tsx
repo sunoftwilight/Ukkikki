@@ -6,6 +6,7 @@ import Main from './pages/Main';
 import Login from './pages/Login';
 import Camera from './pages/Camera';
 import GroupMain from './pages/GroupMain';
+import GroupCreate from './pages/GroupCreate';
 import MyPage from './pages/MyPage';
 import Setting from './pages/Setting';
 import GroupList from './pages/GroupList';
@@ -24,6 +25,7 @@ export default function Router() {
         <Route path="/" element={<Main />} />
         <Route path="/group" element={<GroupMain />} />
         <Route path="/grouplist" element={<GroupList />} />
+        <Route path="/groupcreate" element={<GroupCreate />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/album" element={<Album />} />
