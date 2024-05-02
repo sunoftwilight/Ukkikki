@@ -120,12 +120,8 @@ const Cam: React.FC = () => {
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // const imageCompressor = new ImageCompressor();
-        // Convert canvas to base64 or blob and save as needed
         canvas.toBlob(async blob => {
           if (blob) {
-            // const compressFile = await imageCompressor.compress(blob);
-
             const formData = new FormData();
 
             const key = new Blob([JSON.stringify({key:'Parkyd', partyId:1})], {type: 'application/json',});
