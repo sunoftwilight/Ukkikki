@@ -14,6 +14,7 @@ import Album from './pages/Album';
 import Feed from './pages/Feed';
 import DetailImg from './pages/DetailImg';
 import Write from './pages/Write';
+import Chatting from './pages/Chatting';
 
 export default function Router() {
   const { currentImg, currentUrl } = useStore(DetailImgStore)
@@ -32,6 +33,7 @@ export default function Router() {
         <Route path={`/album/${currentImg}`} element={<DetailImg url={currentUrl} />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/write" element={<Write />} />
+        <Route path="/chat" element={<Chatting />} />
       </Route>
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}
