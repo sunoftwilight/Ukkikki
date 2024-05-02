@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 const buttonList = [
   { img: camera, name: '카메라', router: '/camera' },
   { img: gallery, name: '마이 앨범', router: '/mypage' },
-  { img: group, name: '참여 중인 그룹', router: '/group' },
+  { img: group, name: '참여 중인 그룹', router: '/grouplist' },
   { img: setting, name: '설정', router: '/setting' }
 ]
 
