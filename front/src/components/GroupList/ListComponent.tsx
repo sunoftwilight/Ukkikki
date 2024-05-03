@@ -13,7 +13,9 @@ const ListComponent:React.FC = () => {
       <div className="flex flex-col gap-2">
         { sampleList.map((item, idx) => (
           <div key={idx} className="relative w-100 h-20 rounded-2xl flex items-center border border-disabled-gray">
-            <img src={item.src} className="w-14 h-14 rounded-full ms-4 me-5"/>
+            <div className="w-14 h-14 rounded-full ms-4 me-5">
+              <img src={item.src} className="object-cover w-14 h-14 rounded-full"/>
+            </div>
             <p className="text-xl font-pre-R">{item.partyName}</p>
             <img src={item.favorite ? favorStar : unFavorStar} className="absolute w-6 h-6 right-5"/>
           </div>
