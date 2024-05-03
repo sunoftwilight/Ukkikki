@@ -38,24 +38,17 @@ public interface DirectoryService {
      * @return : 조회하려는 폴더의 정보 전부
      */
     public GetDirDto getDir(String dirId);
-
     public GetDirDto createDir(CreateDirDto request);
-
     // 폴더 이동
     public GetDirDto moveDir(MoveDirDto request);
-
     // 폴더 삭제
     public GetDirDto deleteDir(String dirId);
-
     // 폴더 복구
     public DirWithChildsNameDto restoreDir(String dirId);
-
     // 폴더 이름 수정
     public RenameDirDto renameDir(project.domain.directory.dto.request.RenameDirDto request);
-
     // 디렉토리 엔티티 DB에서 조회
     public Directory findById(String dirId);
-
     // 여러가지 있을떄 한방에 저장 할 수 있도록 list 로 묶어준는 메서드
     public List<Directory> toList(Directory... directories);
     // 해당 파일의 자식 폴더의 이름 리스트 제공
@@ -63,5 +56,7 @@ public interface DirectoryService {
     String getParentDirName(Directory directory);
     List<String> getChildDirNameList(Directory directory);
     List<String> getPhotoUrlList(Directory directory);
+
+    String getRootDirId(Directory dir);
 
 }
