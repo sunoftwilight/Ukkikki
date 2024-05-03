@@ -8,8 +8,8 @@ import WriteHeader from "../components/Header/WriteHeader";
 const Header: React.FC = () => {
   const location = useLocation()
 
-  const basicPath = ['/', '/group', '/mypage',]
-  const backPath = ['/grouplist', '/setting', '/feed','/groupcreate', '/chat']
+  const basicPath = ['/', '/group', '/mypage', ]
+  const backPath = ['/grouplist', '/setting', '/feed','/groupcreate', '/createdone', '/chat',]
   const albumPath = ['/album']
 
   if (basicPath.includes(location.pathname)) return <LogoHeader />
