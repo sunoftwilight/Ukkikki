@@ -40,7 +40,10 @@ public enum ResultCode {
     MOVE_DIRECTORY_SUCCESS(200, "폴더 이동에 성공하였습니다."),
     RENAME_DIRECTORY_SUCCESS(200, "폴더 이름 수정에 성공하였습니다."),
     DELETE_DIRECTORY_SUCCESS(204, "폴더 삭제에 성공하였습니다."),
-    RESTORED_DIRECTORY_SUCCESS(201, "폴더 복원에 성공하였습니다."),
+    RESTORE_DIRECTORY_OR_FILE_SUCCESS(201, "폴더 또는 파일 복원에 성공하였습니다."),
+
+    // 휴지통 관련
+    GET_TRASH_BIN_SUCCESS(200, "휴지통 조회에 성공하였습니다."),
 
     // alarm
     GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다.")

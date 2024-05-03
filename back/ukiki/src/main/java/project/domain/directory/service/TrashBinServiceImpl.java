@@ -8,14 +8,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
+import project.domain.directory.collection.Trash;
 import project.domain.directory.collection.TrashBin;
+import project.domain.directory.dto.TrashFileDto;
+import project.domain.directory.dto.TrashPhotoDto;
 import project.domain.directory.dto.response.GetTrashBinDto;
 import project.domain.directory.mapper.GetTrashBinMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
+import project.domain.directory.repository.TrashRepository;
 import project.domain.party.entity.Party;
 import project.domain.photo.entity.Photo;
+import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -27,6 +32,8 @@ public class TrashBinServiceImpl implements TrashBinService {
     private final TrashBinRepository trashBinRepository;
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
+    private final TrashRepository trashRepository;
+    private final PhotoRepository photoRepository;
     private final GetTrashBinMapper getTrashBinMapper;
 
     @Override
@@ -45,6 +52,38 @@ public class TrashBinServiceImpl implements TrashBinService {
         List<String> dirNameList = getDirNameList(trashBin);
         List<String> photoUrlList = getPhotoUrlList(trashBin);
         return getTrashBinMapper.toGetTrashBinDto(trashBin, dirNameList, photoUrlList);
+    }
+
+    @Override
+    public void clearTrashBin(Long trashBinId) {
+        TrashBin trashBin = findById(trashBinId);
+        // 휴지통에 있는 모든 dir 삭제 + photo num - 1
+        List<String> dirIdList = trashBin.getDirIdList();
+        // BFS인데;;
+        // 휴지통에 있는 모든 file 삭제
+        List<String> trasIdList = trashBin.getFileIdList();
+        List<Trash> trashList = trashRepository.findAllById(trasIdList);
+        ModelMapper modelMapper = new ModelMapper();
+        for (Trash trash : trashList) {
+            TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
+            TrashPhotoDto trashPhotoDto = modelMapper.map(trashFileDto.getPhoto(), TrashPhotoDto.class);
+            // 여기서 trashFileDto.getPhoto() => Photo로 바꿔주는 modelMapper를 쓰기위한 TrashPhotoDto를 생성해줘
+            Long photoId = trashPhotoDto.getId();
+            Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+            // photoNum 감소 및 사진 삭제 로직
+            int photoNum = photo.getPhotoNum() - 1;
+            if (photoNum == 0) {
+                photoRepository.delete(photo);
+            } else {
+                photo.setPhotoNum(photoNum);
+                photoRepository.save(photo); // 변경된 photoNum을 저장
+            }
+            // 휴지통에서 제거
+            trashBin.getFileIdList().remove(trash.getId());
+            // 쓰레기에서 제거
+            trashRepository.delete(trash);
+        }
     }
 
     @Override
