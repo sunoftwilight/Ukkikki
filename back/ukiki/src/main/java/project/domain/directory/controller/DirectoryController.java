@@ -14,7 +14,6 @@ import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.MoveDirDto;
 import project.domain.directory.dto.request.RenameDirDto;
 import project.domain.directory.dto.response.DirDto;
-import project.domain.directory.dto.response.DirWithChildsNameDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.service.DirectoryService;
 import project.global.result.ResultCode;
@@ -61,12 +60,6 @@ public class DirectoryController implements DirectoryDocs{
         return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_DIRECTORY_SUCCESS, response));
     }
 
-    @Override
-    @PostMapping("/restore/{deletedDirId}")
-    public ResponseEntity<ResultResponse> restoreDir(@PathVariable String deletedDirId) {
-        DirWithChildsNameDto response = directoryService.restoreDir(deletedDirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.RESTORED_DIRECTORY_SUCCESS, response));
-    }
 
     @Override
     @PatchMapping("/rename")

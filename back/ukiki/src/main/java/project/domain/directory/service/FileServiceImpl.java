@@ -1,5 +1,6 @@
 package project.domain.directory.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -8,12 +9,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
+import project.domain.directory.collection.Trash;
+import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.mapper.GetDirMapper;
+import project.domain.directory.mapper.TrashFileMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
+import project.domain.directory.repository.TrashRepository;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
@@ -27,13 +33,16 @@ import project.global.exception.ErrorCode;
 public class FileServiceImpl implements FileService{
 
     private final DirectoryService directoryService;
-    private final TrashService trashService;
     private final TrashBinService trashBinService;
+
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
     private final PhotoRepository photoRepository;
+    private final TrashRepository trashRepository;
+
     private final GetDirMapper getDirMapper;
+    private final TrashFileMapper trashFileMapper;
 
 
     @Override
@@ -44,12 +53,12 @@ public class FileServiceImpl implements FileService{
             ErrorCode.PARTY_NOT_FOUND));
         // file객체 생성하기
         File newFile = File.builder()
-            .fileId(generateId())
+            .id(generateId())
             .photo(photo)
             .build();
 
         String rootDirId = findParty.getRootDirId();
-        String newFileId = newFile.getFileId();
+        String newFileId = newFile.getId();
         setDirFileRelation(rootDirId, newFileId);
     }
 
@@ -98,7 +107,7 @@ public class FileServiceImpl implements FileService{
     public GetDirDto deleteOneFile(String fileId, String dirId) {
         deleteDirFileRelation(dirId, fileId);
         // deleteFile을 넘겨 줘야한다.
-        trashService.saveFile(findById(fileId), dirId);
+        saveFile(findById(fileId), dirId);
         trashBinService.saveFile(fileId);
         Directory dirDir = directoryService.findById(dirId);
 
@@ -160,5 +169,18 @@ public class FileServiceImpl implements FileService{
     public File findById(String fileId) {
         return fileRepository.findById(fileId).orElseThrow(() ->
             new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public Trash saveFile(File file, String dirId) {
+        // file to deleteFile
+        TrashFileDto trashFileDto = trashFileMapper.toTrashFile(file, dirId);
+        return trashRepository.save(Trash.builder()
+            .id(generateId())
+            .dataType(DataType.FILE)
+            .content(trashFileDto)
+            .deadLine(LocalDate.now().plusWeeks(2))
+            .build());
     }
 }

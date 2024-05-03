@@ -12,14 +12,12 @@ import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
+import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.response.GetTrashBinDto;
-import project.domain.directory.mapper.TrashFileMapper;
 import project.domain.directory.repository.DirectoryRepository;
-import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
-import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -27,40 +25,11 @@ import project.global.exception.ErrorCode;
 @AllArgsConstructor
 public class TrashServiceImpl implements TrashService{
 
-    private final DirectoryService directoryService;
+    private DirectoryService directoryService;
     private final FileService fileService;
-    private final TrashBinService trashBinService;
     private final DirectoryRepository directoryRepository;
     private final TrashBinRepository trashBinRepository;
-    private final FileRepository fileRepository;
     private final TrashRepository trashRepository;
-    private final PhotoRepository photoRepository;
-    private final TrashFileMapper trashFileMapper;
-
-
-    @Override
-    @Transactional
-    public Trash saveDir(Directory dir) {
-        return trashRepository.save(Trash.builder()
-            .id(dir.getId())
-            .dataType(DataType.DIRECTORY)
-            .content(dir)
-            .deadLine(LocalDate.now().plusWeeks(2))
-            .build());
-    }
-
-    @Override
-    @Transactional
-    public Trash saveFile(File file, String dirId) {
-        // file to deleteFile
-        TrashFileDto trashFileDto = trashFileMapper.toTrashFile(file, dirId);
-        return trashRepository.save(Trash.builder()
-            .id(file.getFileId())
-            .dataType(DataType.FILE)
-            .content(trashFileDto)
-            .deadLine(LocalDate.now().plusWeeks(2))
-            .build());
-    }
 
 
     @Override
@@ -94,7 +63,7 @@ public class TrashServiceImpl implements TrashService{
             parentDir.getChildDirIdList().add(deletedDir.getId());
             directoryRepository.saveAll(directoryService.toList(restoredDir, parentDir));
             // 기존 휴지통에 있었던 그놈 삭제하기
-            trashBinService.restoreDir(deletedDir.getId(), trashBinId);
+            restoreDir(deletedDir.getId(), trashBinId);
             trashRepository.delete(trash);
             return new GetTrashBinDto();
         } else if (trash.getDataType() == DataType.FILE) {
@@ -113,7 +82,7 @@ public class TrashServiceImpl implements TrashService{
             }
             // 관계 설정
             fileService.setDirFileRelation(trashFileDto.getDirId(), trash.getId());
-            trashBinService.restoreFile(trashFileDto.getId(), trashBinId);
+            restoreFile(trashFileDto.getId(), trashBinId);
             trashRepository.delete(trash);
             return new GetTrashBinDto();
         }
@@ -147,6 +116,22 @@ public class TrashServiceImpl implements TrashService{
         StringBuilder sb = new StringBuilder();
         sb.append(UUID.randomUUID()).append(LocalDateTime.now());
         return String.valueOf(sb);
+    }
+
+    @Override
+    public void restoreDir(String dirId, Long trashBinId) {
+        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+        trashBin.getDirIdList().remove(dirId);
+        trashBinRepository.save(trashBin);
+    }
+
+    @Override
+    public void restoreFile(String fileId, Long trashBinId) {
+        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+        trashBin.getFileIdList().remove(fileId);
+        trashBinRepository.save(trashBin);
     }
 
 }

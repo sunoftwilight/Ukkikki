@@ -5,7 +5,6 @@ import project.domain.directory.collection.Directory;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.MoveDirDto;
 import project.domain.directory.dto.response.DirDto;
-import project.domain.directory.dto.response.DirWithChildsNameDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.party.entity.Party;
@@ -43,8 +42,6 @@ public interface DirectoryService {
     public GetDirDto moveDir(MoveDirDto request);
     // 폴더 삭제
     public GetDirDto deleteDir(String dirId);
-    // 폴더 복구
-    public DirWithChildsNameDto restoreDir(String dirId);
     // 폴더 이름 수정
     public RenameDirDto renameDir(project.domain.directory.dto.request.RenameDirDto request);
     // 디렉토리 엔티티 DB에서 조회

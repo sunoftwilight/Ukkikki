@@ -1,5 +1,6 @@
 package project.domain.directory.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,18 +16,18 @@ import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
+import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.MoveDirDto;
 import project.domain.directory.dto.response.DirDto;
-import project.domain.directory.dto.response.DirWithChildsNameDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.directory.mapper.DirMapper;
-import project.domain.directory.mapper.DirWithChildsNameMapper;
 import project.domain.directory.mapper.GetDirMapper;
 import project.domain.directory.mapper.RenameDirMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
+import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
@@ -40,14 +41,13 @@ import project.global.exception.ErrorCode;
 public class DirectoryServiceImpl implements DirectoryService {
 
 
-    private final TrashService trashService;
-    private final TrashBinService trashBinService;
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
     private final TrashRepository trashRepository;
+    private final TrashBinRepository trashBinRepository;
+
     private final DirMapper dirMapper;
-    private final DirWithChildsNameMapper dirWithChildsNameMapper;
     private final RenameDirMapper renameDirMapper;
     private final GetDirMapper getDirMapper;
 
@@ -119,9 +119,8 @@ public class DirectoryServiceImpl implements DirectoryService {
         parentDir.getChildDirIdList().remove(dirId);
         directoryRepository.save(parentDir);
         // child 는 그대로 휴지통으로 임시 저장
-        trashService.saveDir(dir);
-        trashBinService.saveDir(dir);
-
+        saveDirtoTrash(dir);
+        saveDirInTrashBin(dir);
         // child 삭제
         directoryRepository.deleteById(dirId);
 
@@ -131,41 +130,6 @@ public class DirectoryServiceImpl implements DirectoryService {
             getChildNameList(parentDir),
             getPhotoUrlList(parentDir)
         );
-    }
-
-    @Override
-    @Transactional
-    public DirWithChildsNameDto restoreDir(String deletedDataId) {
-        // 쓰레기 통에서 가져오기
-        Trash deletedData = trashService.findById(deletedDataId);
-        // 오늘이 deadLine보다 크다면 복구 불가능
-        if(trashService.isOutOfRecoveryPeriod(deletedData)) {
-            throw new BusinessLogicException(ErrorCode.DIRECTORY_OUT_OF_DEADLINE);
-        }
-        ModelMapper modelMapper = new ModelMapper();
-        // 새롭게 태어나기
-        if(deletedData.getDataType() == DataType.DIRECTORY) {
-            // json to class
-            Directory deletedDir = modelMapper.map(deletedData.getContent(), Directory.class);
-            Directory restoredDir = Directory.builder()
-                .id(deletedDir.getId())
-                .dirName(deletedDir.getDirName())
-                .parentDirId(deletedDir.getParentDirId())
-                .childDirIdList(deletedDir.getChildDirIdList())
-                .fileIdList(deletedDir.getFileIdList())
-                .build();
-            // 부모에 이어붙여주기 => 부모가 directory에 있으면 진행 없으면 찾기
-            Directory parentDir = findById(deletedDir.getParentDirId());
-            parentDir.getChildDirIdList().add(deletedDir.getId());
-            directoryRepository.saveAll(toList(restoredDir, parentDir));
-            // 기존 휴지통에 있었던 그놈 삭제하기
-            trashRepository.delete(deletedData);
-            return dirWithChildsNameMapper.toDirWithChildsNameDto(restoredDir, getChildNameList(restoredDir));
-        } else if (deletedData.getDataType() == DataType.FILE) {
-            return null;
-        }
-        // 저장하기
-        return null;
     }
 
     @Override
@@ -295,6 +259,28 @@ public class DirectoryServiceImpl implements DirectoryService {
             }
         }
         return dir.getId();
+    }
+
+    public Trash saveDirtoTrash(Directory dir) {
+        return trashRepository.save(Trash.builder()
+            .id(generateId())
+            .dataType(DataType.DIRECTORY)
+            .content(dir)
+            .deadLine(LocalDate.now().plusWeeks(2))
+            .build());
+    }
+
+
+    public void saveDirInTrashBin(Directory dir) {
+        // parentDirId = ""이면 while 탈출
+        String rootDirId = getRootDirId(dir);
+        Party party = partyRepository.findPartyByRootDirId(rootDirId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+        Long partyId = party.getId();
+        TrashBin trashBin = trashBinRepository.findById(partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+        trashBin.getDirIdList().add(dir.getId());
+        trashBinRepository.save(trashBin);
     }
 
 }

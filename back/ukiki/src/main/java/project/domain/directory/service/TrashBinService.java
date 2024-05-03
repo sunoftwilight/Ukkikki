@@ -1,7 +1,6 @@
 package project.domain.directory.service;
 
 import java.util.List;
-import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.response.GetTrashBinDto;
 import project.domain.party.entity.Party;
@@ -16,13 +15,8 @@ public interface TrashBinService {
 
     public List<String> getPhotoUrlList(TrashBin trashBin);
 
-    public void restoreDir(String dirId, Long trashBinId);
-
-    public void restoreFile(String fileId, Long trashBinId);
-
     public TrashBin findById(Long trashBinId);
 
     public void saveFile(String fileId);
 
-    public void saveDir(Directory dir);
 }

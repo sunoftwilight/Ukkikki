@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "file")
 public class File {
     @Id
-    private String fileId;
+    private String id;
     private Object photo;
     @Builder.Default
     private List<String> dirIdList = new ArrayList<>();

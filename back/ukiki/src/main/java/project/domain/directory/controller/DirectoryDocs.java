@@ -33,9 +33,6 @@ public interface DirectoryDocs {
     @DeleteMapping()
     public ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId);
 
-    @PostMapping
-    public ResponseEntity<ResultResponse> restoreDir(@PathVariable String deletedDirId);
-
     @PatchMapping
     public ResponseEntity<ResultResponse> renameDir(@RequestBody RenameDirDto request);
 }

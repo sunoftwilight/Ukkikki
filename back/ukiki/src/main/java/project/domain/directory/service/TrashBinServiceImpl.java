@@ -15,7 +15,6 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.party.entity.Party;
-import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
@@ -25,11 +24,8 @@ import project.global.exception.ErrorCode;
 @Slf4j
 public class TrashBinServiceImpl implements TrashBinService {
 
-    private final DirectoryService directoryService;
-    private final FileService fileService;
     private final TrashBinRepository trashBinRepository;
     private final DirectoryRepository directoryRepository;
-    private final PartyRepository partyRepository;
     private final FileRepository fileRepository;
     private final GetTrashBinMapper getTrashBinMapper;
 
@@ -61,7 +57,8 @@ public class TrashBinServiceImpl implements TrashBinService {
     @Override
     public void saveFile(String fileId) {
         // file -> photo -> partyId -> trashBin -> addfileId
-        File file = fileService.findById(fileId);
+        File file = fileRepository.findById(fileId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
         ModelMapper modelMapper = new ModelMapper();
         Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
         // partyId == trashBinId
@@ -71,17 +68,6 @@ public class TrashBinServiceImpl implements TrashBinService {
         trashBinRepository.save(trashBin);
     }
 
-    @Override
-    public void saveDir(Directory dir) {
-        // parentDirId = ""이면 while 탈출
-        String rootDirId = directoryService.getRootDirId(dir);
-        Party party = partyRepository.findPartyByRootDirId(rootDirId)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
-        Long partyId = party.getId();
-        TrashBin trashBin = findById(partyId);
-        trashBin.getDirIdList().add(dir.getId());
-        trashBinRepository.save(trashBin);
-    }
 
     @Override
     public List<String> getDirNameList(TrashBin trashBin) {
@@ -105,19 +91,7 @@ public class TrashBinServiceImpl implements TrashBinService {
         return photoUrlList;
     }
 
-    @Override
-    public void restoreDir(String dirId, Long trashBinId) {
-        TrashBin trashBin = findById(trashBinId);
-        trashBin.getDirIdList().remove(dirId);
-        trashBinRepository.save(trashBin);
-    }
 
-    @Override
-    public void restoreFile(String fileId, Long trashBinId) {
-        TrashBin trashBin = findById(trashBinId);
-        trashBin.getFileIdList().remove(fileId);
-        trashBinRepository.save(trashBin);
-    }
 
 
 }
