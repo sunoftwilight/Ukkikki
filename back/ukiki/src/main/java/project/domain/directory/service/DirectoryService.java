@@ -3,7 +3,6 @@ package project.domain.directory.service;
 import java.util.List;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.dto.request.CreateDirDto;
-import project.domain.directory.dto.request.MoveDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.RenameDirDto;
@@ -39,11 +38,11 @@ public interface DirectoryService {
     public GetDirDto getDir(String dirId);
     public GetDirDto createDir(CreateDirDto request);
     // 폴더 이동
-    public GetDirDto moveDir(MoveDirDto request);
+    public GetDirDto moveDir(String dirId, String toDirId);
     // 폴더 삭제
     public GetDirDto deleteDir(String dirId);
     // 폴더 이름 수정
-    public RenameDirDto renameDir(project.domain.directory.dto.request.RenameDirDto request);
+    public RenameDirDto renameDir(String dirId, String newName);
     // 디렉토리 엔티티 DB에서 조회
     public Directory findById(String dirId);
     // 여러가지 있을떄 한방에 저장 할 수 있도록 list 로 묶어준는 메서드

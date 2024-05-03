@@ -4,6 +4,7 @@ import java.util.List;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.response.GetDirDto;
+import project.domain.directory.dto.response.GetFileDto;
 import project.domain.photo.entity.Photo;
 
 public interface FileService {
@@ -37,4 +38,6 @@ public interface FileService {
     public String generateId();
 
     public File findById(String fileId);
+
+    GetFileDto getFileDto(String fileId);
 }

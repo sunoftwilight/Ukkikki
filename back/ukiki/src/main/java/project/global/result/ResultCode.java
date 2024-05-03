@@ -28,6 +28,11 @@ public enum ResultCode {
     //File
     FILE_UPLOAD_SUCCESS(200, "파일이 정상적으로 업로드 되었습니다."),
     FILE_DOWNLOAD_SUCCESS(200, "파일이 정상적으로 다운로드 되었습니다."),
+    FILE_DELETE_SUCCESS(200, "파일이 정상적으로 삭제 되었습니다."),
+    FILE_COPY_SUCCESS(200, "파일 복사에 성공하였습니다."),
+    FILE_MOVE_SUCCESS(200, "파일 이동에 성공하였습니다."),
+    GET_FILE_SUCCESS(200, "파일 조회에 성공하였습니다."),
+
 
     // Directory
     GET_DIRECTORY_SUCCESS(200, "폴더 조회에 성공하였습니다."),

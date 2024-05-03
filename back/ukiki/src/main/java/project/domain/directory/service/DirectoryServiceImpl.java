@@ -18,7 +18,6 @@ import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.request.CreateDirDto;
-import project.domain.directory.dto.request.MoveDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.RenameDirDto;
@@ -87,10 +86,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     @Transactional
-    public GetDirDto moveDir(MoveDirDto request) {
-        String dirId = request.getDirId();
-        String toDirId = request.getToDirId();
-
+    public GetDirDto moveDir(String dirId, String toDirId) {
         Directory dir = findById(dirId);
         Directory fromDir = findById(dir.getParentDirId());
         Directory toDir = findById(toDirId);
@@ -134,9 +130,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     @Transactional
-    public RenameDirDto renameDir(project.domain.directory.dto.request.RenameDirDto request) {
-        String dirId = request.getDirId();
-        String newName = request.getNewName();
+    public RenameDirDto renameDir(String dirId, String newName) {
         Directory dir = findById(dirId);
         dir.setDirName(newName);
         directoryRepository.save(dir);
