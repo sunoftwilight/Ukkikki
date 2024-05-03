@@ -2,6 +2,16 @@ package project.domain.party.service;
 
 
 import com.amazonaws.services.s3.model.SSECustomerKey;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,23 +23,23 @@ import project.domain.alarm.redis.AlarmType;
 
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.directory.service.DirectoryService;
+import project.domain.directory.service.TrashBinService;
 import project.domain.member.entity.Member;
+import project.domain.member.entity.MemberRole;
+import project.domain.member.repository.MemberRepository;
 import project.domain.party.dto.request.ChangeThumbDto;
+import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.EnterPartyDto;
 import project.domain.party.dto.request.PartyPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
+import project.domain.party.dto.response.PartyLinkDto;
 import project.domain.party.dto.response.SimpleMemberPartyDto;
 import project.domain.party.entity.MemberParty;
-import project.domain.member.entity.MemberRole;
-import project.domain.member.repository.MemberRepository;
-import project.domain.party.dto.request.CreatePartyDto;
-import project.domain.party.dto.response.PartyLinkDto;
 import project.domain.party.entity.Party;
 import project.domain.party.mapper.MemberPartyMapper;
 import project.domain.party.mapper.PartyLinkMapper;
-import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.redis.PartyLink;
-
+import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyLinkRedisRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
@@ -39,18 +49,13 @@ import project.global.exception.ErrorCode;
 import project.global.util.BcryptUtil;
 import project.global.util.S3Util;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 @AllArgsConstructor
 public class PartyServiceImpl implements PartyService {
 
     private final DirectoryService directoryService;
+    private final TrashBinService trashBinService;
     private final MemberRepository memberRepository;
     private final PartyRepository partyRepository;
     private final MemberpartyRepository memberpartyRepository;
@@ -90,8 +95,9 @@ public class PartyServiceImpl implements PartyService {
         }
         partyRepository.save(party);
 
-        // 해당 파티에 초기 공유 앨범 디렉토리 부여
+        // 해당 파티에 초기 공유 앨범디렉토리, 휴지통 부여
         directoryService.initDirParty(party);
+        trashBinService.createTrashBin(party);
 
         MemberParty memberParty = MemberParty.customBuilder()
             .memberRole(MemberRole.MASTER)

@@ -42,6 +42,10 @@ public enum ErrorCode {
     // 폴더 관련
     DIRECTORY_NOE_FOUND(404, "해당 폴더를 찾을 수 없습니다."),
     DIRECTORY_OUT_OF_DEADLINE(403, "유효 기간이 만료된 폴더입니다."),
+    ROOTDIR_NOT_FOUND(404, "최상위 폴더를 찾을 수 없습니다.(무한 재귀 발생)"),
+
+    // 휴지통 과련
+    TRASHBIN_NOT_FOUND(404, "존재하지 않는 휴지통 입니다."),
 
     // 사진 파일 관련
     PHOTO_FILE_NOT_FOUND(404, "해당 사진 파일을 찾을 수 없습니다."),
