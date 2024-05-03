@@ -13,7 +13,7 @@ const Header: React.FC = () => {
   const albumPath = ['/album']
 
   if (basicPath.includes(location.pathname)) return <LogoHeader />
-  else if (backPath.includes(location.pathname) || location.pathname.startsWith('/album/')) return <BackHeader />
+  else if (backPath.includes(location.pathname) || location.pathname.startsWith('/album/') || location.pathname.startsWith('/feed/')) return <BackHeader />
   else if (albumPath.includes(location.pathname)) return <AlbumHeader />
   else if (location.pathname === '/write') return <WriteHeader />
 };
