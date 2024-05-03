@@ -7,18 +7,16 @@ import GroupMemberModal from "./components/GroupMain/GroupMemberModal";
 // 헤더가 필요한 곳에 대한 설정
 function App() {
 	return (
-		<div>
-      <div className="w-screen h-screen">
-        <Header />
+    <div className="w-screen h-screen">
+      <Header />
 
-        <div className="fixed top-14 w-full h-[calc(100%-56px)] overflow-scroll scrollbar-hide">
-          <Outlet />
-          <Hamburger />
-          <InviteModal />
-          <GroupMemberModal />
-        </div>
-			</div>
-		</div>
+      <div className="fixed top-14 w-full h-[calc(100%-56px)] overflow-scroll scrollbar-hide">
+        <Outlet />
+        <Hamburger />
+        <InviteModal />
+        <GroupMemberModal />
+      </div>
+    </div>
 	);
 }
 
