@@ -1,15 +1,18 @@
 import React from "react";
 
 interface InsertPasswordProps {
-  onBackBtnClick: (type:string) => void;
+  onBackBtnClick: () => void;
+  onNextBtnClick: (partyId:number, partyName:string, partyCode: string) => void
 }
 
-const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick}) => {
+const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtnClick}) => {
 
   const handleBackBtnClick = () => {
-    onBackBtnClick('info')
+    onBackBtnClick()
   }
-
+  const handleNextBtnClick = () => {
+    onNextBtnClick(1, '끄룹', 'www.sdfsdsd')
+  }
 
   return (
     <div className="flex flex-col w-full h-full font-pre-B px-4">
@@ -43,7 +46,7 @@ const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick}) => {
       </div>
 
       <div className="w-full text-xl text-white">
-        <button className="w-full h-[60px] bg-main-blue rounded-2xl">
+        <button className="w-full h-[60px] bg-main-blue rounded-2xl" onClick={handleNextBtnClick}>
           <p>완료</p>
         </button>
         <button className="w-full h-[60px] bg-gray mt-2 rounded-2xl" onClick={handleBackBtnClick}>
