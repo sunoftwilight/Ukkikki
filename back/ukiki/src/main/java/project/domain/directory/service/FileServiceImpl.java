@@ -59,6 +59,7 @@ public class FileServiceImpl implements FileService{
 
         String rootDirId = findParty.getRootDirId();
         String newFileId = newFile.getId();
+        fileRepository.save(newFile);
         setDirFileRelation(rootDirId, newFileId);
     }
 

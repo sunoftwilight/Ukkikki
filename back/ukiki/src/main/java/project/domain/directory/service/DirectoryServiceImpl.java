@@ -239,7 +239,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public List<String> getPhotoUrlList(Directory directory) {
         List<String> photoUrlList = new ArrayList<>();
-        List<File> FileList =  fileRepository.findAllById(directory.getChildDirIdList());
+        List<File> FileList =  fileRepository.findAllById(directory.getFileIdList());
         ModelMapper modelMapper = new ModelMapper();
         for (File file : FileList) {
             Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
