@@ -6,7 +6,7 @@ server:
 spring:
 #  ?? ? ??? ?? ???? ?? => local
   profiles:
-    active: server
+    active: local
     include: key
   jpa:
     hibernate:
@@ -87,5 +87,26 @@ spring:
     mongodb:
       uri: ENC(Bf33id/NT451ymS94xr23Mp5TlZShmuy5ZUIbPwoMMUMIPAg124BRIetV//M+JsYauF4DT7mZ1bsjJtb1sWsifi42+jcs/lidtGhNvE/R2RqGwHioOtZ2A==)
 
-
-
+---
+# kakao
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+        registration:
+          kakao:
+            client-id: ENC(9EljJ7oPUEA9u2V9DnA+JQy2PbbUfmHJYaAiOHh85lZYkkQrjoxSBgV0fNFcsrH9)
+            client-secret: ENC(qziOW7UxQ07u+b17onp9vMpIG0wFljbDb/j1mAUoBHMfFdhbezWJ8lLAO3q4Fxn4)
+            client-authentication-method: client_secret_post
+            redirect-uri: http://localhost:5000/api/login/oauth2/code/kakao
+            authorization-grant-type: authorization_code
+            client-name: kakao
+            scope:
+              - profile_nickname
+              - profile_image

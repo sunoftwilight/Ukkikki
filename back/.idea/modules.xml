@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/back.iml" filepath="$PROJECT_DIR$/.idea/back.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ukiki.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ukiki.main.iml" />
     </modules>
   </component>
 </project>
