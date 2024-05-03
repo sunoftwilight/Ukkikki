@@ -110,3 +110,6 @@ spring:
             scope:
               - profile_nickname
               - profile_image
+
+jwt:
+  key : 'Wjwv2cia9DIR8qnNDHwRIhIA2MsoeEATi1+R48Hac3M='
