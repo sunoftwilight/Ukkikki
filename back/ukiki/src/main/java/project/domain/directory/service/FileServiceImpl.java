@@ -15,7 +15,9 @@ import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.response.GetDirDto;
+import project.domain.directory.dto.response.GetFileDto;
 import project.domain.directory.mapper.GetDirMapper;
+import project.domain.directory.mapper.GetFileMapper;
 import project.domain.directory.mapper.TrashFileMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
@@ -43,6 +45,7 @@ public class FileServiceImpl implements FileService{
 
     private final GetDirMapper getDirMapper;
     private final TrashFileMapper trashFileMapper;
+    private final GetFileMapper getFileMapper;
 
 
     @Override
@@ -59,6 +62,7 @@ public class FileServiceImpl implements FileService{
 
         String rootDirId = findParty.getRootDirId();
         String newFileId = newFile.getId();
+        fileRepository.save(newFile);
         setDirFileRelation(rootDirId, newFileId);
     }
 
@@ -169,6 +173,12 @@ public class FileServiceImpl implements FileService{
     public File findById(String fileId) {
         return fileRepository.findById(fileId).orElseThrow(() ->
             new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
+    }
+
+    @Override
+    public GetFileDto getFileDto(String fileId) {
+        File file = findById(fileId);
+        return getFileMapper.toGetFileDto(file);
     }
 
     @Override

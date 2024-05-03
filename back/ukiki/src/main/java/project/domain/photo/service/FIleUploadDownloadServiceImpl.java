@@ -55,6 +55,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             Photo photo = new Photo();
 //            photo.setParty(partyRepository.findById(partyId));
             PhotoUrl urls = new PhotoUrl();
+
             //S3 파일 업로드 후 저장
             urls.setPhotoUrl(s3Util.fileUpload(file, sseKey));
             photo.setFileName(urls.getPhotoUrl().split("/")[3]);
@@ -62,10 +63,11 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             urls.setThumb_url2(s3Util.bufferedImageUpload(imageUtil.resizeImage(file, 2), sseKey, file));
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
             + ", " + photo.getFileName());
+            photo.setPhotoUrl(urls);
             photoRepository.save(photo);
 
             //MongoDB 업데이트
-            fileService.createFile(1L, photo);
+            fileService.createFile(2L, photo);
 
             //GPT API
             for (Integer code : gptUtil.postChat(file)) {
