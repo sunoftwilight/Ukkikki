@@ -7,7 +7,7 @@ interface CreateDoneProps {
     code: string
 }
 
-const CreateDone:React.FC<CreateDoneProps> = ({id, name, code}) => {
+const CreateDone:React.FC<CreateDoneProps> = ({name}) => {
   const GroupName = name;
   //   const GroupId = id;
   //   const GroupCode = code;
