@@ -37,6 +37,8 @@ public enum ResultCode {
     DELETE_DIRECTORY_SUCCESS(204, "폴더 삭제에 성공하였습니다."),
     RESTORED_DIRECTORY_SUCCESS(201, "폴더 복원에 성공하였습니다."),
 
+    // alarm
+    GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다.")
 
 
     ;

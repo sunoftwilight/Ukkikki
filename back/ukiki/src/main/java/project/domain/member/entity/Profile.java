@@ -7,13 +7,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.domain.party.entity.Party;
 import project.global.baseEntity.BaseEntity;
 
 @Entity
@@ -39,4 +39,9 @@ public class Profile extends BaseEntity {
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
     Member member;
+
+    @JoinColumn(name = "party_id")
+    @ManyToOne
+    private Party party;
+
 }

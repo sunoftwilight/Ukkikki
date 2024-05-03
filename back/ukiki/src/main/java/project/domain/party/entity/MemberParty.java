@@ -34,6 +34,7 @@ public class MemberParty extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "member_role")
     private MemberRole memberRole;
+    
 
     // 연관관계
     @JoinColumn(name = "user_id")

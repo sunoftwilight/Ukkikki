@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.domain.member.entity.Profile;
 import project.domain.photo.entity.Photo;
 import project.global.baseEntity.BaseEntity;
 
@@ -51,6 +52,9 @@ public class Party extends BaseEntity {
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photoList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Profile> profileList = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)

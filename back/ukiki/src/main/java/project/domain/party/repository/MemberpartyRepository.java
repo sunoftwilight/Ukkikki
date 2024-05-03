@@ -6,7 +6,6 @@ import project.domain.member.entity.Member;
 import project.domain.member.entity.MemberRole;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
-import project.domain.party.redis.PartyLink;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,7 @@ public interface MemberpartyRepository extends JpaRepository<MemberParty, Long> 
 
     int countAllByPartyIdAndMemberRoleIsNot(Long partyId, MemberRole memberRole);
 
-    List<MemberParty> findAllByParty(Party party);
+    List<MemberParty> findAllByPartyId(Long partyId);
 
     @Query("SELECT m FROM MemberParty m " +
         " WHERE m.party.id = :partyId" +

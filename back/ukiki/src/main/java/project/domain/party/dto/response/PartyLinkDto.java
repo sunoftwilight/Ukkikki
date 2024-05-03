@@ -9,5 +9,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class PartyLinkDto {
+
     String partyLink;
+    String partyName;
+    Long party;
 }

@@ -23,6 +23,7 @@ public class PartyLink {
 
     @Id
     private String partyLink;
+    private String partyName;
 
     @Indexed
     private Long party;

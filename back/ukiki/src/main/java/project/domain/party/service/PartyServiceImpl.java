@@ -2,16 +2,16 @@ package project.domain.party.service;
 
 
 import com.amazonaws.services.s3.model.SSECustomerKey;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import project.domain.article.redis.Alarm;
-import project.domain.article.redis.AlarmType;
-import project.domain.article.repository.AlarmRedisRepository;
+import project.domain.alarm.redis.Alarm;
+import project.domain.alarm.redis.AlarmType;
+
+import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.directory.service.DirectoryService;
 import project.domain.member.entity.Member;
 import project.domain.party.dto.request.ChangeThumbDto;
@@ -33,7 +33,6 @@ import project.domain.party.redis.PartyLink;
 import project.domain.party.repository.PartyLinkRedisRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
-import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
@@ -67,6 +66,7 @@ public class PartyServiceImpl implements PartyService {
     @Override
     @Transactional
     public PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo) {
+
         // TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(1L)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -83,7 +83,6 @@ public class PartyServiceImpl implements PartyService {
             .build();
 
         // 이미지 저장 해야함
-
         if (photo != null){
             String partyThumbnailImg = s3Util.fileUpload(photo,
                 new SSECustomerKey(s3Util.generateSSEKey(createPartyDto.getPassword())));
@@ -109,11 +108,12 @@ public class PartyServiceImpl implements PartyService {
 
         PartyLink partyLink = PartyLink.builder()
             .partyLink(link)
+            .partyName(party.getPartyName())
             .party(party.getId())
             .build();
 
         partyLinkRedisRepository.save(partyLink);
-        log.info("TEST HERE??");
+
         return partyLinkMapper.toPartyLinkDto(partyLink);
     }
 
@@ -148,6 +148,7 @@ public class PartyServiceImpl implements PartyService {
 
         PartyLink partyLink = PartyLink.builder()
             .partyLink(link)
+            .partyName(party.getPartyName())
             .party(party.getId())
             .build();
 
@@ -265,7 +266,7 @@ public class PartyServiceImpl implements PartyService {
         partyRepository.save(party);
 
         // 알람 보내기
-        List<MemberParty> memberParties = memberpartyRepository.findAllByParty(party);
+        List<MemberParty> memberParties = memberpartyRepository.findAllByPartyId(party.getId());
         for (MemberParty memberParty1 : memberParties) {
             // 마스터라면 넘어가기
             if (memberParty1.getMemberRole().equals(MemberRole.MASTER)) {
@@ -276,7 +277,6 @@ public class PartyServiceImpl implements PartyService {
                 .memberId(member.getId())
                 .alarmType(AlarmType.PASSWORD)
                 .content("비밀번호가 변경 되었습니다.")
-                .identifier(String.valueOf(party.getId()))
                 .build();
             alarmRedisRepository.save(alarm);
             //TODO SSE 보내기 . . .
