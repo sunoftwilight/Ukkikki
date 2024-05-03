@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
+import project.domain.directory.dto.response.GetDirDto;
+import project.domain.directory.mapper.GetDirMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.party.entity.Party;
@@ -26,10 +28,12 @@ public class FileServiceImpl implements FileService{
 
     private final DirectoryService directoryService;
     private final TrashService trashService;
+    private final TrashBinService trashBinService;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
     private final PhotoRepository photoRepository;
+    private final GetDirMapper getDirMapper;
 
 
     @Override
@@ -50,8 +54,9 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public void copyFile(String targetDirId, String fileId) {
-        setDirFileRelation(targetDirId, fileId);
+    @Transactional
+    public GetDirDto copyFile(String fileId, String fromDirId, String toDirId) {
+        setDirFileRelation(toDirId, fileId);
         // photo num ++1
         File findFile = findById(fileId);
         ModelMapper modelMapper = new ModelMapper();
@@ -61,31 +66,64 @@ public class FileServiceImpl implements FileService{
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
         int photoNum = findPhoto.getPhotoNum();
         findPhoto.setPhotoNum(photoNum + 1);
+
+        Directory fromDir = directoryService.findById(fromDirId);
+
+        return getDirMapper.toGetDirDto(
+            fromDir,
+            directoryService.getParentDirName(fromDir),
+            directoryService.getChildNameList(fromDir),
+            directoryService.getPhotoUrlList(fromDir)
+        );
     }
 
     @Override
-    public void moveFile(String fromDirId, String toDirId, String fileId) {
+    @Transactional
+    public GetDirDto moveFile(String fileId, String fromDirId, String toDirId) {
         setDirFileRelation(toDirId, fileId);
         deleteDirFileRelation(fromDirId, fileId);
+
+        Directory fromDir = directoryService.findById(fromDirId);
+
+        return getDirMapper.toGetDirDto(
+            fromDir,
+            directoryService.getParentDirName(fromDir),
+            directoryService.getChildNameList(fromDir),
+            directoryService.getPhotoUrlList(fromDir)
+        );
     }
 
     @Override
-    public void deleteOneFile(String dirId, String fileId) {
+    @Transactional
+    public GetDirDto deleteOneFile(String fileId, String dirId) {
         deleteDirFileRelation(dirId, fileId);
-        trashService.saveFile(findById(fileId));
+        // deleteFile을 넘겨 줘야한다.
+        trashService.saveFile(findById(fileId), dirId);
+        trashBinService.saveFile(fileId);
+        Directory dirDir = directoryService.findById(dirId);
+
+        return getDirMapper.toGetDirDto(
+            dirDir,
+            directoryService.getParentDirName(dirDir),
+            directoryService.getChildNameList(dirDir),
+            directoryService.getPhotoUrlList(dirDir)
+        );
     }
 
     @Override
-    public void deleteAllFile(String fileId) {
-
+    @Transactional
+    public GetDirDto deleteAllFile(String fileId, String dirId) {
+        return null;
     }
 
     @Override
-    public void deleteSelectedFile(List<String> fileIdList) {
-
+    @Transactional
+    public GetDirDto deleteSelectedFile(List<String> fileIdList, String dirId) {
+        return null;
     }
 
     @Override
+    @Transactional
     public void setDirFileRelation(String dirId, String fileId) {
         // dir에 fileId 추가
         Directory findDir = directoryService.findById(dirId);
@@ -98,6 +136,7 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
+    @Transactional
     public void deleteDirFileRelation(String dirId, String fileId) {
         // dir에서 fileId 제거
         Directory findDir = directoryService.findById(dirId);

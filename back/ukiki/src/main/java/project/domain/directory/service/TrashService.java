@@ -1,15 +1,20 @@
 package project.domain.directory.service;
 
-import java.time.LocalDateTime;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
+import project.domain.directory.dto.response.GetTrashBinDto;
 
 public interface TrashService {
 
+
     public Trash saveDir(Directory directory);
 
-    public Trash saveFile(File file);
+    Trash saveFile(File file, String dirId);
+
+    void getTrash();
+
+    GetTrashBinDto restoreTrash(String trashId, Long trashBinId);
 
     public Integer realDelete();
 
@@ -18,7 +23,5 @@ public interface TrashService {
     public Boolean isOutOfRecoveryPeriod(Trash deletedData);
 
     public String generateId();
-
-    // 디렉토리 및 사진 복원
 
 }

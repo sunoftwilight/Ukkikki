@@ -41,6 +41,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
 
     private final TrashService trashService;
+    private final TrashBinService trashBinService;
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
@@ -119,6 +120,8 @@ public class DirectoryServiceImpl implements DirectoryService {
         directoryRepository.save(parentDir);
         // child 는 그대로 휴지통으로 임시 저장
         trashService.saveDir(dir);
+        trashBinService.saveDir(dir);
+
         // child 삭제
         directoryRepository.deleteById(dirId);
 
@@ -279,6 +282,19 @@ public class DirectoryServiceImpl implements DirectoryService {
             photoUrlList.add(photo.getPhotoUrl().getPhotoUrl());
         }
         return photoUrlList;
+    }
+
+    @Override
+    public String getRootDirId(Directory dir) {
+        int cnt = 0;
+        while(!dir.getParentDirId().equals("")) {
+            dir = findById(dir.getParentDirId());
+            cnt++;
+            if(cnt > 100){
+                throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
+            }
+        }
+        return dir.getId();
     }
 
 }

@@ -2,6 +2,7 @@ package project.domain.directory.service;
 
 import java.util.List;
 import project.domain.directory.collection.File;
+import project.domain.directory.dto.response.GetDirDto;
 import project.domain.photo.entity.Photo;
 
 public interface FileService {
@@ -10,19 +11,19 @@ public interface FileService {
     void createFile(Long partyId, Photo photo);
 
     // 사진 복사
-    void copyFile(String targetDirId, String fileId);
+    GetDirDto copyFile(String fileId, String fromDirId, String toDirId);
 
     // 사진 이동
-    void moveFile(String fromDirId, String toDirId, String fileId);
+    GetDirDto moveFile(String fileId, String fromDirId, String toDirId);
 
     // 단일 사진 삭제
-    void deleteOneFile(String dirId, String fileId);
+    GetDirDto deleteOneFile(String fileId, String dirId);
 
     // 전체 사진 삭제
-    void deleteAllFile(String fileId);
+    GetDirDto deleteAllFile(String fileId, String dirId);
 
     // 선택 사진 삭제
-    void deleteSelectedFile(List<String> fileIdList);
+    GetDirDto deleteSelectedFile(List<String> fileIdList, String dirId);
 
     // dir, file의 관계 설정 메서드
     void setDirFileRelation(String dirId, String fileId);
