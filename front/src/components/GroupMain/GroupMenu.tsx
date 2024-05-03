@@ -3,7 +3,7 @@ import { inviteStore } from "../../stores/ModalStore";
 import { Link } from "react-router-dom";
 
 const GroupMenu: React.FC = () => {
-  const btnStyle = "w-full h-[50px] rounded-[15px] bg-soft-blue font-pre-SB text-white text-xl flex justify-center items-center active:scale-95 active:bg-main-blue transition-transform duration-75"
+  const btnStyle = "w-full h-[50px] rounded-[15px] bg-soft-blue font-pre-SB text-white text-xl flex justify-center items-center hover:scale-95 hover:bg-main-blue active:scale-95 active:bg-main-blue transition-transform duration-75"
   const { setInviteOpen } = inviteStore()
 
   return (

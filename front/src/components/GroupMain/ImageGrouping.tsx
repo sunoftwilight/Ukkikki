@@ -17,7 +17,7 @@ const ImageGrouping: React.FC = () => {
     <div className="w-full h-[72px] flex rounded-xl bg-soft-gray items-center ps-[10px] overflow-x-auto scrollbar-hide">
       <div style={{ minWidth: `${groupingList.length * 72}px` }} className="flex gap-5">
         { groupingList.map((item, idx) => (
-          <div key={idx} className="w-[52px] h-[52px] rounded-full border-disabled-gray border-[1px] flex justify-center items-center">
+          <div key={idx} className="w-[52px] h-[52px] rounded-full border-disabled-gray border-[1px] flex justify-center items-center hover:scale-125">
             <img src={item} className="w-12 h-12 object-cover rounded-full" />
           </div>
         ))}

@@ -59,7 +59,7 @@ const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
 
   return (
-    <div className="grid grid-cols-3 px-4 gap-1 overflow-scroll scrollbar-hide ">
+    <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
       {albumList.folder.map((item, idx) => (
         <div key={idx} className="flex flex-col justify-center items-center gap-1">
           <img src={folder} className="w-[82px] h-[65px]" />

@@ -20,7 +20,7 @@ export default function Router() {
   const { currentImg, currentUrl } = useStore(DetailImgStore)
 
   return (
-    <Routes>
+    <Routes location={location} key={location.pathname}>
       {/* 헤더 & 네브를 넣을 페이지 */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Main />} />

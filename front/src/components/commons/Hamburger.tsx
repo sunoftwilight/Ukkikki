@@ -3,6 +3,7 @@ import close from '@/assets/Hamburger/close.png'
 import ModalBackground from "./ModalBackground";
 import headerStore from "../../stores/headerStore";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion"
 
 const alarmDummy = [
   {
@@ -51,20 +52,27 @@ const Hamburger: React.FC = () => {
   }
 
   return (
-    <>
-    { (alarmOpen || menuOpen) && 
-      <div className="fixed top-0 start-0 h-screen w-screen flex justify-end">
+    <AnimatePresence>
+      { (alarmOpen || menuOpen) && 
+        <div className="fixed top-0 start-0 h-screen w-screen flex justify-end">
           <ModalBackground />
-        <div className="h-full w-72 z-20 bg-white p-4 flex flex-col gap-y-7">
-          {/* 햄버거 제목 & 닫기 버튼 */}
-          <div className="flex justify-between items-center">
-            <div className="font-gtr-B text-3xl text-black">
-              {menuOpen ? '메뉴' : '알림함'}
-            </div>
-            <img src={close} onClick={() => closeHandler()} className="font-gtr-R text-black text-xl" />
-          </div>
 
-          {/* 메뉴바 */}
+          <motion.div 
+            key={menuOpen ? '메뉴' : '알림함'}
+            className="h-full w-72 z-20 bg-white p-4 flex flex-col gap-y-7"
+            initial={{ opacity: 0, translateX: "88px" }}
+            animate={{ opacity: 1, translateX: "0px" }}
+            exit={{ opacity: 0, translateX: "88px" }}
+          >
+            {/* 햄버거 제목 & 닫기 버튼 */}
+            <div className="flex justify-between items-center">
+              <div className="font-gtr-B text-3xl text-black">
+                {menuOpen ? '메뉴' : '알림함'}
+              </div>
+              <img src={close} onClick={() => closeHandler()} className="font-gtr-R text-black text-xl" />
+            </div>
+
+            {/* 메뉴바 */}
             { menuOpen &&
               <div>
                 {menuList.map((menuItem, idx) => (
@@ -80,7 +88,7 @@ const Hamburger: React.FC = () => {
               </div>
             }
 
-          {/* 알림함 */}
+            {/* 알림함 */}
             { alarmOpen &&
               alarmDummy.map((alarmItem, idx) => (
                 <div key={idx} className="flex gap-3">
@@ -97,10 +105,10 @@ const Hamburger: React.FC = () => {
                 </div>
               ))
             }
+          </motion.div>
         </div>
-      </div>
-    }
-    </>
+      }
+    </AnimatePresence>
   )
 };
 
