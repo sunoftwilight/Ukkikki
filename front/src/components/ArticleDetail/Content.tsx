@@ -1,6 +1,7 @@
 import React from "react";
 import editBtn from "@/assets/ArticleDetail/edit.png";
 import deleteBtn from "@/assets/ArticleDetail/delete.png";
+import { useNavigate } from "react-router-dom";
 
 const dummy = {
   writer: '나는 이해진이다',
@@ -11,14 +12,25 @@ const dummy = {
   isModify: true,
   isMine: true,
   imgList: [
-    'https://i.namu.wiki/i/6nJq7Dza9kRKQbvw-EBUHqArvnLuKWGqeaWTT5odfIp1mJnrJNuLRe5hmxC3eXQtB0_1sQiknnDOpT0-kz1baA.webp',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeIaJPlIwTx-zhhvIq-Ymptj3fstzg8tntZ6om8hmybj-Z4tKndKK2u3JgcAHKhY_cWFQ&usqp=CAU',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbs36JG0hg3CcHcfJUbbBZc23aqqRePcmf8c8XECCWdr2XkQdEo10Q3p_FwcsVU3IxGsQ&usqp=CAU',
-    'https://mblogthumb-phinf.pstatic.net/MjAyMTExMTlfMTkx/MDAxNjM3MjU1MjMwNTAw.VZU97O6P_cpm2FY7IeZQsaoapq11qYMQggY0EDjSeY0g.YT-b7uqVrMJjHSIyfOtM1OmEiZlTiB8ZCgbr-dVg4vIg.JPEG.letyourselfglow/IMG_3017.jpg?type=w800',
+    { pk: 1, url: 'https://i.namu.wiki/i/6nJq7Dza9kRKQbvw-EBUHqArvnLuKWGqeaWTT5odfIp1mJnrJNuLRe5hmxC3eXQtB0_1sQiknnDOpT0-kz1baA.webp' },
+    { pk: 2, url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeIaJPlIwTx-zhhvIq-Ymptj3fstzg8tntZ6om8hmybj-Z4tKndKK2u3JgcAHKhY_cWFQ&usqp=CAU' },
+    { pk: 3, url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbs36JG0hg3CcHcfJUbbBZc23aqqRePcmf8c8XECCWdr2XkQdEo10Q3p_FwcsVU3IxGsQ&usqp=CAU' },
+    { pk: 4, url: 'https://mblogthumb-phinf.pstatic.net/MjAyMTExMTlfMTkx/MDAxNjM3MjU1MjMwNTAw.VZU97O6P_cpm2FY7IeZQsaoapq11qYMQggY0EDjSeY0g.YT-b7uqVrMJjHSIyfOtM1OmEiZlTiB8ZCgbr-dVg4vIg.JPEG.letyourselfglow/IMG_3017.jpg?type=w800' },
   ],
 }
 
+interface navigateProps {
+  pk: number;
+  url: string
+}
+
 const Content: React.FC = () => {
+  const navigate = useNavigate()
+
+  const goImgDetailHandler = (imgInfo: navigateProps) => {
+    navigate(`/feed/img/${imgInfo.pk}`, { state: { imgUrl: imgInfo.url } })
+  }
+
   return (
     <div className="flex flex-col w-full bg-white gap-1">
       {/* 작성자 프로필 */}
@@ -50,7 +62,7 @@ const Content: React.FC = () => {
 
         <div className="flex gap-[6px] overflow-x-scroll scrollbar-hide">
           { dummy.imgList.map((item, idx) => (
-            <img key={idx} src={item} className="w-full h-60 rounded-xl object-cover" />
+            <img key={idx} src={item.url} onClick={() => goImgDetailHandler(item)} className="w-full h-60 rounded-xl object-cover" />
           ))}
         </div>
       </div>
