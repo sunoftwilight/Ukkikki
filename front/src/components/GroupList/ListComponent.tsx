@@ -1,6 +1,7 @@
 import React from "react";
 import unFavorStar from "@/assets/GroupList/unFavoriteStar.png";
 import favorStar from "@/assets/GroupList/favoriteStar.png";
+import { Link } from "react-router-dom";
 const ListComponent:React.FC = () => {
     const sampleList = [
         {src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQylUM6q508tjNv_Aj4N5wRBhxmVNj3_rjXo5VCuUkiRQ&s', partyId: 1, partyName: '그룹이름보단그루비룸', favorite: false},
@@ -12,13 +13,11 @@ const ListComponent:React.FC = () => {
     return (
       <div className="flex flex-col gap-2">
         { sampleList.map((item, idx) => (
-          <div key={idx} className="relative w-100 h-20 rounded-2xl flex items-center border border-disabled-gray">
-            <div className="w-14 h-14 rounded-full ms-4 me-5">
-              <img src={item.src} className="object-cover w-14 h-14 rounded-full"/>
-            </div>
+          <Link to={'/group'} key={idx} className="relative w-100 h-20 rounded-2xl flex items-center border border-disabled-gray">
+            <img src={item.src} className="w-14 h-14 rounded-full ms-4 me-5"/>
             <p className="text-xl font-pre-R">{item.partyName}</p>
             <img src={item.favorite ? favorStar : unFavorStar} className="absolute w-6 h-6 right-5"/>
-          </div>
+          </Link>
         ))}
       </div>
     )

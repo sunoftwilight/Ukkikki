@@ -15,6 +15,7 @@ import Feed from './pages/Feed';
 import DetailImg from './pages/DetailImg';
 import Write from './pages/Write';
 import Chatting from './pages/Chatting';
+import ArticleDetail from './pages/ArticleDetail';
 
 export default function Router() {
   const { currentImg, currentUrl } = useStore(DetailImgStore)
@@ -32,6 +33,7 @@ export default function Router() {
         <Route path="/album" element={<Album />} />
         <Route path={`/album/${currentImg}`} element={<DetailImg url={currentUrl} />} />
         <Route path="/feed" element={<Feed />} />
+        <Route path="/feed/:pk" element={<ArticleDetail />} />
         <Route path="/write" element={<Write />} />
         <Route path="/chat" element={<Chatting />} />
       </Route>
