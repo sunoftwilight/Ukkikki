@@ -20,3 +20,8 @@ export interface detailImgType {
   currentUrl: string
   setCurrentImg: (pk: number, url: string) => void;
 }
+
+export interface selectModeType {
+  selectMode: boolean;
+  setSelectMode: () => void;
+}

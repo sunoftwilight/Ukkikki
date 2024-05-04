@@ -7,10 +7,13 @@ import albumOption from "@/assets/Header/albumOption.png"
 import selectOption from "@/assets/Header/selectOptn.png"
 import AlbumEditOptions from "./AlbumEditOptions";
 import AlbumSelectOptions from "./AlbumSelectOptions";
+import { useStore } from "zustand";
+import { selectModeStore } from "../../stores/AlbumStore";
 
 const AlbumHeader: React.FC = () => {
   const btnStyle = 'w-14 h-8 rounded-[10px] font-pre-SB text-white flex justify-center items-center'
-  const [isSelect, setIsSelect] = useState(false)
+
+  const { selectMode, setSelectMode } = useStore(selectModeStore)
   const [isEdit, setIsEdit] = useState(false)
   const [isDone, setIsDone] = useState(false)
   const navigate = useNavigate()
@@ -23,7 +26,7 @@ const AlbumHeader: React.FC = () => {
 
   return (
     <div className="flex justify-between items-center px-4 w-full h-14 bg-white">
-      {!isSelect ?
+      {!selectMode ?
         <>
           <img src={back} onClick={() => goBackHandler()} />
 
@@ -47,14 +50,14 @@ const AlbumHeader: React.FC = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            <button onClick={() => setIsSelect(true)} className="rounded-[10px] font-pre-SB text-white text-lg justify-center flex items-center bg-main-blue w-14 h-8">
+            <button onClick={() => setSelectMode()} className="rounded-[10px] font-pre-SB text-white text-lg justify-center flex items-center bg-main-blue w-14 h-8">
               선택
             </button>
           </div>
         </>
         :
         <>
-          <button onClick={() => setIsSelect(false)} className={`${btnStyle} text-lg bg-disabled-gray`}>취소</button>
+          <button onClick={() => setSelectMode()} className={`${btnStyle} text-lg bg-disabled-gray`}>취소</button>
           <div className="flex items-center gap-4">
             <img src={selectOption} className="w-6 h-6" onClick={() => setIsDone(!isDone)} />
             <AnimatePresence>

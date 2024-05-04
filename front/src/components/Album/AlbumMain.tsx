@@ -3,6 +3,8 @@ import folder from "@/assets/Album/folder.png"
 import { Link } from "react-router-dom";
 import { useStore } from "zustand";
 import { DetailImgStore } from "../../stores/DetailImgStore";
+import { selectModeStore } from "../../stores/AlbumStore";
+import SelectModeImg from "./SelectModeImg";
 
 const albumList = {
   folder: ['우리의 믿음', '우리의 사랑'],
@@ -57,6 +59,7 @@ const albumList = {
 
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
+  const { selectMode } = useStore(selectModeStore)
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
@@ -67,13 +70,19 @@ const AlbumMain: React.FC = () => {
         </div>
       ))}
       {albumList.thumbnailImg.map((item, idx) => (
-        <Link 
-          to={`/album/${item.pk}`} state={{url: item.url}}
-          key={idx} onClick={() => setCurrentImg(item.pk, item.url)}
-          className="flex justify-center items-center"
-        >
-          <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />
-        </Link>
+        <>
+          { selectMode ? 
+            <SelectModeImg key={idx} item={item} />
+          :
+            <Link 
+              to={`/album/${item.pk}`} state={{url: item.url}}
+              key={idx} onClick={() => setCurrentImg(item.pk, item.url)}
+              className="flex justify-center items-center"
+            >
+              <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />
+            </Link>
+          }
+        </>
       ))}
     </div>
   )
