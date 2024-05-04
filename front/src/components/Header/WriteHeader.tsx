@@ -14,7 +14,7 @@ const BackHeader: React.FC = () => {
   }
 
   return (
-    <div className="fixed flex justify-between items-center px-4 w-full h-14 bg-white">
+    <div className="flex justify-between items-center px-4 w-full h-14 bg-white">
       <img src={back} onClick={() => goBackHandler()} />
       <button onClick={() => writeHandler()} className="rounded-[10px] font-pre-SB text-white text-lg justify-center flex items-center bg-main-blue w-14 h-8">작성</button>
     </div>

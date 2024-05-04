@@ -8,7 +8,9 @@ import GroupMemberModal from "./components/GroupMain/GroupMemberModal";
 function App() {
 	return (
     <div className="w-screen h-screen">
-      <Header />
+      <div className="fixed top-0 w-full h-14 z-10">
+        <Header />
+      </div>
 
       <div className="fixed top-14 w-full h-[calc(100%-56px)] overflow-scroll scrollbar-hide">
         <Outlet />

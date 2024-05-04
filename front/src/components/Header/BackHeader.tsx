@@ -21,7 +21,7 @@ const BackHeader: React.FC = () => {
   const { setMenuOpen } = headerStore()
 
   return (
-    <div className="fixed flex justify-between items-center px-4 w-full h-14 bg-white">
+    <div className="flex justify-between items-center px-4 w-full h-14 bg-white">
       <img src={back} onClick={() => goBackHandler()} />
 
       <div className="flex gap-6">
