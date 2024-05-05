@@ -49,7 +49,7 @@ public class Alarm {
     LocalDateTime createDate;
     List<String> identifier;
     @Builder.Default
-    int isRead = 1;
+    Boolean isRead = true;
 
     @TimeToLive
     @Builder.Default

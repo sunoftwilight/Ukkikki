@@ -21,6 +21,6 @@ public class SimpleAlarm {
     String content;
     LocalDateTime createDate;
     List<String> identifier;     // LIST 형태안에 API를 넣어주자
-    int read;
+    boolean read;
 
 }
