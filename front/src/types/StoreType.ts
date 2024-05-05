@@ -5,6 +5,16 @@ export interface headerType {
   setMenuOpen: () => void;
 }
 
+export interface albumEditType {
+  isEdit : boolean;
+  setIsEdit: () => void;
+}
+
+export interface albumDoneType {
+  isDone : boolean;
+  setIsDone: () => void;
+}
+
 export interface inviteType {
   inviteOpen : boolean;
   setInviteOpen: () => void;
@@ -24,4 +34,9 @@ export interface detailImgType {
 export interface selectModeType {
   selectMode: boolean;
   setSelectMode: () => void;
+}
+
+export interface folderModalType {
+  folderOpen: boolean;
+  setFolderOpen: () => void;
 }

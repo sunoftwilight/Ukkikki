@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion"
 import back from "@/assets/Header/back.png"
@@ -7,15 +7,16 @@ import albumOption from "@/assets/Header/albumOption.png"
 import selectOption from "@/assets/Header/selectOptn.png"
 import AlbumEditOptions from "./AlbumEditOptions";
 import AlbumSelectOptions from "./AlbumSelectOptions";
-import { useStore } from "zustand";
 import { selectModeStore } from "../../stores/AlbumStore";
+import { albumDoneStore, albumEditStore } from "../../stores/HeaderStateStore";
 
 const AlbumHeader: React.FC = () => {
   const btnStyle = 'w-14 h-8 rounded-[10px] font-pre-SB text-white flex justify-center items-center'
 
-  const { selectMode, setSelectMode } = useStore(selectModeStore)
-  const [isEdit, setIsEdit] = useState(false)
-  const [isDone, setIsDone] = useState(false)
+  const { selectMode, setSelectMode } = selectModeStore()
+  const { isEdit, setIsEdit } = albumEditStore()
+  const { isDone, setIsDone } = albumDoneStore()
+
   const navigate = useNavigate()
 
   const goBackHandler = () => {
@@ -37,7 +38,7 @@ const AlbumHeader: React.FC = () => {
                 <div className="font-pre-R text-black">13 : 28</div>
               </div>
             }
-            <img src={albumOption} className="w-6 h-6" onClick={() => setIsEdit(!isEdit)} />
+            <img src={albumOption} className="w-6 h-6" onClick={() => setIsEdit()} />
             <AnimatePresence>
               {isEdit && (
                 <motion.div
@@ -59,7 +60,7 @@ const AlbumHeader: React.FC = () => {
         <>
           <button onClick={() => setSelectMode()} className={`${btnStyle} text-lg bg-disabled-gray`}>취소</button>
           <div className="flex items-center gap-4">
-            <img src={selectOption} className="w-6 h-6" onClick={() => setIsDone(!isDone)} />
+            <img src={selectOption} className="w-6 h-6" onClick={() => setIsDone()} />
             <AnimatePresence>
               {isDone && (
                 <motion.div
