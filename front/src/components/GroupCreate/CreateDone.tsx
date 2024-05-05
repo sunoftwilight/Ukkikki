@@ -1,6 +1,6 @@
 import React from "react";
 import { inviteStore } from "../../stores/ModalStore";
-
+import { useNavigate } from "react-router-dom";
 interface CreateDoneProps {
     id: number,
     name: string,
@@ -13,6 +13,7 @@ const CreateDone:React.FC<CreateDoneProps> = ({name}) => {
   //   const GroupCode = code;
   const btnStyle = "w-full h-[50px] rounded-[15px] flex justify-center items-center hover:scale-95 active:scale-95 active:bg-main-blue transition-transform duration-75"
   const { setInviteOpen } = inviteStore()
+  const navi = useNavigate();
   return (
     <div className="flex flex-col w-full h-full px-4">
       <div className="font-pre-B text-2xl mt-28 mb-24">
@@ -20,7 +21,7 @@ const CreateDone:React.FC<CreateDoneProps> = ({name}) => {
         <p>생성되었습니다!</p>
       </div>
       <div className="font-pre-B text-white text-xl flex flex-col gap-4">
-        <button className={btnStyle + ' bg-main-blue'}>
+        <button className={btnStyle + ' bg-main-blue'} onClick={() => navi('/group')}>
           <p>바로가기</p>
         </button>
         <button className={btnStyle + ' bg-soft-blue'} onClick={setInviteOpen}>
