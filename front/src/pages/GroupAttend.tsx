@@ -1,23 +1,22 @@
 import React from "react";
-import LoginLogo from "../../icons/512.png";
-import LoginBtn from "@/assets/Login/kakaoLoginBtn.png";
 import InfoIcon from "@/assets/GroupAttend/info_icon.png";
 
 const GroupAttend:React.FC = () => {
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center bg-white">
-      <img src={LoginLogo} className="-mt-11 mb-5 w-[170px]"/>
-      <div className="flex flex-col justify-center items-center mb-16">
-        <button >
-          <img src={LoginBtn} className="mb-3 rounded-lg"/>
-        </button>
-        <button >
-          <div className="w-[300px] h-[45px] bg-point-gray font-gtr-B text-base text-white rounded-lg flex justify-center items-center">
-            <p>게스트로 시작하기</p>
-          </div>
-        </button>
+    <div className="w-full h-full flex flex-col bg-white p-4 font-pre-SB text-lg gap-3">
+      <p>그룹 비밀번호</p>
+      <div className="w-80 h-14 flex justify-between">
+        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
       </div>
-      <div className="w-[300px] h-[180px] bg-gray flex flex-col p-2 rounded-xl text-sm font-pre-M">
+      <div className="my-5 w-80 h-[45px] bg-disabled-gray font-gtr-B text-base text-white rounded-lg flex justify-center items-center">
+        <p>다음</p>
+      </div>
+      <div className="w-80 h-[180px] bg-gray flex flex-col p-2 rounded-xl text-sm font-pre-M">
         <div className="m-2 flex items-center">
           <img src={InfoIcon} className="w-8 h-8 me-3"/>
           <div>

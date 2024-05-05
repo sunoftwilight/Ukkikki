@@ -8,6 +8,7 @@ import Camera from './pages/Camera';
 import GroupMain from './pages/GroupMain';
 import GroupList from './pages/GroupList';
 import GroupCreate from './pages/GroupCreate';
+import GroupAttendLogin from './pages/GroupAttendLogin';
 import GroupAttend from './pages/GroupAttend';
 import MyPage from './pages/MyPage';
 import Setting from './pages/Setting';
@@ -30,6 +31,7 @@ export default function Router() {
         <Route path="/group" element={<GroupMain />} />
         <Route path="/grouplist" element={<GroupList />} />
         <Route path="/groupcreate" element={<GroupCreate />} />
+        <Route path="/groupattendlogin" element={<GroupAttendLogin />} />
         <Route path="/groupattend" element={<GroupAttend />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />

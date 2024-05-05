@@ -9,7 +9,7 @@ import SaveHeader from "../components/Header/SaveHeader";
 const Header: React.FC = () => {
   const location = useLocation()
 
-  const basicPath = ['/', '/group', '/mypage', ]
+  const basicPath = ['/', '/group', '/mypage', '/groupattend']
   const backPath = ['/grouplist', '/setting', '/feed','/groupcreate', '/createdone', '/chat',]
   const albumPath = ['/album']
 
