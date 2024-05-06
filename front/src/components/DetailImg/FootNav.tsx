@@ -8,22 +8,34 @@ import heart from '@/assets/DetailImg/heart.png'
 import memo from '@/assets/DetailImg/memo.png'
 import article from '@/assets/DetailImg/article.png'
 import ArticleList from "./ArticleList";
+import Memo from "./Memo";
 
 const FootNav: React.FC = () => {
   const [isStar, setIsStar] = useState<boolean>(false)
   const [isHeart, setIsHeart] = useState<boolean>(false)
+  const [isArticle, setIsArticle] = useState<boolean>(false)
   const [isMemo, setIsMemo] = useState<boolean>(false)
 
   return (
     <>
       <AnimatePresence>
-        { isMemo && (
+        { isArticle && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <ArticleList />
+          </motion.div>
+        )}
+
+        { isMemo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Memo />
           </motion.div>
         )}
       </AnimatePresence>
@@ -41,9 +53,9 @@ const FootNav: React.FC = () => {
           : <img src={noHeart} onClick={() => setIsHeart(!isHeart)} className="w-6" />
         }
 
-        <img src={memo} className="w-6" />
+        <img src={memo} onClick={() => setIsMemo(!isMemo)} className="w-6" />
 
-        <img src={article} onClick={() => setIsMemo(!isMemo)} className="w-6" />
+        <img src={article} onClick={() => setIsArticle(!isArticle)} className="w-6" />
       </div>
     </>
   )
