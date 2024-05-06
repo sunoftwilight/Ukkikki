@@ -21,6 +21,7 @@ public class Trash {
 
     @Id
     private String id;
+    private String rawId;
     @Enumerated
     private DataType dataType;
     private Object content;

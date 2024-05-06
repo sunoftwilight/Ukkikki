@@ -111,8 +111,8 @@ public class FileServiceImpl implements FileService{
     public GetDirDto deleteOneFile(String fileId, String dirId) {
         deleteDirFileRelation(dirId, fileId);
         // deleteFile을 넘겨 줘야한다.
-        saveFile(findById(fileId), dirId);
-        trashBinService.saveFile(fileId);
+        saveFileToTrash(findById(fileId), dirId);
+        trashBinService.saveFileToTrashBin(fileId);
         Directory dirDir = directoryService.findById(dirId);
 
         return getDirMapper.toGetDirDto(
@@ -183,7 +183,7 @@ public class FileServiceImpl implements FileService{
 
     @Override
     @Transactional
-    public Trash saveFile(File file, String dirId) {
+    public Trash saveFileToTrash(File file, String dirId) {
         // file to deleteFile
         TrashFileDto trashFileDto = trashFileMapper.toTrashFile(file, dirId);
         return trashRepository.save(Trash.builder()

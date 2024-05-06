@@ -27,7 +27,7 @@ public interface FileService {
     // 선택 사진 삭제
     GetDirDto deleteSelectedFile(List<String> fileIdList, String dirId);
 
-    public Trash saveFile(File file, String dirId);
+    public Trash saveFileToTrash(File file, String dirId);
 
     // dir, file의 관계 설정 메서드
     void setDirFileRelation(String dirId, String fileId);

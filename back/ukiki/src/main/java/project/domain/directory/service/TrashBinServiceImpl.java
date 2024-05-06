@@ -94,7 +94,7 @@ public class TrashBinServiceImpl implements TrashBinService {
     }
 
     @Override
-    public void saveFile(String fileId) {
+    public void saveFileToTrashBin(String fileId) {
         // file -> photo -> partyId -> trashBin -> addfileId
         File file = fileRepository.findById(fileId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
@@ -129,7 +129,6 @@ public class TrashBinServiceImpl implements TrashBinService {
         }
         return photoUrlList;
     }
-
 
 
 
