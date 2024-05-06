@@ -11,6 +11,8 @@ public interface TrashBinService {
 
     public GetTrashBinDto getTrashBin(Long trashBinId);
 
+    void clearTrashBin(Long trashBinId);
+
     public List<String> getDirNameList(TrashBin trashBin);
 
     public List<String> getPhotoUrlList(TrashBin trashBin);

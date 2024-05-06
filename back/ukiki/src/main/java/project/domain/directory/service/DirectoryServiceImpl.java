@@ -237,7 +237,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         ModelMapper modelMapper = new ModelMapper();
         for (File file : FileList) {
             Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
-            photoUrlList.add(photo.getPhotoUrl().getPhotoUrl());
+            photoUrlList.add(photo.getPhotoUrl().getThumb_url1());
         }
         return photoUrlList;
     }

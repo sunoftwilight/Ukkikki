@@ -46,6 +46,7 @@ public enum ErrorCode {
 
     // 휴지통 과련
     TRASHBIN_NOT_FOUND(404, "존재하지 않는 휴지통 입니다."),
+    TRASH_CLASSIFICATION_FAIL(422, "분류 불가능한 쓰레기 타입입니다."),
 
     // 사진 파일 관련
     PHOTO_FILE_NOT_FOUND(404, "해당 사진 파일을 찾을 수 없습니다."),
