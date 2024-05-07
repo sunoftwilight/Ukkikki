@@ -18,6 +18,10 @@ public class JWTUtil {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+    }
+
     public String getUsername(String token){
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username",String.class);
     }
@@ -26,12 +30,18 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("providerId",String.class);
     }
 
+    public Long getId(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
+    }
+
     public boolean isExpired(String token){
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
-    public String createJWT(String username, String providerId, Long expiredMS){
+    public String createJWT(String category, Long id, String username, String providerId, Long expiredMS){
         return Jwts.builder()
+                .claim("category", category)
+                .claim("id",id)
                 .claim("username",username)
                 .claim("providerId",providerId)
                 .issuedAt(new Date(System.currentTimeMillis()))

@@ -22,6 +22,7 @@ public class CustomOAuth2User implements OAuth2User {
         return memberDto.getProviderId();
     }
 
+    public long getId() {return memberDto.getId();}
     /*
     아래는
     사용하지 않을 예정.

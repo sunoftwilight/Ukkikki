@@ -1,5 +1,6 @@
 package project.global.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -14,48 +15,117 @@ import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.dto.response.MemberDto;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @AllArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
     private  final JWTUtil jwtUtil;
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // 쿠키에서 토큰 가져오기
-        String token = null;
+        String access = null;
+        String refresh = null;
+        Cookie accessCookie = null;
         Cookie[] cookies = request.getCookies();
-        for(Cookie cookie : cookies){
-            if(cookie.getName().equals("AccessToken")){
-                token = cookie.getValue();
-                break;
+        if(cookies != null){
+            for(Cookie cookie : cookies){
+                if(cookie.getName().equals("access")){
+                    access = cookie.getValue();
+                    accessCookie = cookie;
+                }
+                if(cookie.getName().equals("refresh")){
+                    refresh = cookie.getValue();
+                }
+            }
+
+        }
+
+        // refresh토큰 체크
+        if(refresh != null) {
+            try {
+                jwtUtil.isExpired(refresh);
+            } catch (ExpiredJwtException e) {
+                //response body
+                PrintWriter writer = response.getWriter();
+                writer.print("refresh token expired");
+
+                //response status code
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
         }
 
+
+
         // 토큰 널값체크
-        if(token == null){
-            System.out.println("token null");
+        if(access == null){
+            System.out.println("access token null");
             filterChain.doFilter(request, response);
 
             return;
         }
 
-        // 토큰 만료시간 체크
-        if(jwtUtil.isExpired(token)){
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
 
+        // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
+        try {
+            jwtUtil.isExpired(access);
+        } catch (ExpiredJwtException e) {
+
+            PrintWriter writer = response.getWriter();
+
+            // 게스트
+            if(refresh == null){
+                //response body
+                writer.print("access token expired");
+
+                //response status code
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+            // 일반 회원
+            else{
+
+                // 토큰 자동 갱신.
+                writer.print("access token renewal");
+                String reUsername = jwtUtil.getUsername(refresh);
+                String reProviderId = jwtUtil.getProviderId(refresh);
+                Long id = jwtUtil.getId(refresh);
+
+                access = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
+
+                accessCookie.setValue(access);
+                accessCookie.setPath("/");
+                accessCookie.setHttpOnly(true);
+                accessCookie.setMaxAge(60 * 60 * 4);
+                response.addCookie(accessCookie);
+            }
+
+
+        }
+        // 토큰이 access인지 확인 (발급시 페이로드에 명시)
+        String category = jwtUtil.getCategory(access);
+        if (!category.equals("access")) {
+
+            //response body
+            PrintWriter writer = response.getWriter();
+            writer.print("invalid access token");
+
+            //response status code
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        String username = jwtUtil.getUsername(token);
-        String providerId = jwtUtil.getProviderId(token);
+        String username = jwtUtil.getUsername(access);
+        String providerId = jwtUtil.getProviderId(access);
+        Long id = jwtUtil.getId(access);
 
         MemberDto memberDto = new MemberDto();
         memberDto.setUserName(username);
         memberDto.setProviderId(providerId);
+        memberDto.setId(id);
 
         // UserDetails에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(memberDto);

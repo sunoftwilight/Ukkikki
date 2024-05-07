@@ -25,16 +25,21 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String userName = customOAuth2User.getName();
         String providerId = customOAuth2User.getProviderId();
+        Long id = customOAuth2User.getId();
 
-        String token = jwtUtil.createJWT(userName, providerId, (long) ((1000 * 60) * 240));
+        // 10분
+        String access = jwtUtil.createJWT("access", id, userName, providerId, ((1000L * 60) * 60 * 4));
+        // 몇분이더라
+        String refresh = jwtUtil.createJWT("refresh", id, userName, providerId, ((1000L * 60 * 60) * 24 * 60));
 
-        response.addCookie(createCookies("AccessToken", token));
-
+        response.addCookie(createCookie("access", access));
+        response.addCookie(createCookie("refresh", refresh));
         response.sendRedirect("https://k10d202.p.ssafy.io/");
+//        response.sendRedirect("http://localhost:3000/");
     }
 
 
-    public Cookie createCookies(String key, String value){
+    public Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60 * 60 * 4);
         cookie.setPath("/");
