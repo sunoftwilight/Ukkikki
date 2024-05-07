@@ -22,6 +22,10 @@ public class CustomUserDetails implements UserDetails {
         return memberDto.getProviderId();
     }
 
+    public Long getId(){
+        return memberDto.getId();
+    }
+
     /*
     아래 사용 X
      */
