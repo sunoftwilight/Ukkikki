@@ -11,7 +11,7 @@ const Header: React.FC = () => {
 
   const basicPath = ['/', '/group', '/mypage', '/groupattend']
   const backPath = ['/grouplist', '/setting', '/feed','/groupcreate', '/createdone', '/chat',]
-  const albumPath = ['/album']
+  const albumPath = ['/album', '/trash']
 
   if (basicPath.includes(location.pathname)) return <LogoHeader />
   else if (location.pathname.startsWith('/feed/img/')) return <SaveHeader />
