@@ -1,6 +1,5 @@
 import React from "react";
 import MemoItem from "./MemoItem";
-import InputNav from "../commons/InputNav";
 
 const memoList = [
   {
