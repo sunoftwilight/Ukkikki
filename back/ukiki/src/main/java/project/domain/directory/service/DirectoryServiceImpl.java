@@ -2,8 +2,10 @@ package project.domain.directory.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -17,6 +19,7 @@ import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.collection.TrashBin;
+import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
@@ -24,6 +27,7 @@ import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.directory.mapper.DirMapper;
 import project.domain.directory.mapper.GetDirMapper;
 import project.domain.directory.mapper.RenameDirMapper;
+import project.domain.directory.mapper.TrashFileMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
@@ -39,6 +43,8 @@ import project.global.exception.ErrorCode;
 @Slf4j
 public class DirectoryServiceImpl implements DirectoryService {
 
+    private static Deque<Directory> deque = new ArrayDeque<>();
+
 
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
@@ -49,6 +55,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     private final DirMapper dirMapper;
     private final RenameDirMapper renameDirMapper;
     private final GetDirMapper getDirMapper;
+    private final TrashFileMapper trashFileMapper;
 
     @Override
     public GetDirDto getDir(String dirId) {
@@ -108,17 +115,45 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     @Transactional
-    public GetDirDto deleteDir(String dirId) {
-        // 부모의 child list에서 해당 dirId 제거
+    public GetDirDto deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
+        // 부모의 child list에서 해당 dirId 제거, child에서 parent는 제거하지 않음
         Directory dir = findById(dirId);
         Directory parentDir = findById(dir.getParentDirId());
         parentDir.getChildDirIdList().remove(dirId);
         directoryRepository.save(parentDir);
-        // child 는 그대로 휴지통으로 임시 저장
-        saveDirtoTrash(dir);
+
+        // 대표 폴더만 TrashBin에 저장, 자식 폴더나 사진 파일은 Trash 로 저장
         saveDirInTrashBin(dir);
-        // child 삭제
-        directoryRepository.deleteById(dirId);
+
+        // 초기화 작업
+        deque.push(dir);
+        while (!deque.isEmpty()) {
+            // pop + 할 거 하기
+            Directory curDir = deque.pop();
+            // 현재 폴더 휴지통에 저장
+            saveDirtoTrash(curDir);
+            // 현재 폴더의 파일 휴지통으로 이동 및 폴더에서 삭제
+            List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
+            for (File file : fileList) {
+                saveFileToTrash(file, curDir.getId());
+                fileRepository.delete(file);
+            }
+            // 현재 파일 폴더에서 삭제
+            directoryRepository.delete(curDir);
+            // child 탐색
+            // childIdList가 null이면 continue
+            if (curDir.getFileIdList().isEmpty()) {
+                continue;
+            }
+            // childIsList가 null이 아닌경우 탐색
+            for (String nextDirId : curDir.getChildDirIdList()) {
+                Directory nextDir = directoryRepository.findById(nextDirId)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+                // push
+                deque.push(nextDir);
+                // 방문 체크
+            }
+        }
 
         return getDirMapper.toGetDirDto(
             parentDir,
@@ -258,6 +293,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     public Trash saveDirtoTrash(Directory dir) {
         return trashRepository.save(Trash.builder()
             .id(generateId())
+            .rawId(dir.getId())
             .dataType(DataType.DIRECTORY)
             .content(dir)
             .deadLine(LocalDate.now().plusWeeks(2))
@@ -277,4 +313,17 @@ public class DirectoryServiceImpl implements DirectoryService {
         trashBinRepository.save(trashBin);
     }
 
+    @Override
+    @Transactional
+    public Trash saveFileToTrash(File file, String dirId) {
+        // file to deleteFile
+        TrashFileDto trashFileDto = trashFileMapper.toTrashFile(file, dirId);
+        return trashRepository.save(Trash.builder()
+            .id(generateId())
+            .rawId(trashFileDto.getId())
+            .dataType(DataType.FILE)
+            .content(trashFileDto)
+            .deadLine(LocalDate.now().plusWeeks(2))
+            .build());
+    }
 }

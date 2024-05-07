@@ -2,6 +2,8 @@ package project.domain.directory.service;
 
 import java.util.List;
 import project.domain.directory.collection.Directory;
+import project.domain.directory.collection.File;
+import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
@@ -54,5 +56,7 @@ public interface DirectoryService {
     List<String> getPhotoUrlList(Directory directory);
 
     String getRootDirId(Directory dir);
+
+    public Trash saveFileToTrash(File file, String dirId);
 
 }

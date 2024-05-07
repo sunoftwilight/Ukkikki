@@ -19,6 +19,6 @@ public interface TrashBinService {
 
     public TrashBin findById(Long trashBinId);
 
-    public void saveFile(String fileId);
+    public void saveFileToTrashBin(String fileId);
 
 }
