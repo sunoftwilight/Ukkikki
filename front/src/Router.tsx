@@ -5,11 +5,20 @@ import MainLayout from './MainLayout'
 import Main from './pages/Main';
 import Login from './pages/Login';
 import Camera from './pages/Camera';
+
 import GroupMain from './pages/GroupMain';
 import GroupList from './pages/GroupList';
 import GroupCreate from './pages/GroupCreate';
 import GroupAttendLogin from './pages/GroupAttendLogin';
 import GroupAttend from './pages/GroupAttend';
+import GroupConfig from './pages/GroupConfig/GroupConfig';
+import GroupEnvConfig from './pages/GroupConfig/GroupEnvConfig';
+import GroupProfile from './pages/GroupConfig/GroupProfile';
+import GroupBan from './pages/GroupConfig/GroupBan';
+import GroupInfo from './pages/GroupConfig/GroupInfo';
+import GroupUser from './pages/GroupConfig/GroupUser';
+import GroupPass from './pages/GroupConfig/GroupPass';
+
 import MyPage from './pages/MyPage';
 import Setting from './pages/Setting';
 import Album from './pages/Album';
@@ -34,6 +43,13 @@ export default function Router() {
         <Route path="/groupcreate" element={<GroupCreate />} />
         <Route path="/groupattendlogin" element={<GroupAttendLogin />} />
         <Route path="/groupattend" element={<GroupAttend />} />
+        <Route path="/groupconfig" element={<GroupConfig />} />
+        <Route path="/groupenv" element={<GroupEnvConfig />} />
+        <Route path="/groupprofile" element={<GroupProfile />} />
+        <Route path="/groupban" element={<GroupBan />} />
+        <Route path="/groupinfo" element={<GroupInfo />} />
+        <Route path="/groupuser" element={<GroupUser />} />
+        <Route path="/grouppass" element={<GroupPass />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/album" element={<Album />} />

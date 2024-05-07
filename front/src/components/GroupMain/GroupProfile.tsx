@@ -1,7 +1,9 @@
 import React from "react";
 import edit from "@/assets/GroupMain/edit.png"
+import settings from "@/assets/GroupMain/settings.png"
 import etc from "@/assets/GroupMain/etc.png"
 import { memberStore } from "../../stores/ModalStore";
+import { Link } from "react-router-dom";
 
 const groupInfo = {
   img: 'https://pbs.twimg.com/profile_images/1044938826727055361/_2tCfp7B_400x400.jpg',
@@ -38,7 +40,9 @@ const GroupProfile: React.FC = () => {
 
       <div className="flex items-center gap-4">
         <div className="text-black text-xl font-gtr-B">{groupInfo.name}</div>
-        <img src={edit} className="w-3 h-3" />
+        <Link to={'/groupconfig'}>
+          <img src={settings} className="w-3 h-3" />
+        </Link>
       </div>
 
       <div className="flex" onClick={() => setMemberOpen()}>
