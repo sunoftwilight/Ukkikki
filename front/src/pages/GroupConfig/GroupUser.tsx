@@ -1,12 +1,13 @@
 import React from "react";
+import UserList from "../../components/GroupConfig/UserList"
 
+const GroupUser: React.FC = () => {
 
-const GroupUserConfig: React.FC = () => {
   return (
-		<div className="p-4 w-full h-[calc(100%-48px)] flex flex-col gap-2 relative font-pre-R text-xl">
-      그룹유저
+		<div className="p-4 w-full h-full">
+      <UserList type="users"/>
     </div>
   )
 };
 
-export default GroupUserConfig;
+export default GroupUser;

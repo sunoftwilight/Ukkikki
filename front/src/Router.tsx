@@ -17,6 +17,7 @@ import GroupProfile from './pages/GroupConfig/GroupProfile';
 import GroupBan from './pages/GroupConfig/GroupBan';
 import GroupInfo from './pages/GroupConfig/GroupInfo';
 import GroupUser from './pages/GroupConfig/GroupUser';
+import GroupUserDetail from './pages/GroupConfig/GroupUserDetail';
 import GroupPass from './pages/GroupConfig/GroupPass';
 
 import MyPage from './pages/MyPage';
@@ -38,6 +39,7 @@ export default function Router() {
       {/* 헤더 & 네브를 넣을 페이지 */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Main />} />
+
         <Route path="/group" element={<GroupMain />} />
         <Route path="/grouplist" element={<GroupList />} />
         <Route path="/groupcreate" element={<GroupCreate />} />
@@ -49,7 +51,9 @@ export default function Router() {
         <Route path="/groupban" element={<GroupBan />} />
         <Route path="/groupinfo" element={<GroupInfo />} />
         <Route path="/groupuser" element={<GroupUser />} />
+        <Route path="/groupuserdetail" element={<GroupUserDetail />} />
         <Route path="/grouppass" element={<GroupPass />} />
+
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/album" element={<Album />} />

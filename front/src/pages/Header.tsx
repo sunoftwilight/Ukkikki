@@ -16,6 +16,7 @@ const Header: React.FC = () => {
                          '/groupenv',
                          '/groupprofile',
                          '/groupuser',
+                         '/groupuserdetail',
                          '/groupban',
                          '/groupinfo',
                          '/grouppass']
