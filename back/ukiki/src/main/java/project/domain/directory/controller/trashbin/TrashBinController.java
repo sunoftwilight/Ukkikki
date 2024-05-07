@@ -1,13 +1,25 @@
 package project.domain.directory.controller.trashbin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import project.global.result.ResultResponse;
 
+@Tag(name ="휴지통 관련 Controller", description = "휴지통 조회, 삭제, 복구 API")
 public interface TrashBinController {
     // 조회
+    @Operation(summary = "쓰레기통 조회 요청", description = "PathVariable로 trashBinId를 받아 해당 쓰레기통 정보를 반환")
+    @ApiResponse(responseCode = "200", description = "쓰레기통 조회에 성공하였습니다.")
+    @GetMapping("/{trashBinId}")
     ResponseEntity<ResultResponse> getTrashBin(Long trashBinId);
 
     // 쓰래기 복원
+    @Operation(summary = "폴더 및 파일 복원 요청", description = "PathVariable로 trashBinId와 trashId를 받아 해당 쓰레기를 복원하고 쓰레기통 정보를 반환")
+    @ApiResponse(responseCode = "201", description = "폴더 또는 파일복원에 성공하였습니다.")
+    @PatchMapping("/{trashBinId}/trashes/{trashId}")
     ResponseEntity<ResultResponse> restoreTrash(Long trashBinId, String trashId);
 
 
