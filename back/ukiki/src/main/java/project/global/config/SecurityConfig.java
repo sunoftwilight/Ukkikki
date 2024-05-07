@@ -48,8 +48,8 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler));
 
         // JWT 필터 추가
-//        http
-//                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .authorizeHttpRequests((auth) -> auth
