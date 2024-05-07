@@ -7,6 +7,8 @@ import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
+import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.party.entity.Party;
 
@@ -38,6 +40,8 @@ public interface DirectoryService {
      * @return : 조회하려는 폴더의 정보 전부
      */
     public GetDirDto getDir(String dirId);
+    public GetDirDtov2 getDirv2(String dirId);
+    public List<GetDirListDto> getDirList(Long userId);
     public GetDirDto createDir(CreateDirDto request);
     // 폴더 이동
     public GetDirDto moveDir(String dirId, String toDirId);
