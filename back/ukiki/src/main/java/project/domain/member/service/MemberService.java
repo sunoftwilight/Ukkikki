@@ -1,5 +1,7 @@
 package project.domain.member.service;
 
-public interface MemberService {
+import project.domain.member.dto.response.InfoDto;
 
+public interface MemberService {
+    InfoDto myInfo();
 }

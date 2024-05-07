@@ -37,7 +37,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Member member = memberRepository.findByProviderId(oAuth2Response.getProviderId());
         // 저장.
 
-
         MemberDto memberDto = saveUser(member, oAuth2Response);
 
         return new CustomOAuth2User(memberDto);
