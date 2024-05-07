@@ -1,7 +1,7 @@
 import React from "react";
 import ChattingRoom from "../components/Chatting/ChattingRoom";
 import logo from '../../icons/512.png'
-import InputNav from "../components/commons/InputNav";
+import InputNav from "../components/@commons/InputNav";
 
 const Chatting: React.FC = () => {
   return (

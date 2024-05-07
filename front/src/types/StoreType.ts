@@ -36,6 +36,11 @@ export interface selectModeType {
   setSelectMode: () => void;
 }
 
+export interface selectListType {
+  selectList: number[];
+  setSelectList: (imgId: number, isSelect: boolean) => void;
+}
+
 export interface folderModalType {
   folderOpen: boolean;
   setFolderOpen: () => void;

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AlbumHeader from "../components/Header/AlbumHeader";
 import BackHeader from "../components/Header/BackHeader";
 import LogoHeader from "../components/Header/LogoHeader";
 import WriteHeader from "../components/Header/WriteHeader";
 import SaveHeader from "../components/Header/SaveHeader";
+import { connectAlarm } from "../api/alarm";
 
 const Header: React.FC = () => {
   const location = useLocation()
@@ -12,6 +13,13 @@ const Header: React.FC = () => {
   const basicPath = ['/', '/group', '/mypage', '/groupattend']
   const backPath = ['/grouplist', '/setting', '/feed','/groupcreate', '/createdone', '/chat',]
   const albumPath = ['/album', '/trash']
+
+  useEffect(() => {
+    connectAlarm(
+      (res) => { console.log('연결 성공', res)},
+      (err) => { console.error('연결 실패', err)}
+    )
+  }, [])
 
   if (basicPath.includes(location.pathname)) return <LogoHeader />
   else if (location.pathname.startsWith('/feed/img/')) return <SaveHeader />

@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion"
 import newFolder from "@/assets/Album/newFolder.png"
 import { folderStore } from "../../stores/ModalStore";
-import ModalBackground from "../commons/ModalBackground";
+import ModalBackground from "../@commons/ModalBackground";
 import FolderItem from "./FolderItem";
 
 const parentFolderList = [

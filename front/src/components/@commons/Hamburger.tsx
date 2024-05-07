@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import close from "@/assets/Hamburger/close.png";
 import ModalBackground from "./ModalBackground";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "zustand";
 import { headerStore } from "../../stores/HeaderStateStore";
+import { getAlarm } from "../../api/alarm";
 
 const alarmDummy = [
 	{
@@ -55,6 +56,14 @@ const Hamburger: React.FC = () => {
 			setMenuOpen();
 		}
 	};
+
+  useEffect(() => {
+    getAlarm(
+      { pageNo: 1, pageSize: 5 },
+      (res) => { console.log(res) },
+      (err) => { console.error(err) }
+    )
+  }, [])
 
 	return (
 		<AnimatePresence>

@@ -13,6 +13,7 @@
     "@iconify/tailwind": "^0.1.4",
     "@material-tailwind/react": "^2.1.9",
     "axios": "^1.6.8",
+    "event-source-polyfill": "^1.0.31",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.9.0",
     "framer-motion": "^11.1.7",

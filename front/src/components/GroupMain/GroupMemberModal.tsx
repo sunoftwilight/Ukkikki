@@ -1,5 +1,5 @@
 import React from "react";
-import ModalBackground from "../commons/ModalBackground";
+import ModalBackground from "../@commons/ModalBackground";
 import { memberStore } from "../../stores/ModalStore";
 import close from '@/assets/Hamburger/close.png'
 import { motion, AnimatePresence } from "framer-motion"

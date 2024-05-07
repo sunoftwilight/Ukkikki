@@ -6,15 +6,31 @@ import star from '@/assets/DetailImg/star.png'
 import noHeart from '@/assets/DetailImg/noHeart.png'
 import heart from '@/assets/DetailImg/heart.png'
 import memo from '@/assets/DetailImg/memo.png'
+import download from '@/assets/DetailImg/download.png'
 import article from '@/assets/DetailImg/article.png'
 import ArticleList from "./ArticleList";
 import Memo from "./Memo";
+import { downloadFile } from "../../api/file";
 
 const FootNav: React.FC = () => {
   const [isStar, setIsStar] = useState<boolean>(false)
   const [isHeart, setIsHeart] = useState<boolean>(false)
   const [isArticle, setIsArticle] = useState<boolean>(false)
   const [isMemo, setIsMemo] = useState<boolean>(false)
+
+  const downHandler = () => {
+    downloadFile(
+      {
+        key: '',
+        fileId: 0,
+        prefix: ''
+      },
+      (res) => {
+        console.log(res)
+      },
+      (err) => { console.error(err) }
+    )
+  }
 
   return (
     <>
@@ -47,13 +63,15 @@ const FootNav: React.FC = () => {
           <img src={star} onClick={() => setIsStar(!isStar)} className="w-6" /> 
           : <img src={noStar} onClick={() => setIsStar(!isStar)} className="w-6" />
         }
-
+    
         { isHeart ? 
           <img src={heart} onClick={() => setIsHeart(!isHeart)} className="w-6" /> 
           : <img src={noHeart} onClick={() => setIsHeart(!isHeart)} className="w-6" />
         }
 
         <img src={memo} onClick={() => setIsMemo(!isMemo)} className="w-6" />
+
+        <img src={download} onClick={() => downHandler()} className="w-5" />
 
         <img src={article} onClick={() => setIsArticle(!isArticle)} className="w-6" />
       </div>

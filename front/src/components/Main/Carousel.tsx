@@ -10,7 +10,7 @@ import carousel3 from '@/assets/Main/Carousel/carousel3.png'
 const Carousel: React.FC = () => {
   return (
     <Swiper 
-      className="w-full"
+      className="w-full z-0"
       spaceBetween={50}
       pagination={{clickable: true}}
       modules={[Pagination, Autoplay]}

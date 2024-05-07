@@ -1,7 +1,7 @@
 import React from "react";
 import Content from "../components/ArticleDetail/Content";
 import Comment from "../components/ArticleDetail/Comment";
-import InputNav from "../components/commons/InputNav";
+import InputNav from "../components/@commons/InputNav";
 
 const ArticleDetail: React.FC = () => {
   return (
