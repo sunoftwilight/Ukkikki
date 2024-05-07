@@ -6,6 +6,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -178,8 +179,10 @@ public class TrashServiceImpl implements TrashService{
 
         // 초기화
         Deque<Trash> deque = new ArrayDeque<>();
+        HashSet<String> visitedSet = new HashSet<>();
         Trash trash = findById(trashIdDirType);
         deque.addFirst(trash);
+        visitedSet.add(trashIdDirType);
         result.add(trash);
 
         LocalDate deadLine = trash.getDeadLine();
@@ -201,10 +204,14 @@ public class TrashServiceImpl implements TrashService{
             List<String> childDirIdList = curDirInTrash.getChildDirIdList();
             if (!childDirIdList.isEmpty()) {
                 for (String dirId : childDirIdList) {
+                    if(visitedSet.contains(dirId)){
+                        continue;
+                    }
                     Trash trashDirType = trashRepository.findByRawIdAndDeadLine(dirId, deadLine)
                         .orElseThrow(
                             () -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
                     deque.addFirst(trashDirType);
+                    visitedSet.add(dirId);
                     result.add(trashDirType);
                 }
             }

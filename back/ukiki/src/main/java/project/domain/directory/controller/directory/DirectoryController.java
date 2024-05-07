@@ -95,7 +95,7 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String fromDirId,
         @RequestParam(name = "toDirId") String toDirId
     ) {
-        GetDirDto response = fileService.moveFile(fileId, fromDirId, toDirId);
+        GetDirDto response = fileService.copyFile(fileId, fromDirId, toDirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_COPY_SUCCESS, response));
     }
 

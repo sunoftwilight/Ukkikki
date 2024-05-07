@@ -6,6 +6,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -44,6 +45,7 @@ import project.global.exception.ErrorCode;
 public class DirectoryServiceImpl implements DirectoryService {
 
     private static Deque<Directory> deque = new ArrayDeque<>();
+    private static HashSet<String> visitedSet = new HashSet<>();
 
 
     private final FileRepository fileRepository;
@@ -127,6 +129,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         // 초기화 작업
         deque.push(dir);
+        visitedSet.add(dir.getId());
         while (!deque.isEmpty()) {
             // pop + 할 거 하기
             Directory curDir = deque.pop();
@@ -147,11 +150,15 @@ public class DirectoryServiceImpl implements DirectoryService {
             }
             // childIsList가 null이 아닌경우 탐색
             for (String nextDirId : curDir.getChildDirIdList()) {
+                if(visitedSet.contains(nextDirId)){
+                    continue;
+                }
                 Directory nextDir = directoryRepository.findById(nextDirId)
                     .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
                 // push
                 deque.push(nextDir);
                 // 방문 체크
+                visitedSet.add(nextDirId);
             }
         }
 
