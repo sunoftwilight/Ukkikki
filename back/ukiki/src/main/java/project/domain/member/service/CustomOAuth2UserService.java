@@ -34,7 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         // 카카오 id를 가져온 후
-        Member member = memberRepository.findByUserName(oAuth2Response.getProviderId());
+        Member member = memberRepository.findByProviderId(oAuth2Response.getProviderId());
         // 저장.
 
 
@@ -63,6 +63,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // Dto 반환
         MemberDto memberDto = new MemberDto();
+        memberDto.setId(member.getId());
         memberDto.setUserName(member.getUserName());
         memberDto.setProviderId(member.getProviderId());
 
