@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import logougImg from "@/assets/Setting/logout.png";
 import uploadImg from "@/assets/Setting/upload.png";
 import startPageImg from "@/assets/Setting/startPage.png";
