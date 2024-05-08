@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import project.domain.chat.entity.Chat;
 import project.domain.chat.repository.ChatRepository;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.TrashBinService;
+import project.domain.member.dto.request.CustomOAuth2User;
 import project.domain.member.entity.Member;
 import project.domain.member.entity.MemberRole;
 import project.domain.member.entity.Profile;
@@ -77,10 +79,11 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo) {
-
+    public PartyLinkDto createParty(UserDetails userDetails, CreatePartyDto createPartyDto, MultipartFile photo) {
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
         // TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(1L)
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 파티 이름 규칙 확인
@@ -143,10 +146,12 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyLinkDto createLink(Long partyId) {
+    public PartyLinkDto createLink(UserDetails userDetails, Long partyId) {
 
-        // TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(1L)
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         Party party = partyRepository.findById(partyId)
@@ -157,13 +162,10 @@ public class PartyServiceImpl implements PartyService {
 
         // 기존 경로는 삭제
         Optional<PartyLink> existLink = partyLinkRedisRepository.findByParty(party.getId());
-        log.info("TEST1");
         existLink.ifPresent(link ->
         {
-            log.info(link.getCount() + " ");
             partyLinkRedisRepository.delete(link);
         });
-        log.info("TEST2");
 
         String link = makeLink(); // 고유한 link가 나오도록 반복
         while (partyLinkRedisRepository.findById(link).isPresent()){
@@ -214,9 +216,12 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto) {
-        // TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(2L)
+    public PartyEnterDto memberPartyEnter(UserDetails userDetails, EnterPartyDto enterPartyDto) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 파티 링크 확인
@@ -259,10 +264,6 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto) {
-//        // TODO 유저 아이디를 토큰에서 받아야 함
-//        Member member = memberRepository.findById(1L)
-//            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
-
 
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
@@ -285,9 +286,12 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void changePassword(Long partyId, PartyPasswordDto partyPasswordDto) {
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(1L)
+    public void changePassword(UserDetails userDetails, Long partyId, PartyPasswordDto partyPasswordDto) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
         Party party = partyRepository.findById(partyId)
@@ -345,10 +349,13 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public void changePartyName(Long partyId, String partyName) {
+    public void changePartyName(UserDetails userDetails, Long partyId, String partyName) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
 
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(1L)
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
         Party party = partyRepository.findById(partyId)
@@ -368,10 +375,13 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole) {
+    public void grantPartyUser(UserDetails userDetails, Long partyId, Long opponentId, MemberRole memberRole) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
 
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(1L)
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
         Party party = partyRepository.findById(partyId)
@@ -395,10 +405,12 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void exitParty(Long partyId, String key) {
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        Long memberId =1L;
-        Member member = memberRepository.findById(1L)
+    public void exitParty(UserDetails userDetails, Long partyId, String key) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티 권한 조회
         MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(member.getId(), partyId)
@@ -454,12 +466,15 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void memberBlock(Long partyId, Long targetId) {
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        memberRepository.findById(1L)
+    public void memberBlock(UserDetails userDetails, Long partyId, Long targetId) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(memberId, partyId, MemberRole.MASTER)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
 
         MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
@@ -469,12 +484,15 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void kickMember(Long partyId, Long targetId) {
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        memberRepository.findById(1L)
+    public void kickMember(UserDetails userDetails, Long partyId, Long targetId) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 마스터 권한 확인
-        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(memberId, partyId, MemberRole.MASTER)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
         // 상대방 찾기
         MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
@@ -488,12 +506,15 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public List<SimpleMemberPartyDto> getBlockUserList(Long partyId) {
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        memberRepository.findById(1L)
+    public List<SimpleMemberPartyDto> getBlockUserList(UserDetails userDetails, Long partyId) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 마스터 권한 확인
-        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(memberId, partyId, MemberRole.MASTER)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
 
         // BLOCK USER 조회
@@ -504,12 +525,15 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public List<SimpleMemberPartyDto> getUserList(Long partyId) {
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        memberRepository.findById(1L)
+    public List<SimpleMemberPartyDto> getUserList(UserDetails userDetails, Long partyId) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        memberpartyRepository.findByMemberIdAndPartyId(1L, partyId)
+        memberpartyRepository.findByMemberIdAndPartyId(memberId, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // Party User 조회
@@ -520,12 +544,15 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo) {
+    public void changePartyThumb(UserDetails userDetails, Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo) {
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
-        memberRepository.findById(1L)
+        memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 마스터 권한 확인
-        MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(1L, partyId, MemberRole.MASTER)
+        MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(memberId, partyId, MemberRole.MASTER)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
         // 암호 확인
         if (!bcryptUtil.matchesBcrypt(changeThumbDto.getKey(), memberParty.getParty().getPassword())){

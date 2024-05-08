@@ -1,6 +1,7 @@
 package project.domain.party.service;
 
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
 import project.domain.party.dto.request.ChangeThumbDto;
@@ -15,34 +16,34 @@ import java.util.List;
 
 public interface PartyService {
 
-    PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo);
+    PartyLinkDto createParty(UserDetails userDetails, CreatePartyDto createPartyDto, MultipartFile photo);
 
-    PartyLinkDto createLink(Long partyId);
+    PartyLinkDto createLink(UserDetails userDetails, Long partyId);
 
     void enterParty(String partyLink);
 
     void checkPassword(EnterPartyDto enterPartyDto);
 
-    PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
+    PartyEnterDto memberPartyEnter(UserDetails userDetails, EnterPartyDto enterPartyDto);
 
     PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
 
-    void changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
+    void changePassword(UserDetails userDetails, Long partyId, PartyPasswordDto partyPasswordDto);
 
-    void changePartyName(Long partyId, String partyName);
+    void changePartyName(UserDetails userDetails, Long partyId, String partyName);
 
-    void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole);
+    void grantPartyUser(UserDetails userDetails, Long partyId, Long opponentId, MemberRole memberRole);
 
-    void exitParty(Long partyId, String key);
+    void exitParty(UserDetails userDetails, Long partyId, String key);
 
-    void memberBlock(Long partyId, Long targetId);
+    void memberBlock(UserDetails userDetails, Long partyId, Long targetId);
 
-    void kickMember(Long partyId, Long targetId);
+    void kickMember(UserDetails userDetails, Long partyId, Long targetId);
 
-    List<SimpleMemberPartyDto> getBlockUserList(Long partyId);
-    List<SimpleMemberPartyDto> getUserList(Long partyId);
+    List<SimpleMemberPartyDto> getBlockUserList(UserDetails userDetails, Long partyId);
+    List<SimpleMemberPartyDto> getUserList(UserDetails userDetails, Long partyId);
 
-    void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
+    void changePartyThumb(UserDetails userDetails, Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
     void linkDelete();
 }
