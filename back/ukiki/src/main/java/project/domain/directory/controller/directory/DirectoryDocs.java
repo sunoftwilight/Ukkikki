@@ -23,6 +23,11 @@ public interface DirectoryDocs {
     @PostMapping("/init/{partyId}")
     public ResponseEntity<ResultResponse> initDirPartyTest(@PathVariable Long partyId);
 
+    @Operation(summary = "해당 유저의 보유 그룹 리스트 조회 요청(회원 로직이 완료되면 pathVariable 제외 예정)", description = "PathVariable로 userId를 받아 해당 그룹 리스트 반환")
+    @ApiResponse(responseCode = "200", description = "해당 유저의 모든 그룹 조회에 성공하였습니다.")
+    @GetMapping("")
+    public ResponseEntity<ResultResponse> getDirList(Long userId);
+
     @Operation(summary = "폴더 조회 요청", description = "PathVariable로 dirId를 해당 폴더 정보를 반환")
     @ApiResponse(responseCode = "200", description = "폴더 조회에 성공하였습니다.")
     @GetMapping("/{dirId}")

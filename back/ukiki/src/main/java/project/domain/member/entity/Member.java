@@ -49,6 +49,9 @@ public class Member extends BaseEntity {
     @Column(name = "is_deactivate")
     private boolean isDeactivate = false;
 
+    @Column(name = "main_directory")
+    private String mainDirId;
+
     // 연관관계 총 9 개
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Profile> profileList = new ArrayList<>();

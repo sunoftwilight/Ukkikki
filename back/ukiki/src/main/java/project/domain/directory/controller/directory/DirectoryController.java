@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
+import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetFileDto;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.FileService;
@@ -37,9 +39,18 @@ public class DirectoryController implements DirectoryDocs {
     }
 
     @Override
+    @GetMapping("/{userId}")
+    public ResponseEntity<ResultResponse> getDirList(
+        @PathVariable("userId") Long userId
+    ) {
+        List<GetDirListDto> response = directoryService.getDirList(userId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_DIRECTORYLIST_SUCCESS, response));
+    }
+
+    @Override
     @GetMapping("/{dirId}")
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId) {
-        GetDirDto response = directoryService.getDir(dirId);
+        GetDirDtov2 response = directoryService.getDirv2(dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_DIRECTORY_SUCCESS, response));
     }
 

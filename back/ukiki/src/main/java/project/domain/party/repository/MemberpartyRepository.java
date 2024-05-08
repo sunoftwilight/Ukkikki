@@ -38,4 +38,5 @@ public interface MemberpartyRepository extends JpaRepository<MemberParty, Long> 
 
     List<MemberParty> findAllByPartyIdAndMemberRoleIs(Long partyId, MemberRole memberRole);
 
+    List<MemberParty> findMemberPartiesByMember(Member member);
 }

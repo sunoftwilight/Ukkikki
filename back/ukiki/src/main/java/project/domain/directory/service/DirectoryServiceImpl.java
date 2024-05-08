@@ -24,6 +24,9 @@ import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
+import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirInnerDtov2;
+import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.directory.mapper.DirMapper;
 import project.domain.directory.mapper.GetDirMapper;
@@ -33,9 +36,14 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
+import project.domain.member.entity.Member;
+import project.domain.member.repository.MemberRepository;
+import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
+import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
+import project.domain.photo.entity.PhotoUrl;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -46,18 +54,56 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     private static Deque<Directory> deque = new ArrayDeque<>();
     private static HashSet<String> visitedSet = new HashSet<>();
-
+    private static ModelMapper modelMapper;
 
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
     private final TrashRepository trashRepository;
     private final TrashBinRepository trashBinRepository;
+    private final MemberRepository memberRepository;
+    private final MemberpartyRepository memberpartyRepository;
 
     private final DirMapper dirMapper;
     private final RenameDirMapper renameDirMapper;
     private final GetDirMapper getDirMapper;
     private final TrashFileMapper trashFileMapper;
+
+    @Override
+    public List<GetDirListDto> getDirList(Long userId) {
+        // 유저 찾기
+        Member member = memberRepository.findById(userId).orElseThrow(
+            () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+        // 해당 유저의 즐겨찾기 지정 폴더
+        String mainDirId = member.getMainDirId();
+        // 해당 유저가 포함된 모든 party 찾기
+        List<MemberParty> memberPartyList = memberpartyRepository.findMemberPartiesByMember(
+            member);
+
+        // 유저의 보유 방 리스트
+        List<GetDirListDto> response = new ArrayList<>();
+        for (MemberParty memberParty : memberPartyList) {
+            // party 구하기
+            Party party = partyRepository.findById(memberParty.getParty().getId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+            // directory 구하기
+            String rootDirId = party.getRootDirId();
+            Directory directory = directoryRepository.findById(rootDirId).orElseThrow(
+                () -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND)
+            );
+            // 반환 Dto 생성하기
+            GetDirListDto getDirListDto = GetDirListDto.builder()
+                .pk(party.getRootDirId())
+                .name(directory.getDirName())
+                .thumbnail(party.getThumbnail())
+                .isStar(directory.getId().equals(mainDirId))
+                .build();
+            // 결과 리스트에 넣어주기
+            response.add(getDirListDto);
+        }
+        return response;
+    }
 
     @Override
     public GetDirDto getDir(String dirId) {
@@ -69,6 +115,53 @@ public class DirectoryServiceImpl implements DirectoryService {
             getPhotoUrlList(dir)
             );
     }
+
+    @Override
+    public GetDirDtov2 getDirv2(String dirId) {
+        Directory dir = findById(dirId);
+
+        GetDirDtov2 getDirDtov2 = GetDirDtov2.builder()
+            .parentId(dir.getParentDirId())
+            .build();
+        List<GetDirInnerDtov2> contentList = getDirDtov2.getContentList();
+
+        // 우선 폴더부터 채우기
+        List<String> childDirIdList = dir.getChildDirIdList();
+        // childDir
+        if(!childDirIdList.isEmpty()) {
+            for (Directory childDir : directoryRepository.findAllById(childDirIdList)) {
+                GetDirInnerDtov2 dirTypeDto = GetDirInnerDtov2.builder()
+                    .type(DataType.DIRECTORY)
+                    .pk(childDir.getId())
+                    .name(childDir.getDirName())
+                    .url("None")
+                    .build();
+                contentList.add(dirTypeDto);
+            }
+        }
+
+        // 사진 채우기
+        List<String> fileIdList = dir.getFileIdList();
+        if(!fileIdList.isEmpty()) {
+            List<File> fileList = fileRepository.findAllById(fileIdList);
+            // 썸네일을 줘야됨
+            for (File file : fileList) {
+                // json to Photo
+                Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
+                // json to PhotoUrl
+                PhotoUrl photoUrl = modelMapper.map(photo.getPhotoUrl(), PhotoUrl.class);
+                GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
+                    .type(DataType.FILE)
+                    .pk(file.getId())
+                    .name("None")
+                    .url(photoUrl.getThumb_url1())
+                    .build();
+                contentList.add(fileType);
+            }
+        }
+        return getDirDtov2;
+    }
+
 
     @Override
     @Transactional
