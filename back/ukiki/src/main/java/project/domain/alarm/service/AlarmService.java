@@ -19,4 +19,6 @@ public interface AlarmService {
     void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long articleId, Long targetId);
 
     Alarm createAlarm(AlarmType type, Long partyId, Long articleId, Long targetId, String data);
+
+    SseEmitter findEmitterByUserId(Long memberId);
 }

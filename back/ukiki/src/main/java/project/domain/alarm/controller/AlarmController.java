@@ -2,6 +2,8 @@ package project.domain.alarm.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import project.domain.alarm.dto.request.AlarmPageableDto;
@@ -33,5 +35,14 @@ public class AlarmController implements AlarmDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_ALARM_SUCCESS, res));
     }
 
+    @GetMapping("/test-alarm")
+    public void testAlarm(@AuthenticationPrincipal UserDetails userDetails){
+        SseEmitter asd = alarmService.findEmitterByUserId(1L);
+        Alarm dsa = alarmService.createAlarm(
+            AlarmType.REPLY,
+            1L,1L, 53L, "어해진 바보"
+        );
+        alarmService.sendAlarm(asd,1L,dsa);
+    }
 
 }
