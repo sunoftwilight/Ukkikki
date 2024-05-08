@@ -14,7 +14,7 @@ public interface TrashFileMapper {
 
     @Mappings({
         @Mapping(source = "file.id", target = "id"),
-        @Mapping(source = "file.photo", target = "photo"),
+        @Mapping(source = "file.photoDto", target = "photoDto"),
         @Mapping(target = "dirId", ignore = true),
     })
     TrashFileDto toTrashFile(File file, String dirId);

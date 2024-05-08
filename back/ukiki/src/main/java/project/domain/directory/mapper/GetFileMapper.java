@@ -12,7 +12,7 @@ public interface GetFileMapper {
 
     @Mappings({
         @Mapping(source = "file.id", target = "id"),
-        @Mapping(source = "file.photo", target = "photo")
+        @Mapping(source = "file.photoDto", target = "photo")
     })
     GetFileDto toGetFileDto(File file);
 }

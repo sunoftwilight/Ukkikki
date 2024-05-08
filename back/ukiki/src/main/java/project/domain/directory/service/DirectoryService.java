@@ -42,6 +42,8 @@ public interface DirectoryService {
     public GetDirDto getDir(String dirId);
     public GetDirDtov2 getDirv2(String dirId);
     public List<GetDirListDto> getDirList(Long userId);
+
+    public void patchMainDir(Long memberId, String dirId);
     public GetDirDto createDir(CreateDirDto request);
     // 폴더 이동
     public GetDirDto moveDir(String dirId, String toDirId);

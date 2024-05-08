@@ -9,13 +9,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class TrashPhotoDto {
-
+public class PhotoDto {
     private Long id;
     private String fileName;
     private int photoNum;
-    private String partyId;
-    private String memberId;
+    private Long partyId;
+    private Long memberId;
     private String photoUrl;
     private String thumbUrl1;
     private String thumbUrl2;
