@@ -39,11 +39,11 @@ public class JWTUtil {
     }
 
     public String createJWT(String category, Long id, String username, String providerId, Long expiredMS){
-        System.out.println("category = " + category);
-        System.out.println("id = " + id);
-        System.out.println("providerId = " + providerId);
-        System.out.println("expiredMS = " + expiredMS);
-        System.out.println("secretKey = " + secretKey);
+//        System.out.println("category = " + category);
+//        System.out.println("id = " + id);
+//        System.out.println("providerId = " + providerId);
+//        System.out.println("expiredMS = " + expiredMS);
+//        System.out.println("secretKey = " + secretKey);
         return Jwts.builder()
                 .claim("category", category)
                 .claim("id",id)

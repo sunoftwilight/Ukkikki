@@ -41,6 +41,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         memberToken.setUserId(id);
         memberTokenRedisRepository.save(memberToken);
 
+        response.addCookie(createCookie("isLogin", "true"));
         response.addCookie(createCookie("refresh", refresh));
         response.sendRedirect("https://k10d202.p.ssafy.io/");
 //        response.sendRedirect("http://localhost:3000/");
