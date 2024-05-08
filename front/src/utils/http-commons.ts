@@ -32,7 +32,7 @@ export const privateApi: AxiosInstance = axios.create({
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
-    'access': accessToken,
+    'access': `${accessToken}`,
   },
 });
 
@@ -42,7 +42,7 @@ export const downloadApi: AxiosInstance = axios.create({
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
-    'access': accessToken,
+    'access': `${accessToken}`,
   },
 });
 
@@ -51,7 +51,7 @@ export const formDataApi: AxiosInstance = axios.create({
 	headers: {
 		"Access-Control-Allow-Origin": "*",
 		"Content-Type": "multipart/form-data",
-		'access': accessToken,
+    'access': `${accessToken}`,
 	},
 });
 
