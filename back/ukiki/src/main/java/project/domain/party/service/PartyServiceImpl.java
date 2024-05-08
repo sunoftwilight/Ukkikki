@@ -82,7 +82,7 @@ public class PartyServiceImpl implements PartyService {
     public PartyLinkDto createParty(UserDetails userDetails, CreatePartyDto createPartyDto, MultipartFile photo) {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
-        // TODO 유저 아이디를 토큰에서 받아야 함
+
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -127,7 +127,7 @@ public class PartyServiceImpl implements PartyService {
             .build();
         memberpartyRepository.save(memberParty);
 
-//        //TODO Redis에 링크 저장
+        // Redis에 링크 저장
         String link = makeLink(); // 고유한 link가 나오도록 반복
         while (partyLinkRedisRepository.findById(link).isPresent()){
             link = makeLink();
@@ -150,6 +150,10 @@ public class PartyServiceImpl implements PartyService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -291,6 +295,10 @@ public class PartyServiceImpl implements PartyService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
 
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
@@ -354,6 +362,10 @@ public class PartyServiceImpl implements PartyService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
 
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -379,6 +391,10 @@ public class PartyServiceImpl implements PartyService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
 
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
         Member member = memberRepository.findById(memberId)
@@ -409,6 +425,10 @@ public class PartyServiceImpl implements PartyService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -471,6 +491,10 @@ public class PartyServiceImpl implements PartyService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
 
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
         memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -488,6 +512,10 @@ public class PartyServiceImpl implements PartyService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
 
         memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -510,6 +538,10 @@ public class PartyServiceImpl implements PartyService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
 
         memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -548,7 +580,11 @@ public class PartyServiceImpl implements PartyService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
         Long memberId = customOAuth2User.getId();
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
         memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 마스터 권한 확인
