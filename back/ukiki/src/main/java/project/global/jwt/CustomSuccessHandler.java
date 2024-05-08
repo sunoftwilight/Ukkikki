@@ -36,8 +36,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         response.setHeader("access",access);
         response.addCookie(createCookie("refresh", refresh));
-        response.sendRedirect("https://k10d202.p.ssafy.io/");
-//        response.sendRedirect("http://localhost:3000/");
+//        response.sendRedirect("https://k10d202.p.ssafy.io/");
+        response.sendRedirect("http://localhost:3000/");
     }
 
 
