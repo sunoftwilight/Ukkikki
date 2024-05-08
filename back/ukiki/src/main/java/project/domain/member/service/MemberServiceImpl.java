@@ -153,5 +153,10 @@ public class MemberServiceImpl implements MemberService{
         cookie.setPath("/");
 
         response.addCookie(cookie);
+
+        cookie = new Cookie("isLogin", "false");
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 }
