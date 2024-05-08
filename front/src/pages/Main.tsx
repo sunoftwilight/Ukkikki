@@ -16,42 +16,53 @@ const Main: React.FC = () => {
   const [cookies] = useCookies(['isLogin']);
 
   const GetAccessToken = async () => {
-    await TokenRefresh(
-      (res) => {
-        user.setAccessToken(res.headers['access']);
-    }, (err) => {
-        console.log(err)
-    })
-  }
+    try {
+      await TokenRefresh(
+        (response) => {
+          user.setAccessToken(response.headers['access']);
+        },
+        (error) => {
+          console.error('Failed to get access token:', error);
+        }
+      );
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+    }
+  };
   
   const GetInfo = async () => {
-    await UserInfo(
-      (res) => {
-        console.log(2)
-        user.setUserId(res.data.data.userId)
-        user.setUserName(res.data.data.userName)
-        user.setUserProfile(res.data.data.profileUrl)
-      }, (err) => {
-        console.error(err)
-      }
-    )
-  }
+    try {
+      await UserInfo(
+        (response) => {
+          const userData = response.data.data;
+          user.setUserId(userData.userId);
+          user.setUserName(userData.userName);
+          user.setUserProfile(userData.profileUrl);
+        },
+        (error) => {
+          console.error('Failed to get user info:', error);
+        }
+      );
+    } catch (error) {
+      console.error('Failed to get user info:', error);
+    }
+  };
 
   useEffect(() => {
-    if (Boolean(cookies.isLogin)) {
-      GetAccessToken()
+    const fetchData = async () => {
+      try {
+        if (Boolean(cookies.isLogin)) {
+          await GetAccessToken();
+          await GetInfo();
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     }
+    fetchData()
   }, [cookies.isLogin])
 
-  useEffect(() => {
-    if (user.userId === '' && user.accessToken === "") {
-      console.log('thisPoint')
-    }
-    if (user.userId === '' && user.accessToken !== "") {
-      console.log(1)
-      GetInfo()
-    }
-  }, [user.accessToken])
+
 
   return (
     <div className="w-full h-full py-2 px-4 flex flex-col gap-9 mb-2">
