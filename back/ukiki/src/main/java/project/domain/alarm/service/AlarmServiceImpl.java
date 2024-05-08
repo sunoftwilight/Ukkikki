@@ -18,6 +18,7 @@ import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.repository.EmitterRepository;
+import project.domain.member.repository.ProfileRepository;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.repository.MemberpartyRepository;
 
