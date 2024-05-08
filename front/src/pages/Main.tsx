@@ -53,7 +53,6 @@ const Main: React.FC = () => {
       try {
         if (Boolean(cookies.isLogin)) {
           await GetAccessToken();
-          await GetInfo();
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -61,6 +60,20 @@ const Main: React.FC = () => {
     }
     fetchData()
   }, [cookies.isLogin])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (user.accessToken !== '' && user.userId === '') {
+          await GetInfo();
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+    fetchData()
+  }, [user.accessToken, user.userId])
+
 
 
 
