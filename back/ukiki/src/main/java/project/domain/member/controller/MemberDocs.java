@@ -13,5 +13,8 @@ public interface MemberDocs {
     ResponseEntity<ResultResponse> myInfo();
 
     @Operation(summary = "토큰 갱신")
-    ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response);
+    ResponseEntity<ResultResponse> reissue(HttpServletRequest request, HttpServletResponse response);
+
+    @Operation(summary = "로그 아웃")
+    ResponseEntity<ResultResponse> logout(HttpServletRequest request, HttpServletResponse response);
 }

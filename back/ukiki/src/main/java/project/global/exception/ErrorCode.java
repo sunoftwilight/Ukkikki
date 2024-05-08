@@ -22,6 +22,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_NULL(404, "토큰이 유효하지 않습니다."),
     REFRESH_TOKEN_EXPIRED(400, "토큰이 만료되었습니다."),
     REFRESH_TOKEN_MATCH(400, "토큰이 일치하지 않습니다.."),
+    MEMBER_LOGOUT_MATCH(400, "access, refresh 토큰 정보가 일치하지 않습니다."),
 
     // 파티 관련
     PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),
