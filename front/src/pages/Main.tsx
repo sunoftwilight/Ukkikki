@@ -66,9 +66,10 @@ const Main: React.FC = () => {
     console.log(user.accessToken)
     console.log(user.userId)
     const fetchData = async () => {
-      if (user.accessToken === '' && user.userId === '') return;
-
       try {
+        if (user.accessToken === '' && user.userId === ''){
+          return;
+        }
         if (user.accessToken !== '' && user.userId === '') {
           await GetInfo();
         }
