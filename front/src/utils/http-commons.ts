@@ -19,6 +19,7 @@ axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
 const accessToken = userStore.getState().accessToken;
+
 export const publicApi: AxiosInstance = axios.create({
 	baseURL: baseURL,
 	headers: {

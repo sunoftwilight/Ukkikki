@@ -19,7 +19,6 @@ const Main: React.FC = () => {
     await TokenRefresh(
       (res) => {
         user.setAccessToken(res.headers['access']);
-        GetInfo();
     }, (err) => {
         console.log(err)
     })
@@ -28,7 +27,9 @@ const Main: React.FC = () => {
   const GetInfo = async () => {
     await UserInfo(
       (res) => {
-        console.log(res)
+        user.setUserId(res.data.userId)
+        user.setUserName(res.data.userName)
+        user.setUserProfile(res.data.userProfile)
       }, (err) => {
         console.error(err)
       }
@@ -41,6 +42,11 @@ const Main: React.FC = () => {
     }
   }, [cookies.isLogin])
 
+  useEffect(() => {
+    if (user.userId === "") {
+      GetInfo()
+    }
+  }, [user.accessToken])
 
   return (
     <div className="w-full h-full py-2 px-4 flex flex-col gap-9 mb-2">

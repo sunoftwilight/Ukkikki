@@ -5,3 +5,9 @@ export interface ResponseData {
   headers: Record<string, string>;
   config: string;
 }
+
+export interface UserInfoData {
+  userId:string;
+  userName:string;
+  userProfile:string;
+}
