@@ -3,7 +3,7 @@ import ChangePassword from "../../components/GroupConfig/ChangePassword";
 import CurrentPassword from "../../components/GroupConfig/CurrentPassword";
 
 const GroupPasswordConfig: React.FC = () => {
-  const [isCurrentPass, setIsCurrentPass] = useState<boolean>(false)
+  const [isCurrentPass] = useState<boolean>(false)
 
   return (
 		<div className="w-full h-full p-4">

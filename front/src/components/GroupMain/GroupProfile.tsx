@@ -1,5 +1,4 @@
 import React from "react";
-import edit from "@/assets/GroupMain/edit.png"
 import settings from "@/assets/GroupMain/settings.png"
 import etc from "@/assets/GroupMain/etc.png"
 import { memberStore } from "../../stores/ModalStore";
