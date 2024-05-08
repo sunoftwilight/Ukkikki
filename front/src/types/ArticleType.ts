@@ -1,3 +1,5 @@
+// Props Type
+
 export interface CommentItemType {
   writer: string;
   writerUrl: string;
@@ -8,3 +10,6 @@ export interface CommentItemType {
 export interface CommentItemProps {
   reply: CommentItemType;
 }
+
+
+// API type

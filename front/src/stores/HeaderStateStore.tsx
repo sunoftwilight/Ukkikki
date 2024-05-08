@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { albumEditType, albumDoneType, headerType } from '../types/StoreType';
+import { AlbumEditStoreType, AlbumDoneStoreType, HeaderStoreType } from '../types/StoreType/HeaderStateStoreType';
 
 export const headerStore = create(
-  persist<headerType>((set) => ({
+  persist<HeaderStoreType>((set) => ({
     alarmOpen: false,
     menuOpen : false,
 
@@ -14,7 +14,7 @@ export const headerStore = create(
 ))
 
 export const albumEditStore = create(
-  persist<albumEditType>((set) => ({
+  persist<AlbumEditStoreType>((set) => ({
     isEdit: false,
 
     setIsEdit: () => set((state) => ({isEdit: !state.isEdit}))
@@ -23,7 +23,7 @@ export const albumEditStore = create(
 ))
 
 export const albumDoneStore = create(
-  persist<albumDoneType>((set) => ({
+  persist<AlbumDoneStoreType>((set) => ({
     isDone: false,
 
     setIsDone: () => set((state) => ({isDone: !state.isDone}))

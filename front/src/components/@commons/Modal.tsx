@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ModalProps } from "../../types/Modal";
 import warn from "@/assets/Modal/warn.png";
 import done from "@/assets/Modal/done.png";
 import ModalBackground from "./ModalBackground";
 import { motion, AnimatePresence } from "framer-motion"
+import { useStore } from "zustand";
+import { prefixStore } from "../../stores/AlbumStore";
 
 const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtnClick }) => {
 	const modalType = modalItems.modalType;
@@ -43,12 +45,16 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCan
 				);
 
 			case "input":
+				const prefixInput = useRef<HTMLInputElement>(null);
+				const { setPrefix } = useStore(prefixStore)
 				return (
 					<div className={`${containClass} flex-col gap-2`}>
 						<div className="font-pre-B text-black text-xl w-full">
 							{modalItems.title}
 						</div>
 						<input
+							ref={prefixInput}
+							onChange={(e) => setPrefix(e.target.value)}
 							autoComplete="false"
 							maxLength={10}
 							className={`${contentClass} bg-soft-gray px-3 py-2 rounded-xl h-[40px] outline-none`}
@@ -136,13 +142,13 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCan
 					<div className="flex gap-4 w-full justify-end">
 						<button 
 							className={`${btnClass} w-[70px] bg-disabled-gray`} 
-							onClick={() => onCancelBtnClick()}
+							onClick={() => onCancelBtnClick!()}
 						>
 							취소
 						</button>
 						<button
 							className={`${btnClass} w-[70px] ${modalType === "warn" ? "bg-red" : "bg-main-blue"}` }
-							onClick={() => onCancelBtnClick()}
+							onClick={() => onSubmitBtnClick!()}
 						>
 							확인
 						</button>
@@ -153,20 +159,22 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCan
 
   const isOpen = useState<boolean>(false)
 	return (
-    <AnimatePresence>
-      {isOpen && <ModalBackground/> }
-      <motion.div 
-				className="flex justify-center items-center w-full h-full"
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				exit={{ opacity: 0 }}
-			>
-        <div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
-          {contentHandler()}
-          {btnHandler()}
-        </div>
-      </motion.div>
-    </AnimatePresence>
+		<div className="fixed top-0 left-0 w-full h-full">
+			<AnimatePresence>
+				{isOpen && <ModalBackground/> }
+				<motion.div 
+					className="flex justify-center items-center w-full h-full"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+				>
+					<div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
+						{contentHandler()}
+						{btnHandler()}
+					</div>
+				</motion.div>
+			</AnimatePresence>
+		</div>
 	);
 };
 

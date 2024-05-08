@@ -1,3 +1,5 @@
+// Props Type
+
 export interface RequestData {
     files: ?,
     key: string,
@@ -8,3 +10,7 @@ export interface ResponseData {
     resultCode: string,
     data: null
 }
+
+
+// API type
+

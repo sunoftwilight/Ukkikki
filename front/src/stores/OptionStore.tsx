@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { optionType } from '../types/StoreType';
+import { OptionStoreType } from '../types/StoreType/OptionStoreType';
 
 export const optionStore = create(
-  persist<optionType>((set) => ({
+  persist<OptionStoreType>((set) => ({
     startPageOpen: false,
     logoutOpen : false,
 

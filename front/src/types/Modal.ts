@@ -1,3 +1,5 @@
+// Props Type
+
 export interface ModalProps {
   modalItems : {
     title?: string,
@@ -9,3 +11,6 @@ export interface ModalProps {
   onSubmitBtnClick?: () => void,
   onCancelBtnClick?: () => void
 }
+
+
+// API type

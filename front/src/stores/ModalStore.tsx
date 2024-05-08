@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { inviteType, memberListType, folderModalType } from '../types/StoreType'
+import { InviteStoreType, MemberStoreType, FolderStoreType } from '../types/StoreType/ModalStoreType'
 
 export const inviteStore = create(
-  persist<inviteType>((set) => ({
+  persist<InviteStoreType>((set) => ({
     inviteOpen: false,
 
     setInviteOpen: () => set((state) => ({inviteOpen: !state.inviteOpen}))
@@ -12,7 +12,7 @@ export const inviteStore = create(
 ))
 
 export const memberStore = create(
-  persist<memberListType>((set) => ({
+  persist<MemberStoreType>((set) => ({
     memberOpen: false,
 
     setMemberOpen: () => set((state) => ({memberOpen: !state.memberOpen}))
@@ -21,7 +21,7 @@ export const memberStore = create(
 ))
 
 export const folderStore = create(
-  persist<folderModalType>((set) => ({
+  persist<FolderStoreType>((set) => ({
     folderOpen: false,
 
     setFolderOpen: () => set((state) => ({folderOpen: !state.folderOpen}))

@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { detailImgType } from '../types/StoreType'
+import { DetailImgStoreType } from '../types/StoreType/DetailImgStoreType'
 
 export const DetailImgStore = create(
-  persist<detailImgType>((set) => ({
+  persist<DetailImgStoreType>((set) => ({
     currentImg: -1,
     currentUrl: '',
 

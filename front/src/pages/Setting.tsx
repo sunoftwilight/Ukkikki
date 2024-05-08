@@ -4,7 +4,7 @@ import uploadImg from "@/assets/Setting/upload.png";
 import startPageImg from "@/assets/Setting/startPage.png";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion"
-import Modal from "../components/commons/Modal";
+import Modal from "../components/@commons/Modal";
 import { optionStore } from "../stores/OptionStore";
 import { useStore } from "zustand";
 

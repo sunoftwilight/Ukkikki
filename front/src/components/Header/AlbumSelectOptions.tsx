@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { folderStore } from "../../stores/ModalStore";
-import { albumDoneStore } from "../../stores/HeaderStateStore";
-import { selectModeStore } from "../../stores/AlbumStore";
+// import { albumDoneStore } from "../../stores/HeaderStateStore";
+// import { selectModeStore } from "../../stores/AlbumStore";
 import { AnimatePresence } from "framer-motion";
 import download from "@/assets/Header/AlbumSelectOptions/download.png";
 import move from "@/assets/Header/AlbumSelectOptions/move.png";
@@ -10,16 +10,18 @@ import trash from "@/assets/Header/AlbumEditOptions/trash.png";
 import edit from "@/assets/Header/AlbumEditOptions/edit.png";
 import Modal from "../@commons/Modal";
 import { downloadFile } from "../../api/file";
+import { useStore } from "zustand";
+import { prefixStore } from "../../stores/AlbumStore";
 
 const AlbumSelectOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
   
-  const { setSelectMode } = selectModeStore()
+  // const { setSelectMode } = selectModeStore()
+  // const { setIsDone } = albumDoneStore()
   const { setFolderOpen } = folderStore()
-  const { setIsDone } = albumDoneStore()
 
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
-  const [prefix, setPrefix] = useState('')
+  // const [prefix, setPrefix] = useState('')
   
   const [isLoading, setIsLoading] = useState(false)
 
@@ -33,12 +35,13 @@ const AlbumSelectOptions: React.FC = () => {
     // setSelectMode()
   }
 
+  const { prefix } = useStore(prefixStore)
   const prefixHandler = async () => {
     await downloadFile(
       {  
         key: '',
         fileId: 0,
-        prefix: '123',
+        prefix: prefix,
       },
       (res) => { 
         console.log(res) 

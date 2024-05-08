@@ -9,7 +9,7 @@ export const downloadFile = async(
   fileDownloadDto : FileDownloadDto,
   Response : (Response : AxiosResponse<ResponseData>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await commonApi.get(`/${url}/download`)
+  await commonApi.get(`/${url}/download`, {params: { 'fileDownloadDto': fileDownloadDto }})
   .then(Response)
   .catch(Error)
 }

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import env from "@/assets/GroupConfig/env.png";
 import profile from "@/assets/GroupConfig/profile.png";
 import groupOut from "@/assets/GroupConfig/groupOut.png";
-import Modal from "../../components/commons/Modal";
+import Modal from "../../components/@commons/Modal";
 
 
 const GroupConfig: React.FC = () => {
