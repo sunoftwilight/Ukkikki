@@ -19,7 +19,8 @@ const Main: React.FC = () => {
   const GetAccessToken = async () => {
     await TokenRefresh(
       (res) => {
-        console.log(res)
+        console.log(res);
+        user.setAccessToken(res.headers['access']);
     }, (err) => {
         console.log(err)
     })
