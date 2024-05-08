@@ -37,14 +37,14 @@ import { userStore } from "./stores/UserStore";
 import LoginRedirect from './components/User/LoginRedirect';
 
 export default function Router() {
-
   const { currentImg, currentUrl } = useStore(DetailImgStore)
   const navi = useNavigate();
   const user = useStore(userStore);
+  const isLogin = user.isLogin
 
   useEffect(() => {
-    if(!user.isLogin) navi('/login')
-  }, [user.isLogin])
+    if(!isLogin) navi('/login')
+  }, [user.isLogin, navi])
 
   
 
