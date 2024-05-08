@@ -13,8 +13,8 @@ import { TokenRefresh, UserInfo } from "../api/user";
 const Main: React.FC = () => {
   
   const user = useStore(userStore)
-
   const [cookies] = useCookies(['isLogin']);
+
   const GetAccessToken = async () => {
     await TokenRefresh(
       (res) => {
@@ -44,7 +44,6 @@ const Main: React.FC = () => {
   }, [cookies.isLogin])
 
   useEffect(() => {
-    
     if (user.userId === "" && user.accessToken !== "") {
       console.log(1)
       GetInfo()

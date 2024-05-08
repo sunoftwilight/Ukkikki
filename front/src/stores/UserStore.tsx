@@ -10,8 +10,8 @@ export const userStore = create(
     userProfile: '',
     setAccessToken: (newData: string) => set(() => ({accessToken: newData})),
     setUserId: (newData: string) => set(() => ({userId: newData})),
-    setUserName: (newData: string) => set(() => ({accessToken: newData})),
-    setUserProfile: (newData: string) => set(() => ({accessToken: newData}))
+    setUserName: (newData: string) => set(() => ({userName: newData})),
+    setUserProfile: (newData: string) => set(() => ({userProfile: newData}))
   }),
   { name: 'USER_STORE'}
 ))
