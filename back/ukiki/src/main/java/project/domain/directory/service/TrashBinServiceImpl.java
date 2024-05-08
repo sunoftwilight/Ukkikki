@@ -10,8 +10,8 @@ import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.collection.TrashBin;
+import project.domain.directory.dto.PhotoDto;
 import project.domain.directory.dto.TrashFileDto;
-import project.domain.directory.dto.TrashPhotoDto;
 import project.domain.directory.dto.response.GetTrashBinDto;
 import project.domain.directory.mapper.GetTrashBinMapper;
 import project.domain.directory.repository.DirectoryRepository;
@@ -66,7 +66,7 @@ public class TrashBinServiceImpl implements TrashBinService {
         ModelMapper modelMapper = new ModelMapper();
         for (Trash trash : trashList) {
             TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
-            TrashPhotoDto trashPhotoDto = modelMapper.map(trashFileDto.getPhoto(), TrashPhotoDto.class);
+            PhotoDto trashPhotoDto = trashFileDto.getPhotoDto();
             // 여기서 trashFileDto.getPhoto() => Photo로 바꿔주는 modelMapper를 쓰기위한 TrashPhotoDto를 생성해줘
             Long photoId = trashPhotoDto.getId();
             Photo photo = photoRepository.findById(photoId)
@@ -98,10 +98,10 @@ public class TrashBinServiceImpl implements TrashBinService {
         // file -> photo -> partyId -> trashBin -> addfileId
         File file = fileRepository.findById(fileId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
-        ModelMapper modelMapper = new ModelMapper();
-        Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
-        // partyId == trashBinId
-        Long partyId = photo.getParty().getId();
+        log.info("saveFileToTrashBin");
+        log.info("{}", file);
+        Long partyId = file.getPhotoDto().getPartyId();
+        log.info("saveFileToTrashBin");
         TrashBin trashBin = findById(partyId);
         trashBin.getFileIdList().add(fileId);
         trashBinRepository.save(trashBin);
@@ -122,10 +122,8 @@ public class TrashBinServiceImpl implements TrashBinService {
     public List<String> getPhotoUrlList(TrashBin trashBin) {
         List<String> photoUrlList = new ArrayList<>();
         List<File> FileList = fileRepository.findAllById(trashBin.getFileIdList());
-        ModelMapper modelMapper = new ModelMapper();
         for (File file : FileList) {
-            Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
-            photoUrlList.add(photo.getPhotoUrl().getPhotoUrl());
+            photoUrlList.add(file.getPhotoDto().getPhotoUrl());
         }
         return photoUrlList;
     }

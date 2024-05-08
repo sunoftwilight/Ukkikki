@@ -13,13 +13,13 @@ public interface FileService {
     void createFile(Long partyId, Photo photo);
 
     // 사진 복사
-    GetDirDto copyFile(String fileId, String fromDirId, String toDirId);
+    void copyFile(String fileId, String fromDirId, String toDirId);
 
     // 사진 이동
-    GetDirDto moveFile(String fileId, String fromDirId, String toDirId);
+    void moveFile(String fileId, String fromDirId, String toDirId);
 
     // 단일 사진 삭제
-    GetDirDto deleteOneFile(String fileId, String dirId);
+    void deleteOneFile(String fileId, String dirId);
 
     // 전체 사진 삭제
     GetDirDto deleteAllFile(String fileId, String dirId);
@@ -39,5 +39,5 @@ public interface FileService {
 
     public File findById(String fileId);
 
-    GetFileDto getFileDto(String fileId);
+    String getFile(String fileId);
 }

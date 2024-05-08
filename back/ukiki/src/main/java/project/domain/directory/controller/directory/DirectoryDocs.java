@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,10 +30,16 @@ public interface DirectoryDocs {
     @GetMapping("")
     public ResponseEntity<ResultResponse> getDirList(Long userId);
 
-    @Operation(summary = "폴더 조회 요청", description = "PathVariable로 dirId를 해당 폴더 정보를 반환")
+    @Operation(summary = "폴더 조회 요청", description = "PathVariable로 dirId를 받아 해당 폴더 정보를 반환")
     @ApiResponse(responseCode = "200", description = "폴더 조회에 성공하였습니다.")
     @GetMapping("/{dirId}")
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId);
+
+    @Operation(summary = "메인 폴더 설정 변경 요청", description = "PathVariable로 dirId를 받아 유저의 메인 폴더 속성 변경")
+    @ApiResponse(responseCode = "200", description = "메인 폴더 설정 변경에 성공하였습니다.")
+    @GetMapping("/{dirId}/main")
+    public ResponseEntity<ResultResponse> patchMainDir(
+        @AuthenticationPrincipal UserDetails userDetails, @PathVariable String dirId);
 
     @Operation(summary = "자식폴더 생성 요청(선결 조건으로 부모 폴더가 필요합니다./init/{partyId}으로 먼저 생성후 요청하세요 )", description = "Body로 parentDirId(부모폴더 ID), dirName(생성 할 폴더명)을 받아 부모폴더의 정보를 반환")
     @ApiResponse(responseCode = "201", description = "폴더 생성에 성공하였습니다.")

@@ -9,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import project.domain.directory.service.FileService;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
+import project.domain.party.entity.Party;
+import project.domain.party.repository.PartyRepository;
 import project.domain.photo.dto.request.FileDownloadDto;
 import project.domain.photo.dto.request.FileUploadDto;
 import project.domain.photo.dto.request.MultiFileDownloadDto;
@@ -40,6 +42,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     private final PhotoRepository photoRepository;
     private final MemberRepository memberRepository;
     private final MetaRepository metaRepository;
+    private final PartyRepository partyRepository;
     // GptUtil
     private final GptUtil gptUtil;
     private final S3Util s3Util;
@@ -64,10 +67,18 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
             + ", " + photo.getFileName());
             photo.setPhotoUrl(urls);
+
+            Party party = partyRepository.findById(fileUploadDto.getPartyId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+            photo.setParty(party);
             photoRepository.save(photo);
+            Long memberId = 1L;
+            Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+            photo.setMember(member);
 
             //MongoDB 업데이트
-            fileService.createFile(2L, photo);
+            fileService.createFile(fileUploadDto.getPartyId(), photo);
 
             //GPT API
             for (Integer code : gptUtil.postChat(file)) {

@@ -43,6 +43,8 @@ public enum ErrorCode {
     DIRECTORY_NOE_FOUND(404, "해당 폴더를 찾을 수 없습니다."),
     DIRECTORY_OUT_OF_DEADLINE(403, "유효 기간이 만료된 폴더입니다."),
     ROOTDIR_NOT_FOUND(404, "최상위 폴더를 찾을 수 없습니다.(무한 재귀 발생)"),
+    FIND_PARENT_OF_ROOT_NOT_AVAILABLE(404, "최상위 폴더의 상위 폴더 입니다."),
+
 
     // 휴지통 과련
     TRASHBIN_NOT_FOUND(404, "존재하지 않는 휴지통 입니다."),

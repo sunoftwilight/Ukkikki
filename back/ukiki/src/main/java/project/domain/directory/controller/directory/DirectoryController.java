@@ -3,6 +3,8 @@ package project.domain.directory.controller.directory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,9 +19,9 @@ import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
-import project.domain.directory.dto.response.GetFileDto;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.FileService;
+import project.domain.member.dto.request.CustomOAuth2User;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
@@ -39,7 +41,7 @@ public class DirectoryController implements DirectoryDocs {
     }
 
     @Override
-    @GetMapping("/{userId}")
+    @GetMapping("")
     public ResponseEntity<ResultResponse> getDirList(
         @PathVariable("userId") Long userId
     ) {
@@ -52,6 +54,15 @@ public class DirectoryController implements DirectoryDocs {
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId) {
         GetDirDtov2 response = directoryService.getDirv2(dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_DIRECTORY_SUCCESS, response));
+    }
+
+    @Override
+    public ResponseEntity<ResultResponse> patchMainDir(
+        @AuthenticationPrincipal UserDetails userDetails, String dirId) {
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+        directoryService.patchMainDir(memberId, dirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.SET_MAIN_DIRECTORY_SUCCESS));
     }
 
     @PostMapping("")
@@ -95,7 +106,7 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String dirId,
         @PathVariable(name = "fileId") String fileId
     ) {
-        GetFileDto response = fileService.getFileDto(fileId);
+        String response = fileService.getFile(fileId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_FILE_SUCCESS, response));
     }
 
@@ -106,8 +117,8 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String fromDirId,
         @RequestParam(name = "toDirId") String toDirId
     ) {
-        GetDirDto response = fileService.copyFile(fileId, fromDirId, toDirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_COPY_SUCCESS, response));
+        fileService.copyFile(fileId, fromDirId, toDirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_COPY_SUCCESS));
     }
 
     @Override
@@ -117,8 +128,8 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String fromDirId,
         @RequestParam(name = "toDirId") String toDirId
     ) {
-        GetDirDto response = fileService.moveFile(fileId, fromDirId, toDirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS, response));
+        fileService.moveFile(fileId, fromDirId, toDirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS));
     }
 
     @Override
@@ -128,8 +139,8 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "fileId") String fileId
     ) {
 
-        GetDirDto response = fileService.deleteOneFile(fileId, dirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS, response));
+        fileService.deleteOneFile(fileId, dirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS));
     }
 
     @Override
