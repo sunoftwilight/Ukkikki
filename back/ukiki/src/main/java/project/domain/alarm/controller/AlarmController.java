@@ -42,6 +42,7 @@ public class AlarmController implements AlarmDocs {
             AlarmType.REPLY,
             1L,1L, 53L, "어해진 바보"
         );
+        dsa.setMemberId(1L);
         alarmService.sendAlarm(asd,1L,dsa);
     }
 
