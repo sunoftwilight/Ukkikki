@@ -12,11 +12,19 @@ const LoginRedirect: React.FC = () => {
   const navi = useNavigate();
   const user = useStore(userStore);
 
+  useEffect(() => {
+    console.log(user.isLogin)
+    getAccess();
+    getUserInfo();
+  })
+
   const getAccess = async () => {
     if (cookies.isLogin === 'ture'){
       await tokenRefresh(
         (response) => {
-          user.setAccessToken(response.headers['access']);        
+          console.log(response)
+          user.setAccessToken(response.headers['access']);
+          user.setIsLogin(true);
         },
         (error) => {
           console.error(error)
@@ -29,11 +37,12 @@ const LoginRedirect: React.FC = () => {
     if (user.accessToken !== '') {
       await userInfo(
         (response) => {
+          console.log(response)
           const userData = response.data.data;
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);
-          user.setIsLogin(true);
+
         },
         (error) => {
           console.error(error)
@@ -43,11 +52,6 @@ const LoginRedirect: React.FC = () => {
     navi('/')
   }
 
-  useEffect(() => {
-    console.log(user.isLogin)
-    getAccess();
-    getUserInfo();
-  })
 
   return null;
 };
