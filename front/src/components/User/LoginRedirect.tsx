@@ -19,6 +19,7 @@ const LoginRedirect: React.FC = () => {
   })
 
   const getAccess = async () => {
+    console.log(cookies.isLogin)
     if (cookies.isLogin === 'true'){
       await tokenRefresh(
         (response) => {
@@ -34,6 +35,7 @@ const LoginRedirect: React.FC = () => {
   }
 
   const getUserInfo = async () => {
+    console.log(user.accessToken)
     if (user.accessToken !== '') {
       await userInfo(
         (response) => {
