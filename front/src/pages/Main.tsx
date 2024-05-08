@@ -43,8 +43,11 @@ const Main: React.FC = () => {
   }, [cookies.isLogin])
 
   useEffect(() => {
-    if (user.accessToken !== '') {
+    if (user.accessToken === '') {
       GetInfo()
+      console.log(user.accessToken)
+    } else {
+      console.log(user.accessToken)
     }
   }, [user.accessToken])
 
