@@ -27,14 +27,10 @@ const Main: React.FC = () => {
   const GetInfo = async () => {
     await UserInfo(
       (res) => {
-        console.log(res.data)
-        console.log(res.data.data.userId)
-        console.log(res.data.data.userName)
-        console.log(res.data.data.profileUrl)
-
-        // user.setUserId(res.data.userId)
-        // user.setUserName(res.data.userName)
-        // user.setUserProfile(res.data.userProfile)
+        console.log(2)
+        user.setUserId(res.data.data.userId)
+        user.setUserName(res.data.data.userName)
+        user.setUserProfile(res.data.data.profileUrl)
       }, (err) => {
         console.error(err)
       }
@@ -48,7 +44,9 @@ const Main: React.FC = () => {
   }, [cookies.isLogin])
 
   useEffect(() => {
+    
     if (user.userId === "" && user.accessToken !== "") {
+      console.log(1)
       GetInfo()
     }
   }, [user.accessToken])
