@@ -41,6 +41,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //web socket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 //    testImplementation 'org.springframework.security:spring-security-test'
@@ -74,6 +77,11 @@ dependencies {
 
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    //WebClient
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    }
 }
 
 // 빌드시 기존 빌드 정보 청소후 재빌드

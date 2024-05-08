@@ -46,7 +46,7 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     }
 
     @GetMapping("/download")
-    public void fileDownload(@RequestBody @Valid FileDownloadDto fileDownloadDto, HttpServletResponse response) {
+    public void fileDownload(FileDownloadDto fileDownloadDto, HttpServletResponse response) {
         S3Object object = fileUploadDownloadService.fileDownload(fileDownloadDto);
         String contentType = object.getObjectMetadata().getContentType().split("/")[1];
         InputStream inputStream = object.getObjectContent();
@@ -72,7 +72,7 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     }
 
     @GetMapping("/multi-select-download")
-    public void multiSelectDownload(@RequestBody @Valid MultiFileDownloadDto multiFileDownloadDto, HttpServletResponse response) throws Exception {
+    public void multiSelectDownload(MultiFileDownloadDto multiFileDownloadDto, HttpServletResponse response) throws Exception {
         HashMap<String, List<File>> map = (HashMap<String, List<File>>) fileUploadDownloadService.multiFileDownload(multiFileDownloadDto);
         String path = map.keySet().iterator().next();
         List<File> files = map.get(path);

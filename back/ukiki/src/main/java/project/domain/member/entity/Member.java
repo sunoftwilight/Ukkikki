@@ -3,9 +3,12 @@ package project.domain.member.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.domain.chat.entity.Chat;
 import project.domain.party.entity.Article;
-import project.domain.party.entity.Chat;
 import project.domain.party.entity.MemberParty;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.DownloadLog;
@@ -53,6 +56,16 @@ public class Member extends BaseEntity {
     private String mainDirId;
 
     // 연관관계 총 9 개
+
+//    @Builder.Default
+//    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Member> readMember = new ArrayList<>();
+
+    // 연관관계 총 9 + 1 개
+    @JoinColumn(name = "chat")
+    @ManyToOne(fetch = FetchType.LAZY)
+    Chat chat;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Profile> profileList = new ArrayList<>();
 

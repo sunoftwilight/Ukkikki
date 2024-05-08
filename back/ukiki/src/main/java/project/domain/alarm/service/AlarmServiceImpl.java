@@ -18,8 +18,13 @@ import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.repository.EmitterRepository;
+import project.domain.member.entity.Member;
+import project.domain.member.entity.Profile;
+import project.domain.member.repository.ProfileRepository;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.repository.MemberpartyRepository;
+import project.global.exception.BusinessLogicException;
+import project.global.exception.ErrorCode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +40,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final EmitterRepository emitterRepository;
     private final MemberpartyRepository memberpartyRepository;
     private final AlarmRedisRepository alarmRedisRepository;
+    private final ProfileRepository profileRepository;
     private final AlarmMapper alarmMapper;
 
 
@@ -42,6 +48,10 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public Alarm createAlarm(AlarmType type, Long partyId, Long articleId, Long targetId, String data){
+
+        Profile profile = profileRepository.findByMemberIdAndPartyId(targetId, partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
+
         List<String> identifier = new ArrayList<>();
         String message = null;
         switch (type){
@@ -49,7 +59,7 @@ public class AlarmServiceImpl implements AlarmService {
                 identifier = AlarmIdentifier.CHAT.identifier(partyId, articleId);
             }
             case REPLY -> {
-                message = String.format("%s님께서 회원님에게 댓글을 작성하였습니다.\n%s", "홍길동", data);
+                message = String.format("%s님께서 회원님에게 댓글을 작성하였습니다.\n%s", profile.getNickname(), data);
                 identifier = AlarmIdentifier.REPLY.identifier(partyId, articleId);
             }
             case ARTICLE -> {
@@ -101,6 +111,7 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     // 유저 아이디로 emitter 조회 / not exist -> return null;
+    @Override
     public SseEmitter findEmitterByUserId(Long userId){
         return emitterRepository.getByUserId(userId);
     }
@@ -154,7 +165,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public AlarmPageDto getAlarmList(AlarmPageableDto alarmPageableDto) {
-        Pageable pageable = PageRequest.of(alarmPageableDto.getPageNo(), alarmPageableDto.getPageSize()+1, Sort.Direction.DESC, "createDate");
+        Pageable pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.Direction.DESC, "createDate");
         Long userId = 1L;
         Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(userId, pageable);
         List<SimpleAlarm> alarmList = alarmPage.stream()

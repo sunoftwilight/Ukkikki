@@ -9,7 +9,7 @@ public enum ResultCode {
 
     //User
     GET_USERLIST_SUCCESS(200, "유저리스트 검색에 성공하였습니다."),
-
+    GET_USERINFO_SUCCESS(200, "유정 정보 조회에 성공하였습니다."),
     //Party
     CREATE_PARTY_SUCCESS(201, "그룹 생성에 성공하였습니다."),
     GET_PARTY_LINK_SUCCESS(201, "참가 링크 생성에 성공하였습니다. "),
@@ -47,8 +47,10 @@ public enum ResultCode {
     GET_TRASH_BIN_SUCCESS(200, "휴지통 조회에 성공하였습니다."),
 
     // alarm
-    GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다.")
+    GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다."),
 
+    // Chat
+    CHAT_SEND_SUCCESS(200, "채팅 전송에 성공하였습니다."),
 
     ;
 

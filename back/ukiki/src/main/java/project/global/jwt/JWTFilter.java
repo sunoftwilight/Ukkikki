@@ -26,43 +26,10 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // 쿠키에서 토큰 가져오기
-        String access = null;
-        String refresh = null;
-        Cookie accessCookie = null;
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null){
-            for(Cookie cookie : cookies){
-                if(cookie.getName().equals("access")){
-                    access = cookie.getValue();
-                    accessCookie = cookie;
-                }
-                if(cookie.getName().equals("refresh")){
-                    refresh = cookie.getValue();
-                }
-            }
-
-        }
-
-        // refresh토큰 체크
-        if(refresh != null) {
-            try {
-                jwtUtil.isExpired(refresh);
-            } catch (ExpiredJwtException e) {
-                //response body
-                PrintWriter writer = response.getWriter();
-                writer.print("refresh token expired");
-
-                //response status code
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
-        }
-
-
+        String access = request.getHeader("access");
 
         // 토큰 널값체크
         if(access == null){
-            System.out.println("access token null");
             filterChain.doFilter(request, response);
 
             return;
@@ -75,36 +42,13 @@ public class JWTFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
 
             PrintWriter writer = response.getWriter();
+            writer.print("access token expired");
 
-            // 게스트
-            if(refresh == null){
-                //response body
-                writer.print("access token expired");
-
-                //response status code
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
-            // 일반 회원
-            else{
-
-                // 토큰 자동 갱신.
-                writer.print("access token renewal");
-                String reUsername = jwtUtil.getUsername(refresh);
-                String reProviderId = jwtUtil.getProviderId(refresh);
-                Long id = jwtUtil.getId(refresh);
-
-                access = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
-
-                accessCookie.setValue(access);
-                accessCookie.setPath("/");
-                accessCookie.setHttpOnly(true);
-                accessCookie.setMaxAge(60 * 60 * 4);
-                response.addCookie(accessCookie);
-            }
-
-
+            //response status code
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
+
         // 토큰이 access인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getCategory(access);
         if (!category.equals("access")) {
@@ -126,6 +70,7 @@ public class JWTFilter extends OncePerRequestFilter {
         memberDto.setUserName(username);
         memberDto.setProviderId(providerId);
         memberDto.setId(id);
+
 
         // UserDetails에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(memberDto);

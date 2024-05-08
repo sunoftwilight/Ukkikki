@@ -19,6 +19,10 @@ public enum ErrorCode {
 
     // 회원 관련
     MEMBER_NOT_FOUND(404, "해당하는 회원이 존재하지 않습니다."),
+    REFRESH_TOKEN_NULL(404, "토큰이 유효하지 않습니다."),
+    REFRESH_TOKEN_EXPIRED(400, "토큰이 만료되었습니다."),
+    REFRESH_TOKEN_MATCH(400, "토큰이 일치하지 않습니다.."),
+    MEMBER_LOGOUT_MATCH(400, "access, refresh 토큰 정보가 일치하지 않습니다."),
 
     // 파티 관련
     PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),
@@ -31,6 +35,7 @@ public enum ErrorCode {
     MASTER_CANT_EXIT(400, "마스터는 파티방을 나갈 수 없습니다."),
     ENTER_DENIED_BLOCK_USER(400, "가입 거부 차단된 유저입니다."),
     PARTY_ALREADY_HAVE_ROOT_DIR(400, "이미 그룹 폴더가 존재 합니다."),
+    MEMBER_NOT_PROFILE(400, "프로필을 찾을 수 없습니다."),
 
     // 사진 업로드, 다운로드 관련
     META_CODE_NOT_FOUND(404, "해당 메타코드 분류가 존재하지 않습니다."),
@@ -54,6 +59,8 @@ public enum ErrorCode {
     // GptUtil 관련
     JSON_PARSE_EXCEPTION(400, "JSON 파싱에 실패했습니다."),
 
+    // Chat
+    NOT_JOIN_CHAT(400, "채팅에서 유저를 찾을 수 없습니다.")
     ;
 
     private final int status;

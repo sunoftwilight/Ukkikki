@@ -30,6 +30,8 @@ public class Profile extends BaseEntity {
     @Column(name = "profile_id")
     private Long id;
 
+    private ProfileType type;
+
     @Column(name = "nickname")
     private String nickname;
 

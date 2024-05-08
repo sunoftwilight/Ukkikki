@@ -1,27 +1,23 @@
-package project.domain.party.entity;
+package project.domain.chat.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import project.domain.member.entity.Member;
+import project.domain.member.entity.Profile;
+import project.domain.party.entity.Party;
 import project.global.baseEntity.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Chat extends BaseEntity {
 
     @Id
@@ -29,24 +25,40 @@ public class Chat extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private ChatType chatType;
+
+    private String userName;
+
+
     @Column(name = "content")
     private String content;
 
+    @Builder.Default
     @Column(name = "is_delete")
     private Boolean isDelete = false;
 
+    @JoinColumn(name = "profile")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Profile profile;
+
+
     @JoinColumn(name = "party_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Party party;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Member member;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Member> readMember = new ArrayList<>();
 
     // 빌더를 사용한 객체 생성 방법을 재정의 (커스텀 빌더 사용)
     @Builder(builderMethodName = "customBuilder")
-    public static Chat create(String content, Party party, Member member) {
+    public static Chat create(String content, ChatType chatType,Party party, Member member) {
         Chat chat = new Chat();
+        chat.chatType = chatType;
         chat.setParty(party);
         chat.setMember(member);
         chat.setContent(content);

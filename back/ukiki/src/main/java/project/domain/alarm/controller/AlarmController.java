@@ -1,15 +1,18 @@
 package project.domain.alarm.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import project.domain.alarm.dto.request.AlarmPageableDto;
 import project.domain.alarm.dto.response.AlarmPageDto;
+import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
+import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
@@ -20,23 +23,33 @@ import project.global.result.ResultResponse;
 public class AlarmController implements AlarmDocs {
 
     private final AlarmService alarmService;
-
+    private final AlarmRedisRepository alarmRedisRepository;
     @Override
-    @GetMapping(value= "/sub", produces = "text/event-stream")
-    public SseEmitter subScribe(){
+    @GetMapping(value= "/sub", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subScribe(HttpServletResponse response){
         SseEmitter res = alarmService.createEmitter();
+        response.setHeader("X-Accel-Buffering", "no");
+        response.setCharacterEncoding("UTF-8");
         return res;
     }
 
     @Override
-    @PostMapping("/list")
+    @GetMapping("/list")
     public ResponseEntity<ResultResponse> getAlarmList(AlarmPageableDto alarmPageDto) {
         AlarmPageDto res = alarmService.getAlarmList(alarmPageDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_ALARM_SUCCESS, res));
     }
-    @GetMapping("testtest")
-    public Object ASDASD(){
-        return alarmService.createAlarm(AlarmType.CHECK,1L, 1L, 1L, "이건 테스트");
+
+    @GetMapping("/test-alarm")
+    public void testAlarm(@AuthenticationPrincipal UserDetails userDetails){
+        SseEmitter asd = alarmService.findEmitterByUserId(1L);
+        Alarm dsa = alarmService.createAlarm(
+            AlarmType.REPLY,
+            1L,1L, 53L, "어해진 바보"
+        );
+        dsa.setMemberId(1L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,1L,dsa);
     }
 
 }
