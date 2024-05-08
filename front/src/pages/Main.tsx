@@ -1,9 +1,56 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Banner from "../components/Main/Banner";
 import Carousel from "../components/Main/Carousel";
 import Buttons from "../components/Main/Buttons";
 
+
+// 로그인용 작업중.
+import { useNavigate } from "react-router-dom";
+import { useStore } from "zustand";
+import { userStore } from "../stores/UserStore";
+import { useCookies } from 'react-cookie';
+import { TokenRefresh, UserInfo } from "../api/user";
+
 const Main: React.FC = () => {
+  
+  const user = useStore(userStore)
+
+  const navi = useNavigate();
+  const [cookies] = useCookies(['refresh']);
+
+  const GetAccessToken = async () => {
+    await TokenRefresh(
+      (res) => {
+        console.log(res)
+    }, (err) => {
+        console.log(err)
+    })
+  }
+  const GetInfo = async () => {
+    await UserInfo(
+      (res) => {
+        console.log(res)
+      }, (err) => {
+        console.error(err)
+      }
+    )
+  }
+
+
+  useEffect(() => {
+    if (!cookies.refresh) {
+      navi('/login')
+    }
+    else
+    {
+      GetAccessToken()
+    }
+
+    if (user.accessToken) {
+      GetInfo()
+    }
+  }, [cookies.refresh, user.accessToken])
+
   return (
     <div className="w-full h-full py-2 px-4 flex flex-col gap-9 mb-2">
       <div className="flex flex-col gap-[14px]">
