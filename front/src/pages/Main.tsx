@@ -24,6 +24,7 @@ const Main: React.FC = () => {
         console.log(err)
     })
   }
+
   const GetInfo = async () => {
     await UserInfo(
       (res) => {
@@ -38,12 +39,13 @@ const Main: React.FC = () => {
     if (cookies.refresh) {
       GetAccessToken()
     }
+  }, [cookies.refresh])
 
+  useEffect(() => {
     if (user.accessToken) {
       GetInfo()
     }
-
-  }, [cookies.refresh, user.accessToken])
+  }, [user.accessToken])
 
   return (
     <div className="w-full h-full py-2 px-4 flex flex-col gap-9 mb-2">
