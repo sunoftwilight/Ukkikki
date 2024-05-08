@@ -1,4 +1,4 @@
-import { Routes, Route  } from 'react-router-dom';
+import { Routes, Route, useNavigate  } from 'react-router-dom';
 import { useStore } from 'zustand';
 import { DetailImgStore } from './stores/DetailImgStore';
 import MainLayout from './MainLayout'
@@ -31,7 +31,19 @@ import ArticleDetail from './pages/ArticleDetail';
 import ArticleImg from './pages/ArticleImg';
 import Trash from './pages/Trash';
 
+// 로그인용 작업중.
+import { useEffect } from 'react';
+import { useCookies } from 'react-cookie';
+
 export default function Router() {
+
+  const navi = useNavigate();
+  const [cookies] = useCookies(['access']);
+
+  useEffect(() => {
+    if (!cookies.access) navi('/login')
+  }, [cookies.access, ])
+
   const { currentImg, currentUrl } = useStore(DetailImgStore)
 
   return (
