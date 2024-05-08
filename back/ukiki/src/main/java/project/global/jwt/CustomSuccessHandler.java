@@ -31,8 +31,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String access = jwtUtil.createJWT("access", id, userName, providerId, ((1000L * 60) * 60 * 4));
         // 몇분이더라
         String refresh = jwtUtil.createJWT("refresh", id, userName, providerId, ((1000L * 60 * 60) * 24 * 60));
-
-        response.addCookie(createCookie("access", access));
+        System.out.println(access);
+//        response.addCookie(createCookie("access", access));
+        response.setHeader("access",access);
         response.addCookie(createCookie("refresh", refresh));
         response.sendRedirect("https://k10d202.p.ssafy.io/");
 //        response.sendRedirect("http://localhost:3000/");

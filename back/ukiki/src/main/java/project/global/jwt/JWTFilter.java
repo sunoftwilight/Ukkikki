@@ -26,16 +26,12 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // 쿠키에서 토큰 가져오기
-        String access = null;
+        String access = request.getHeader("access");
         String refresh = null;
-        Cookie accessCookie = null;
         Cookie[] cookies = request.getCookies();
+
         if(cookies != null){
             for(Cookie cookie : cookies){
-                if(cookie.getName().equals("access")){
-                    access = cookie.getValue();
-                    accessCookie = cookie;
-                }
                 if(cookie.getName().equals("refresh")){
                     refresh = cookie.getValue();
                 }
@@ -96,11 +92,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 access = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
 
-                accessCookie.setValue(access);
-                accessCookie.setPath("/");
-                accessCookie.setHttpOnly(true);
-                accessCookie.setMaxAge(60 * 60 * 4);
-                response.addCookie(accessCookie);
+                response.setHeader("access",access);
             }
 
 
@@ -135,7 +127,6 @@ public class JWTFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
-
 
     }
 }
