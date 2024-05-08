@@ -6,7 +6,7 @@ const Login: React.FC = () => {
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center bg-white">
       <img src={LoginLogo} className="-mt-11 mb-5"/>
-      <a href="https://k10d202.p.ssafy.io/api/oauth2/authorization/kakao">
+      <a href="http://localhost:5000/api/oauth2/authorization/kakao">
         <img src={LoginBtn} />
       </a>
     </div>
