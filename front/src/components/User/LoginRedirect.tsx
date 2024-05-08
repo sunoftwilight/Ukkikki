@@ -44,6 +44,7 @@ const LoginRedirect: React.FC = () => {
   }
 
   useEffect(() => {
+    console.log(user.isLogin)
     getAccess();
     getUserInfo();
   })
