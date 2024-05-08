@@ -60,10 +60,10 @@ const Hamburger: React.FC = () => {
   useEffect(() => {
     getAlarm(
       { pageNo: 1, pageSize: 5 },
-      (res) => { console.log(res) },
+      (res) => { console.log(res, '알람')},
       (err) => { console.error(err) }
     )
-  }, [])
+  }, [alarmOpen])
 
 	return (
 		<AnimatePresence>
