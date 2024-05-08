@@ -11,16 +11,15 @@ export const selectModeStore = create(
   { name: 'ALBUM_STORE' }
 ))
 
-export const selectStore = create(
-  persist<selectListStoreType>((set) => ({
+export const selectStore = create<selectListStoreType>(
+  (set) => ({
     selectList: [],
     
     setSelectList: (imgId: number, isSelect: boolean) => set((state) => ({
       selectList: isSelect ? state.selectList.filter(id => id !== imgId) : [...state.selectList, imgId]
     }))
-  }),
-  { name: 'ALBUM_STORE' }
-))
+  })
+)
 
 export const prefixStore = create(
   persist<PrefixStoreType>((set) => ({

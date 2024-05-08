@@ -12,11 +12,12 @@ interface SelectModeImgProps {
 
 const SelectModeImg: React.FC<SelectModeImgProps> = ({ item }) => {
   const [isSelect, setIsSelect] = useState(false)
-  const { setSelectList } = useStore(selectStore)
+  const { selectList, setSelectList } = useStore(selectStore)
 
   const clickHandler = (id: number) => {
     setSelectList(id, isSelect)
     setIsSelect(!isSelect)
+    console.log(selectList)
   }
 
   return (
