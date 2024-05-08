@@ -125,6 +125,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendAlarm(SseEmitter emitter, Long userId, Alarm alarm){
         try{
+            alarmRedisRepository.save(alarm);
             emitter.send(SseEmitter.event()
                 .id(makeEmitterId(userId))
                 .name(String.valueOf(alarm.getAlarmType()))
@@ -149,7 +150,6 @@ public class AlarmServiceImpl implements AlarmService {
             // XXX 여기에는 emitter 찾아서 메시지 보내는 거 구현해야함 알람도 저장하구요
             SseEmitter memberEmitter = emitterRepository.getByUserId(memberParty.getMember().getId());
             Alarm alarm = new Alarm(data, memberParty.getMember().getId());
-            alarmRedisRepository.save(alarm);
             sendAlarm(memberEmitter, memberParty.getMember().getId(), alarm);
 
         }
