@@ -34,6 +34,7 @@ import Trash from './pages/Trash';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from 'react';
 import { userStore } from "./stores/UserStore";
+import LoginRedirect from './components/User/LoginRedirect';
 
 export default function Router() {
 
@@ -86,6 +87,7 @@ export default function Router() {
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}
       <Route path="/login" element={<Login />} />
+      <Route path="/loginredirect" element={<LoginRedirect />} />
       <Route path="/camera" element={<Camera />} />
     </Routes>
   );

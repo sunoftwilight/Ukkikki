@@ -6,7 +6,7 @@ import { UserResponeseData } from '../types/UserInfoType';
 
 const url = 'member';
 
-export const UserInfo = async (
+export const userInfo = async (
 	Response: (Response: AxiosResponse<UserResponeseData>) => void,
 	Error: (Error: AxiosResponse<UserResponeseData>) => void) => {
 		await privateApi.get(`/${url}/info/my`)
@@ -14,7 +14,7 @@ export const UserInfo = async (
 		.catch(Error)
   }
 
-  export const TokenRefresh = async(
+  export const tokenRefresh = async(
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await publicApi.post(`/${url}/reissue`)
