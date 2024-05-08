@@ -60,6 +60,11 @@ public class MemberServiceImpl implements MemberService{
                 infoDto.setUserName(member.getUserName());
                 infoDto.setUserId(member.getId());
 
+            } else{
+                infoDto = new InfoDto();
+                infoDto.setUserId(userId);
+                infoDto.setUserName(userDetails.getUsername());
+                infoDto.setProfileUrl(null);
             }
         }
 

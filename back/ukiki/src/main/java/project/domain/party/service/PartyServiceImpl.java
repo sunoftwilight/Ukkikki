@@ -2,12 +2,8 @@ package project.domain.party.service;
 
 
 import com.amazonaws.services.s3.model.SSECustomerKey;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +47,7 @@ import project.domain.photo.entity.Photo;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
+import project.global.jwt.JWTUtil;
 import project.global.util.BcryptUtil;
 import project.global.util.S3Util;
 
@@ -76,6 +73,7 @@ public class PartyServiceImpl implements PartyService {
     private final BcryptUtil bcryptUtil;
     private final RedisTemplate redisTemplate;
 
+    private final JWTUtil jwtUtil;
 
     @Override
     @Transactional
@@ -270,7 +268,15 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
 
         //TODO 게스트용 토큰 만들어야함.
-        String guestToken = "asd2123_asd1kas1+asd";
+        Random random = new Random();
+        long num = random.nextLong(1000000);
+
+        Long id = 0L;
+        String name = "Guest" + num;
+        String pro = "Guest " + num;
+
+        //TODO 게스트용 토큰 만들어야함.
+        String guestToken = jwtUtil.createJWT("access", id, name, pro,((1000L * 60) * 10));
 
 
         PartyEnterDto res = partyLinkMapper.toPartyEnterDto(partyLink);
