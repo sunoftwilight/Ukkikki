@@ -165,7 +165,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public AlarmPageDto getAlarmList(AlarmPageableDto alarmPageableDto) {
-        Pageable pageable = PageRequest.of(alarmPageableDto.getPageNo(), alarmPageableDto.getPageSize()+1, Sort.Direction.DESC, "createDate");
+        Pageable pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.Direction.DESC, "createDate");
         Long userId = 1L;
         Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(userId, pageable);
         List<SimpleAlarm> alarmList = alarmPage.stream()
