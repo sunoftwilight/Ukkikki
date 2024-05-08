@@ -44,7 +44,10 @@ const Main: React.FC = () => {
   }, [cookies.isLogin])
 
   useEffect(() => {
-    if (user.userId === "" && user.accessToken !== "") {
+    if (user.userId === '' && user.accessToken === "") {
+      console.log('thisPoint')
+    }
+    if (user.userId === '' && user.accessToken !== "") {
       console.log(1)
       GetInfo()
     }
@@ -61,7 +64,7 @@ const Main: React.FC = () => {
         {/* 유저 정보 */}
         <div>
           <div className="font-pre-SB text-lg text-black">
-            <span className="font-pre-B text-black text-2xl">이해진</span> 님, 반갑습니다
+            <span className="font-pre-B text-black text-2xl">{user.userName}</span> 님, 반갑습니다
           </div>
           <div className="font-pre-R text-black text-base">
             현재 업로딩 그룹은 <span className="font-pre-B text-main-blue text-lg">그룹이름보단그루비룸</span> 입니다
