@@ -24,7 +24,7 @@ public class CorsConfig {
 //        // POST, GET, DELETE, PATCH 요청을 허용하겠다
 //        configuration.addAllowedMethod("*");
 
-        configuration.setAllowedOrigins(List.of("https://k10d202.p.ssafy.io", "http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("https://k10d202.p.ssafy.io", "http://localhost:3000", "http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("*"));

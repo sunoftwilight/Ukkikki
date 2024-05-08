@@ -19,6 +19,9 @@ public enum ErrorCode {
 
     // 회원 관련
     MEMBER_NOT_FOUND(404, "해당하는 회원이 존재하지 않습니다."),
+    REFRESH_TOKEN_NULL(404, "토큰이 유효하지 않습니다."),
+    REFRESH_TOKEN_EXPIRED(400, "토큰이 만료되었습니다."),
+    REFRESH_TOKEN_MATCH(400, "토큰이 일치하지 않습니다.."),
 
     // 파티 관련
     PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),

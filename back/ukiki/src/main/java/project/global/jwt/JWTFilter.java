@@ -27,34 +27,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 쿠키에서 토큰 가져오기
         String access = request.getHeader("access");
-        String refresh = null;
-        Cookie[] cookies = request.getCookies();
-
-        if(cookies != null){
-            for(Cookie cookie : cookies){
-                if(cookie.getName().equals("refresh")){
-                    refresh = cookie.getValue();
-                }
-            }
-
-        }
-
-        // refresh토큰 체크
-        if(refresh != null) {
-            try {
-                jwtUtil.isExpired(refresh);
-            } catch (ExpiredJwtException e) {
-                //response body
-                PrintWriter writer = response.getWriter();
-                writer.print("refresh token expired");
-
-                //response status code
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
-        }
-
-
 
         // 토큰 널값체크
         if(access == null){
@@ -71,32 +43,13 @@ public class JWTFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
 
             PrintWriter writer = response.getWriter();
+            writer.print("access token expired");
 
-            // 게스트
-            if(refresh == null){
-                //response body
-                writer.print("access token expired");
-
-                //response status code
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
-            // 일반 회원
-            else{
-
-                // 토큰 자동 갱신.
-                writer.print("access token renewal");
-                String reUsername = jwtUtil.getUsername(refresh);
-                String reProviderId = jwtUtil.getProviderId(refresh);
-                Long id = jwtUtil.getId(refresh);
-
-                access = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
-
-                response.setHeader("access",access);
-            }
-
-
+            //response status code
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
+
         // 토큰이 access인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getCategory(access);
         if (!category.equals("access")) {
