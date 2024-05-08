@@ -27,6 +27,12 @@ const FootNav: React.FC = () => {
       },
       (res) => {
         console.log(res)
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `sdfsdf.png`)
+        document.body.appendChild(link)
+        link.click()
       },
       (err) => { console.error(err) }
     )
