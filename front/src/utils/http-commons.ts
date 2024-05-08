@@ -26,6 +26,7 @@ export const publicApi: AxiosInstance = axios.create({
   baseURL: baseURL,
   headers: {
     'Content-Type': 'application/json',
+		'access': `${localStorage.getItem('accessToken')}`,
   },
 });
 
@@ -43,6 +44,7 @@ export const formDataApi: AxiosInstance = axios.create({
 	headers: {
 		"Access-Control-Allow-Origin": "*",
 		"Content-Type": "multipart/form-data",
+		'access': `${localStorage.getItem('accessToken')}`,
 	},
 });
 

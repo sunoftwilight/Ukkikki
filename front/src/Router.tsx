@@ -38,11 +38,11 @@ import { useCookies } from 'react-cookie';
 export default function Router() {
 
   const navi = useNavigate();
-  const [cookies] = useCookies(['access']);
+  const [cookies] = useCookies(['refresh']);
 
   useEffect(() => {
-    if (!cookies.access) navi('/login')
-  }, [cookies.access, ])
+    if (!cookies.refresh) navi('/login')
+  }, [cookies.refresh, ])
 
   const { currentImg, currentUrl } = useStore(DetailImgStore)
 
