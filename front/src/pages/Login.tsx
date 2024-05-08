@@ -12,9 +12,12 @@ const Login: React.FC = () => {
   const [cookies] = useCookies(['isLogin']);
 
   const GetAccessToken = async () => {
+    console.log(2)
     await TokenRefresh(
       async (response) => {
+        console.log(3)
         user.setAccessToken(response.headers['access']);
+        console.log(4)
         user.setIsLogin(true)
       },
       (error) => {
@@ -25,7 +28,9 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (cookies.isLogin === 'true') {
+      console.log(1)
       GetAccessToken();
+      console.log(5)
     }
   }, [cookies.isLogin, user.isLogin])
 
