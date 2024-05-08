@@ -46,7 +46,7 @@ export default function Router() {
 
   useEffect(() => {
     if (Boolean(cookies.isLogin) && user.accessToken !=='') {
-      return;
+      navi('/')
     }
     else{
       navi('/login')
