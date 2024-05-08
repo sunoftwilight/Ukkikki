@@ -18,16 +18,12 @@ axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
 
-export const noHeaderApi: AxiosInstance = axios.create({
-	baseURL: baseURL,
-});
-
 export const publicApi: AxiosInstance = axios.create({
-  baseURL: baseURL,
-  headers: {
-    'Content-Type': 'application/json',
-		'access': `${localStorage.getItem('accessToken')}`,
-  },
+	baseURL: baseURL,
+	headers: {
+		'Access-Control-Allow-Origin': '*',
+		'Content-Type': 'application/json',
+	}
 });
 
 export const privateApi: AxiosInstance = axios.create({

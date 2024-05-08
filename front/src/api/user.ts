@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { noHeaderApi, publicApi } from '../utils/http-commons';
+import { publicApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
 
 
@@ -16,7 +16,7 @@ export const UserInfo = async (
   export const TokenRefresh = async(
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await noHeaderApi.post(`/${url}/reissue`)
+    await publicApi.post(`/${url}/reissue`)
     .then(Response)
     .catch(Error)
   }
