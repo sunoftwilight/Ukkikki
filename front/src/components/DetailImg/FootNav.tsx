@@ -21,9 +21,9 @@ const FootNav: React.FC = () => {
   const downHandler = () => {
     downloadFile(
       {
-        key: '',
-        fileId: 0,
-        prefix: ''
+        key: 'mykey',
+        fileId: 40,
+        prefix: '123'
       },
       (res) => {
         console.log(res)

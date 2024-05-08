@@ -5,13 +5,13 @@ import Buttons from "../components/Main/Buttons";
 
 const Main: React.FC = () => {
   return (
-    <div className="w-full h-full py-2 px-4 flex flex-col gap-9">
+    <div className="w-full h-full py-2 px-4 flex flex-col gap-9 mb-2">
       <div className="flex flex-col gap-[14px]">
         <Banner />
         <Carousel />
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 h-full">
         {/* 유저 정보 */}
         <div>
           <div className="font-pre-SB text-lg text-black">
@@ -24,8 +24,6 @@ const Main: React.FC = () => {
 
         <Buttons />
       </div>
-
-
     </div>
   )
 };
