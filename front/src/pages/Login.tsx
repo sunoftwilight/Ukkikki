@@ -12,26 +12,22 @@ const Login: React.FC = () => {
   const [cookies] = useCookies(['isLogin']);
 
   const GetAccessToken = async () => {
-    try {
-      await TokenRefresh(
-        async (response) => {
-          user.setAccessToken(response.headers['access']);
-          user.setIsLogin(true)
-        },
-        (error) => {
-          console.error('Failed to get access token:', error);
-        }
-      );
-    } catch (error) {
-      console.error('Failed to get access token:', error);
-    }
+    await TokenRefresh(
+      async (response) => {
+        user.setAccessToken(response.headers['access']);
+        user.setIsLogin(true)
+      },
+      (error) => {
+        console.error('Failed to get access token:', error);
+      }
+    );
   };
 
   useEffect(() => {
     if (cookies.isLogin === 'true') {
       GetAccessToken();
     }
-  }, [cookies.isLogin])
+  }, [cookies.isLogin, user.isLogin])
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center bg-white">
