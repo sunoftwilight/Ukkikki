@@ -34,6 +34,7 @@ import Trash from './pages/Trash';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from 'react';
 import { userStore } from "./stores/UserStore";
+import { useCookies } from 'react-cookie';
 import LoginRedirect from './components/User/LoginRedirect';
 
 export default function Router() {
@@ -41,11 +42,10 @@ export default function Router() {
   const navi = useNavigate();
   const user = useStore(userStore);
   const isLogin = user.isLogin
-
+  const [cookies] = useCookies(['isLogin']);
   useEffect(() => {
-    console.log(typeof(isLogin))
-    if(!isLogin) navi('/login')
-  }, [isLogin, navi])
+    if(!isLogin &&  !Boolean(cookies.isLogin)) navi('/login')
+  }, [isLogin, cookies.isLogin, navi])
 
   
 
