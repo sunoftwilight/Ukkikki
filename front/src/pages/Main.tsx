@@ -40,6 +40,9 @@ const Main: React.FC = () => {
           user.setUserProfile(userData.profileUrl);
         },
         (error) => {
+          console.log('정보API 전송됨')
+          console.log(user.accessToken)
+          console.log(user.userId)
           console.error('Failed to get user info:', error);
         }
       );
@@ -62,9 +65,6 @@ const Main: React.FC = () => {
   }, [cookies.isLogin])
 
   useEffect(() => {
-    console.log('정보API 전송됨')
-    console.log(user.accessToken)
-    console.log(user.userId)
     const fetchData = async () => {
       try {
         if (user.accessToken === '' && user.userId === ''){
