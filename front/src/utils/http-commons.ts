@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import { useStore } from "zustand";
 import { userStore } from "../stores/UserStore";
 // import { httpStatusCode } from "./http-status";
 
@@ -19,8 +18,7 @@ import { userStore } from "../stores/UserStore";
 axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
-const user = useStore(userStore)
-
+const accessToken = userStore.getState().accessToken;
 export const publicApi: AxiosInstance = axios.create({
 	baseURL: baseURL,
 	headers: {
@@ -34,8 +32,7 @@ export const privateApi: AxiosInstance = axios.create({
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
-    // 'access': `${localStorage.getItem('USER_STORE')}`,
-		'access': `${user.accessToken}` 
+    'access': accessToken,
   },
 });
 
@@ -45,7 +42,7 @@ export const downloadApi: AxiosInstance = axios.create({
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
-    'access': `${localStorage.getItem('accessToken')}`,
+    'access': accessToken,
   },
 });
 
@@ -54,7 +51,7 @@ export const formDataApi: AxiosInstance = axios.create({
 	headers: {
 		"Access-Control-Allow-Origin": "*",
 		"Content-Type": "multipart/form-data",
-		'access': `${localStorage.getItem('accessToken')}`,
+		'access': accessToken,
 	},
 });
 
