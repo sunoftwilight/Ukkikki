@@ -19,8 +19,8 @@ const Main: React.FC = () => {
   const GetAccessToken = async () => {
     await TokenRefresh(
       (res) => {
-        console.log(res);
         user.setAccessToken(res.headers['access']);
+        GetInfo();
     }, (err) => {
         console.log(err)
     })
@@ -42,14 +42,6 @@ const Main: React.FC = () => {
     }
   }, [cookies.isLogin])
 
-  useEffect(() => {
-    if (user.accessToken !== '') {
-      GetInfo()
-      console.log(user.accessToken)
-    } else {
-      console.log(user.accessToken)
-    }
-  }, [user.accessToken])
 
   return (
     <div className="w-full h-full py-2 px-4 flex flex-col gap-9 mb-2">
