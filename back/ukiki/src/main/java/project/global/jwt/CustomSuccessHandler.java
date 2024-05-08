@@ -41,7 +41,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         memberToken.setUserId(id);
         memberTokenRedisRepository.save(memberToken);
 
-        response.setHeader("access",access);
+//        response.setHeader("access",access);
+        response.addCookie(createCookie("access", access));
         response.addCookie(createCookie("refresh", refresh));
         response.sendRedirect("https://k10d202.p.ssafy.io/");
 //        response.sendRedirect("http://localhost:3000/");
@@ -52,7 +53,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60 * 60 * 4);
         cookie.setPath("/");
-        cookie.setHttpOnly(true);
+        if(key.equals("refresh")){
+            cookie.setHttpOnly(true);
+        }
         return cookie;
     }
 }
