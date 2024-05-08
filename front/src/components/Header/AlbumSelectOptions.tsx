@@ -9,7 +9,7 @@ import copy from "@/assets/Header/AlbumSelectOptions/copy.png";
 import trash from "@/assets/Header/AlbumEditOptions/trash.png";
 import edit from "@/assets/Header/AlbumEditOptions/edit.png";
 import Modal from "../@commons/Modal";
-import { downloadFile } from "../../api/file";
+import { multiDownloadFile } from "../../api/file";
 import { useStore } from "zustand";
 import { prefixStore } from "../../stores/AlbumStore";
 
@@ -23,7 +23,7 @@ const AlbumSelectOptions: React.FC = () => {
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
   // const [prefix, setPrefix] = useState('')
   
-  const [isLoading, setIsLoading] = useState(false)
+  // const [isLoading, setIsLoading] = useState(false)
 
   const openHandler = (mode: string) => {
     if (mode === 'folder') {
@@ -37,15 +37,21 @@ const AlbumSelectOptions: React.FC = () => {
 
   const { prefix } = useStore(prefixStore)
   const prefixHandler = async () => {
-    await downloadFile(
+    await multiDownloadFile(
       {  
-        key: '',
-        fileId: 0,
+        key: 'mykey',
+        fileIdList: [40, 41],
         prefix: prefix,
       },
       (res) => { 
-        console.log(res) 
-        setIsLoading(true)
+        console.log('여러개 성공', res) 
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `${prefix}.zip`)
+        document.body.appendChild(link)
+        link.click()
+        // setIsLoading(true)
       },
       (err) => { 
         console.error(err)
@@ -64,9 +70,9 @@ const AlbumSelectOptions: React.FC = () => {
         />
       )}
 
-      { isLoading && 
+      {/* { isLoading && 
         <Modal modalItems={{ content: '다운로드 진행 중입니다', modalType: 'ing', btn: 0 }} />
-      }
+      } */}
 
       <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[186px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
         <div className={`${optionStyle}`} onClick={() => openHandler('down')}>
