@@ -12,9 +12,6 @@ import project.domain.member.service.MemberService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
-import java.io.PrintWriter;
-import java.util.Optional;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +24,11 @@ public class MemberController implements MemberDocs{
     @Override
     @GetMapping("/info/my")
     public ResponseEntity<ResultResponse> myInfo() {
+
         // 로그인 성공했을때 저장해두었던 값을들 가져온다.
         try {
             InfoDto infoDTO = memberService.myInfo();
+            System.out.println(infoDTO);
             return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERINFO_SUCCESS, infoDTO));
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -38,7 +37,7 @@ public class MemberController implements MemberDocs{
 
     @Override
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ResultResponse> reissue(HttpServletRequest request, HttpServletResponse response) {
 
         // 쿠키 가져오기
         Cookie[] cookies = request.getCookies();
@@ -50,5 +49,14 @@ public class MemberController implements MemberDocs{
 
         return new ResponseEntity<>(HttpStatus.OK);
 
+    }
+
+    @Override
+    @PostMapping("/logout")
+    public ResponseEntity<ResultResponse> logout(HttpServletRequest request, HttpServletResponse response) {
+
+        memberService.logout(request,response);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -31,7 +31,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Long id = customOAuth2User.getId();
 
         // 10분
-        String access = jwtUtil.createJWT("access", id, userName, providerId, ((1000L * 60) * 60 * 4));
+//        String access = jwtUtil.createJWT("access", id, userName, providerId, ((1000L * 60) * 60 * 4));
         // 몇분이더라
         String refresh = jwtUtil.createJWT("refresh", id, userName, providerId, ((1000L * 60 * 60) * 24 * 60));
 
@@ -41,8 +41,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         memberToken.setUserId(id);
         memberTokenRedisRepository.save(memberToken);
 
-//        response.setHeader("access",access);
-        response.addCookie(createCookie("access", access));
         response.addCookie(createCookie("refresh", refresh));
         response.sendRedirect("https://k10d202.p.ssafy.io/");
 //        response.sendRedirect("http://localhost:3000/");
