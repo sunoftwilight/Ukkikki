@@ -42,7 +42,6 @@ const Login: React.FC = () => {
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);
-
         },
         (error) => {
           console.error(error)
