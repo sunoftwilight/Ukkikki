@@ -1,6 +1,8 @@
 package project.domain.alarm.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,9 +25,11 @@ public class AlarmController implements AlarmDocs {
     private final AlarmService alarmService;
     private final AlarmRedisRepository alarmRedisRepository;
     @Override
-    @GetMapping(value= "/sub", produces = "text/event-stream")
-    public SseEmitter subScribe(){
+    @GetMapping(value= "/sub", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subScribe(HttpServletResponse response){
         SseEmitter res = alarmService.createEmitter();
+        response.setHeader("X-Accel-Buffering", "no");
+        response.setCharacterEncoding("UTF-8");
         return res;
     }
 
