@@ -2,6 +2,7 @@ package project.domain.member.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,8 @@ public class MemberServiceImpl implements MemberService{
         if(authentication != null){
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             long userId = userDetails.getId();
+
+            System.out.println(userId);
 
             Optional<Member> optionalMember = memberRepository.findById(userId);
             // 널 값 체크
@@ -102,8 +105,48 @@ public class MemberServiceImpl implements MemberService{
             throw new BusinessLogicException(ErrorCode.REFRESH_TOKEN_MATCH);
         }
 
-        refresh = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
+//        refresh = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
+        refresh = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 10));
 
         return refresh;
+    }
+
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+
+        Cookie[] cookies = request.getCookies();
+
+        String access = request.getHeader("access");
+        String refresh = null;
+
+        System.out.println(access);
+        // refresh 검색
+        for(Cookie cookie : cookies){
+            if(cookie.getName().equals("refresh")){
+                refresh = cookie.getValue();
+                break;
+            }
+        }
+
+        System.out.println(refresh);
+        if(refresh == null){
+            throw new BusinessLogicException(ErrorCode.REFRESH_TOKEN_NULL);
+        }
+
+        Long accesId = jwtUtil.getId(access);
+        Long refreshId = jwtUtil.getId(refresh);
+
+        if(!accesId.equals(refreshId)){
+            throw new BusinessLogicException(ErrorCode.MEMBER_LOGOUT_MATCH);
+        }
+
+        // redis 삭제
+        memberTokenRedisRepository.findById(accesId).ifPresent(memberToken -> memberTokenRedisRepository.deleteById(accesId));
+
+        Cookie cookie = new Cookie("refresh", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+
+        response.addCookie(cookie);
     }
 }

@@ -30,7 +30,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 토큰 널값체크
         if(access == null){
-            System.out.println("access token null");
             filterChain.doFilter(request, response);
 
             return;
@@ -71,6 +70,7 @@ public class JWTFilter extends OncePerRequestFilter {
         memberDto.setUserName(username);
         memberDto.setProviderId(providerId);
         memberDto.setId(id);
+
 
         // UserDetails에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(memberDto);
