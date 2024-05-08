@@ -14,7 +14,7 @@ const Main: React.FC = () => {
   
   const user = useStore(userStore)
 
-  const [cookies] = useCookies(['refresh']);
+  const [cookies] = useCookies(['isLogin']);
 
   const GetAccessToken = async () => {
     await TokenRefresh(
@@ -36,13 +36,13 @@ const Main: React.FC = () => {
   }
 
   useEffect(() => {
-    if (cookies.refresh) {
+    if (Boolean(cookies.isLogin)) {
       GetAccessToken()
     }
-  }, [cookies.refresh])
+  }, [cookies.isLogin])
 
   useEffect(() => {
-    if (user.accessToken) {
+    if (user.accessToken !== '') {
       GetInfo()
     }
   }, [user.accessToken])

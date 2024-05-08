@@ -40,13 +40,13 @@ export default function Router() {
 
   const navi = useNavigate();
   
-  const [cookies] = useCookies(['refresh']);
+  const [cookies] = useCookies(['isLogin']);
 
   useEffect(() => {
-    if (!cookies.refresh) {
+    if (!Boolean(cookies.isLogin)) {
       navi('/login')
     }
-  }, [cookies.refresh])
+  }, [cookies.isLogin])
 
   const { currentImg, currentUrl } = useStore(DetailImgStore)
 
