@@ -34,6 +34,7 @@ import Trash from './pages/Trash';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
+import { userStore } from "./stores/UserStore";
 
 export default function Router() {
 
@@ -41,12 +42,16 @@ export default function Router() {
   const navi = useNavigate();
   
   const [cookies] = useCookies(['isLogin']);
+  const user = useStore(userStore)
 
   useEffect(() => {
-    if (!Boolean(cookies.isLogin)) {
+    if (Boolean(cookies.isLogin) && user.accessToken !=='') {
+      return;
+    }
+    else{
       navi('/login')
     }
-  }, [cookies.isLogin])
+  }, [cookies.isLogin, user.accessToken])
 
   const { currentImg, currentUrl } = useStore(DetailImgStore)
 
