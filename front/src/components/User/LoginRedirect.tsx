@@ -33,6 +33,7 @@ const LoginRedirect: React.FC = () => {
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);
+          user.setIsLogin(true);
         },
         (error) => {
           console.error(error)
