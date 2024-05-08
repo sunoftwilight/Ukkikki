@@ -18,7 +18,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     getAccess();
     getUserInfo();
-  })
+  }, [])
 
   const getAccess = async () => {
     if (cookies.isLogin === 'true'){
