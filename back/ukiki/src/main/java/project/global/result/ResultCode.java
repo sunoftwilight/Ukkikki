@@ -46,8 +46,10 @@ public enum ResultCode {
     GET_TRASH_BIN_SUCCESS(200, "휴지통 조회에 성공하였습니다."),
 
     // alarm
-    GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다.")
+    GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다."),
 
+    // Chat
+    CHAT_SEND_SUCCESS(200, "채팅 전송에 성공하였습니다."),
 
     ;
 

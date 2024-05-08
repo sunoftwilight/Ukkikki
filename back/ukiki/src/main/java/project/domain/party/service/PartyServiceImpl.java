@@ -22,11 +22,16 @@ import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
 
 import project.domain.alarm.repository.AlarmRedisRepository;
+import project.domain.chat.entity.Chat;
+import project.domain.chat.repository.ChatRepository;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.TrashBinService;
 import project.domain.member.entity.Member;
 import project.domain.member.entity.MemberRole;
+import project.domain.member.entity.Profile;
+import project.domain.member.entity.ProfileType;
 import project.domain.member.repository.MemberRepository;
+import project.domain.member.repository.ProfileRepository;
 import project.domain.party.dto.request.ChangeThumbDto;
 import project.domain.party.dto.request.CreatePartyDto;
 import project.domain.party.dto.request.EnterPartyDto;
@@ -62,11 +67,15 @@ public class PartyServiceImpl implements PartyService {
     private final PartyLinkRedisRepository partyLinkRedisRepository;
     private final AlarmRedisRepository alarmRedisRepository;
     private final PhotoRepository photoRepository;
+    private final ProfileRepository profileRepository;
+    private final ChatRepository chatRepository;
+
     private final PartyLinkMapper partyLinkMapper;
     private final MemberPartyMapper memberPartyMapper;
     private final S3Util s3Util;
     private final BcryptUtil bcryptUtil;
     private final RedisTemplate redisTemplate;
+
 
     @Override
     @Transactional
@@ -98,6 +107,17 @@ public class PartyServiceImpl implements PartyService {
         // 해당 파티에 초기 공유 앨범디렉토리, 휴지통 부여
         directoryService.initDirParty(party);
         trashBinService.createTrashBin(party);
+
+        // 마스터 파티 프로필 설정
+        Profile profile = Profile.builder()
+            .nickname(member.getUserName())
+            .type(ProfileType.KAKAO)
+            .profileUrl(member.getProfileUrl())
+            .party(party)
+            .member(member)
+            .build();
+        profileRepository.save(profile);
+
 
         MemberParty memberParty = MemberParty.customBuilder()
             .memberRole(MemberRole.MASTER)
@@ -198,21 +218,36 @@ public class PartyServiceImpl implements PartyService {
     @Transactional
     public PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto) {
         // TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(1L)
+        Member member = memberRepository.findById(2L)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
+        // 파티 링크 확인
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
-// 파티확인
+
+        // 파티확인
         Party party = partyRepository.findById(partyLink.getParty())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
         // 파티에 유저 찾고 없으면 새로 만들기
         MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
-            .orElseGet(() -> MemberParty.customBuilder()
-                .party(party)
-                .member(member)
-                .memberRole(MemberRole.VIEWER)
-                .build());
+            .orElseGet(() -> {
+                // 신규유저 프로필 저장
+                Profile profile = Profile.builder()
+                    .nickname(member.getUserName())
+                    .type(ProfileType.KAKAO)
+                    .profileUrl(member.getProfileUrl())
+                    .party(party)
+                    .member(member)
+                    .build();
+                profileRepository.save(profile);
+
+                return MemberParty.customBuilder()
+                    .party(party)
+                    .member(member)
+                    .memberRole(MemberRole.VIEWER)
+                    .build();
+                });
         // 차단 당한 유저라면?
         if (memberParty.getMemberRole().equals(MemberRole.BLOCK)){
             throw new BusinessLogicException(ErrorCode.ENTER_DENIED_BLOCK_USER);
@@ -226,9 +261,9 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto) {
-        // TODO 유저 아이디를 토큰에서 받아야 함
-        Member member = memberRepository.findById(1L)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+//        // TODO 유저 아이디를 토큰에서 받아야 함
+//        Member member = memberRepository.findById(1L)
+//            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
 
         PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
@@ -356,8 +391,10 @@ public class PartyServiceImpl implements PartyService {
     @Override
     public void exitParty(Long partyId, String key) {
         // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        Long memberId =1L;
         Member member = memberRepository.findById(1L)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 파티 권한 조회
         MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(member.getId(), partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
@@ -369,8 +406,13 @@ public class PartyServiceImpl implements PartyService {
             throw new BusinessLogicException(ErrorCode.MASTER_CANT_EXIT);
         }
 
+        // 자신 프로필 조회
+        Profile profile = profileRepository.findByMemberIdAndPartyId(memberId, partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
+
         // 자신 파티에서 삭제
         memberpartyRepository.delete(memberParty);
+        profileRepository.delete(profile);
 
         // 자신 밖에 없을 때 party 데이터 삭제
         if (partyMemberCount == 1) {
@@ -398,7 +440,9 @@ public class PartyServiceImpl implements PartyService {
             // 파티 삭제
             partyRepository.delete(party);
 
-            // TODO directory, comment 삭제 코드 추가해야함
+            // TODO directory[O], comment[X], Chat[O] 삭제 코드 추가해야함
+            chatRepository.deleteAllByPartyId(partyId);
+            directoryService.deleteDir(party.getRootDirId());
         }
 
     }
@@ -429,9 +473,12 @@ public class PartyServiceImpl implements PartyService {
         // 상대방 찾기
         MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 상대방 프로필 찾기
+        Profile targetProfile = profileRepository.findByMemberIdAndPartyId(targetId, partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
         // 상대방 삭제
         memberpartyRepository.delete(targetParty);
-        
+        profileRepository.delete(targetProfile);
     }
 
     @Override

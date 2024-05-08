@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.domain.chat.entity.Chat;
 import project.domain.member.entity.Profile;
 import project.domain.photo.entity.Photo;
 import project.global.baseEntity.BaseEntity;
