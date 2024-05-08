@@ -45,3 +45,10 @@ export interface folderModalType {
   folderOpen: boolean;
   setFolderOpen: () => void;
 }
+
+export interface optionType {
+  startPageOpen : boolean;
+  logoutOpen : boolean;
+  setStartPageOpen: () => void;
+  setLogoutOpen: () => void;
+}

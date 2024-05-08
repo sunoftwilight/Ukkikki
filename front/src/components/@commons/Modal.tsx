@@ -5,7 +5,7 @@ import done from "@/assets/Modal/done.png";
 import ModalBackground from "./ModalBackground";
 import { motion, AnimatePresence } from "framer-motion"
 
-const OneBtnModal: React.FC<ModalProps> = ({ modalItems }) => {
+const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtnClick }) => {
 	const modalType = modalItems.modalType;
 
 	const containClass: string = "flex justify-center items-center w-full";
@@ -134,11 +134,15 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems }) => {
 			case 2:
 				return (
 					<div className="flex gap-4 w-full justify-end">
-						<button className={`${btnClass} w-[70px] bg-disabled-gray`}>
+						<button 
+							className={`${btnClass} w-[70px] bg-disabled-gray`} 
+							onClick={() => onCancelBtnClick()}
+						>
 							취소
 						</button>
 						<button
-							className={`${btnClass} w-[70px] ${modalType === "warn" ? "bg-red" : "bg-main-blue"}`}
+							className={`${btnClass} w-[70px] ${modalType === "warn" ? "bg-red" : "bg-main-blue"}` }
+							onClick={() => onCancelBtnClick()}
 						>
 							확인
 						</button>
@@ -148,24 +152,21 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems }) => {
 	};
 
   const isOpen = useState<boolean>(false)
-
 	return (
-		<div className="fixed z-10 top-0 left-0 w-full h-full">
-			<AnimatePresence>
-				{isOpen && <ModalBackground/> }
-				<motion.div 
-					className="flex justify-center items-center w-full h-full"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-				>
-					<div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
-						{contentHandler()}
-						{btnHandler()}
-					</div>
-				</motion.div>
-			</AnimatePresence>
-		</div>
+    <AnimatePresence>
+      {isOpen && <ModalBackground/> }
+      <motion.div 
+				className="flex justify-center items-center w-full h-full"
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				exit={{ opacity: 0 }}
+			>
+        <div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
+          {contentHandler()}
+          {btnHandler()}
+        </div>
+      </motion.div>
+    </AnimatePresence>
 	);
 };
 
