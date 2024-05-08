@@ -10,6 +10,7 @@ import project.domain.alarm.dto.request.AlarmPageableDto;
 import project.domain.alarm.dto.response.AlarmPageDto;
 import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
+import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
@@ -20,7 +21,7 @@ import project.global.result.ResultResponse;
 public class AlarmController implements AlarmDocs {
 
     private final AlarmService alarmService;
-
+    private final AlarmRedisRepository alarmRedisRepository;
     @Override
     @GetMapping(value= "/sub", produces = "text/event-stream")
     public SseEmitter subScribe(){
@@ -43,6 +44,7 @@ public class AlarmController implements AlarmDocs {
             1L,1L, 53L, "어해진 바보"
         );
         dsa.setMemberId(1L);
+        alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,1L,dsa);
     }
 
