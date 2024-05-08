@@ -16,11 +16,13 @@ const LoginRedirect: React.FC = () => {
     console.log(typeof(user.isLogin))
     getAccess();
     getUserInfo();
+    console.log(2)
   })
 
   const getAccess = async () => {
     console.log(cookies.isLogin)
     if (cookies.isLogin === 'true'){
+      console.log(1)
       await tokenRefresh(
         (response) => {
           console.log(response)
