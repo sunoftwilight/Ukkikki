@@ -1,4 +1,6 @@
 import axios, { AxiosInstance } from "axios";
+import { useStore } from "zustand";
+import { userStore } from "../stores/UserStore";
 // import { httpStatusCode } from "./http-status";
 
 // const httpsStatusCode: Record<string, Number> = {
@@ -17,17 +19,7 @@ import axios, { AxiosInstance } from "axios";
 axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
-
-const storedData = localStorage.getItem('USER_STORE');
-if (storedData) {
-	try {
-		const { state } = JSON.parse(storedData);
-		console.log('test', state)
-
-	} catch (error) {
-		console.error('Error parsing stored data:', error);
-	}
-}
+const user = useStore(userStore)
 
 export const publicApi: AxiosInstance = axios.create({
 	baseURL: baseURL,
@@ -42,7 +34,8 @@ export const privateApi: AxiosInstance = axios.create({
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
-    'access': `${localStorage.getItem('USER_STORE')}`,
+    // 'access': `${localStorage.getItem('USER_STORE')}`,
+		'access': `${user.accessToken}` 
   },
 });
 
