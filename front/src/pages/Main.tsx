@@ -27,9 +27,10 @@ const Main: React.FC = () => {
   const GetInfo = async () => {
     await UserInfo(
       (res) => {
-        user.setUserId(res.data.userId)
-        user.setUserName(res.data.userName)
-        user.setUserProfile(res.data.userProfile)
+        console.log(res)
+        // user.setUserId(res.data.userId)
+        // user.setUserName(res.data.userName)
+        // user.setUserProfile(res.data.userProfile)
       }, (err) => {
         console.error(err)
       }
