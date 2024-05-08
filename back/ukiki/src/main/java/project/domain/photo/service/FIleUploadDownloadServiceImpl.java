@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +33,6 @@ import project.global.util.gptutil.GptUtil;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.*;
 
@@ -69,9 +68,11 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             //S3 파일 업로드 후 저장
             urls.setPhotoUrl(s3Util.fileUpload(file, sseKey));
             photo.setFileName(urls.getPhotoUrl().split("/")[3]);
+
             BufferedImage firstThumbnail = imageUtil.resizeImage(file, 1);
             String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, sseKey, file);
             urls.setThumb_url1(firstThumbnailUrl);
+
             BufferedImage secondThumbnail = imageUtil.resizeImage(file, 1);
             String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, sseKey, file);
             urls.setThumb_url2(secondThumbnailUrl);
@@ -82,65 +83,47 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             photo.setPhotoUrl(urls);
             photoRepository.save(photo);
 
-            String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
-            File tempDir = new File(tempPath);  // 임시 디렉터리 경로
-            tempDir.mkdirs();
-
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-            String fileName = file.getOriginalFilename(); //원본 이미지 이름
-            String ext = fileName.substring(fileName.lastIndexOf(".")); //확장자
-
             try {
-                ImageIO.write(secondThumbnail, ext.substring(ext.indexOf(".")+1) ,outputStream);//바이트 스트림에 입력
+                ImageIO.write(secondThumbnail, "jpg", outputStream);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
             byte[] imageBytes = outputStream.toByteArray();
 
-            InputStream inputStream = new ByteArrayInputStream(imageBytes);
-            File tempFile = new File(tempDir, photo.getFileName());
-            tempFile.deleteOnExit();
-            fileUtil.copyInputStreamToFile(inputStream, tempFile);
-
-            byte[] bytes;
-            try {
-                bytes = Files.readAllBytes(tempFile.toPath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            System.out.println(bytes.length);
-
-            MultipartBodyBuilder builder = new MultipartBodyBuilder();
-            builder.part("partyId", fileUploadDto.getPartyId());
-            builder.part("key", fileUploadDto.getKey());
-            builder.part("file", new ByteArrayResource(bytes))
-                    .header("Content-Disposition",
-                            "form-data; name = file; filename=" + photo.getFileName());
+            MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+            bodyBuilder.part("file", imageBytes)
+                    .filename(urls.getPhotoUrl())
+                    .contentType(MediaType.IMAGE_JPEG);
+            bodyBuilder.part("partyId", fileUploadDto.getPartyId());
+            bodyBuilder.part("key", fileUploadDto.getKey());
 
             webClient
                     .post()
-                    .body(BodyInserters.fromMultipartData(builder.build()))
-                    .exchange()
-                    .block()
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                    .retrieve()
                     .bodyToMono(String.class)
-                    .block();
+                    .subscribe(response -> {
+                        // Handle response from server
+                        log.info(response);
+                    });
 
             //MongoDB 업데이트
-//            fileService.createFile(1L, photo);
+            fileService.createFile(2L, photo);
 
             //GPT API
-//            for (Integer code : gptUtil.postChat(file)) {
-//                // 받은 메타 코드 저장 Meta 테이블에 저장
-//                metaRepository.save(
-//                    Meta.builder()
-//                        .photo(photo)
-//                        .metaCode(MetaCode.getEnumByCode(code))
-//                        .build()
-//                );
-//            }
+            for (Integer code : gptUtil.postChat(file)) {
+                // 받은 메타 코드 저장 Meta 테이블에 저장
+                metaRepository.save(
+                    Meta.builder()
+                        .photo(photo)
+                        .metaCode(MetaCode.getEnumByCode(code))
+                        .build()
+                );
+            }
         }
     }
 
