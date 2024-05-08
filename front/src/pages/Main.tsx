@@ -63,6 +63,8 @@ const Main: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (user.accessToken === '' && user.userId === '') return;
+      
       try {
         if (user.accessToken !== '' && user.userId === '') {
           await GetInfo();
