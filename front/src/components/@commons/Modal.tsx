@@ -148,21 +148,24 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems }) => {
 	};
 
   const isOpen = useState<boolean>(false)
+
 	return (
-    <AnimatePresence>
-      {isOpen && <ModalBackground/> }
-      <motion.div 
-				className="flex justify-center items-center w-full h-full"
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				exit={{ opacity: 0 }}
-			>
-        <div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
-          {contentHandler()}
-          {btnHandler()}
-        </div>
-      </motion.div>
-    </AnimatePresence>
+		<div className="fixed z-10 top-0 left-0 w-full h-full">
+			<AnimatePresence>
+				{isOpen && <ModalBackground/> }
+				<motion.div 
+					className="flex justify-center items-center w-full h-full"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+				>
+					<div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
+						{contentHandler()}
+						{btnHandler()}
+					</div>
+				</motion.div>
+			</AnimatePresence>
+		</div>
 	);
 };
 

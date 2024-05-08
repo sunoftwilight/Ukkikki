@@ -4,5 +4,8 @@ export interface ModalProps {
     content: string,
     modalType: 'txtOnly' | 'warn' | 'done' | 'input' | 'ing',
     btn: number
-  }
+  },
+
+  onSubmitBtnClick?: () => void,
+  onCancelBtnClick?: () => void
 }
