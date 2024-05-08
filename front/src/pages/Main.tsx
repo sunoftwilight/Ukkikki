@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Banner from "../components/Main/Banner";
 import Carousel from "../components/Main/Carousel";
 import Buttons from "../components/Main/Buttons";
@@ -7,10 +7,19 @@ import Buttons from "../components/Main/Buttons";
 // 로그인용 작업중.
 import { useStore } from "zustand";
 import { userStore } from "../stores/UserStore";
-
+import { useNavigate } from "react-router-dom";
 
 const Main: React.FC = () => {
-  const user = useStore(userStore)
+  const user = useStore(userStore);
+  const navi = useNavigate();
+
+  // 로그인 정보가 없으면 로그인으로 가라.
+  useEffect(() => {
+    if(!user.isLogin) {
+      navi('/login');
+    }
+  }, [])
+
   return (
     <div className="w-full h-full py-2 px-4 flex flex-col gap-9 mb-2">
       <div className="flex flex-col gap-[14px]">

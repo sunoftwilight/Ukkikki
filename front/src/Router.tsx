@@ -31,21 +31,21 @@ import ArticleDetail from './pages/ArticleDetail';
 import ArticleImg from './pages/ArticleImg';
 import Trash from './pages/Trash';
 
-import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react';
-import { userStore } from "./stores/UserStore";
-import { useCookies } from 'react-cookie';
+// import { useNavigate } from "react-router-dom";
+// import { useEffect } from 'react';
+// import { userStore } from "./stores/UserStore";
+// import { useCookies } from 'react-cookie';
 import LoginRedirect from './components/User/LoginRedirect';
 
 export default function Router() {
   const { currentImg, currentUrl } = useStore(DetailImgStore)
-  const navi = useNavigate();
-  const user = useStore(userStore);
-  const isLogin = user.isLogin
-  const [cookies] = useCookies(['isLogin']);
-  useEffect(() => {
-    if(!isLogin &&  !Boolean(cookies.isLogin)) navi('/login')
-  }, [isLogin, cookies.isLogin, navi])
+  // const navi = useNavigate();
+  // const user = useStore(userStore);
+  // const isLogin = user.isLogin
+  // const [cookies] = useCookies(['isLogin']);
+  // useEffect(() => {
+  //   if(!isLogin && !Boolean(cookies.isLogin)) navi('/login')
+  // }, [isLogin, cookies.isLogin, navi])
 
   
 
