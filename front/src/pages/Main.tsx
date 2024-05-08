@@ -62,9 +62,12 @@ const Main: React.FC = () => {
   }, [cookies.isLogin])
 
   useEffect(() => {
+    console.log('정보API 전송됨')
+    console.log(user.accessToken)
+    console.log(user.userId)
     const fetchData = async () => {
       if (user.accessToken === '' && user.userId === '') return;
-      
+
       try {
         if (user.accessToken !== '' && user.userId === '') {
           await GetInfo();
