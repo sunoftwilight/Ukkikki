@@ -1,8 +1,38 @@
-import React from "react";
+import React, {useEffect} from "react";
 import LoginLogo from "../../icons/256.png";
 import LoginBtn from "@/assets/Login/kakaoLoginBtn.png";
 
+import { userStore } from "../stores/UserStore";
+import { useStore } from "zustand";
+import { TokenRefresh } from "../api/user";
+import { useCookies } from 'react-cookie';
+
 const Login: React.FC = () => {
+  const user = useStore(userStore)
+  const [cookies] = useCookies(['isLogin']);
+
+  const GetAccessToken = async () => {
+    try {
+      await TokenRefresh(
+        async (response) => {
+          user.setAccessToken(response.headers['access']);
+          user.setIsLogin(true)
+        },
+        (error) => {
+          console.error('Failed to get access token:', error);
+        }
+      );
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (cookies.isLogin === 'true') {
+      GetAccessToken();
+    }
+  }, [cookies.isLogin])
+
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center bg-white">
       <img src={LoginLogo} className="-mt-11 mb-5"/>

@@ -7,29 +7,12 @@ import Buttons from "../components/Main/Buttons";
 // 로그인용 작업중.
 import { useStore } from "zustand";
 import { userStore } from "../stores/UserStore";
-import { useCookies } from 'react-cookie';
-import { TokenRefresh, UserInfo } from "../api/user";
+import { UserInfo } from "../api/user";
 
 const Main: React.FC = () => {
   
   const user = useStore(userStore)
-  const [cookies] = useCookies(['isLogin']);
 
-  const GetAccessToken = async () => {
-    try {
-      await TokenRefresh(
-        (response) => {
-          user.setAccessToken(response.headers['access']);
-        },
-        (error) => {
-          console.error('Failed to get access token:', error);
-        }
-      );
-    } catch (error) {
-      console.error('Failed to get access token:', error);
-    }
-  };
-  
   const GetInfo = async () => {
     try {
       await UserInfo(
@@ -51,22 +34,6 @@ const Main: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (Boolean(cookies.isLogin)) {
-          await GetAccessToken();
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-    fetchData()
-  }, [cookies.isLogin])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (user.accessToken === '' && user.userId === ''){
-          return;
-        }
         if (user.accessToken !== '' && user.userId === '') {
           await GetInfo();
         }
