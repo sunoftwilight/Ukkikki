@@ -38,6 +38,16 @@ export const privateApi: AxiosInstance = axios.create({
   },
 });
 
+export const downloadApi: AxiosInstance = axios.create({
+  baseURL: baseURL,
+	responseType: 'blob',
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json',
+    'access': `${localStorage.getItem('accessToken')}`,
+  },
+});
+
 export const formDataApi: AxiosInstance = axios.create({
 	baseURL: baseURL,
 	headers: {
