@@ -50,7 +50,7 @@ const LoginRedirect: React.FC = () => {
   }
 
 
-  return null;
+  return <></>;
 };
 
 export default LoginRedirect;
