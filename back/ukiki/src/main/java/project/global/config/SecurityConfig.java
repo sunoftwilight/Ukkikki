@@ -46,7 +46,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/oauth2/**","/member/reissue").permitAll()
                         .anyRequest().authenticated());
 
 
