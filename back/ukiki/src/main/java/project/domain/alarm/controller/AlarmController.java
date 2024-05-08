@@ -31,7 +31,7 @@ public class AlarmController implements AlarmDocs {
 
     @Override
     @GetMapping("/list")
-    public ResponseEntity<ResultResponse> getAlarmList(@ModelAttribute AlarmPageableDto alarmPageDto) {
+    public ResponseEntity<ResultResponse> getAlarmList(AlarmPageableDto alarmPageDto) {
         AlarmPageDto res = alarmService.getAlarmList(alarmPageDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_ALARM_SUCCESS, res));
     }
