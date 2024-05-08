@@ -68,7 +68,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                 switch (accessor.getCommand()) {
                     case CONNECT:
-                        log.info("TEST CONNECT");
+                        log.info(" CONNECT");
                         break;
                     case SUBSCRIBE:
                         log.info("TEST SUCCESS WEBSOCKET");
