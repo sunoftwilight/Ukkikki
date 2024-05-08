@@ -8,7 +8,7 @@ import Buttons from "../components/Main/Buttons";
 import { useStore } from "zustand";
 import { userStore } from "../stores/UserStore";
 import { useCookies } from 'react-cookie';
-import { TokenRefresh, UserInfo } from "../api/user";
+import { TokenRefresh } from "../api/user";
 
 const Main: React.FC = () => {
   
@@ -20,21 +20,22 @@ const Main: React.FC = () => {
     await TokenRefresh(
       (res) => {
         user.setAccessToken(res.headers['access']);
-        GetInfo();
+        console.log(user.accessToken); 
+        // GetInfo();
     }, (err) => {
         console.log(err)
     })
   }
 
-  const GetInfo = async () => {
-    await UserInfo(
-      (res) => {
-        console.log(res)
-      }, (err) => {
-        console.error(err)
-      }
-    )
-  }
+  // const GetInfo = async () => {
+  //   await UserInfo(
+  //     (res) => {
+  //       console.log(res)
+  //     }, (err) => {
+  //       console.error(err)
+  //     }
+  //   )
+  // }
 
   useEffect(() => {
     if (Boolean(cookies.isLogin)) {
