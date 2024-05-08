@@ -43,7 +43,7 @@ export default function Router() {
   const isLogin = user.isLogin
 
   useEffect(() => {
-    console.log(isLogin)
+    console.log(typeof(isLogin))
     if(!isLogin) navi('/login')
   }, [user.isLogin, navi])
 

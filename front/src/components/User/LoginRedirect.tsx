@@ -13,7 +13,7 @@ const LoginRedirect: React.FC = () => {
   const user = useStore(userStore);
 
   useEffect(() => {
-    console.log(user.isLogin)
+    console.log(typeof(user.isLogin))
     getAccess();
     getUserInfo();
   })
