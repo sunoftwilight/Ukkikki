@@ -19,7 +19,7 @@ const LoginRedirect: React.FC = () => {
   })
 
   const getAccess = async () => {
-    if (cookies.isLogin === 'ture'){
+    if (cookies.isLogin === 'true'){
       await tokenRefresh(
         (response) => {
           console.log(response)
