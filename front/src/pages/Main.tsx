@@ -44,6 +44,7 @@ const Main: React.FC = () => {
   }, [cookies.isLogin])
 
   useEffect(() => {
+    if (!user) return;
     if (user.userId === "") {
       GetInfo()
     }

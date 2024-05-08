@@ -1,13 +1,14 @@
 import { AxiosResponse } from 'axios';
 import { publicApi, privateApi } from '../utils/http-commons';
-import { ResponseData, UserInfoData } from '../types/ApiResponseType';
+import { ResponseData } from '../types/ApiResponseType';
+import { UserResponeseData } from '../types/UserInfoType';
 
 
 const url = 'member';
 
 export const UserInfo = async (
-	Response: (Response: AxiosResponse<UserInfoData>) => void,
-	Error: (Error: AxiosResponse<UserInfoData>) => void) => {
+	Response: (Response: AxiosResponse<UserResponeseData>) => void,
+	Error: (Error: AxiosResponse<UserResponeseData>) => void) => {
 		await privateApi.get(`/${url}/info/my`)
 		.then(Response)
 		.catch(Error)
