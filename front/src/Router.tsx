@@ -31,8 +31,20 @@ import ArticleDetail from './pages/ArticleDetail';
 import ArticleImg from './pages/ArticleImg';
 import Trash from './pages/Trash';
 
+import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 
 export default function Router() {
+
+
+  const navi = useNavigate();
+  const [cookies] = useCookies(['refresh']);
+  useEffect(() => {
+    if (!cookies.refresh) {
+      navi('/login')
+    }
+  }, [cookies.refresh])
 
   const { currentImg, currentUrl } = useStore(DetailImgStore)
 

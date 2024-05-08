@@ -5,7 +5,6 @@ import Buttons from "../components/Main/Buttons";
 
 
 // 로그인용 작업중.
-import { useNavigate } from "react-router-dom";
 import { useStore } from "zustand";
 import { userStore } from "../stores/UserStore";
 import { useCookies } from 'react-cookie';
@@ -15,7 +14,6 @@ const Main: React.FC = () => {
   
   const user = useStore(userStore)
 
-  const navi = useNavigate();
   const [cookies] = useCookies(['refresh']);
 
   const GetAccessToken = async () => {
@@ -36,19 +34,15 @@ const Main: React.FC = () => {
     )
   }
 
-
   useEffect(() => {
-    if (!cookies.refresh) {
-      navi('/login')
-    }
-    else
-    {
+    if (cookies.refresh) {
       GetAccessToken()
     }
 
     if (user.accessToken) {
       GetInfo()
     }
+
   }, [cookies.refresh, user.accessToken])
 
   return (
