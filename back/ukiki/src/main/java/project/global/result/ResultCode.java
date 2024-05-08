@@ -9,6 +9,7 @@ public enum ResultCode {
 
     //User
     GET_USERLIST_SUCCESS(200, "유저리스트 검색에 성공하였습니다."),
+    GET_KEYGROUP_SUCCESS(200, "유저 키 그룹을 가져오는데 성공하였습니다."),
 
     //Party
     CREATE_PARTY_SUCCESS(201, "그룹 생성에 성공하였습니다."),

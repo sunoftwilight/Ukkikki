@@ -43,6 +43,9 @@ public class Member extends BaseEntity {
     @Column(name = "user_name")
     private String userName;
 
+    @Column(name = "password")
+    private String password;
+
     @Column(name = "profile_url")
     private String profileUrl;
 
@@ -76,4 +79,7 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member",  cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favoriteList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<KeyGroup> keyGroupList = new ArrayList<>();
 }
