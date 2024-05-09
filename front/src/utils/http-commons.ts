@@ -23,7 +23,6 @@ export const privateApi: AxiosInstance = axios.create({
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
-    'access': `${accessToken}`,
   },
 });
 
@@ -53,7 +52,7 @@ privateApi.interceptors.request.use(
 		if (stored){
 			const obj = JSON.parse(stored)
 			if (obj.state.accessToken !== ''){
-				config.headers['access'] = obj.state.accessToken;
+				config.headers['Authorization'] = obj.state.accessToken;
 			}
 		}
     return config;
