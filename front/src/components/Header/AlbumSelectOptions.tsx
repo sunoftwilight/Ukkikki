@@ -36,13 +36,12 @@ const AlbumSelectOptions: React.FC = () => {
 
   const prefixHandler = async () => {
     await multiDownloadFile(
+      'mykey',
       {  
-        key: 'mykey',
-        fileIdList: [40, 41],
+        fileIdList: [1, 2],
         prefix: prefix,
       },
       (res) => { 
-        console.log('여러개 성공', res) 
         const url = window.URL.createObjectURL(new Blob([res.data]))
         const link = document.createElement('a')
         link.href = url

@@ -7,23 +7,26 @@ import qs from 'qs';
 const url = 'file';
 
 export const downloadFile = async(
+  sseKey : string,
   fileDownloadDto : FileDownloadDto,
   Response : (Response : AxiosResponse<Blob>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await downloadApi.get(`/${url}/download`, { params: fileDownloadDto })
+  await downloadApi(sseKey).get(`/${url}/download`, { params: fileDownloadDto })
   .then(Response)
   .catch(Error)
 }
 
 export const multiDownloadFile = async(
+  sseKey : string,
   multiFileDownloadDto : MultiFileDownloadDto,
   Response : (Response : AxiosResponse<Blob>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await downloadApi.get(
+  await downloadApi(sseKey)
+  .get(
     `/${url}/multi-select-download`, { 
       params: multiFileDownloadDto,
       paramsSerializer: (params) => {
-        return qs.stringify(params, { arrayFormat: "comma"})
+        return qs.stringify(params, { arrayFormat: "comma"});
       }
   })
   .then(Response)

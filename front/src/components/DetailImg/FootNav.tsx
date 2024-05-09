@@ -27,13 +27,12 @@ const FootNav: React.FC = () => {
 
   const prefixHandler = async () => {
     await downloadFile(
+      'mykey',
       {
-        key: 'mykey',
-        fileId: 40,
+        fileId: 1,
         prefix: prefix
       },
       (res) => {
-        console.log(res)
         const url = window.URL.createObjectURL(new Blob([res.data]))
         const link = document.createElement('a')
         link.href = url
