@@ -15,7 +15,7 @@ import java.util.List;
 public class SimpleAlarm {
 
     Long partyId;
-    Long articleId;
+    Long contentsId;
     Long targetId;
     AlarmType alarmType;
     String content;

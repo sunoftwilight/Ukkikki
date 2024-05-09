@@ -6,7 +6,7 @@ server:
 spring:
 #  ?? ? ??? ?? ???? ?? => local
   profiles:
-    active: local
+    active: server
     include: key
   jpa:
     hibernate:

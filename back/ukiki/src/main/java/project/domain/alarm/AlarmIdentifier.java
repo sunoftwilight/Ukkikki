@@ -5,44 +5,30 @@ import java.util.List;
 
 
 public enum AlarmIdentifier {
-    PARTY{
-        public List<String> identifier(Long partyId, Long detailId){
+    MEMO{ // 사진 메모 URL
+        public List<String> identifier(Long partyId, Long detailId, Long targetId){
             return new ArrayList<>(){{
-                add("PARTY URL");
-            }};
-        }
-    },
-    CHAT{
-        public List<String> identifier(Long partyId, Long detailId) {
-            return new ArrayList<>(){{
-                add("CHAT URL");
-            }};
-        }
-    },
-    ARTICLE{
-        public List<String> identifier(Long partyId, Long detailId) {
-            return new ArrayList<>(){{
-                add("ARTICLE URL");
+                add(String.format("/api/photo/memo/%d/%d", partyId, detailId));
             }};
         }
     },
     COMMENT{
-        public List<String> identifier(Long partyId, Long detailId) {
+        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
             return new ArrayList<>(){{
-                add("COMMENT URL");
+                add(String.format("/api/article/comment/%d/%d/", partyId, detailId));
             }};
         }
     },
-    REPLY{
-        public List<String> identifier(Long partyId, Long detailId) {
+    REPLY{ // 이건 만들어 봐야할듯
+        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
             return new ArrayList<>(){{
                 add("REPLY URL");
             }};
         }
     },
 
-    CHECK{
-        public List<String> identifier(Long partyId, Long detailId) {
+    CHECK{ // SSE 연결 체크용
+        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
             return new ArrayList<>(){{
                 add("CHECK URL1");
                 add("CHECK URL2");
@@ -52,5 +38,6 @@ public enum AlarmIdentifier {
     ;
 
 
-    public abstract List<String> identifier(Long partyId, Long detailId);
+    public abstract List<String> identifier(Long partyId, Long detailId, Long targetId);
+//    public abstract List<String> identifier2 (Long partyId, Long detailId);
 }

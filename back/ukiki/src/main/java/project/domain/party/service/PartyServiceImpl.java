@@ -330,7 +330,7 @@ public class PartyServiceImpl implements PartyService {
         partyRepository.save(party);
 
         // 알람 보내기
-        alarmService.groupSendAlarm(memberId, AlarmType.PASSWORD, partyId,0L,0L);
+        alarmService.groupSendAlarm(memberId, AlarmType.PASSWORD, partyId,0L,0L, 0L);
 
         // S3 이미지 비밀번호 바꾸기
         List<Photo> photos = party.getPhotoList();
