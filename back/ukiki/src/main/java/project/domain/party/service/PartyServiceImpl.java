@@ -164,6 +164,7 @@ public class PartyServiceImpl implements PartyService {
 
         PartyLinkDto partyLinkDto = partyLinkMapper.toPartyLinkDto(partyLink);
         partyLinkDto.setSseKey(sseKey);
+        partyLinkDto.setRootDirId(party.getRootDirId());
         return partyLinkDto;
     }
 
