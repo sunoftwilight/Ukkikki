@@ -73,7 +73,8 @@ export default function Router() {
       <Route path="/login" element={<Login />} />
       <Route path="/loginredirect" element={<LoginRedirect />} />
       <Route path="/camera" element={<Camera />} />
-      <Route path="/simple" element={<SimplePass />}/>
+      <Route path='/simpleinsert' element={<SimplePass type='insert'/>}/>
+      <Route path='/simplecheck' element={<SimplePass type='check'/>}/>
     </Routes>
   );
 }

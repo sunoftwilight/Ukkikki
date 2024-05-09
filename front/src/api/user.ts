@@ -31,10 +31,10 @@ export const simpleInsert = async(
   }
 
 export const simpleCheck = async(
-  config: Record<string,string>,
+  data: Record<string,string>,
   Response : (Response : AxiosResponse<ResponseData>) => void,
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.post(`/${url}/mykey`, '', config)
+    await privateApi.get(`/${url}/mykey`,{headers: {...data}})
     .then(Response)
     .catch(Error)
   }

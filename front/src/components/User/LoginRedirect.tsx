@@ -36,10 +36,15 @@ const LoginRedirect: React.FC = () => {
       await userInfo(
         (response) => {
           const userData = response.data.data;
+          
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);
-          navi('/')
+          user.setUploadGroupId(userData.mainDirId);
+          user.setIsInsert(userData.password);
+          
+          if(userData.password) navi('/simpleCheck');
+          else navi('/simpleInsert')
         },
         (error) => {
           console.error(error)

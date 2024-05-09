@@ -49,7 +49,6 @@ privateApi.interceptors.request.use(
 		if (stored){
 			const obj = JSON.parse(stored)
 			if (obj.state.accessToken !== ''){
-        console.log(obj.state.accessToken);
 				config.headers['authorization'] = obj.state.accessToken;
 			}
 		}

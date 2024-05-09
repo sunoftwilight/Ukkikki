@@ -1,20 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { simpleInsert, simpleCheck } from '../api/user';
+import { httpStatusCode } from "../utils/http-status";
+import { useStore } from 'zustand';
+import { userStore } from '../stores/UserStore';
+import { useNavigate } from 'react-router-dom';
+interface SimplePassProps {
+  type: string
+}
 
-const SimplePass: React.FC = () => {
+const SimplePass: React.FC<SimplePassProps> = ({type}) => {
   const [password, setPassword] = useState<string>("");
   const [numbers, setNumbers] = useState<string[]>([]);
+  const [pageTitle, setPageTitle] = useState<string>('');
+  const [isCheck, setIsCheck] = useState<boolean>(false);
+  const [forCheck, setForCheck] = useState<string>("");
   const gridCols = "w-full grid grid-cols-3"
   const colOpt = "flex justify-center items-center"
-  
+  const pageType = type
+  const user = useStore(userStore);
+  const navi = useNavigate();
   useEffect(() => {
     setNumbers(Array.from({ length: 10 }, (_, index) => String(index)).sort(() => Math.random() - 0.5))
   }, [])
 
-  useEffect(()=>{
-    console.log(password)
+  useEffect(() => {
+    if(pageType === 'insert' && !isCheck) 
+      setPageTitle('간편 비밀번호 등록')
+    else
+      setPageTitle('간편 비밀번호 확인')
+    
+  }, [pageType, isCheck])
+
+
+  useEffect(() => {
     if (password.length === 4){
-      sendInsertPass();
+      if(pageType === 'insert' && !isCheck) {
+        setIsCheck(true);
+        setForCheck(password);
+        setPassword('');
+        return;
+      }
+      else if(pageType === 'insert' && isCheck) {
+        if (forCheck !== password) {
+          alert('다시 입력하세요');
+          setPassword('');
+          return;
+        }
+        sendInsertPass();
+      }
+      else if(pageType === 'check'){
+        sendCheckPass();
+      }
+      navi('/')
     }
   }, [password])
 
@@ -22,7 +59,12 @@ const SimplePass: React.FC = () => {
     const param = {password: password};
     await simpleInsert(param,
       (response) => {
-        console.log(response)
+        if(response.status === httpStatusCode.OK) {
+          user.setIsInsert(true);
+          user.setIsCheck(true);
+          user.setSimplePass(password);
+          console.log('Done')
+        }
       },
       (error) => {
         console.error(error)
@@ -32,12 +74,16 @@ const SimplePass: React.FC = () => {
 
   const sendCheckPass = async() => {
     const config = {
-      
+      'password': password
     }
+    console.log(config)
     await simpleCheck(
       config,
       (response) => {
-        console.log(response)
+        if(response.status === httpStatusCode.OK) {
+          user.setIsCheck(true);
+          user.setSimplePass(password);
+        }
       },
       (error) => {
         console.error(error)
@@ -45,8 +91,6 @@ const SimplePass: React.FC = () => {
     )
   }
   
-
-
   // 비밀번호 한 자리를 입력하는 함수
   const handleInput = (value: string) => {
     if (password.length === 4) return;
@@ -69,7 +113,7 @@ const SimplePass: React.FC = () => {
   return (
     <div className="w-screen h-screen">
       <div className="w-full h-36 p-4 flex flex-col items-center justify-end bg-main-blue">
-        <p className="text-3xl ps-4 font-pre-B text-white">간편 비밀번호 등록</p>
+        <p className="text-3xl ps-4 font-pre-B text-white">{pageTitle}</p>
       </div>
       <div className="flex w-full h-[272px] justify-center gap-6 items-center bg-main-blue">
         <div className={(password.length >= 1 ? "bg-white" : "bg-disabled-gray") + " w-10 h-10 rounded-full"}></div>
