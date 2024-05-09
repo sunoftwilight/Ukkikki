@@ -51,7 +51,7 @@ public class MemberController implements MemberDocs{
         // 토큰 발급
         String token = memberService.reissue(cookies);
 
-        response.setHeader("access","Bearer " + token);
+        response.setHeader("access",token);
 
         return new ResponseEntity<>(HttpStatus.OK);
 

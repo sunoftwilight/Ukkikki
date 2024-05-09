@@ -127,7 +127,7 @@ public class MemberServiceImpl implements MemberService{
 
         Cookie[] cookies = request.getCookies();
 
-        String access = request.getHeader("access").split(" ")[1];
+        String access = request.getHeader("access");
         String refresh = null;
 
         // refresh 검색
