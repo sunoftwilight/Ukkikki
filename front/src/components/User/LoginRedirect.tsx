@@ -31,16 +31,14 @@ const LoginRedirect: React.FC = () => {
   }
 
   const getUserInfo = async () => {
-    console.log(user.accessToken)
-    if (user.accessToken !== '') {
-      console.log('plz')
+    const data = userStore.getState().accessToken
+    if (data !== '') {
       await userInfo(
         (response) => {
           const userData = response.data.data;
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);
-          console.log('test4');
           navi('/')
         },
         (error) => {

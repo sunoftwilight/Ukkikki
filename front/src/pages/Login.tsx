@@ -2,19 +2,7 @@ import React from 'react';
 import LoginLogo from "../../icons/256.png";
 import LoginBtn from "@/assets/Login/kakaoLoginBtn.png";
 
-// import { useCookies } from 'react-cookie';
-// import { useNavigate } from 'react-router';
-// import { userStore } from '../stores/UserStore';
-
-// import { useStore } from 'zustand';
-// import { tokenRefresh, userInfo } from '../api/user';
-
-
 const Login: React.FC = () => {
-  // const [cookies] = useCookies(['isLogin']);
-  // const navi = useNavigate();
-  // const isLogin = userStore.getState().isLogin;
-  // const user = useStore(userStore);
   const login = () => {
     window.location.href = "https://k10d202.p.ssafy.io/api/oauth2/authorization/kakao"
   }
