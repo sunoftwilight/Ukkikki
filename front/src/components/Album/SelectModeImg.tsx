@@ -12,14 +12,14 @@ const SelectModeImg: React.FC<SelectModeImgProps> = ({ item }) => {
   const [isSelect, setIsSelect] = useState(false)
   const { selectList, setSelectList } = useStore(selectStore)
 
-  const clickHandler = (id: number) => {
+  const clickHandler = (id: string) => {
     setSelectList(id, isSelect)
     setIsSelect(!isSelect)
     console.log(selectList)
   }
 
   return (
-    <div onClick={() => clickHandler(item.pk)} className="flex justify-center items-center">
+    <div onClick={() => clickHandler(item.url)} className="flex justify-center items-center">
       <div className="w-[106px] h-[90px] relative">
         { isSelect ?
           <div className="w-[18px] h-[18px] rounded-full absolute top-1 right-1 bg-main-blue flex justify-center items-center">

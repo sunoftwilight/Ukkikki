@@ -4,8 +4,8 @@ export interface selectModeStoreType {
 }
 
 export interface selectListStoreType {
-  selectList: number[];
-  setSelectList: (imgId: number, isSelect: boolean) => void;  
+  selectList: string[];
+  setSelectList: (imgId: string, isSelect: boolean) => void;  
 }
 
 export interface PrefixStoreType {

@@ -6,7 +6,7 @@ import { DetailImgStore } from "../../stores/DetailImgStore";
 import { selectModeStore } from "../../stores/AlbumStore";
 import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
-import { AlbumData, contentListData } from "../../types/AlbumType";
+import { contentListData } from "../../types/AlbumType";
 
 // const albumList = {
 //   folder: ['우리의 믿음', '우리의 사랑'],
@@ -72,6 +72,7 @@ const AlbumMain: React.FC = () => {
     getDirectory(
       dirId,
       (res) => {
+        console.log(res.data.data)
         setParentId(res.data.data.parentId)
         setAlbumList(res.data.data.contentList)
       },

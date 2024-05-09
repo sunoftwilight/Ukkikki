@@ -8,12 +8,12 @@ export interface DetailImgProps {
 // API type
 
 export interface FileDownloadDto {
-  fileId: number;
+  fileId: string;
   prefix: string;
 }
 
 export interface MultiFileDownloadDto {
-  fileIdList: number[];
+  fileIdList: string[];
   prefix: string;
 }
 

@@ -15,7 +15,7 @@ export const selectStore = create<selectListStoreType>(
   (set) => ({
     selectList: [],
     
-    setSelectList: (imgId: number, isSelect: boolean) => set((state) => ({
+    setSelectList: (imgId: string, isSelect: boolean) => set((state) => ({
       selectList: isSelect ? state.selectList.filter(id => id !== imgId) : [...state.selectList, imgId]
     }))
   })

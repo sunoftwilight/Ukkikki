@@ -70,7 +70,7 @@ const MyAlbum: React.FC = () => {
         <>
           <Link 
             to={`/album/${item.pk}`} state={{url: item.url}}
-            key={idx} onClick={() => setCurrentImg(item.pk, item.url)}
+            key={idx} onClick={() => setCurrentImg(item.url, item.url)}
             className="flex justify-center items-center"
           >
             <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />

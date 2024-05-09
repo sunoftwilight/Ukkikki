@@ -29,7 +29,7 @@ const FootNav: React.FC = () => {
     await downloadFile(
       'mykey',
       {
-        fileId: 1,
+        fileId: '',
         prefix: prefix
       },
       (res) => {
