@@ -13,7 +13,7 @@ public interface MemberService {
     InfoDto myInfo();
     String reissue(Cookie[] cookies);
     void logout(HttpServletRequest request, HttpServletResponse response);
-    void setPassword(String password, Long userId);
-    List<KeyGroupDto> getKeyGroup(Long userId, String password);
+    void setPassword(String password);
+    List<KeyGroupDto> getKeyGroup(String password);
 
 }
