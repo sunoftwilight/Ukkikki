@@ -85,7 +85,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     mongodb:
-      uri: ENC(Bf33id/NT451ymS94xr23Mp5TlZShmuy5ZUIbPwoMMUMIPAg124BRIetV//M+JsYauF4DT7mZ1bsjJtb1sWsifi42+jcs/lidtGhNvE/R2RqGwHioOtZ2A==)
+      uri: ENC(H6ROv5UsTFS636Qw5p33+kf2G2Lc2E2IZBJ14IOvEiqOhujC2vW2d2M8vEXZz9f/IpuSkaYQoNXtW5b7SyTKrzGIRa03KjHi+15Rj/ZETBPy8aqppK9yjQ==)
 
 ---
 # kakao
