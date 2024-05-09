@@ -16,34 +16,34 @@ import java.util.List;
 
 public interface PartyService {
 
-    PartyLinkDto createParty(UserDetails userDetails, CreatePartyDto createPartyDto, MultipartFile photo);
+    PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo);
 
-    PartyLinkDto createLink(UserDetails userDetails, Long partyId);
+    PartyLinkDto createLink(Long partyId);
 
     void enterParty(String partyLink);
 
     void checkPassword(EnterPartyDto enterPartyDto);
 
-    PartyEnterDto memberPartyEnter(UserDetails userDetails, EnterPartyDto enterPartyDto);
+    PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
 
     PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
 
-    void changePassword(UserDetails userDetails, Long partyId, PartyPasswordDto partyPasswordDto);
+    void changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
-    void changePartyName(UserDetails userDetails, Long partyId, String partyName);
+    void changePartyName(Long partyId, String partyName);
 
-    void grantPartyUser(UserDetails userDetails, Long partyId, Long opponentId, MemberRole memberRole);
+    void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole);
 
-    void exitParty(UserDetails userDetails, Long partyId, String key);
+    void exitParty(Long partyId, String key);
 
-    void memberBlock(UserDetails userDetails, Long partyId, Long targetId);
+    void memberBlock(Long partyId, Long targetId);
 
-    void kickMember(UserDetails userDetails, Long partyId, Long targetId);
+    void kickMember(Long partyId, Long targetId);
 
-    List<SimpleMemberPartyDto> getBlockUserList(UserDetails userDetails, Long partyId);
-    List<SimpleMemberPartyDto> getUserList(UserDetails userDetails, Long partyId);
+    List<SimpleMemberPartyDto> getBlockUserList(Long partyId);
+    List<SimpleMemberPartyDto> getUserList(Long partyId);
 
-    void changePartyThumb(UserDetails userDetails, Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
+    void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
     void linkDelete();
 }

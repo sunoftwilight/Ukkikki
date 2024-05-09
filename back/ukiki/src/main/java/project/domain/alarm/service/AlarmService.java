@@ -9,13 +9,13 @@ import project.domain.alarm.redis.AlarmType;
 
 public interface AlarmService {
 
-    SseEmitter createEmitter(UserDetails userDetails);
+    SseEmitter createEmitter();
 
     void sendAlarm(SseEmitter emitter, Long userId, Alarm data);
 
     void checkEmitterLive();
 
-    AlarmPageDto getAlarmList(UserDetails userDetails, AlarmPageableDto alarmPageableDto);
+    AlarmPageDto getAlarmList(AlarmPageableDto alarmPageableDto);
 
     void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long articleId, Long targetId);
 
