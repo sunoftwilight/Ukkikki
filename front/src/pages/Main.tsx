@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+// import React, { useEffect } from "react";
+import React from "react";
 import Banner from "../components/Main/Banner";
 import Carousel from "../components/Main/Carousel";
 import Buttons from "../components/Main/Buttons";
