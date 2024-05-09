@@ -72,8 +72,7 @@ dependencies {
     // modelMapper
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.0'
 
-    //MongoDB
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
 
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
