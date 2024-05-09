@@ -76,28 +76,28 @@ public class PartyController implements PartyDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.GUEST_ENTER_SUCCESS, response));
     }
 
-    @Override
+    @Override   // 비밀번호 변경
     @PatchMapping("/change/password/{partyId}")
     public ResponseEntity<ResultResponse> changePartyPassword(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @RequestBody PartyPasswordDto partyPasswordDto) {
         partyService.changePassword(userDetails, partyId, partyPasswordDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS));
     }
 
-    @Override
+    @Override   // 파티명 변경
     @PatchMapping("/change/name/{partyId}")
     public ResponseEntity<ResultResponse> changePartyName(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @RequestParam(name = "partyName") String partyName) {
         partyService.changePartyName(userDetails, partyId, partyName);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PARTY_NAME_SUCCESS));
     }
 
-    @Override
+    @Override   // 파티원 권한 부여
     @PatchMapping("/grant/{partyId}/{opponentId}")
     public ResponseEntity<ResultResponse> grantAuthority(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @PathVariable Long opponentId, @RequestParam(name = "memberRole") MemberRole memberRole) {
         partyService.grantPartyUser(userDetails, partyId, opponentId, memberRole);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GRANT_TARGET_SUCCESS));
     }
 
-    @Override
+    @Override   // 파티 나가기
     @DeleteMapping("/exit/{partyId}")
     public ResponseEntity<ResultResponse> exitParty(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @RequestParam(name = "key") String key) {
         partyService.exitParty(userDetails, partyId, key);
