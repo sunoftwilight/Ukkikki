@@ -91,6 +91,11 @@ public interface DirectoryDocs {
     @DeleteMapping("/{dirId}/files/{fileId}")
     ResponseEntity<ResultResponse> deleteOneFile(String fileId, String dirId);
 
+    @Operation(summary = "하위 폴더 조회", description = "PathVariable로 dirId(부모 폴더 Id)를 받아 하위 폴더의 pk와 name을 반환")
+    @ApiResponse(responseCode = "200", description = "하위 폴더 조회에 성공하였습니다.")
+    @GetMapping("/{dirId}/child")
+    ResponseEntity<ResultResponse> getChildDir(String dirId);
+
     // 전체 사진 삭제
     ResponseEntity<ResultResponse> deleteAllFile(String fileId, String dirId);
 
