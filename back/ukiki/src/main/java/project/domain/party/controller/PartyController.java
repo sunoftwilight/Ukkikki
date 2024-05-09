@@ -34,7 +34,7 @@ public class PartyController implements PartyDocs {
     private final PartyService partyService;
 
     @Override
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create", consumes = {"application/json", "multipart/form-data"})
     public ResponseEntity<ResultResponse> createParty(@RequestPart @Valid CreatePartyDto createPartyDto,
                                                       @RequestPart(required = false) MultipartFile photo) {
         PartyLinkDto response = partyService.createParty(createPartyDto, photo);

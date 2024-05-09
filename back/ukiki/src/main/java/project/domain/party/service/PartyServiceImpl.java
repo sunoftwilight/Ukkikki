@@ -621,19 +621,21 @@ public class PartyServiceImpl implements PartyService {
         List<String> linkList = new ArrayList<>(linkKeyMap.keySet());
         List<Long> idList = new ArrayList<>(idMap.keySet());
         // 해당 key를 돌면서 hash 값이 없다면 삭제 -> ttl로 자동제거가 안됨
-        for (int i=0; i< linkList.size();i++) {
+        for (String link : linkList) {
 
-            Optional<PartyLink> partyLink = partyLinkRedisRepository.findByPartyLink(linkList.get(i));
+            Optional<PartyLink> partyLink = partyLinkRedisRepository.findByPartyLink(link);
             if(!partyLink.isPresent()){
                 try {
-                    redisTemplate.delete(linkKeyMap.get(linkList.get(i)));
-                    redisTemplate.opsForSet().remove("partyLink", linkList.get(i));
+                    redisTemplate.delete(linkKeyMap.get(link));
+                    redisTemplate.opsForSet().remove("partyLink", link);
                 }catch (Exception ignore){}
             }
-            Optional<PartyLink> partyId = partyLinkRedisRepository.findByParty(idList.get(i));
+        }
+        for (Long id : idList) {
+            Optional<PartyLink> partyId = partyLinkRedisRepository.findByParty(id);
             if(!partyId.isPresent()){
                 try {
-                    redisTemplate.delete(idMap.get(idList.get(i)));
+                    redisTemplate.delete(idMap.get(id));
 
                 }catch (Exception ignore){}
             }
