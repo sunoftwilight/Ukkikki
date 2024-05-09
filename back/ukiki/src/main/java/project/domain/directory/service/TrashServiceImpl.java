@@ -100,7 +100,7 @@ public class TrashServiceImpl implements TrashService{
                         // 새로 file을 만들기
                         fileRepository.save(File.builder()
                             .id(trashFileDto.getId())
-                            .photo(trashFileDto.getPhoto())
+                            .photoDto(trashFileDto.getPhotoDto())
                             .dirIdList(Arrays.asList(trashFileDto.getDirId()))
                             .build()
                         );
@@ -137,7 +137,7 @@ public class TrashServiceImpl implements TrashService{
                 // 새로 file을 생성해서 저장하기
                 fileRepository.save(File.builder()
                     .id(trashFileDto.getId())
-                    .photo(trashFileDto.getPhoto())
+                    .photoDto(trashFileDto.getPhotoDto())
                     .dirIdList(Arrays.asList(trashFileDto.getDirId()))
                     .build());
 
@@ -216,6 +216,8 @@ public class TrashServiceImpl implements TrashService{
                 }
             }
         }
+        // 다음 요청을 위해 방문체크 지워주기
+        visitedSet.clear();
         return result;
     }
 

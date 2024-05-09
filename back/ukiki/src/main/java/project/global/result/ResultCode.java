@@ -10,6 +10,8 @@ public enum ResultCode {
     //User
     GET_USERLIST_SUCCESS(200, "유저리스트 검색에 성공하였습니다."),
     GET_USERINFO_SUCCESS(200, "유정 정보 조회에 성공하였습니다."),
+    GET_KEYGROUP_SUCCESS(200, "유저 키 그룹을 가져오는데 성공하였습니다."),
+
     //Party
     CREATE_PARTY_SUCCESS(201, "그룹 생성에 성공하였습니다."),
     GET_PARTY_LINK_SUCCESS(201, "참가 링크 생성에 성공하였습니다. "),
@@ -42,6 +44,7 @@ public enum ResultCode {
     DELETE_DIRECTORY_SUCCESS(204, "폴더 삭제에 성공하였습니다."),
     RESTORE_DIRECTORY_OR_FILE_SUCCESS(201, "폴더 또는 파일 복원에 성공하였습니다."),
     GET_DIRECTORYLIST_SUCCESS(200, "해당 유저의 모든 그룹 조회에 성공하였습니다."),
+    SET_MAIN_DIRECTORY_SUCCESS(200, "메인 폴더 설정 변경에 성공하였습니다."),
 
     // 휴지통 관련
     GET_TRASH_BIN_SUCCESS(200, "휴지통 조회에 성공하였습니다."),

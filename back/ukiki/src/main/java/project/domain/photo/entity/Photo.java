@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import project.domain.party.entity.ArticlePhoto;
 import project.domain.party.entity.Party;
 import project.domain.member.entity.Member;
@@ -33,6 +34,7 @@ import project.global.baseEntity.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class Photo extends BaseEntity {
 
     @Id

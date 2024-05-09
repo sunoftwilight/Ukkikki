@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import project.domain.directory.dto.PhotoDto;
 
 @Getter
 @Setter
@@ -22,7 +23,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class File {
     @Id
     private String id;
-    private Object photo;
+    private PhotoDto photoDto;
     @Builder.Default
     private List<String> dirIdList = new ArrayList<>();
 }

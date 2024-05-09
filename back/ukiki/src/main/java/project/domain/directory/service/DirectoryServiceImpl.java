@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.DataType;
@@ -42,8 +41,6 @@ import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
-import project.domain.photo.entity.Photo;
-import project.domain.photo.entity.PhotoUrl;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -54,7 +51,6 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     private static Deque<Directory> deque = new ArrayDeque<>();
     private static HashSet<String> visitedSet = new HashSet<>();
-    private static ModelMapper modelMapper;
 
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
@@ -146,15 +142,11 @@ public class DirectoryServiceImpl implements DirectoryService {
             List<File> fileList = fileRepository.findAllById(fileIdList);
             // 썸네일을 줘야됨
             for (File file : fileList) {
-                // json to Photo
-                Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
-                // json to PhotoUrl
-                PhotoUrl photoUrl = modelMapper.map(photo.getPhotoUrl(), PhotoUrl.class);
                 GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
                     .type(DataType.FILE)
                     .pk(file.getId())
                     .name("None")
-                    .url(photoUrl.getThumb_url1())
+                    .url(file.getPhotoDto().getThumbUrl1())
                     .build();
                 contentList.add(fileType);
             }
@@ -162,6 +154,16 @@ public class DirectoryServiceImpl implements DirectoryService {
         return getDirDtov2;
     }
 
+
+    @Override
+    public void patchMainDir(Long memberId, String dirId) {
+        // 유저 조회
+        Member member = memberRepository.findById(memberId).orElseThrow(
+            () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+        // 유저의 기본 폴더 id 변경
+        member.setMainDirId(dirId);
+    }
 
     @Override
     @Transactional
@@ -212,7 +214,11 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Transactional
     public GetDirDto deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
         // 부모의 child list에서 해당 dirId 제거, child에서 parent는 제거하지 않음
+
         Directory dir = findById(dirId);
+        if (dir.getParentDirId().equals("")) {
+            throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+        }
         Directory parentDir = findById(dir.getParentDirId());
         parentDir.getChildDirIdList().remove(dirId);
         directoryRepository.save(parentDir);
@@ -224,21 +230,23 @@ public class DirectoryServiceImpl implements DirectoryService {
         deque.push(dir);
         visitedSet.add(dir.getId());
         while (!deque.isEmpty()) {
-            // pop + 할 거 하기
+            // pop
             Directory curDir = deque.pop();
-            // 현재 폴더 휴지통에 저장
+            // 현재 폴더 휴지통에 저장(폴더에 남아있는 상황)
             saveDirtoTrash(curDir);
-            // 현재 폴더의 파일 휴지통으로 이동 및 폴더에서 삭제
-            List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
-            for (File file : fileList) {
-                saveFileToTrash(file, curDir.getId());
-                fileRepository.delete(file);
+            // 현재 폴더의 파일 휴지통에 저장후 폴더에서 삭제
+            // fileList가 null이 아닐 경우에만 작업
+            if (!curDir.getFileIdList().isEmpty()) {
+                List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
+                for (File file : fileList) {
+                    saveFileToTrash(file, curDir.getId());
+                    fileRepository.delete(file);
+                }
             }
-            // 현재 파일 폴더에서 삭제
-            directoryRepository.delete(curDir);
-            // child 탐색
-            // childIdList가 null이면 continue
-            if (curDir.getFileIdList().isEmpty()) {
+            // curDir의 자식 폴더 탐색
+            // childIdList가 null면 현재 폴더 지우고 다음 deque의 dir 탐색
+            if (curDir.getChildDirIdList().isEmpty()) {
+                directoryRepository.delete(curDir);
                 continue;
             }
             // childIsList가 null이 아닌경우 탐색
@@ -253,7 +261,11 @@ public class DirectoryServiceImpl implements DirectoryService {
                 // 방문 체크
                 visitedSet.add(nextDirId);
             }
+            // 탐색 끝난 폴더 삭제
+            directoryRepository.delete(curDir);
         }
+        // 다음 요청 수행을 위해 visitedSet 비워주기
+        visitedSet.clear();
 
         return getDirMapper.toGetDirDto(
             parentDir,
@@ -349,7 +361,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         if (Objects.equals(directory.getParentDirId(), "")) {
             return "";  // 또는 ""로 반환
         }
-        log.info("여기");
+        log.info("상위 폴더가 있는 경우");
         Directory parentDir = findById(directory.getParentDirId());
         return parentDir != null ? parentDir.getDirName() : "No Parent";
     }
@@ -369,10 +381,8 @@ public class DirectoryServiceImpl implements DirectoryService {
     public List<String> getPhotoUrlList(Directory directory) {
         List<String> photoUrlList = new ArrayList<>();
         List<File> FileList =  fileRepository.findAllById(directory.getFileIdList());
-        ModelMapper modelMapper = new ModelMapper();
         for (File file : FileList) {
-            Photo photo = modelMapper.map(file.getPhoto(), Photo.class);
-            photoUrlList.add(photo.getPhotoUrl().getThumb_url1());
+            photoUrlList.add(file.getPhotoDto().getThumbUrl1());
         }
         return photoUrlList;
     }

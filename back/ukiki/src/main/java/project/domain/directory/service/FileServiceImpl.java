@@ -13,7 +13,9 @@ import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
+import project.domain.directory.dto.PhotoDto;
 import project.domain.directory.dto.TrashFileDto;
+import project.domain.directory.dto.TrashPhotoDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetFileDto;
 import project.domain.directory.mapper.GetDirMapper;
@@ -54,10 +56,20 @@ public class FileServiceImpl implements FileService{
         // 파티에서 rootDirId 찾기
         Party findParty = partyRepository.findById(partyId).orElseThrow(() -> new BusinessLogicException(
             ErrorCode.PARTY_NOT_FOUND));
+
         // file객체 생성하기
         File newFile = File.builder()
             .id(generateId())
-            .photo(photo)
+            .photoDto(PhotoDto.builder()
+                .id(photo.getId())
+                .fileName(photo.getFileName())
+                .photoNum(photo.getPhotoNum())
+                .partyId(photo.getParty().getId())
+                .memberId(photo.getMember().getId())
+                .photoUrl(photo.getPhotoUrl().getPhotoUrl())
+                .thumbUrl1(photo.getPhotoUrl().getThumb_url1())
+                .thumbUrl2(photo.getPhotoUrl().getThumb_url2())
+                .build())
             .build();
 
         String rootDirId = findParty.getRootDirId();
@@ -68,59 +80,37 @@ public class FileServiceImpl implements FileService{
 
     @Override
     @Transactional
-    public GetDirDto copyFile(String fileId, String fromDirId, String toDirId) {
+    public void copyFile(String fileId, String fromDirId, String toDirId) {
         setDirFileRelation(toDirId, fileId);
         // photo num ++1
         File findFile = findById(fileId);
-        ModelMapper modelMapper = new ModelMapper();
-        Photo photo = modelMapper.map(findFile.getPhoto(), Photo.class);
-        Long photoId = photo.getId();
-        Photo findPhoto = photoRepository.findById(photoId)
+        Photo findPhoto = photoRepository.findById(findFile.getPhotoDto().getId())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
         int photoNum = findPhoto.getPhotoNum();
         findPhoto.setPhotoNum(photoNum + 1);
-
-        Directory fromDir = directoryService.findById(fromDirId);
-
-        return getDirMapper.toGetDirDto(
-            fromDir,
-            directoryService.getParentDirName(fromDir),
-            directoryService.getChildNameList(fromDir),
-            directoryService.getPhotoUrlList(fromDir)
-        );
     }
 
     @Override
     @Transactional
-    public GetDirDto moveFile(String fileId, String fromDirId, String toDirId) {
+    public void moveFile(String fileId, String fromDirId, String toDirId) {
         setDirFileRelation(toDirId, fileId);
         deleteDirFileRelation(fromDirId, fileId);
-
-        Directory fromDir = directoryService.findById(fromDirId);
-
-        return getDirMapper.toGetDirDto(
-            fromDir,
-            directoryService.getParentDirName(fromDir),
-            directoryService.getChildNameList(fromDir),
-            directoryService.getPhotoUrlList(fromDir)
-        );
     }
 
     @Override
     @Transactional
-    public GetDirDto deleteOneFile(String fileId, String dirId) {
-        deleteDirFileRelation(dirId, fileId);
-        // deleteFile을 넘겨 줘야한다.
-        saveFileToTrash(findById(fileId), dirId);
+    public void deleteOneFile(String fileId, String dirId) {
+        // 쓰레기에 file 등록
+        File file = findById(fileId);
+        saveFileToTrash(file, dirId);
+        // 휴지통에 file 등록
         trashBinService.saveFileToTrashBin(fileId);
-        Directory dirDir = directoryService.findById(dirId);
-
-        return getDirMapper.toGetDirDto(
-            dirDir,
-            directoryService.getParentDirName(dirDir),
-            directoryService.getChildNameList(dirDir),
-            directoryService.getPhotoUrlList(dirDir)
-        );
+        // 폴더에서 제거
+        deleteDirFileRelation(dirId, fileId);
+        // file에서 제거
+        if(file.getDirIdList().isEmpty()) {
+            fileRepository.delete(file);
+        }
     }
 
     @Override
@@ -176,20 +166,24 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public GetFileDto getFileDto(String fileId) {
+    public String getFile(String fileId) {
         File file = findById(fileId);
-        return getFileMapper.toGetFileDto(file);
+        return file.getPhotoDto().getPhotoUrl();
+
     }
 
     @Override
     @Transactional
     public Trash saveFileToTrash(File file, String dirId) {
-        // file to deleteFile
-        TrashFileDto trashFileDto = trashFileMapper.toTrashFile(file, dirId);
+        // file에 trashId와 삭제 당시 dirid 추가
         return trashRepository.save(Trash.builder()
             .id(generateId())
             .dataType(DataType.FILE)
-            .content(trashFileDto)
+            .content(TrashFileDto.builder()
+                .id(file.getId())
+                .photoDto(file.getPhotoDto())
+                .dirId(dirId)
+                .build())
             .deadLine(LocalDate.now().plusWeeks(2))
             .build());
     }

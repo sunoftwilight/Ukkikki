@@ -23,6 +23,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_EXPIRED(400, "토큰이 만료되었습니다."),
     REFRESH_TOKEN_MATCH(400, "토큰이 일치하지 않습니다.."),
     MEMBER_LOGOUT_MATCH(400, "access, refresh 토큰 정보가 일치하지 않습니다."),
+    USER_PASSWORD_INVALID(400, "잘못된 비밀번호입니다."),
 
     // 파티 관련
     PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),
@@ -49,6 +50,8 @@ public enum ErrorCode {
     DIRECTORY_NOE_FOUND(404, "해당 폴더를 찾을 수 없습니다."),
     DIRECTORY_OUT_OF_DEADLINE(403, "유효 기간이 만료된 폴더입니다."),
     ROOTDIR_NOT_FOUND(404, "최상위 폴더를 찾을 수 없습니다.(무한 재귀 발생)"),
+    FIND_PARENT_OF_ROOT_NOT_AVAILABLE(404, "최상위 폴더의 상위 폴더 입니다."),
+
 
     // 휴지통 과련
     TRASHBIN_NOT_FOUND(404, "존재하지 않는 휴지통 입니다."),
