@@ -6,13 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.PhotoDto;
 import project.domain.directory.dto.TrashFileDto;
-import project.domain.directory.dto.response.GetTrashBinDto;
+import project.domain.directory.dto.response.GetTrashDto;
 import project.domain.directory.mapper.GetTrashBinMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
@@ -29,6 +30,7 @@ import project.global.exception.ErrorCode;
 @Slf4j
 public class TrashBinServiceImpl implements TrashBinService {
 
+    private static ModelMapper modelMapper = new ModelMapper();
     private final TrashBinRepository trashBinRepository;
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
@@ -47,11 +49,50 @@ public class TrashBinServiceImpl implements TrashBinService {
     }
 
     @Override
-    public GetTrashBinDto getTrashBin(Long trashBinId) {
+    public List<GetTrashDto> getTrashBin(Long trashBinId) {
+        log.info("getTrashBin service");
         TrashBin trashBin = findById(trashBinId);
-        List<String> dirNameList = getDirNameList(trashBin);
-        List<String> photoUrlList = getPhotoUrlList(trashBin);
-        return getTrashBinMapper.toGetTrashBinDto(trashBin, dirNameList, photoUrlList);
+        log.info("getTrashBin service");
+        // 그냥 Trash 애들 담아서 주면된다.
+        List<GetTrashDto> response = new ArrayList<>();
+        // 디렉토리 자료형 담기
+        // null이 아닐 경우
+        List<String> dirTypeTrashIdList = trashBin.getDirIdList();
+        if(!dirTypeTrashIdList.isEmpty()) {
+            for (String trashId : dirTypeTrashIdList) {
+                Trash trash = trashRepository.findFirstByRawId(trashId)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+                Directory directory = modelMapper.map(trash.getContent(), Directory.class);
+                GetTrashDto getTrashDto = GetTrashDto.builder()
+                    .type(DataType.DIRECTORY)
+                    .pk(trash.getId())
+                    .name(directory.getDirName())
+                    .url("none")
+                    .deadLine(trash.getDeadLine())
+                    .build();
+                response.add(getTrashDto);
+            }
+        }
+        // 파일 자료형 담기
+        // null이 아닐 경우
+        List<String> fileTypeTrashIdList = trashBin.getFileIdList();
+        if(!fileTypeTrashIdList.isEmpty()) {
+            for (String trashId : fileTypeTrashIdList) {
+                Trash trash = trashRepository.findFirstByRawId(trashId)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+                TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
+                GetTrashDto getTrashDto = GetTrashDto.builder()
+                    .type(DataType.FILE)
+                    .pk(trash.getId())
+                    .name("none")
+                    .url(trashFileDto.getPhotoDto().getThumbUrl1())
+                    .deadLine(trash.getDeadLine())
+                    .build();
+                response.add(getTrashDto);
+            }
+        }
+
+        return response;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package project.domain.directory.controller.trashbin;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.response.GetTrashBinDto;
+import project.domain.directory.dto.response.GetTrashDto;
 import project.domain.directory.service.TrashBinService;
 import project.domain.directory.service.TrashService;
 import project.global.result.ResultCode;
@@ -29,7 +31,7 @@ public class TrashBinControllerImpl implements TrashBinController {
     public ResponseEntity<ResultResponse> getTrashBin(
         @PathVariable(name = "trashBinId") Long trashBinId
     ) {
-        GetTrashBinDto response = trashBinService.getTrashBin(trashBinId);
+        List<GetTrashDto> response = trashBinService.getTrashBin(trashBinId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_TRASH_BIN_SUCCESS, response));
     }
 
@@ -39,8 +41,8 @@ public class TrashBinControllerImpl implements TrashBinController {
         @PathVariable(name = "trashBinId") Long trashBinId,
         @PathVariable(name = "trashId") String trashId
     ) {
-        GetTrashBinDto response = trashService.restoreTrash(trashId, trashBinId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.RESTORE_DIRECTORY_OR_FILE_SUCCESS, response));
+        trashService.restoreTrash(trashId, trashBinId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.RESTORE_DIRECTORY_OR_FILE_SUCCESS));
     }
 
     @Override
