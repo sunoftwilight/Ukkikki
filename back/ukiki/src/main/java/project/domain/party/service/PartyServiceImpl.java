@@ -247,7 +247,7 @@ public class PartyServiceImpl implements PartyService {
         checkPasswordDto.setSseKey(sseKey);
 
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         //DB UPDATE
         StringEncryptor encryptor = jasyptUtil.customEncryptor(checkChangePasswordDto.getSimplePassword());
@@ -427,7 +427,7 @@ public class PartyServiceImpl implements PartyService {
             }
             Member targetMember = targetMemberParty.getMember();
             KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetMember, party)
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
             keyGroup.setSseKey("expired");
             keyGroupRepository.save(keyGroup);
@@ -435,7 +435,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 마스터 유저는 바로 키그룹에 반영
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         StringEncryptor encryptor = jasyptUtil.customEncryptor(partyPasswordDto.getSimplePassword());
         String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
@@ -591,7 +591,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 자신 키그룹에서 파티 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, memberParty.getParty())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         keyGroupRepository.delete(keyGroup);
 
@@ -651,7 +651,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 차단 멤버의 키그룹에서 키 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         keyGroupRepository.delete(keyGroup);
 
@@ -683,7 +683,7 @@ public class PartyServiceImpl implements PartyService {
         profileRepository.delete(targetProfile);
         // 추방 멤버의 키그룹에서 키 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         keyGroupRepository.delete(keyGroup);
     }

@@ -24,6 +24,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_MATCH(400, "토큰이 일치하지 않습니다.."),
     MEMBER_LOGOUT_MATCH(400, "access, refresh 토큰 정보가 일치하지 않습니다."),
     USER_PASSWORD_INVALID(400, "잘못된 비밀번호입니다."),
+    KEY_GROUP_NOT_FOUND(400, "키그룹에 대한 잘못된 접근입니다."),
 
     // 파티 관련
     PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),
