@@ -14,6 +14,7 @@ import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
+import project.domain.member.dto.request.CustomOAuth2User;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
@@ -26,8 +27,8 @@ public class AlarmController implements AlarmDocs {
     private final AlarmRedisRepository alarmRedisRepository;
     @Override
     @GetMapping(value= "/sub", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subScribe(HttpServletResponse response){
-        SseEmitter res = alarmService.createEmitter();
+    public SseEmitter subScribe(@AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+        SseEmitter res = alarmService.createEmitter(userDetails);
         response.setHeader("X-Accel-Buffering", "no");
         response.setCharacterEncoding("UTF-8");
         return res;
@@ -35,21 +36,24 @@ public class AlarmController implements AlarmDocs {
 
     @Override
     @GetMapping("/list")
-    public ResponseEntity<ResultResponse> getAlarmList(AlarmPageableDto alarmPageDto) {
-        AlarmPageDto res = alarmService.getAlarmList(alarmPageDto);
+    public ResponseEntity<ResultResponse> getAlarmList(@AuthenticationPrincipal UserDetails userDetails, AlarmPageableDto alarmPageDto) {
+        AlarmPageDto res = alarmService.getAlarmList(userDetails, alarmPageDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_ALARM_SUCCESS, res));
     }
 
     @GetMapping("/test-alarm")
     public void testAlarm(@AuthenticationPrincipal UserDetails userDetails){
-        SseEmitter asd = alarmService.findEmitterByUserId(1L);
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
+        Long memberId = customOAuth2User.getId();
+
+        SseEmitter asd = alarmService.findEmitterByUserId(memberId);
         Alarm dsa = alarmService.createAlarm(
             AlarmType.REPLY,
             1L,1L, 53L, "어해진 바보"
         );
-        dsa.setMemberId(1L);
+        dsa.setMemberId(memberId);
         alarmRedisRepository.save(dsa);
-        alarmService.sendAlarm(asd,1L,dsa);
+        alarmService.sendAlarm(asd,memberId,dsa);
     }
 
 }

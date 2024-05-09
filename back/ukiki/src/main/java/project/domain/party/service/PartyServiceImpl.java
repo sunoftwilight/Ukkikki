@@ -19,6 +19,7 @@ import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
 
 import project.domain.alarm.repository.AlarmRedisRepository;
+import project.domain.alarm.service.AlarmService;
 import project.domain.chat.entity.Chat;
 import project.domain.chat.repository.ChatRepository;
 import project.domain.directory.service.DirectoryService;
@@ -65,6 +66,7 @@ public class PartyServiceImpl implements PartyService {
     private final MemberpartyRepository memberpartyRepository;
     private final PartyLinkRedisRepository partyLinkRedisRepository;
     private final AlarmRedisRepository alarmRedisRepository;
+    private final AlarmService alarmService;
     private final PhotoRepository photoRepository;
     private final ProfileRepository profileRepository;
     private final ChatRepository chatRepository;
@@ -325,23 +327,11 @@ public class PartyServiceImpl implements PartyService {
         partyRepository.save(party);
 
         // 알람 보내기
-        List<MemberParty> memberParties = memberpartyRepository.findAllByPartyId(party.getId());
-        for (MemberParty memberParty1 : memberParties) {
-            // 마스터라면 넘어가기
-            if (memberParty1.getMemberRole().equals(MemberRole.MASTER)) {
-                continue;
-            }
-            Alarm alarm = Alarm.builder()
-                .partyId(party.getId())
-                .memberId(member.getId())
-                .alarmType(AlarmType.PASSWORD)
-                .content("비밀번호가 변경 되었습니다.")
-                .build();
-            alarmRedisRepository.save(alarm);
-            //TODO SSE 보내기 . . .
-        }
+        alarmService.groupSendAlarm(memberId, AlarmType.PASSWORD, partyId,0L,0L);
+
         // S3 이미지 비밀번호 바꾸기
         List<Photo> photos = party.getPhotoList();
+
         for (Photo photo : photos) {
             for (String url : photo.getPhotoUrl().photoUrls()){
                 String fileName = url.substring(
@@ -350,8 +340,6 @@ public class PartyServiceImpl implements PartyService {
                 s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
             }
         }
-        
-
 
     }
 
