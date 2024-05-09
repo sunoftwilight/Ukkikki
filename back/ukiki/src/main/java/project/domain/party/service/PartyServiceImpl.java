@@ -33,10 +33,7 @@ import project.domain.member.repository.KeyGroupRepository;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
 import project.domain.party.dto.request.*;
-import project.domain.party.dto.response.CheckPasswordDto;
-import project.domain.party.dto.response.PartyEnterDto;
-import project.domain.party.dto.response.PartyLinkDto;
-import project.domain.party.dto.response.SimpleMemberPartyDto;
+import project.domain.party.dto.response.*;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.mapper.MemberPartyMapper;
@@ -166,6 +163,18 @@ public class PartyServiceImpl implements PartyService {
         partyLinkDto.setSseKey(sseKey);
         partyLinkDto.setRootDirId(party.getRootDirId());
         return partyLinkDto;
+    }
+
+    @Override
+    public List<SimplePartyDto> getPartyList() {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        List<Party> partyList = partyRepository.findPartyListByMemberId(memberId);
+        List<SimplePartyDto> res = memberPartyMapper.toSimplePartyDtoList(partyList);
+
+        return res;
     }
 
     @Override
