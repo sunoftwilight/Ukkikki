@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.domain.directory.service.FileService;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.Party;
@@ -59,7 +61,8 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     private final WebClient webClient;
 
     public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) {
-
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
         //S3업로드 커스텀 키 생성
         SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileUploadDto.getKey()));
 
@@ -88,7 +91,6 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             Party party = partyRepository.findById(fileUploadDto.getPartyId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
             photo.setParty(party);
-            Long memberId = 1L;
             Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
             photo.setMember(member);
@@ -139,15 +141,16 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         }
     }
 
-    public S3Object fileDownload(FileDownloadDto fileDownloadDto) {
+    public S3Object fileDownload(FileDownloadDto fileDownloadDto, String key) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Photo photo = photoRepository.findById(fileDownloadDto.getFileId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
 
-        Member member = memberRepository.findById(1L)
+        Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         String fileName = photo.getFileName();
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileDownloadDto.getKey()));
+        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(key));
 
         S3Object object = null;
 
@@ -166,15 +169,16 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         return object;
     }
 
-    public Map<String, List<File>> multiFileDownload(MultiFileDownloadDto multiFileDownloadDto) {
+    public Map<String, List<File>> multiFileDownload(MultiFileDownloadDto multiFileDownloadDto, String key) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<S3Object> objects = new ArrayList<>();
         List<File> files = new ArrayList<>();
         List<Long> fileIds = multiFileDownloadDto.getFileIdList();
 
-        Member member = memberRepository.findById(1L)
+        Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(multiFileDownloadDto.getKey()));
+        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(key));
 
         String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
         File tempDir = new File(tempPath);  // 임시 디렉터리 경로

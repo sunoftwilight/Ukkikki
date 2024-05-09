@@ -127,7 +127,13 @@ public class MemberServiceImpl implements MemberService{
 
         Cookie[] cookies = request.getCookies();
 
-        String access = request.getHeader("access");
+        String authorization = request.getHeader("authorization");
+        String access = null;
+
+        if(authorization != null){
+            access = authorization.split(" ")[1];
+        }
+
         String refresh = null;
 
         // refresh 검색
@@ -165,9 +171,10 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public void setPassword(String password, Long userId) {
+    public void setPassword(String password) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         //맴버 객체 찾아오기
-        Member member = memberRepository.findById(userId)
+        Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         //멤버 password 컬럼에 값추가
         member.setPassword(bcryptUtil.encodeBcrypt(password));
@@ -175,9 +182,10 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public List<KeyGroupDto> getKeyGroup(Long userId, String password) {
+    public List<KeyGroupDto> getKeyGroup(String password) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         //userId로 유저 검색해서 객체 가져오고
-        Member member = memberRepository.findById(userId)
+        Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         //password 맞는지 검증하고
         if(!bcryptUtil.matchesBcrypt(password, member.getPassword())){
@@ -188,4 +196,5 @@ public class MemberServiceImpl implements MemberService{
 
         return keyGroupMapper.toKeyGroupDtoList(keyGroupList);
     }
+
 }
