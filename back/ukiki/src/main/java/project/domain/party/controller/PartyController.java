@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import project.domain.member.entity.MemberRole;
-import project.domain.party.dto.request.ChangeThumbDto;
-import project.domain.party.dto.request.EnterPartyDto;
-import project.domain.party.dto.request.CreatePartyDto;
-import project.domain.party.dto.request.PartyPasswordDto;
+import project.domain.party.dto.request.*;
+import project.domain.party.dto.response.CheckPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
 import project.domain.party.dto.response.SimpleMemberPartyDto;
@@ -56,10 +54,17 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
+    @PostMapping("/check/changed-password")  // 그룹 비밀번호 변경시 기존유저 대조 확인
+    public ResponseEntity<ResultResponse> checkChangedPartyKey(@RequestBody CheckChangePasswordDto checkChangePasswordDto) {
+        CheckPasswordDto response = partyService.checkChangedPassword(checkChangePasswordDto);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.PASSWORD_CORRECT, response));
+    }
+
+    @Override
     @PostMapping("/check/password")  // 그룹 비밀번호를 대조 확인
     public ResponseEntity<ResultResponse> checkPartyKey(@RequestBody EnterPartyDto enterPartyDto) {
-        partyService.checkPassword(enterPartyDto);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.PASSWORD_CORRECT));
+        CheckPasswordDto response = partyService.checkPassword(enterPartyDto);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.PASSWORD_CORRECT, response));
     }
 
     @Override
@@ -79,8 +84,8 @@ public class PartyController implements PartyDocs {
     @Override   // 비밀번호 변경
     @PatchMapping("/change/password/{partyId}")
     public ResponseEntity<ResultResponse> changePartyPassword(@PathVariable Long partyId, @RequestBody PartyPasswordDto partyPasswordDto) {
-        partyService.changePassword(partyId, partyPasswordDto);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS));
+        CheckPasswordDto response = partyService.changePassword(partyId, partyPasswordDto);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS, response));
     }
 
     @Override   // 파티명 변경

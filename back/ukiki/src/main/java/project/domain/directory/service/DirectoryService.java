@@ -6,6 +6,7 @@ import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
+import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
@@ -22,7 +23,7 @@ public interface DirectoryService {
      * @return : 폴더정보 DTO
      */
     public DirDto initDirPartyTest(Long partyId);
-
+    public List<GetChildDirDto> getChildDir(String dirId);
     public void initDirParty(Party party);
 //    public InitDirDto initDirMember(Long memberId);
 
@@ -42,7 +43,7 @@ public interface DirectoryService {
     public GetDirDto getDir(String dirId);
     public GetDirDtov2 getDirv2(String dirId);
     public List<GetDirListDto> getDirList(Long userId);
-
+//    public List<GetChildDirDto> getChildDir(String dirId);
     public void patchMainDir(Long memberId, String dirId);
     public GetDirDto createDir(CreateDirDto request);
     // 폴더 이동

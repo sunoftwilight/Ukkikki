@@ -22,6 +22,7 @@ import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
+import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirInnerDtov2;
@@ -72,7 +73,7 @@ public class DirectoryServiceImpl implements DirectoryService {
             () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
         );
         // 해당 유저의 즐겨찾기 지정 폴더
-        String mainDirId = member.getMainDirId();
+        String mainDirId = member.getUploadGroupId();
         // 해당 유저가 포함된 모든 party 찾기
         List<MemberParty> memberPartyList = memberpartyRepository.findMemberPartiesByMember(
             member);
@@ -98,6 +99,27 @@ public class DirectoryServiceImpl implements DirectoryService {
             // 결과 리스트에 넣어주기
             response.add(getDirListDto);
         }
+        return response;
+    }
+
+    @Override
+    public List<GetChildDirDto> getChildDir(String dirId) {
+        log.info("come in Service");
+        List<GetChildDirDto> response = new ArrayList<>();
+        Directory directory = directoryRepository.findById(dirId).orElseThrow(
+            () -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+        List<String> childDirIdList = directory.getChildDirIdList();
+        log.info("childDirIdList = {}", childDirIdList);
+        if(childDirIdList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.NO_MORE_CHILD_DIR);
+        }
+        for (Directory childDir:directoryRepository.findAllById(childDirIdList)){
+            response.add(GetChildDirDto.builder()
+                .pk(childDir.getId())
+                .name(childDir.getDirName())
+                .build());
+        }
+        log.info("service response = {}", response);
         return response;
     }
 
@@ -162,7 +184,7 @@ public class DirectoryServiceImpl implements DirectoryService {
             () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
         );
         // 유저의 기본 폴더 id 변경
-        member.setMainDirId(dirId);
+        member.setUploadGroupId(dirId);
     }
 
     @Override
@@ -238,7 +260,14 @@ public class DirectoryServiceImpl implements DirectoryService {
                 List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
                 for (File file : fileList) {
                     saveFileToTrash(file, curDir.getId());
-                    fileRepository.delete(file);
+                    // 사진의 DirIdList 에서 curDirId 제외하기
+                    file.getDirIdList().remove(curDir.getId());
+                    fileRepository.save(file);
+                    // 사진이 이제 전체 폴더에 존재하지 않는 경우에 삭제
+                    if(file.getDirIdList().isEmpty()) {
+                        fileRepository.delete(file);
+                        fileRepository.save(file);
+                    }
                 }
             }
             // curDir의 자식 폴더 탐색
@@ -433,7 +462,6 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    @Transactional
     public Trash saveFileToTrash(File file, String dirId) {
         // file에 trashId와 삭제 당시 dirid 추가
         return trashRepository.save(Trash.builder()

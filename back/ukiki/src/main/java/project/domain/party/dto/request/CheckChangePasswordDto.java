@@ -5,10 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EnterPartyDto {
+public class CheckChangePasswordDto {
 
-    private String link;
     private String password;
+    private Long partyId;
     private String simplePassword;
 
 }

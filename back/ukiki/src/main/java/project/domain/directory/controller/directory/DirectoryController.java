@@ -2,6 +2,7 @@ package project.domain.directory.controller.directory;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
+import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
@@ -28,6 +30,7 @@ import project.global.result.ResultResponse;
 @RequestMapping("/directories")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class DirectoryController implements DirectoryDocs {
 
     private final DirectoryService directoryService;
@@ -141,6 +144,15 @@ public class DirectoryController implements DirectoryDocs {
 
         fileService.deleteOneFile(fileId, dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS));
+    }
+
+    @Override
+    @GetMapping("/{dirId}/child")
+    public ResponseEntity<ResultResponse> getChildDir(@PathVariable(name = "dirId") String dirId) {
+        log.info("come in Controller");
+        List<GetChildDirDto> response = directoryService.getChildDir(dirId);
+        log.info("controller response = {}", response);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_CHILD_DIR_SUCCESS, response));
     }
 
     @Override

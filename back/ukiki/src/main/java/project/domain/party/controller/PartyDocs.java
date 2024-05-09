@@ -8,10 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
-import project.domain.party.dto.request.ChangeThumbDto;
-import project.domain.party.dto.request.EnterPartyDto;
-import project.domain.party.dto.request.CreatePartyDto;
-import project.domain.party.dto.request.PartyPasswordDto;
+import project.domain.party.dto.request.*;
 import project.global.result.ResultResponse;
 
 
@@ -28,6 +25,9 @@ public interface PartyDocs {
 
     @Operation(summary = "그룹 참여 링크")
     ResponseEntity<ResultResponse> enterParty(String partyLink);
+
+    @Operation(summary = "파티 암호키 체크")
+    ResponseEntity<ResultResponse> checkChangedPartyKey(CheckChangePasswordDto checkChangePasswordDto);
 
     @Operation(summary = "파티 암호키 체크")
     ResponseEntity<ResultResponse> checkPartyKey(EnterPartyDto checkPartyEnterDto);
