@@ -108,8 +108,8 @@ public class FileServiceImpl implements FileService{
         // 폴더에서 제거
         deleteDirFileRelation(dirId, fileId);
         // file에서 제거
-        if(file.getDirIdList().isEmpty()) {
-            fileRepository.delete(file);
+        if(file.getDirIdList().isEmpty()){
+            fileRepository.deleteById(file.getId());
         }
     }
 
@@ -179,6 +179,7 @@ public class FileServiceImpl implements FileService{
         return trashRepository.save(Trash.builder()
             .id(generateId())
             .dataType(DataType.FILE)
+            .rawId(file.getId())
             .content(TrashFileDto.builder()
                 .id(file.getId())
                 .photoDto(file.getPhotoDto())

@@ -88,11 +88,12 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             Party party = partyRepository.findById(fileUploadDto.getPartyId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
             photo.setParty(party);
-            photoRepository.save(photo);
             Long memberId = 1L;
             Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
             photo.setMember(member);
+            photoRepository.save(photo);
+
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

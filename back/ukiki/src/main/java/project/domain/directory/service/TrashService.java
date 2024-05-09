@@ -8,7 +8,7 @@ public interface TrashService {
 
     void getTrash();
 
-    GetTrashBinDto restoreTrash(String trashId, Long trashBinId);
+    void restoreTrash(String trashId, Long trashBinId);
 
     public Integer realDelete();
 

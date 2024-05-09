@@ -10,7 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.DataType;
@@ -30,6 +33,7 @@ import project.global.exception.ErrorCode;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TrashServiceImpl implements TrashService{
 
 
@@ -53,11 +57,12 @@ public class TrashServiceImpl implements TrashService{
 
     @Override
     @Transactional
-    public GetTrashBinDto restoreTrash(String trashId, Long trashBinId) {
+    // trashId != rawId
+    public void restoreTrash(String trashId, Long trashBinId) {
         TrashBin trashBin = trashBinService.findById(trashBinId);
+        Trash trash = trashRepository.findById(trashId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
 
-        // 쓰레기 불러오기
-        Trash trash = findById(trashId);
         if (isOutOfRecoveryPeriod(trash)) {
             throw new BusinessLogicException(ErrorCode.DIRECTORY_OUT_OF_DEADLINE);
         }
@@ -65,6 +70,7 @@ public class TrashServiceImpl implements TrashService{
         // 폴더인지 파일인지 분기 처리
         if (trash.getDataType() == DataType.DIRECTORY) {
             List<Trash> allTrash = getAllTrash(trash.getId());
+            log.info("모든 쓰레기 = {}", allTrash);
             // 일단 가장 첫번째인 폴더는 휴지통에서 제거 + 본 디렉토리에서 관계 회복
             Directory deletedRootDir = modelMapper.map(trash.getContent(), Directory.class);
 
@@ -73,12 +79,13 @@ public class TrashServiceImpl implements TrashService{
             parentDir.getChildDirIdList().add(deletedRootDir.getId());
             // 변경 사항 저장
             directoryRepository.save(parentDir);
+            log.info("여기까진 OK잖아?");
 
             for (Trash oneTrash : allTrash) {
                 // 해당 파일 타입 분류 후 그냥 그대로 save만 해주면 된다.
-                if (trash.getDataType() == DataType.DIRECTORY) {
+                if (oneTrash.getDataType() == DataType.DIRECTORY) {
                     // content 추출하기
-                    Directory deletedDir = modelMapper.map(trash.getContent(), Directory.class);
+                    Directory deletedDir = modelMapper.map(oneTrash.getContent(), Directory.class);
                     // content를 바탕으로 directory 복원
                     Directory restoredDir = Directory.builder()
                         .id(deletedDir.getId())
@@ -89,14 +96,16 @@ public class TrashServiceImpl implements TrashService{
                         .build();
                     directoryRepository.save(restoredDir);
                     trashRepository.delete(oneTrash);
+                    log.info("여기도 OK");
                 } else if (oneTrash.getDataType() == DataType.FILE) {
                     // content 가져오기
                     TrashFileDto trashFileDto = modelMapper.map(trash.getContent(),
                         TrashFileDto.class);
                     // file이 있을때 => 그냥 그 file의 dirId에가다 dirId 추가
                     try {
-                        File file = fileService.findById(trashFileDto.getId());
-                    } catch (BusinessLogicException e) {
+                        File file = fileRepository.findById(trashFileDto.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 filedId"));
+                    } catch (IllegalArgumentException e) {
                         // 새로 file을 만들기
                         fileRepository.save(File.builder()
                             .id(trashFileDto.getId())
@@ -108,21 +117,23 @@ public class TrashServiceImpl implements TrashService{
                         trashRepository.delete(oneTrash);
                         continue;
                     }
-                    // 있으면 기존의 file의 dirIdList에 추가
+                    log.info("file에 있는경우");
+                    // 있으면 기존의 file의 dirIdList에 추가, 여기서 복원된 dir은 해당 file의 정보를 가지고 있다.
+                    // 그래서 dir의 fileIdList는 별도로 작업이 필요없다.
                     File file = fileService.findById(trashFileDto.getId());
                     file.getDirIdList().add(trashFileDto.getDirId());
                     trashRepository.delete(oneTrash);
                 }
             }
-            // 휴지통에서 rootDir 제거
-            trashBin.getDirIdList().remove(trashId);
+            // 휴지통에서 제거
+            trashBin.getDirIdList().remove(trash.getRawId());
+            trashBinRepository.save(trashBin);
             // 쓰래기에서 제거
-            return getTrashBinMapper.toGetTrashBinDto(
-                trashBin,
-                trashBinService.getDirNameList(trashBin),
-                trashBinService.getPhotoUrlList(trashBin)
-            );
+            return;
+
+
         } else if (trash.getDataType() == DataType.FILE) {
+            log.info("사진 타입 쓰레기 복권 시작");
             // content 가져오기
             TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
 
@@ -132,8 +143,11 @@ public class TrashServiceImpl implements TrashService{
 
             // 없을떄(휴지통에 있는 파일이 마지막일때) 그냥 file을 새로 만들어서 dir와 관계 설정 해줘야됨
             try {
-                File file = fileService.findById(trashFileDto.getId());
-            } catch (BusinessLogicException e) {
+                log.info("디렉토리에서 복원 사진 찾기 시도 rawId = {}", trashFileDto.getId());
+                File file = fileRepository.findById(trashFileDto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 fileId입니다."));
+            } catch (IllegalArgumentException e) {
+                log.info("디렉토이에 사진이 없어서 새로 만들기");
                 // 새로 file을 생성해서 저장하기
                 fileRepository.save(File.builder()
                     .id(trashFileDto.getId())
@@ -149,26 +163,18 @@ public class TrashServiceImpl implements TrashService{
                 // 휴지통에서 file 제거
                 deleteFileFromTrashBin(trashFileDto.getId(), trashBinId);
                 // 쓰레기에서 file 제거
-                trashRepository.delete(trash);
-                return getTrashBinMapper.toGetTrashBinDto(
-                    trashBin,
-                    trashBinService.getDirNameList(trashBin),
-                    trashBinService.getPhotoUrlList(trashBin)
-                );
+                trashRepository.deleteById(trash.getId());
+                return;
             }
-            // 해당 폴더의 fileIdList에 fileId 추가
-            fileService.setDirFileRelation(trashFileDto.getDirId(), trash.getId());
+            log.info("너 이쪽으로 오니?");
+            // 해당 폴더의 fileIdList에 fileId 추가= > 폴더
+            fileService.setDirFileRelation(trashFileDto.getDirId(), trashFileDto.getId());
 
-            // 쓰레기 통에서 file 제거
+            // 쓰레기 통에서 file 제거 rawId임=> 쓰레기 통
             deleteFileFromTrashBin(trashFileDto.getId(), trashBinId);
             // 쓰레기에서 trash제거
             trashRepository.delete(trash);
-
-            return getTrashBinMapper.toGetTrashBinDto(
-                trashBin,
-                trashBinService.getDirNameList(trashBin),
-                trashBinService.getPhotoUrlList(trashBin)
-            );
+            return;
         }
         throw new BusinessLogicException(ErrorCode.TRASH_CLASSIFICATION_FAIL);
     }
@@ -191,27 +197,26 @@ public class TrashServiceImpl implements TrashService{
             Trash curTrash = deque.pollLast();
             // trashDirType 저장
             Directory curDirInTrash = modelMapper.map(curTrash.getContent(), Directory.class);
-            List<String> fileIdList = curDirInTrash.getFileIdList();
-            if (!fileIdList.isEmpty()) {
-                for (String fileId : fileIdList) {
-                    Trash trashFileType = trashRepository.findByRawIdAndDeadLine(fileId, deadLine)
+            List<String> fileRawIdList = curDirInTrash.getFileIdList();
+            if (!fileRawIdList.isEmpty()) {
+                for (String fileRawId : fileRawIdList) {
+                    Trash trashFileType = trashRepository.findFirstByRawId(fileRawId)
                         .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
                     result.add(trashFileType);
                 }
             }
             // 탐색
             // trashToDir 저장
-            List<String> childDirIdList = curDirInTrash.getChildDirIdList();
-            if (!childDirIdList.isEmpty()) {
-                for (String dirId : childDirIdList) {
-                    if(visitedSet.contains(dirId)){
+            List<String> childDirRawIdList = curDirInTrash.getChildDirIdList();
+            if (!childDirRawIdList.isEmpty()) {
+                for (String dirRawId : childDirRawIdList) {
+                    if(visitedSet.contains(dirRawId)){
                         continue;
                     }
-                    Trash trashDirType = trashRepository.findByRawIdAndDeadLine(dirId, deadLine)
-                        .orElseThrow(
-                            () -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+                    Trash trashDirType = trashRepository.findFirstByRawId(dirRawId)
+                        .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
                     deque.addFirst(trashDirType);
-                    visitedSet.add(dirId);
+                    visitedSet.add(dirRawId);
                     result.add(trashDirType);
                 }
             }
