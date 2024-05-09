@@ -7,9 +7,10 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 public class InfoDto {
     Long userId;
     String userName;
     String profileUrl;
+    boolean isPassword;
+    String mainDirId;
 }

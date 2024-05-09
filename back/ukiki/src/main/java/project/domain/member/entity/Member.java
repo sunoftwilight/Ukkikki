@@ -49,6 +49,9 @@ public class Member extends BaseEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "is_password")
+    private boolean isPass = false;
+
     @Column(name = "profile_url")
     private String profileUrl;
 
