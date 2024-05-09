@@ -4,10 +4,8 @@ package project.domain.party.service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
-import project.domain.party.dto.request.ChangeThumbDto;
-import project.domain.party.dto.request.EnterPartyDto;
-import project.domain.party.dto.request.CreatePartyDto;
-import project.domain.party.dto.request.PartyPasswordDto;
+import project.domain.party.dto.request.*;
+import project.domain.party.dto.response.CheckPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
 import project.domain.party.dto.response.SimpleMemberPartyDto;
@@ -22,13 +20,15 @@ public interface PartyService {
 
     void enterParty(String partyLink);
 
-    void checkPassword(EnterPartyDto enterPartyDto);
+    CheckPasswordDto checkChangedPassword(CheckChangePasswordDto checkChangePasswordDto);
+
+    CheckPasswordDto checkPassword(EnterPartyDto enterPartyDto);
 
     PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
 
     PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
 
-    void changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
+    CheckPasswordDto changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
     void changePartyName(Long partyId, String partyName);
 

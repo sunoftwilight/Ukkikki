@@ -63,12 +63,18 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
+
+        String key = fileUploadDto.getKey();
+
+        if (key == null || key.isEmpty()){
+            throw new BusinessLogicException(ErrorCode.SSE_KEY_MISSED);
+        }
+
         //S3업로드 커스텀 키 생성
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(fileUploadDto.getKey()));
+        SSECustomerKey sseKey = new SSECustomerKey(key);
 
         for(MultipartFile file : files){
             Photo photo = new Photo();
-//            photo.setParty(partyRepository.findById(partyId));
             PhotoUrl urls = new PhotoUrl();
 
             //S3 파일 업로드 후 저장
@@ -112,7 +118,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                     .filename(urls.getPhotoUrl())
                     .contentType(MediaType.IMAGE_JPEG);
             bodyBuilder.part("partyId", fileUploadDto.getPartyId());
-            bodyBuilder.part("key", fileUploadDto.getKey());
+            bodyBuilder.part("key", key);
 
             webClient
                     .post()
@@ -149,8 +155,12 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
+        if (key == null || key.isEmpty()){
+            throw new BusinessLogicException(ErrorCode.SSE_KEY_MISSED);
+        }
+
         String fileName = photo.getFileName();
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(key));
+        SSECustomerKey sseKey = new SSECustomerKey(key);
 
         S3Object object = null;
 
@@ -178,7 +188,11 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
         Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(key));
+        if (key == null || key.isEmpty()){
+            throw new BusinessLogicException(ErrorCode.SSE_KEY_MISSED);
+        }
+
+        SSECustomerKey sseKey = new SSECustomerKey(key);
 
         String tempPath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID();
         File tempDir = new File(tempPath);  // 임시 디렉터리 경로

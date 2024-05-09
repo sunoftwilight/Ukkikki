@@ -7,4 +7,6 @@ public class PartyPasswordDto {
 
     private String beforePassword;
     private String afterPassword;
+    private String simplePassword;
+
 }

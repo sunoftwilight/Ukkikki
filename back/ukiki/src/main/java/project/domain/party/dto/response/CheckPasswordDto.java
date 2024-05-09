@@ -5,10 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PartyEnterDto {
+public class CheckPasswordDto {
 
     private Long partyId;
-    private String token;
-
+    private String sseKey;
 
 }

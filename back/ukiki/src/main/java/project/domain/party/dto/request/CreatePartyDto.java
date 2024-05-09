@@ -14,7 +14,8 @@ public class CreatePartyDto {
     private String password;
     @NotNull
     private String partyName;
-
+    @NotNull
+    private String simplePassword;
 
 
 }

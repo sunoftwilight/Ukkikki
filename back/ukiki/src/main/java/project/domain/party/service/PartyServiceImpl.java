@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jasypt.encryption.StringEncryptor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,16 +28,12 @@ import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.TrashBinService;
 import project.domain.member.dto.request.CustomOAuth2User;
 import project.domain.member.dto.request.CustomUserDetails;
-import project.domain.member.entity.Member;
-import project.domain.member.entity.MemberRole;
-import project.domain.member.entity.Profile;
-import project.domain.member.entity.ProfileType;
+import project.domain.member.entity.*;
+import project.domain.member.repository.KeyGroupRepository;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
-import project.domain.party.dto.request.ChangeThumbDto;
-import project.domain.party.dto.request.CreatePartyDto;
-import project.domain.party.dto.request.EnterPartyDto;
-import project.domain.party.dto.request.PartyPasswordDto;
+import project.domain.party.dto.request.*;
+import project.domain.party.dto.response.CheckPasswordDto;
 import project.domain.party.dto.response.PartyEnterDto;
 import project.domain.party.dto.response.PartyLinkDto;
 import project.domain.party.dto.response.SimpleMemberPartyDto;
@@ -54,6 +51,7 @@ import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 import project.global.jwt.JWTUtil;
 import project.global.util.BcryptUtil;
+import project.global.util.JasyptUtil;
 import project.global.util.S3Util;
 
 @Service
@@ -72,10 +70,12 @@ public class PartyServiceImpl implements PartyService {
     private final PhotoRepository photoRepository;
     private final ProfileRepository profileRepository;
     private final ChatRepository chatRepository;
+    private final KeyGroupRepository keyGroupRepository;
 
     private final PartyLinkMapper partyLinkMapper;
     private final MemberPartyMapper memberPartyMapper;
     private final S3Util s3Util;
+    private final JasyptUtil jasyptUtil;
     private final BcryptUtil bcryptUtil;
     private final RedisTemplate redisTemplate;
 
@@ -146,7 +146,21 @@ public class PartyServiceImpl implements PartyService {
 
         partyLinkRedisRepository.save(partyLink);
 
-        return partyLinkMapper.toPartyLinkDto(partyLink);
+        String sseKey = s3Util.generateSSEKey(createPartyDto.getPassword());
+        StringEncryptor encryptor = jasyptUtil.customEncryptor(createPartyDto.getSimplePassword());
+        String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
+
+        KeyGroup keyGroup = KeyGroup.builder()
+                .party(party)
+                .member(member)
+                .sseKey(encryptorPassword)
+                .build();
+
+        keyGroupRepository.save(keyGroup);
+
+        PartyLinkDto partyLinkDto = partyLinkMapper.toPartyLinkDto(partyLink);
+        partyLinkDto.setSseKey(sseKey);
+        return partyLinkDto;
     }
 
     @Override
@@ -202,7 +216,48 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public void checkPassword(EnterPartyDto enterPartyDto) {
+    public CheckPasswordDto checkChangedPassword(CheckChangePasswordDto checkChangePasswordDto) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member member = memberRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Party party = partyRepository.findById(checkChangePasswordDto.getPartyId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+        //차단 당한 유저라면
+        if (memberParty.getMemberRole().equals(MemberRole.BLOCK)){
+            throw new BusinessLogicException(ErrorCode.ENTER_DENIED_BLOCK_USER);
+        }
+
+        if (!bcryptUtil.matchesBcrypt(checkChangePasswordDto.getPassword(), party.getPassword())) {
+            throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
+        }
+
+        //리턴 DTO 생성
+        String sseKey = s3Util.generateSSEKey(checkChangePasswordDto.getPassword());
+        CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
+        checkPasswordDto.setPartyId(party.getId());
+        checkPasswordDto.setSseKey(sseKey);
+
+        KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        //DB UPDATE
+        StringEncryptor encryptor = jasyptUtil.customEncryptor(checkChangePasswordDto.getSimplePassword());
+        String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
+
+        keyGroup.setSseKey(encryptorPassword);
+        keyGroupRepository.save(keyGroup);
+
+        return checkPasswordDto;
+    }
+
+    @Override
+    @Transactional
+    public CheckPasswordDto checkPassword(EnterPartyDto enterPartyDto) {
         PartyLink partyLink = partyLinkRedisRepository.findByPartyLink(enterPartyDto.getLink())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
 
@@ -221,6 +276,35 @@ public class PartyServiceImpl implements PartyService {
 
             throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
         }
+
+        String sseKey = s3Util.generateSSEKey(enterPartyDto.getPassword());
+        CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
+        checkPasswordDto.setPartyId(party.getId());
+        checkPasswordDto.setSseKey(sseKey);
+
+        //게스트인지 회원인지 확인
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+        //게스트일 경우 sseKey 반환
+        if (memberId == 0){
+            return checkPasswordDto;
+        }
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        StringEncryptor encryptor = jasyptUtil.customEncryptor(enterPartyDto.getSimplePassword());
+        String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
+
+        KeyGroup keyGroup = KeyGroup.builder()
+                .member(member)
+                .party(party)
+                .sseKey(encryptorPassword)
+                .build();
+
+        keyGroupRepository.save(keyGroup);
+
+        return checkPasswordDto;
     }
 
     @Override
@@ -295,7 +379,7 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void changePassword(Long partyId, PartyPasswordDto partyPasswordDto) {
+    public CheckPasswordDto changePassword(Long partyId, PartyPasswordDto partyPasswordDto) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
@@ -329,6 +413,31 @@ public class PartyServiceImpl implements PartyService {
         party.setPassword(bcryptUtil.encodeBcrypt(partyPasswordDto.getAfterPassword()));
         partyRepository.save(party);
 
+        String sseKey = s3Util.generateSSEKey(partyPasswordDto.getAfterPassword());
+
+        List<MemberParty> memberPartyList = party.getMemberPartyList();
+
+        for (MemberParty targetMemberParty : memberPartyList) {
+            if(targetMemberParty.getMemberRole() == MemberRole.BLOCK){
+                continue;
+            }
+            Member targetMember = targetMemberParty.getMember();
+            KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetMember, party)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+            keyGroup.setSseKey("expired");
+            keyGroupRepository.save(keyGroup);
+        }
+
+        // 마스터 유저는 바로 키그룹에 반영
+        KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST));
+
+        StringEncryptor encryptor = jasyptUtil.customEncryptor(partyPasswordDto.getSimplePassword());
+        String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
+        keyGroup.setSseKey(encryptorPassword);
+        keyGroupRepository.save(keyGroup);
+
         // 알람 보내기
         alarmService.groupSendAlarm(memberId, AlarmType.PASSWORD, partyId,0L,0L, 0L);
 
@@ -343,7 +452,11 @@ public class PartyServiceImpl implements PartyService {
                 s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
             }
         }
+        CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
+        checkPasswordDto.setPartyId(party.getId());
+        checkPasswordDto.setSseKey(sseKey);
 
+        return checkPasswordDto;
     }
 
     @Override
@@ -443,6 +556,12 @@ public class PartyServiceImpl implements PartyService {
         memberpartyRepository.delete(memberParty);
         profileRepository.delete(profile);
 
+        // 자신 키그룹에서 파티 삭제
+        KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, memberParty.getParty())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
+        keyGroupRepository.delete(keyGroup);
+
         // 자신 밖에 없을 때 party 데이터 삭제
         if (partyMemberCount == 1) {
             // S3 key
@@ -496,6 +615,13 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 멤버 차단 시켜 버리기
         targetParty.setMemberRole(MemberRole.BLOCK);
+
+        // 차단 멤버의 키그룹에서 키 삭제
+        KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
+        keyGroupRepository.delete(keyGroup);
+
     }
 
     @Override
@@ -522,6 +648,11 @@ public class PartyServiceImpl implements PartyService {
         // 상대방 삭제
         memberpartyRepository.delete(targetParty);
         profileRepository.delete(targetProfile);
+        // 추방 멤버의 키그룹에서 키 삭제
+        KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
+        keyGroupRepository.delete(keyGroup);
     }
 
     @Override
