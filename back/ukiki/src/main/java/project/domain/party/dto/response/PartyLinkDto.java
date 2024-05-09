@@ -13,4 +13,6 @@ public class PartyLinkDto {
     String partyLink;
     String partyName;
     Long party;
+    String sseKey;
+
 }

@@ -146,7 +146,21 @@ public class PartyServiceImpl implements PartyService {
 
         partyLinkRedisRepository.save(partyLink);
 
-        return partyLinkMapper.toPartyLinkDto(partyLink);
+        String sseKey = s3Util.generateSSEKey(createPartyDto.getPassword());
+        StringEncryptor encryptor = jasyptUtil.customEncryptor(createPartyDto.getSimplePassword());
+        String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
+
+        KeyGroup keyGroup = KeyGroup.builder()
+                .party(party)
+                .member(member)
+                .sseKey(encryptorPassword)
+                .build();
+
+        keyGroupRepository.save(keyGroup);
+
+        PartyLinkDto partyLinkDto = partyLinkMapper.toPartyLinkDto(partyLink);
+        partyLinkDto.setSseKey(sseKey);
+        return partyLinkDto;
     }
 
     @Override
@@ -332,7 +346,6 @@ public class PartyServiceImpl implements PartyService {
                 });
         // 차단 당한 유저라면?
         if (memberParty.getMemberRole().equals(MemberRole.BLOCK)){
-//            KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty()
             throw new BusinessLogicException(ErrorCode.ENTER_DENIED_BLOCK_USER);
         }
 
@@ -400,11 +413,25 @@ public class PartyServiceImpl implements PartyService {
         party.setPassword(bcryptUtil.encodeBcrypt(partyPasswordDto.getAfterPassword()));
         partyRepository.save(party);
 
+        String sseKey = s3Util.generateSSEKey(partyPasswordDto.getAfterPassword());
+
+        List<MemberParty> memberPartyList = party.getMemberPartyList();
+
+        for (MemberParty targetMemberParty : memberPartyList) {
+            if(targetMemberParty.getMemberRole() == MemberRole.BLOCK){
+                continue;
+            }
+            Member targetMember = targetMemberParty.getMember();
+            KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetMember, party)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+            keyGroup.setSseKey("expired");
+            keyGroupRepository.save(keyGroup);
+        }
+
         // 마스터 유저는 바로 키그룹에 반영
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST));
-
-        String sseKey = s3Util.generateSSEKey(partyPasswordDto.getAfterPassword());
 
         StringEncryptor encryptor = jasyptUtil.customEncryptor(partyPasswordDto.getSimplePassword());
         String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
