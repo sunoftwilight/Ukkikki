@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "zustand";
 import { prefixStore } from "../../stores/AlbumStore";
 
-const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtnClick }) => {
+const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtnClick }) => {
 	const modalType = modalItems.modalType;
 
 	const containClass: string = "flex justify-center items-center w-full";
@@ -131,7 +131,7 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCan
 			case 1:
 				return (
 					<div className="flex w-full justify-center">
-						<button className={`${btnClass} w-[130px] bg-main-blue`}>
+						<button onClick={() => onSubmitBtnClick!()} className={`${btnClass} w-[130px] bg-main-blue`}>
 							확인
 						</button>
 					</div>
@@ -159,10 +159,11 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCan
 
   const isOpen = useState<boolean>(false)
 	return (
-		<div className="fixed top-0 left-0 w-full h-full">
+		<div className="fixed z-10 top-0 left-0 w-full h-full">
 			<AnimatePresence>
 				{isOpen && <ModalBackground/> }
 				<motion.div 
+					key='modalForm'
 					className="flex justify-center items-center w-full h-full"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
@@ -178,4 +179,4 @@ const OneBtnModal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCan
 	);
 };
 
-export default OneBtnModal;
+export default Modal;

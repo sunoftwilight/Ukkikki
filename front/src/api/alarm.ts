@@ -17,7 +17,7 @@ export const getAlarm = async(
   alarmPageDto : AlarmRequestType,
   Response : (Response : AxiosResponse<ResponseData>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await privateApi.get(`/${url}/list`, { params: alarmPageDto } )
+  await privateApi.get(`/${url}/list`, { params: alarmPageDto })
   .then(Response)
   .catch(Error)
 }

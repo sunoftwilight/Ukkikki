@@ -70,7 +70,7 @@ const AlbumMain: React.FC = () => {
         </div>
       ))}
       {albumList.thumbnailImg.map((item, idx) => (
-        <>
+        <div key={idx}>
           { selectMode ? 
             <SelectModeImg key={idx} item={item} />
           :
@@ -82,7 +82,7 @@ const AlbumMain: React.FC = () => {
               <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />
             </Link>
           }
-        </>
+        </div>
       ))}
     </div>
   )

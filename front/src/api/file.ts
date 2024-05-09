@@ -25,7 +25,7 @@ export const multiDownloadFile = async(
       paramsSerializer: (params) => {
         return qs.stringify(params, { arrayFormat: "comma"})
       }
-    })
+  })
   .then(Response)
   .catch(Error)
   }
