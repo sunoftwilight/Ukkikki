@@ -6,7 +6,7 @@ server:
 spring:
 #  ?? ? ??? ?? ???? ?? => local
   profiles:
-    active: server
+    active: local
     include: key
   jpa:
     hibernate:
@@ -68,9 +68,7 @@ spring:
     driver-class-name: ${my-db.driver-class-name}
   data:
     mongodb:
-      database: ${my-mongodb.database}
-      host: ${my-mongodb.host}
-      port: ${my-mongodb.port}
+      uri: ENC(0xPjQoLrRyqYOPWOJgk8Or4NNPSTnvUEyMuiV79vjIgGVDQKpRG4Ao9grbU6mUY1iCjH/GHX+ce2cEcu4cMosandf+o9lg6s)
 
 ---
 # server ???? ???
@@ -85,7 +83,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     mongodb:
-      uri: ENC(SUqV68MCEFmmGByJmtm2yimZhbTy7BSzK8imxm5S89DywFnndjgM92p7y0AZNjQOLrJqkUWhvVcK0oX1VFaKlPqjugFuJ9o9s+JD84JFhHQCva+BiCCmIw==)
+      uri: ENC(0xPjQoLrRyqYOPWOJgk8Or4NNPSTnvUEyMuiV79vjIgGVDQKpRG4Ao9grbU6mUY1iCjH/GHX+ce2cEcu4cMosandf+o9lg6s)
 
 ---
 # kakao
