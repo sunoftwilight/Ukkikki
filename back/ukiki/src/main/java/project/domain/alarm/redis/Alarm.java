@@ -41,7 +41,7 @@ public class Alarm {
     String alarmId = String.valueOf(UUID.randomUUID());
 
     Long partyId;
-    Long articleId;
+    Long contentsId;
     Long targetId;
     @Indexed
     Long memberId;

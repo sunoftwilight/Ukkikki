@@ -53,45 +53,41 @@ public class AlarmServiceImpl implements AlarmService {
 
 
     @Override
-    public Alarm createAlarm(AlarmType type, Long partyId, Long articleId, Long targetId, String data){
+    public Alarm createAlarm(AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId, String data){
 
-        Profile profile = profileRepository.findByMemberIdAndPartyId(targetId, partyId)
+        Profile profile = profileRepository.findByMemberIdAndPartyId(writerId, partyId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
 
         List<String> identifier = new ArrayList<>();
         String message = null;
         switch (type){
-            case CHAT -> {
-                identifier = AlarmIdentifier.CHAT.identifier(partyId, articleId);
+            case MEMO -> { // DONE
+                message = String.format("%s님께서 사진에 메모를 작성하였습니다.\n%s", profile.getNickname(), data);
+                identifier = AlarmIdentifier.MEMO.identifier(partyId, contentsId, targetId);
             }
             case REPLY -> {
-                message = String.format("%s님께서 회원님에게 댓글을 작성하였습니다.\n%s", profile.getNickname(), data);
-                identifier = AlarmIdentifier.REPLY.identifier(partyId, articleId);
-            }
-            case ARTICLE -> {
-                message = String.format("%s 게시글이 생성 되었습니다.", data);
-                identifier = AlarmIdentifier.ARTICLE.identifier(partyId, articleId);
+                message = String.format("%s님께서 회원님에게 답글을 작성하였습니다.\n%s", profile.getNickname(), data);
+                identifier = AlarmIdentifier.REPLY.identifier(partyId, contentsId, targetId);
             }
             case COMMENT -> {
-                message = String.format("%s님께서 댓글을 작성하였습니다.\n%s", "홍길동", data);
-                identifier = AlarmIdentifier.COMMENT.identifier(partyId, articleId);
-            }
-            case PASSWORD -> {
-                message = String.format("%s 그룹의 비밀번호가 변경되었습니다.", data);
+                message = String.format("%s님께서 댓글을 작성하였습니다.\n%s", profile.getNickname(), data);
+                identifier = AlarmIdentifier.COMMENT.identifier(partyId, contentsId, targetId);
             }
             case CHECK -> {
                 message = "체크 알람";
             }
+            case PASSWORD -> { // DONE
+                message = String.format("%s 그룹의 비밀번호가 변경되었습니다.", data);
+            }
         }
-        Alarm res = Alarm.builder()
+        return Alarm.builder()
             .alarmType(type)
             .partyId(partyId)
-            .articleId(articleId)
+            .contentsId(contentsId)
             .targetId(targetId)
             .content(message)
             .identifier(identifier)
             .build();
-        return res;
     }
 
 
@@ -150,9 +146,9 @@ public class AlarmServiceImpl implements AlarmService {
     }
     @Transactional
     @Override
-    public void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long articleId, Long targetId) {
+    public void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId) {
         List<MemberParty> memberPartyList = memberpartyRepository.findMemberList(partyId);
-        Alarm data = createAlarm(type, partyId, articleId, targetId, "");
+        Alarm data = createAlarm(type, partyId, contentsId, targetId, 0L,"");
         for (MemberParty memberParty : memberPartyList) {
             Long sendMemberId = memberParty.getMember().getId();
             if(sendMemberId.equals(memberId)){

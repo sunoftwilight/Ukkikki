@@ -17,9 +17,9 @@ public interface AlarmService {
 
     AlarmPageDto getAlarmList(AlarmPageableDto alarmPageableDto);
 
-    void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long articleId, Long targetId);
+    void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long articleId, Long targetId, Long writerId);
 
-    Alarm createAlarm(AlarmType type, Long partyId, Long articleId, Long targetId, String data);
+    Alarm createAlarm(AlarmType type, Long partyId, Long articleId, Long targetId, Long writerId, String data);
 
     SseEmitter findEmitterByUserId(Long memberId);
 }

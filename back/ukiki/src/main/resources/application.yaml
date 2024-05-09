@@ -7,7 +7,7 @@ spring:
 #  ?? ? ??? ?? ???? ?? => local
   profiles:
     active: server
-    include: key  
+    include: key
   jpa:
     hibernate:
       ddl-auto: update
@@ -81,7 +81,7 @@ spring:
     username: ENC(Nd9hps8Hr207vp8fZgjt+w==)
     password: ENC(MteBDlIIwXGZRw7gjOVX97iyvl1oLNru)
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  data:
     mongodb:
       uri: ENC(0xPjQoLrRyqYOPWOJgk8Or4NNPSTnvUEyMuiV79vjIgGVDQKpRG4Ao9grbU6mUY1iCjH/GHX+ce2cEcu4cMosandf+o9lg6s)
 
