@@ -13,13 +13,14 @@ const LoginRedirect: React.FC = () => {
   const user = useStore(userStore);
 
   useEffect(() => {
+    console.log('test1');
     getAccess();
     getUserInfo();
-  })
+  }, [])
 
   const getAccess = async () => {
-    if (cookies.isLogin === 'true'){
-      console.log('test1')
+    if (Boolean(cookies.isLogin)){
+      console.log('test2');
       await tokenRefresh(
         (response) => {
           user.setAccessToken(response.headers['access']);
@@ -34,12 +35,14 @@ const LoginRedirect: React.FC = () => {
 
   const getUserInfo = async () => {
     if (user.accessToken !== '') {
+      console.log('test3');
       await userInfo(
         (response) => {
           const userData = response.data.data;
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);
+          console.log('test4');
           navi('/')
         },
         (error) => {
@@ -47,7 +50,6 @@ const LoginRedirect: React.FC = () => {
         }
       )
     }
-    
   }
 
 
