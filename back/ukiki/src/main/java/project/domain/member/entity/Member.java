@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.domain.chat.entity.Chat;
-import project.domain.party.entity.Article;
+import project.domain.article.entity.Article;
 import project.domain.party.entity.MemberParty;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.DownloadLog;

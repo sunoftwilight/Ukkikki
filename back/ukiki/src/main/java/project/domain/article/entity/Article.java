@@ -1,4 +1,4 @@
-package project.domain.party.entity;
+package project.domain.article.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,7 +17,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.domain.article.entity.ArticlePhoto;
 import project.domain.member.entity.Member;
+import project.domain.party.entity.Party;
 import project.global.baseEntity.BaseEntity;
 
 @Entity
