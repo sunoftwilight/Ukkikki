@@ -36,7 +36,6 @@ public class TrashBinServiceImpl implements TrashBinService {
     private final FileRepository fileRepository;
     private final TrashRepository trashRepository;
     private final PhotoRepository photoRepository;
-    private final GetTrashBinMapper getTrashBinMapper;
 
     @Override
     public void createTrashBin(Party party) {
@@ -57,10 +56,10 @@ public class TrashBinServiceImpl implements TrashBinService {
         List<GetTrashDto> response = new ArrayList<>();
         // 디렉토리 자료형 담기
         // null이 아닐 경우
-        List<String> dirTypeTrashIdList = trashBin.getDirIdList();
+        List<String> dirTypeTrashIdList = trashBin.getDirTrashIdList();
         if(!dirTypeTrashIdList.isEmpty()) {
             for (String trashId : dirTypeTrashIdList) {
-                Trash trash = trashRepository.findFirstByRawId(trashId)
+                Trash trash = trashRepository.findById(trashId)
                     .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
                 Directory directory = modelMapper.map(trash.getContent(), Directory.class);
                 GetTrashDto getTrashDto = GetTrashDto.builder()
@@ -75,10 +74,10 @@ public class TrashBinServiceImpl implements TrashBinService {
         }
         // 파일 자료형 담기
         // null이 아닐 경우
-        List<String> fileTypeTrashIdList = trashBin.getFileIdList();
+        List<String> fileTypeTrashIdList = trashBin.getFileTrashIdList();
         if(!fileTypeTrashIdList.isEmpty()) {
             for (String trashId : fileTypeTrashIdList) {
-                Trash trash = trashRepository.findFirstByRawId(trashId)
+                Trash trash = trashRepository.findById(trashId)
                     .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
                 TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
                 GetTrashDto getTrashDto = GetTrashDto.builder()
@@ -91,7 +90,6 @@ public class TrashBinServiceImpl implements TrashBinService {
                 response.add(getTrashDto);
             }
         }
-
         return response;
     }
 
@@ -99,10 +97,10 @@ public class TrashBinServiceImpl implements TrashBinService {
     public void clearTrashBin(Long trashBinId) {
         TrashBin trashBin = findById(trashBinId);
         // 휴지통에 있는 모든 dir 삭제 + photo num - 1
-        List<String> dirIdList = trashBin.getDirIdList();
-        // BFS인데;;
+        List<String> dirIdList = trashBin.getDirTrashIdList();
+        // BFS인데;
         // 휴지통에 있는 모든 file 삭제
-        List<String> trasIdList = trashBin.getFileIdList();
+        List<String> trasIdList = trashBin.getFileTrashIdList();
         List<Trash> trashList = trashRepository.findAllById(trasIdList);
         ModelMapper modelMapper = new ModelMapper();
         for (Trash trash : trashList) {
@@ -121,7 +119,7 @@ public class TrashBinServiceImpl implements TrashBinService {
                 photoRepository.save(photo); // 변경된 photoNum을 저장
             }
             // 휴지통에서 제거
-            trashBin.getFileIdList().remove(trash.getId());
+            trashBin.getFileTrashIdList().remove(trash.getId());
             // 쓰레기에서 제거
             trashRepository.delete(trash);
         }
@@ -135,16 +133,17 @@ public class TrashBinServiceImpl implements TrashBinService {
     }
 
     @Override
-    public void saveFileToTrashBin(String fileId) {
+    public void saveFileToTrashBin(Trash fileTrash) {
         // file -> photo -> partyId -> trashBin -> addfileId
-        File file = fileRepository.findById(fileId)
+        TrashFileDto trashFileDto = modelMapper.map(fileTrash.getContent(), TrashFileDto.class);
+        File file = fileRepository.findById(trashFileDto.getId())
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
         log.info("saveFileToTrashBin");
         log.info("{}", file);
         Long partyId = file.getPhotoDto().getPartyId();
         log.info("saveFileToTrashBin");
         TrashBin trashBin = findById(partyId);
-        trashBin.getFileIdList().add(fileId);
+        trashBin.getFileTrashIdList().add(fileTrash.getId());
         trashBinRepository.save(trashBin);
     }
 
@@ -152,7 +151,7 @@ public class TrashBinServiceImpl implements TrashBinService {
     @Override
     public List<String> getDirNameList(TrashBin trashBin) {
         List<String> dirNameList = new ArrayList<>();
-        List<Directory> dirList = directoryRepository.findAllById(trashBin.getDirIdList());
+        List<Directory> dirList = directoryRepository.findAllById(trashBin.getDirTrashIdList());
         for (Directory dir : dirList) {
             dirNameList.add(dir.getDirName());
         }
@@ -162,7 +161,7 @@ public class TrashBinServiceImpl implements TrashBinService {
     @Override
     public List<String> getPhotoUrlList(TrashBin trashBin) {
         List<String> photoUrlList = new ArrayList<>();
-        List<File> FileList = fileRepository.findAllById(trashBin.getFileIdList());
+        List<File> FileList = fileRepository.findAllById(trashBin.getFileTrashIdList());
         for (File file : FileList) {
             photoUrlList.add(file.getPhotoDto().getPhotoUrl());
         }

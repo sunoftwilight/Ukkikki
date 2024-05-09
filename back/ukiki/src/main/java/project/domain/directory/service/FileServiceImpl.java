@@ -45,10 +45,6 @@ public class FileServiceImpl implements FileService{
     private final PhotoRepository photoRepository;
     private final TrashRepository trashRepository;
 
-    private final GetDirMapper getDirMapper;
-    private final TrashFileMapper trashFileMapper;
-    private final GetFileMapper getFileMapper;
-
 
     @Override
     @Transactional
@@ -102,9 +98,9 @@ public class FileServiceImpl implements FileService{
     public void deleteOneFile(String fileId, String dirId) {
         // 쓰레기에 file 등록
         File file = findById(fileId);
-        saveFileToTrash(file, dirId);
+        Trash fileTrash = saveFileToTrash(file, dirId);
         // 휴지통에 file 등록
-        trashBinService.saveFileToTrashBin(fileId);
+        trashBinService.saveFileToTrashBin(fileTrash);
         // 폴더에서 제거
         deleteDirFileRelation(dirId, fileId);
         // file에서 제거
@@ -173,7 +169,6 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    @Transactional
     public Trash saveFileToTrash(File file, String dirId) {
         // file에 trashId와 삭제 당시 dirid 추가
         return trashRepository.save(Trash.builder()

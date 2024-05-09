@@ -69,6 +69,7 @@ public class TrashServiceImpl implements TrashService{
 
         // 폴더인지 파일인지 분기 처리
         if (trash.getDataType() == DataType.DIRECTORY) {
+            log.info("DataType = DIRECTORY");
             List<Trash> allTrash = getAllTrash(trash.getId());
             log.info("모든 쓰레기 = {}", allTrash);
             // 일단 가장 첫번째인 폴더는 휴지통에서 제거 + 본 디렉토리에서 관계 회복
@@ -79,11 +80,12 @@ public class TrashServiceImpl implements TrashService{
             parentDir.getChildDirIdList().add(deletedRootDir.getId());
             // 변경 사항 저장
             directoryRepository.save(parentDir);
-            log.info("여기까진 OK잖아?");
 
             for (Trash oneTrash : allTrash) {
                 // 해당 파일 타입 분류 후 그냥 그대로 save만 해주면 된다.
+                log.info("oneTrash = {}", oneTrash);
                 if (oneTrash.getDataType() == DataType.DIRECTORY) {
+                    log.info("디렉토리타입 쓰레기 복원 작업");
                     // content 추출하기
                     Directory deletedDir = modelMapper.map(oneTrash.getContent(), Directory.class);
                     // content를 바탕으로 directory 복원
@@ -96,11 +98,13 @@ public class TrashServiceImpl implements TrashService{
                         .build();
                     directoryRepository.save(restoredDir);
                     trashRepository.delete(oneTrash);
-                    log.info("여기도 OK");
+
                 } else if (oneTrash.getDataType() == DataType.FILE) {
+                    log.info("파일타입 쓰레기 복원 작업 시작");
                     // content 가져오기
-                    TrashFileDto trashFileDto = modelMapper.map(trash.getContent(),
+                    TrashFileDto trashFileDto = modelMapper.map(oneTrash.getContent(),
                         TrashFileDto.class);
+
                     // file이 있을때 => 그냥 그 file의 dirId에가다 dirId 추가
                     try {
                         File file = fileRepository.findById(trashFileDto.getId())
@@ -126,14 +130,14 @@ public class TrashServiceImpl implements TrashService{
                 }
             }
             // 휴지통에서 제거
-            trashBin.getDirIdList().remove(trash.getRawId());
+            trashBin.getDirTrashIdList().remove(trash.getId());
             trashBinRepository.save(trashBin);
             // 쓰래기에서 제거
             return;
 
 
         } else if (trash.getDataType() == DataType.FILE) {
-            log.info("사진 타입 쓰레기 복권 시작");
+            log.info("DataType = FILE");
             // content 가져오기
             TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
 
@@ -161,7 +165,7 @@ public class TrashServiceImpl implements TrashService{
                 directoryRepository.save(findDir);
 
                 // 휴지통에서 file 제거
-                deleteFileFromTrashBin(trashFileDto.getId(), trashBinId);
+                deleteFileFromTrashBin(trash.getId(), trashBinId);
                 // 쓰레기에서 file 제거
                 trashRepository.deleteById(trash.getId());
                 return;
@@ -171,7 +175,7 @@ public class TrashServiceImpl implements TrashService{
             fileService.setDirFileRelation(trashFileDto.getDirId(), trashFileDto.getId());
 
             // 쓰레기 통에서 file 제거 rawId임=> 쓰레기 통
-            deleteFileFromTrashBin(trashFileDto.getId(), trashBinId);
+            deleteFileFromTrashBin(trash.getId(), trashBinId);
             // 쓰레기에서 trash제거
             trashRepository.delete(trash);
             return;
@@ -198,10 +202,27 @@ public class TrashServiceImpl implements TrashService{
             // trashDirType 저장
             Directory curDirInTrash = modelMapper.map(curTrash.getContent(), Directory.class);
             List<String> fileRawIdList = curDirInTrash.getFileIdList();
+
             if (!fileRawIdList.isEmpty()) {
                 for (String fileRawId : fileRawIdList) {
-                    Trash trashFileType = trashRepository.findFirstByRawId(fileRawId)
-                        .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+                    List<Trash> trashFileTypeList = trashRepository.findByRawId(fileRawId);
+                    log.info("List<Trash> = {}", trashFileTypeList);
+                    if(trashFileTypeList.isEmpty()) {
+                        throw new BusinessLogicException(ErrorCode.FILE_NOT_FOUND);
+                    }
+                    Trash trashFileType = null;
+                    for (Trash fileTrash : trashFileTypeList) {
+                        TrashFileDto trashFileDto = modelMapper.map(fileTrash.getContent(),
+                            TrashFileDto.class);
+                        if (trashFileDto.getDirId().equals(curDirInTrash.getId())) {
+                            trashFileType = fileTrash;
+                            break;
+                        }
+                    }
+                    if (trashFileType == null) {
+                        throw new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND);
+                    }
+                    log.info("검색된 TrashFileType = {}", trashFileType);
                     result.add(trashFileType);
                 }
             }
@@ -255,18 +276,18 @@ public class TrashServiceImpl implements TrashService{
     }
 
     @Override
-    public void deleteDirFromTrashBin(String dirId, Long trashBinId) {
+    public void deleteDirFromTrashBin(String trashId, Long trashBinId) {
         TrashBin trashBin = trashBinRepository.findById(trashBinId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
-        trashBin.getDirIdList().remove(dirId);
+        trashBin.getDirTrashIdList().remove(trashId);
         trashBinRepository.save(trashBin);
     }
 
     @Override
-    public void deleteFileFromTrashBin(String fileId, Long trashBinId) {
+    public void deleteFileFromTrashBin(String trashId, Long trashBinId) {
         TrashBin trashBin = trashBinRepository.findById(trashBinId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
-        trashBin.getFileIdList().remove(fileId);
+        trashBin.getFileTrashIdList().remove(trashId);
         trashBinRepository.save(trashBin);
     }
 

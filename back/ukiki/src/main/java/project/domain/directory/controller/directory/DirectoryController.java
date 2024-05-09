@@ -84,8 +84,8 @@ public class DirectoryController implements DirectoryDocs {
     @Override
     @DeleteMapping("/{dirId}")
     public ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId) {
-        GetDirDto response = directoryService.deleteDir(dirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_DIRECTORY_SUCCESS, response));
+        directoryService.deleteDir(dirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_DIRECTORY_SUCCESS));
     }
 
 

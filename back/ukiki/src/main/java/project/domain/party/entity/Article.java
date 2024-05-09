@@ -49,5 +49,6 @@ public class Article extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ArticlePhoto> articlePhotoList= new ArrayList<>();
 }

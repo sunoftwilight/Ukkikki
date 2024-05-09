@@ -16,9 +16,9 @@ public interface GetTrashBinMapper {
     @Mappings({
         @Mapping(source = "trashBin.id", target = "id"),
         @Mapping(source = "trashBin.trashBinName", target = "trashBinName"),
-        @Mapping(source = "trashBin.dirIdList", target = "dirIdList"),
+        @Mapping(source = "trashBin.dirTrashIdList", target = "dirIdList"),
         @Mapping(target = "dirNameList", ignore = true),
-        @Mapping(source = "trashBin.fileIdList", target = "fileIdList"),
+        @Mapping(source = "trashBin.fileTrashIdList", target = "fileIdList"),
         @Mapping(target = "photoUrlList", ignore = true),
     })
     GetTrashBinDto toGetTrashBinDto(

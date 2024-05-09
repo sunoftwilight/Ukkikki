@@ -15,4 +15,6 @@ public interface TrashRepository extends MongoRepository<Trash, String> {
 
     @Query(value = "{ 'rawId': ?0 }" )
     Optional<Trash> findFirstByRawId(String rawId);
+
+    List<Trash> findByRawId(String rawId);
 }

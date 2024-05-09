@@ -212,19 +212,17 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     @Transactional
-    public GetDirDto deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
-        // 부모의 child list에서 해당 dirId 제거, child에서 parent는 제거하지 않음
+    public void deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
+        // 폴더에서 제거, file에서 제거, 휴지통에 저장, 쓰레기 등록
 
         Directory dir = findById(dirId);
         if (dir.getParentDirId().equals("")) {
             throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
         }
+
         Directory parentDir = findById(dir.getParentDirId());
         parentDir.getChildDirIdList().remove(dirId);
         directoryRepository.save(parentDir);
-
-        // 대표 폴더만 TrashBin에 저장, 자식 폴더나 사진 파일은 Trash 로 저장
-        saveDirInTrashBin(dir);
 
         // 초기화 작업
         deque.push(dir);
@@ -267,12 +265,14 @@ public class DirectoryServiceImpl implements DirectoryService {
         // 다음 요청 수행을 위해 visitedSet 비워주기
         visitedSet.clear();
 
-        return getDirMapper.toGetDirDto(
-            parentDir,
-            getParentDirName(parentDir),
-            getChildNameList(parentDir),
-            getPhotoUrlList(parentDir)
-        );
+        // 해당 휴지통에 삭제된 dirTrashId 추가
+        Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+        Long trashBinId = getTrashBinId(dir);
+        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+        trashBin.getDirTrashIdList().add(dirTrash.getId());
+        trashBinRepository.save(trashBin);
     }
 
     @Override
@@ -419,20 +419,32 @@ public class DirectoryServiceImpl implements DirectoryService {
         Long partyId = party.getId();
         TrashBin trashBin = trashBinRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
-        trashBin.getDirIdList().add(dir.getId());
+        trashBin.getDirTrashIdList().add(dir.getId());
         trashBinRepository.save(trashBin);
+    }
+
+    public Long getTrashBinId(Directory dir) {
+        String rootDirId = getRootDirId(dir);
+        Party party = partyRepository.findPartyByRootDirId(rootDirId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+        // 파티Id가 곧 TrashBin의 Id
+        Long partyId = party.getId();
+        return  partyId;
     }
 
     @Override
     @Transactional
     public Trash saveFileToTrash(File file, String dirId) {
-        // file to deleteFile
-        TrashFileDto trashFileDto = trashFileMapper.toTrashFile(file, dirId);
+        // file에 trashId와 삭제 당시 dirid 추가
         return trashRepository.save(Trash.builder()
             .id(generateId())
-            .rawId(trashFileDto.getId())
             .dataType(DataType.FILE)
-            .content(trashFileDto)
+            .rawId(file.getId())
+            .content(TrashFileDto.builder()
+                .id(file.getId())
+                .photoDto(file.getPhotoDto())
+                .dirId(dirId)
+                .build())
             .deadLine(LocalDate.now().plusWeeks(2))
             .build());
     }

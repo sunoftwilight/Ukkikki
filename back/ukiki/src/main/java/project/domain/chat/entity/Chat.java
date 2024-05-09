@@ -38,16 +38,16 @@ public class Chat extends BaseEntity {
     private Boolean isDelete = false;
 
     @JoinColumn(name = "profile")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Profile profile;
 
 
     @JoinColumn(name = "party_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Party party;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @Builder.Default

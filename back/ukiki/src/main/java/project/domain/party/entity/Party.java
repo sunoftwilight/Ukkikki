@@ -46,18 +46,22 @@ public class Party extends BaseEntity {
 
     // 연관관계 총 4개
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Article> arrayList = new ArrayList<>();
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
     private List<Chat> chatList = new ArrayList<>();
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Profile> profileList = new ArrayList<>();
 
-    @Builder.Default
     @OneToMany(mappedBy = "party", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
     private List<MemberParty> memberPartyList = new ArrayList<>();
 }

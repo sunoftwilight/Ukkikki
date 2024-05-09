@@ -48,7 +48,7 @@ public interface DirectoryService {
     // 폴더 이동
     public GetDirDto moveDir(String dirId, String toDirId);
     // 폴더 삭제
-    public GetDirDto deleteDir(String dirId);
+    public void deleteDir(String dirId);
     // 폴더 이름 수정
     public RenameDirDto renameDir(String dirId, String newName);
     // 디렉토리 엔티티 DB에서 조회

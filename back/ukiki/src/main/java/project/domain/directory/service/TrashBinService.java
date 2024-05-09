@@ -1,6 +1,7 @@
 package project.domain.directory.service;
 
 import java.util.List;
+import project.domain.directory.collection.Trash;
 import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.response.GetTrashBinDto;
 import project.domain.directory.dto.response.GetTrashDto;
@@ -20,6 +21,6 @@ public interface TrashBinService {
 
     public TrashBin findById(Long trashBinId);
 
-    public void saveFileToTrashBin(String fileId);
+    public void saveFileToTrashBin(Trash fileTrash);
 
 }

@@ -53,6 +53,7 @@ public class Member extends BaseEntity {
     private String profileUrl;
 
     @Column(name = "is_deactivate")
+    @Builder.Default
     private boolean isDeactivate = false;
 
     @Column(name = "main_directory")
@@ -70,32 +71,42 @@ public class Member extends BaseEntity {
     Chat chat;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Profile> profileList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Article> articleList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Chat> chatList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberParty> memberPartyList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Likes> likesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<DownloadLog> downloadLogList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Memo> memoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Favorite> favoriteList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<KeyGroup> keyGroupList = new ArrayList<>();
 }

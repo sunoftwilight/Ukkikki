@@ -62,20 +62,26 @@ public class Photo extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ArticlePhoto> articlePhotoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Likes> likesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Memo> memoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<DownloadLog> downloadLogList = new ArrayList<>();
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Favorite> favoriteList = new ArrayList<>();
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Meta> metaList = new ArrayList<>();
 }

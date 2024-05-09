@@ -24,7 +24,7 @@ public class TrashBin {
     private Long id;
     private String trashBinName;
     @Builder.Default
-    private List<String> dirIdList = new ArrayList<>();
+    private List<String> dirTrashIdList = new ArrayList<>();
     @Builder.Default
-    private List<String> fileIdList = new ArrayList<>();
+    private List<String> fileTrashIdList = new ArrayList<>();
 }
