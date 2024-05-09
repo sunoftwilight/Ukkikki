@@ -11,7 +11,7 @@ import edit from "@/assets/Header/AlbumEditOptions/edit.png";
 import Modal from "../@commons/Modal";
 import { multiDownloadFile } from "../../api/file";
 import { useStore } from "zustand";
-import { prefixStore } from "../../stores/AlbumStore";
+import { prefixStore, selectStore } from "../../stores/AlbumStore";
 
 const AlbumSelectOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
@@ -24,7 +24,7 @@ const AlbumSelectOptions: React.FC = () => {
   const { setSelectMode } = selectModeStore()
   const { setIsDone } = albumDoneStore()
 
-    
+  const { selectList } = useStore(selectStore)
   
   const openHandler = (mode: string) => {
     if (mode === 'folder') {
@@ -36,9 +36,9 @@ const AlbumSelectOptions: React.FC = () => {
 
   const prefixHandler = async () => {
     await multiDownloadFile(
-      'mykey',
+      'RNIelUcYrpKz8VpS+4Yo7xBQpr7167KhFtKoV4TkWuY=',
       {  
-        fileIdList: [1, 2],
+        fileIdList: selectList,
         prefix: prefix,
       },
       (res) => { 

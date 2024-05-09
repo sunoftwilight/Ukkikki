@@ -60,7 +60,7 @@ const ThumbnailNav: React.FC = () => {
   return (
     <div className="w-full h-11 flex fixed bottom-0 overflow-x-scroll scrollbar-hide">
       { albumList.thumbnailImg.map((item, idx) => (
-        <Link to={`/album/${item.pk}`} key={idx} onClick={() => setCurrentImg(item.pk, item.url)}>
+        <Link to={`/album/${item.pk}`} key={idx} onClick={() => setCurrentImg(item.url, item.url)}>
           <img 
             src={item.url}
             className="min-w-11 h-full border-r-[1px] border-white object-cover"

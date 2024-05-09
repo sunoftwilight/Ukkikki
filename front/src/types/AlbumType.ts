@@ -8,11 +8,28 @@ export interface DetailImgProps {
 // API type
 
 export interface FileDownloadDto {
-  fileId: number;
+  fileId: string;
   prefix: string;
 }
 
 export interface MultiFileDownloadDto {
-  fileIdList: number[];
+  fileIdList: string[];
   prefix: string;
+}
+
+export interface contentListData {
+  type: string;
+  pk: string;
+  name: string;
+  url: string;
+}
+
+export interface AlbumData {
+  parentId: string;
+  contentList: contentListData[]
+}
+
+export interface AlbumResponse {
+  resultCode: string;
+  data: AlbumData
 }
