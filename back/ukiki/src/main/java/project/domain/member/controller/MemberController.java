@@ -35,7 +35,6 @@ public class MemberController implements MemberDocs{
         // 로그인 성공했을때 저장해두었던 값을들 가져온다.
         try {
             InfoDto infoDTO = memberService.myInfo();
-            System.out.println(infoDTO);
             return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERINFO_SUCCESS, infoDTO));
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -52,7 +51,7 @@ public class MemberController implements MemberDocs{
         // 토큰 발급
         String token = memberService.reissue(cookies);
 
-        response.setHeader("access",token);
+        response.setHeader("access","Bearer " + token);
 
         return new ResponseEntity<>(HttpStatus.OK);
 

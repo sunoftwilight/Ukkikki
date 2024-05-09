@@ -54,7 +54,6 @@ public class MemberServiceImpl implements MemberService{
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             long userId = userDetails.getId();
 
-            System.out.println(userId);
 
             Optional<Member> optionalMember = memberRepository.findById(userId);
             // 널 값 체크
@@ -128,10 +127,9 @@ public class MemberServiceImpl implements MemberService{
 
         Cookie[] cookies = request.getCookies();
 
-        String access = request.getHeader("access");
+        String access = request.getHeader("access").split(" ")[1];
         String refresh = null;
 
-        System.out.println(access);
         // refresh 검색
         for(Cookie cookie : cookies){
             if(cookie.getName().equals("refresh")){
@@ -140,7 +138,6 @@ public class MemberServiceImpl implements MemberService{
             }
         }
 
-        System.out.println(refresh);
         if(refresh == null){
             throw new BusinessLogicException(ErrorCode.REFRESH_TOKEN_NULL);
         }
