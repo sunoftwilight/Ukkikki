@@ -6,6 +6,7 @@ import { DetailImgStore } from "../../stores/DetailImgStore";
 import { selectModeStore } from "../../stores/AlbumStore";
 import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
+import { AlbumData, contentListData } from "../../types/AlbumType";
 
 // const albumList = {
 //   folder: ['우리의 믿음', '우리의 사랑'],
@@ -62,49 +63,59 @@ const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
 
-  const [albumList, setAlbumList] = useState({
-    folder: [],
-    thumbnailImg: []
-  })
+  const [albumList, setAlbumList] = useState<contentListData[]>([])
+  const [parentId, setParentId] = useState('')
   
-  const dirId = 'd04f25f0-d4ae-42b6-81df-a77e933f24ac2024-05-09T17:11:22.100914929'
+  const [dirId, setDirId] = useState('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
   
   useEffect(() => {
     getDirectory(
       dirId,
       (res) => {
-        console.log(res)
+        setParentId(res.data.data.parentId)
+        setAlbumList(res.data.data.contentList)
       },
       (err) => {
         console.error(err)
       }
     )
-  }, [])
+  }, [dirId])
 
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
-      {albumList.folder.map((item, idx) => (
-        <div key={idx} className="flex flex-col justify-center items-center gap-1">
+      { parentId!= '' && 
+        <div 
+          onClick={() => setDirId(parentId)}
+          className="flex flex-col justify-center items-center gap-1"
+        >
           <img src={folder} className="w-[82px] h-[65px]" />
-          <div className="font-pre-R text-center text-xs">{item}</div>
+          <div className="font-pre-R text-center text-xs">.. /</div>
         </div>
-      ))}
-      {albumList.thumbnailImg.map((item, idx) => (
-        <div key={idx}>
-          { selectMode ? 
-            <SelectModeImg key={idx} item={item} />
-          :
-            <Link 
-              to={`/album/${item.pk}`} state={{url: item.url}}
-              key={idx} onClick={() => setCurrentImg(item.pk, item.url)}
-              className="flex justify-center items-center"
-            >
-              <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />
-            </Link>
-          }
-        </div>
-      ))}
+      }
+      {albumList!.map((item, idx) => (
+        ( item.type === 'DIRECTORY' ?
+          <div 
+            key={idx} onClick={() => setDirId(item.pk)}
+            className="flex flex-col justify-center items-center gap-1"
+          >
+            <img src={folder} className="w-[82px] h-[65px]" />
+            <div className="font-pre-R text-center text-xs">{item.name}</div>
+          </div>
+          :(
+            selectMode ? 
+              <SelectModeImg key={idx} item={item} />
+            :
+              <Link 
+                to={`/album/${item.pk}`} state={{url: item.url}}
+                key={idx} onClick={() => setCurrentImg(item.pk, item.url)}
+                className="flex justify-center items-center"
+              >
+                <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />
+              </Link>
+            
+          // </div>
+        ))))}
     </div>
   )
 };

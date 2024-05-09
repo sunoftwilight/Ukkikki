@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import check from "@/assets/Album/check.png"
 import { useStore } from "zustand";
 import { selectStore } from "../../stores/AlbumStore";
+import { contentListData } from "../../types/AlbumType";
 
 interface SelectModeImgProps {
-  item : {
-    pk: number
-    url: string
-  }
+  item : contentListData
 }
 
 const SelectModeImg: React.FC<SelectModeImgProps> = ({ item }) => {
