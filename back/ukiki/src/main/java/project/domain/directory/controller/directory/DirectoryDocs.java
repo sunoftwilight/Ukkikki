@@ -41,7 +41,7 @@ public interface DirectoryDocs {
     public ResponseEntity<ResultResponse> patchMainDir(
         @AuthenticationPrincipal UserDetails userDetails, @PathVariable String dirId);
 
-    @Operation(summary = "자식폴더 생성 요청(선결 조건으로 부모 폴더가 필요합니다./init/{partyId}으로 먼저 생성후 요청하세요 )", description = "Body로 parentDirId(부모폴더 ID), dirName(생성 할 폴더명)을 받아 부모폴더의 정보를 반환")
+    @Operation(summary = "자식폴더 생성 요청(선결 조건으로 부모 폴더가 필요합니다./party/create를 통해 파티를 먼저 생성하세요)", description = "Body로 parentDirId(부모폴더 ID), dirName(생성 할 폴더명)을 받아 부모폴더의 정보를 반환")
     @ApiResponse(responseCode = "201", description = "폴더 생성에 성공하였습니다.")
     @PostMapping("")
     public ResponseEntity<ResultResponse> createDir(@RequestBody CreateDirDto request);

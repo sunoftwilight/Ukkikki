@@ -238,7 +238,14 @@ public class DirectoryServiceImpl implements DirectoryService {
                 List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
                 for (File file : fileList) {
                     saveFileToTrash(file, curDir.getId());
-                    fileRepository.delete(file);
+                    // 사진의 DirIdList 에서 curDirId 제외하기
+                    file.getDirIdList().remove(curDir.getId());
+                    fileRepository.save(file);
+                    // 사진이 이제 전체 폴더에 존재하지 않는 경우에 삭제
+                    if(file.getDirIdList().isEmpty()) {
+                        fileRepository.delete(file);
+                        fileRepository.save(file);
+                    }
                 }
             }
             // curDir의 자식 폴더 탐색
@@ -433,7 +440,6 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    @Transactional
     public Trash saveFileToTrash(File file, String dirId) {
         // file에 trashId와 삭제 당시 dirid 추가
         return trashRepository.save(Trash.builder()

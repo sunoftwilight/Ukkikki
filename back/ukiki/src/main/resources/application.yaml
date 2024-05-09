@@ -68,8 +68,9 @@ spring:
     driver-class-name: ${my-db.driver-class-name}
   data:
     mongodb:
-      uri: ENC(0xPjQoLrRyqYOPWOJgk8Or4NNPSTnvUEyMuiV79vjIgGVDQKpRG4Ao9grbU6mUY1iCjH/GHX+ce2cEcu4cMosandf+o9lg6s)
-
+      database: ${my-mongodb.database}
+      host: ${my-mongodb.host}
+      port: ${my-mongodb.port}
 ---
 # server ???? ???
 spring:

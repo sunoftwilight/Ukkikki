@@ -126,6 +126,7 @@ public class TrashServiceImpl implements TrashService{
                     // 그래서 dir의 fileIdList는 별도로 작업이 필요없다.
                     File file = fileService.findById(trashFileDto.getId());
                     file.getDirIdList().add(trashFileDto.getDirId());
+                    fileRepository.save(file);
                     trashRepository.delete(oneTrash);
                 }
             }
