@@ -40,14 +40,14 @@ const LoginRedirect: React.FC = () => {
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);
-
+          navi('/')
         },
         (error) => {
           console.error(error)
         }
       )
     }
-    navi('/')
+    
   }
 
 
