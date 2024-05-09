@@ -54,7 +54,6 @@ public class MemberServiceImpl implements MemberService{
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             long userId = userDetails.getId();
 
-            System.out.println(userId);
 
             Optional<Member> optionalMember = memberRepository.findById(userId);
             // 널 값 체크
@@ -66,12 +65,15 @@ public class MemberServiceImpl implements MemberService{
                 infoDto.setProfileUrl(member.getProfileUrl());
                 infoDto.setUserName(member.getUserName());
                 infoDto.setUserId(member.getId());
-
+                infoDto.setMainDirId(member.getMainDirId());
+                infoDto.setPassword(member.getPassword() != null);
             } else{
                 infoDto = new InfoDto();
                 infoDto.setUserId(userId);
                 infoDto.setUserName(userDetails.getUsername());
                 infoDto.setProfileUrl(null);
+                infoDto.setMainDirId(null);
+                infoDto.setPassword(false);
             }
         }
 
@@ -118,9 +120,8 @@ public class MemberServiceImpl implements MemberService{
         }
 
 //        refresh = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
-        refresh = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 10));
 
-        return refresh;
+        return jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
     }
 
     @Override
@@ -128,10 +129,15 @@ public class MemberServiceImpl implements MemberService{
 
         Cookie[] cookies = request.getCookies();
 
-        String access = request.getHeader("access");
+        String authorization = request.getHeader("authorization");
+        String access = null;
+
+        if(authorization != null){
+            access = authorization.split(" ")[1];
+        }
+
         String refresh = null;
 
-        System.out.println(access);
         // refresh 검색
         for(Cookie cookie : cookies){
             if(cookie.getName().equals("refresh")){
@@ -140,7 +146,6 @@ public class MemberServiceImpl implements MemberService{
             }
         }
 
-        System.out.println(refresh);
         if(refresh == null){
             throw new BusinessLogicException(ErrorCode.REFRESH_TOKEN_NULL);
         }
@@ -168,19 +173,22 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public void setPassword(String password, Long userId) {
+    public void setPassword(String password) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         //맴버 객체 찾아오기
-        Member member = memberRepository.findById(userId)
+        Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         //멤버 password 컬럼에 값추가
         member.setPassword(bcryptUtil.encodeBcrypt(password));
         memberRepository.save(member);
+
     }
 
     @Override
-    public List<KeyGroupDto> getKeyGroup(Long userId, String password) {
+    public List<KeyGroupDto> getKeyGroup(String password) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         //userId로 유저 검색해서 객체 가져오고
-        Member member = memberRepository.findById(userId)
+        Member member = memberRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         //password 맞는지 검증하고
         if(!bcryptUtil.matchesBcrypt(password, member.getPassword())){
@@ -191,4 +199,5 @@ public class MemberServiceImpl implements MemberService{
 
         return keyGroupMapper.toKeyGroupDtoList(keyGroupList);
     }
+
 }

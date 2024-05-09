@@ -14,6 +14,6 @@ import java.util.Map;
 
 public interface FileUploadDownloadService {
     public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto);
-    public S3Object fileDownload(FileDownloadDto fileDownloadDto);
-    public Map<String, List<File>> multiFileDownload(MultiFileDownloadDto multiFileDownloadDto);
+    public S3Object fileDownload(FileDownloadDto fileDownloadDto, String key);
+    public Map<String, List<File>> multiFileDownload(MultiFileDownloadDto multiFileDownloadDto, String key);
 }

@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -18,8 +20,11 @@ import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.repository.EmitterRepository;
+import project.domain.member.dto.request.CustomOAuth2User;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.entity.Profile;
+import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.repository.MemberpartyRepository;
@@ -41,6 +46,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final MemberpartyRepository memberpartyRepository;
     private final AlarmRedisRepository alarmRedisRepository;
     private final ProfileRepository profileRepository;
+    private final MemberRepository memberRepository;
     private final AlarmMapper alarmMapper;
 
 
@@ -91,12 +97,18 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public SseEmitter createEmitter(){
-        // TODO 유저 아이디 받아와야함
-        Long userId = 1L;
-        // 생성했던 emitter 삭제
-        emitterRepository.deleteAllEmitterStartWithId(userId);
 
-        String emitterId = makeEmitterId(userId);
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+        // 생성했던 emitter 삭제
+        emitterRepository.deleteAllEmitterStartWithId(memberId);
+
+        String emitterId = makeEmitterId(memberId);
         SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
         emitterRepository.save(emitterId, sseEmitter);
 
@@ -105,7 +117,7 @@ public class AlarmServiceImpl implements AlarmService {
         sseEmitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
         // 연결유지 메시지 보내기
-        sendAlarm(sseEmitter, userId, Alarm.builder().alarmType(AlarmType.CHECK).build());
+        sendAlarm(sseEmitter, memberId, Alarm.builder().alarmType(AlarmType.CHECK).build());
 
         return sseEmitter;
     }
@@ -142,15 +154,18 @@ public class AlarmServiceImpl implements AlarmService {
         List<MemberParty> memberPartyList = memberpartyRepository.findMemberList(partyId);
         Alarm data = createAlarm(type, partyId, articleId, targetId, "");
         for (MemberParty memberParty : memberPartyList) {
-            if(memberParty.getMember().getId().equals(memberId)){
+            Long sendMemberId = memberParty.getMember().getId();
+            if(sendMemberId.equals(memberId)){
                 continue;
             }
 
-            // XXX 여기에는 emitter 찾아서 메시지 보내는 거 구현해야함 알람도 저장하구요
-            SseEmitter memberEmitter = emitterRepository.getByUserId(memberParty.getMember().getId());
-            Alarm alarm = new Alarm(data, memberParty.getMember().getId());
+            Alarm alarm = new Alarm(data, sendMemberId);
             alarmRedisRepository.save(alarm);
-            sendAlarm(memberEmitter, memberParty.getMember().getId(), alarm);
+            SseEmitter memberEmitter = emitterRepository.getByUserId(sendMemberId);
+            if(memberEmitter != null){
+                sendAlarm(memberEmitter, sendMemberId, alarm);
+            }
+
 
         }
     }
@@ -165,9 +180,16 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public AlarmPageDto getAlarmList(AlarmPageableDto alarmPageableDto) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        memberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         Pageable pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.Direction.DESC, "createDate");
-        Long userId = 1L;
-        Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(userId, pageable);
+
+        Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(memberId, pageable);
         List<SimpleAlarm> alarmList = alarmPage.stream()
             .map(alarmMapper::toSimpleAlarm)
             .toList();
@@ -186,10 +208,6 @@ public class AlarmServiceImpl implements AlarmService {
 
         return res;
     }
-
-
-
-
 
     // Emitter Id를 만들어 준다
     public String makeEmitterId(Long userId){

@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 @Setter
 public class MultiFileDownloadDto {
-    @NotNull
-    private String key;
+
     @NotNull
     private List<Long> fileIdList = new ArrayList<>();
     @NotNull
     private String prefix;
+
 }

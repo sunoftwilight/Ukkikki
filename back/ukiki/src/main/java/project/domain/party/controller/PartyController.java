@@ -35,16 +35,16 @@ public class PartyController implements PartyDocs {
 
     @Override
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResultResponse> createParty(@AuthenticationPrincipal UserDetails userDetails, @RequestPart @Valid CreatePartyDto createPartyDto,
+    public ResponseEntity<ResultResponse> createParty(@RequestPart @Valid CreatePartyDto createPartyDto,
                                                       @RequestPart(required = false) MultipartFile photo) {
-        PartyLinkDto response = partyService.createParty(userDetails, createPartyDto, photo);
+        PartyLinkDto response = partyService.createParty(createPartyDto, photo);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_PARTY_SUCCESS, response));
     }
 
     @Override
     @GetMapping("/link/{partyId}")
-    public ResponseEntity<ResultResponse> makePartyLink(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId) {
-        PartyLinkDto response = partyService.createLink(userDetails, partyId);
+    public ResponseEntity<ResultResponse> makePartyLink(@PathVariable Long partyId) {
+        PartyLinkDto response = partyService.createLink(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_PARTY_LINK_SUCCESS, response));
     }
 
@@ -64,8 +64,8 @@ public class PartyController implements PartyDocs {
 
     @Override
     @PostMapping("/enter/member")  // 멤버로 로그인
-    public ResponseEntity<ResultResponse> memberPartyEnter(@AuthenticationPrincipal UserDetails userDetails, @RequestBody EnterPartyDto enterPartyDto) {
-        PartyEnterDto response = partyService.memberPartyEnter(userDetails, enterPartyDto);
+    public ResponseEntity<ResultResponse> memberPartyEnter(@RequestBody EnterPartyDto enterPartyDto) {
+        PartyEnterDto response = partyService.memberPartyEnter(enterPartyDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_ENTER_SUCCESS, response));
     }
 
@@ -76,69 +76,68 @@ public class PartyController implements PartyDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.GUEST_ENTER_SUCCESS, response));
     }
 
-    @Override
+    @Override   // 비밀번호 변경
     @PatchMapping("/change/password/{partyId}")
-    public ResponseEntity<ResultResponse> changePartyPassword(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @RequestBody PartyPasswordDto partyPasswordDto) {
-        partyService.changePassword(userDetails, partyId, partyPasswordDto);
+    public ResponseEntity<ResultResponse> changePartyPassword(@PathVariable Long partyId, @RequestBody PartyPasswordDto partyPasswordDto) {
+        partyService.changePassword(partyId, partyPasswordDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PASSWORD_SUCCESS));
     }
 
-    @Override
+    @Override   // 파티명 변경
     @PatchMapping("/change/name/{partyId}")
-    public ResponseEntity<ResultResponse> changePartyName(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @RequestParam(name = "partyName") String partyName) {
-        partyService.changePartyName(userDetails, partyId, partyName);
+    public ResponseEntity<ResultResponse> changePartyName(@PathVariable Long partyId, @RequestParam(name = "partyName") String partyName) {
+        partyService.changePartyName(partyId, partyName);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_PARTY_NAME_SUCCESS));
     }
 
-    @Override
+    @Override   // 파티원 권한 부여
     @PatchMapping("/grant/{partyId}/{opponentId}")
-    public ResponseEntity<ResultResponse> grantAuthority(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @PathVariable Long opponentId, @RequestParam(name = "memberRole") MemberRole memberRole) {
-        partyService.grantPartyUser(userDetails, partyId, opponentId, memberRole);
+    public ResponseEntity<ResultResponse> grantAuthority(@PathVariable Long partyId, @PathVariable Long opponentId, @RequestParam(name = "memberRole") MemberRole memberRole) {
+        partyService.grantPartyUser(partyId, opponentId, memberRole);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GRANT_TARGET_SUCCESS));
     }
 
-    @Override
+    @Override   // 파티 나가기
     @DeleteMapping("/exit/{partyId}")
-    public ResponseEntity<ResultResponse> exitParty(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long partyId, @RequestParam(name = "key") String key) {
-        partyService.exitParty(userDetails, partyId, key);
+    public ResponseEntity<ResultResponse> exitParty(@PathVariable Long partyId, @RequestParam(name = "key") String key) {
+        partyService.exitParty(partyId, key);
         return null;
     }
 
     @Override
     @PatchMapping("/block/{partyId}/{targetId}")
-    public ResponseEntity<ResultResponse> memberBlock(@AuthenticationPrincipal UserDetails userDetails, @PathVariable(name = "partyId") Long partyId, @PathVariable(name = "targetId") Long targetId) {
-        partyService.memberBlock(userDetails, partyId, targetId);
+    public ResponseEntity<ResultResponse> memberBlock(@PathVariable(name = "partyId") Long partyId, @PathVariable(name = "targetId") Long targetId) {
+        partyService.memberBlock(partyId, targetId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_BLOCK_SUCCESS));
     }
 
     @Override
     @DeleteMapping("/kick/{partyId}/{targetId}")
-    public ResponseEntity<ResultResponse> kickMember(@AuthenticationPrincipal UserDetails userDetails, @PathVariable(name = "partyId") Long partyId, @PathVariable(name = "targetId") Long targetId) {
-        partyService.kickMember(userDetails, partyId, targetId);
+    public ResponseEntity<ResultResponse> kickMember(@PathVariable(name = "partyId") Long partyId, @PathVariable(name = "targetId") Long targetId) {
+        partyService.kickMember(partyId, targetId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.MEMBER_KICK_SUCCESS));
     }
 
     @Override
     @GetMapping("/block/user-list/{partyId}")
-    public ResponseEntity<ResultResponse> getBlockUserList(@AuthenticationPrincipal UserDetails userDetails, @PathVariable(name = "partyId") Long partyId) {
-        List<SimpleMemberPartyDto> response = partyService.getBlockUserList(userDetails, partyId);
+    public ResponseEntity<ResultResponse> getBlockUserList(@PathVariable(name = "partyId") Long partyId) {
+        List<SimpleMemberPartyDto> response = partyService.getBlockUserList(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_BLOCK_USER_LIST_SUCCESS, response));
     }
 
     @Override
     @GetMapping("/user-list/{partyId}")
-    public ResponseEntity<ResultResponse> getUserList(@AuthenticationPrincipal UserDetails userDetails, @PathVariable(name = "partyId") Long partyId) {
-        List<SimpleMemberPartyDto> response = partyService.getUserList(userDetails, partyId);
+    public ResponseEntity<ResultResponse> getUserList(@PathVariable(name = "partyId") Long partyId) {
+        List<SimpleMemberPartyDto> response = partyService.getUserList(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERLIST_SUCCESS, response));
     }
 
     @Override
     @PatchMapping(value = "/change/thumb/{partyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResultResponse> changePartyThumb(@AuthenticationPrincipal UserDetails userDetails,
-                                                           @PathVariable(name = "partyId") Long partyId,
+    public ResponseEntity<ResultResponse> changePartyThumb(@PathVariable(name = "partyId") Long partyId,
                                                            @RequestPart @Valid ChangeThumbDto changeThumbDto,
                                                            @RequestPart MultipartFile photo) {
-        partyService.changePartyThumb(userDetails, partyId, changeThumbDto, photo);
+        partyService.changePartyThumb(partyId, changeThumbDto, photo);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_THUMB_SUCCESS));
     }
 

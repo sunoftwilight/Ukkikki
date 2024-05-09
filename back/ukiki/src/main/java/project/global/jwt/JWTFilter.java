@@ -26,7 +26,13 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // 쿠키에서 토큰 가져오기
-        String access = request.getHeader("access");
+
+        String authorization = request.getHeader("authorization");
+        String access = null;
+
+        if(authorization != null){
+            access = authorization.split(" ")[1];
+        }
 
         // 토큰 널값체크
         if(access == null){

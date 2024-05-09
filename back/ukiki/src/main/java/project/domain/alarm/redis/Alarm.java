@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Redis에 저장하는 알람 객체
@@ -36,8 +37,9 @@ import java.util.List;
 public class Alarm {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long alarmId;
+    @Builder.Default
+    String alarmId = String.valueOf(UUID.randomUUID());
+
     Long partyId;
     Long articleId;
     Long targetId;

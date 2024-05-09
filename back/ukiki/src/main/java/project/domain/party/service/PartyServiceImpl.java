@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +20,13 @@ import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
 
 import project.domain.alarm.repository.AlarmRedisRepository;
+import project.domain.alarm.service.AlarmService;
 import project.domain.chat.entity.Chat;
 import project.domain.chat.repository.ChatRepository;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.TrashBinService;
 import project.domain.member.dto.request.CustomOAuth2User;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.entity.MemberRole;
 import project.domain.member.entity.Profile;
@@ -65,6 +68,7 @@ public class PartyServiceImpl implements PartyService {
     private final MemberpartyRepository memberpartyRepository;
     private final PartyLinkRedisRepository partyLinkRedisRepository;
     private final AlarmRedisRepository alarmRedisRepository;
+    private final AlarmService alarmService;
     private final PhotoRepository photoRepository;
     private final ProfileRepository profileRepository;
     private final ChatRepository chatRepository;
@@ -79,9 +83,10 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyLinkDto createParty(UserDetails userDetails, CreatePartyDto createPartyDto, MultipartFile photo) {
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+    public PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -146,10 +151,10 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyLinkDto createLink(UserDetails userDetails, Long partyId) {
+    public PartyLinkDto createLink(Long partyId) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -220,10 +225,10 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyEnterDto memberPartyEnter(UserDetails userDetails, EnterPartyDto enterPartyDto) {
+    public PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -290,10 +295,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void changePassword(UserDetails userDetails, Long partyId, PartyPasswordDto partyPasswordDto) {
+    public void changePassword(Long partyId, PartyPasswordDto partyPasswordDto) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -325,23 +330,11 @@ public class PartyServiceImpl implements PartyService {
         partyRepository.save(party);
 
         // 알람 보내기
-        List<MemberParty> memberParties = memberpartyRepository.findAllByPartyId(party.getId());
-        for (MemberParty memberParty1 : memberParties) {
-            // 마스터라면 넘어가기
-            if (memberParty1.getMemberRole().equals(MemberRole.MASTER)) {
-                continue;
-            }
-            Alarm alarm = Alarm.builder()
-                .partyId(party.getId())
-                .memberId(member.getId())
-                .alarmType(AlarmType.PASSWORD)
-                .content("비밀번호가 변경 되었습니다.")
-                .build();
-            alarmRedisRepository.save(alarm);
-            //TODO SSE 보내기 . . .
-        }
+        alarmService.groupSendAlarm(memberId, AlarmType.PASSWORD, partyId,0L,0L);
+
         // S3 이미지 비밀번호 바꾸기
         List<Photo> photos = party.getPhotoList();
+
         for (Photo photo : photos) {
             for (String url : photo.getPhotoUrl().photoUrls()){
                 String fileName = url.substring(
@@ -350,17 +343,15 @@ public class PartyServiceImpl implements PartyService {
                 s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
             }
         }
-        
-
 
     }
 
     @Override
     @Transactional
-    public void changePartyName(UserDetails userDetails, Long partyId, String partyName) {
+    public void changePartyName(Long partyId, String partyName) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -387,10 +378,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void grantPartyUser(UserDetails userDetails, Long partyId, Long opponentId, MemberRole memberRole) {
+    public void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -421,10 +412,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void exitParty(UserDetails userDetails, Long partyId, String key) {
+    public void exitParty(Long partyId, String key) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -486,10 +477,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void memberBlock(UserDetails userDetails, Long partyId, Long targetId) {
+    public void memberBlock(Long partyId, Long targetId) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -508,10 +499,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void kickMember(UserDetails userDetails, Long partyId, Long targetId) {
+    public void kickMember(Long partyId, Long targetId) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -534,10 +525,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public List<SimpleMemberPartyDto> getBlockUserList(UserDetails userDetails, Long partyId) {
+    public List<SimpleMemberPartyDto> getBlockUserList(Long partyId) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -557,10 +548,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public List<SimpleMemberPartyDto> getUserList(UserDetails userDetails, Long partyId) {
+    public List<SimpleMemberPartyDto> getUserList(Long partyId) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
@@ -576,10 +567,10 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void changePartyThumb(UserDetails userDetails, Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo) {
+    public void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);

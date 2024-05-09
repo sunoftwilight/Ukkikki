@@ -4,13 +4,15 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.dto.response.InfoDto;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import project.domain.member.dto.request.CustomOAuth2User;
 import project.domain.member.dto.request.SetPasswordDto;
 import project.domain.member.dto.response.KeyGroupDto;
 import project.domain.member.service.MemberService;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequestMapping("/member")
 public class MemberController implements MemberDocs{
 
+    private static final Logger log = LoggerFactory.getLogger(MemberController.class);
     private final MemberService memberService;
 
     // 내 정보 조회
@@ -35,7 +38,6 @@ public class MemberController implements MemberDocs{
         // 로그인 성공했을때 저장해두었던 값을들 가져온다.
         try {
             InfoDto infoDTO = memberService.myInfo();
-            System.out.println(infoDTO);
             return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERINFO_SUCCESS, infoDTO));
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -52,7 +54,8 @@ public class MemberController implements MemberDocs{
         // 토큰 발급
         String token = memberService.reissue(cookies);
 
-        response.setHeader("access",token);
+        response.setHeader("authorization","Bearer " + token);
+//        response.addHeader("Access-Control-Expose-Headers", "authorization");
 
         return new ResponseEntity<>(HttpStatus.OK);
 
@@ -67,21 +70,18 @@ public class MemberController implements MemberDocs{
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Override
     @PostMapping("/password")
-    public ResponseEntity<ResultResponse> setPassword(@RequestBody SetPasswordDto setPasswordDto, @AuthenticationPrincipal UserDetails userDetails) {
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        //유저 아이디 필요함
-        Long userId = 1L;
-        memberService.setPassword(setPasswordDto.getPassword(), userId);
+    public ResponseEntity<ResultResponse> setPassword(SetPasswordDto setPasswordDto) {
+        memberService.setPassword(setPasswordDto.getPassword());
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERLIST_SUCCESS));
     }
 
-    //여기서 password를 쿼리 파라메터로 받는건 말도 안되는 짓이잖아 내일 하자
+    @Override
     @GetMapping("/mykey")
-    public ResponseEntity<ResultResponse> getKeyGroup(@AuthenticationPrincipal UserDetails userDetails){
-        Long userId = 1L;
-        String password = "임시";
-        List<KeyGroupDto> response = memberService.getKeyGroup(userId, password);
+    public ResponseEntity<ResultResponse> getKeyGroup(HttpHeaders headers) {
+        List<KeyGroupDto> response = memberService.getKeyGroup(headers.getFirst("password"));
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_KEYGROUP_SUCCESS, response));
     }
+
 }

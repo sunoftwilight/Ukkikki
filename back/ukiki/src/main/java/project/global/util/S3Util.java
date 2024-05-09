@@ -30,6 +30,10 @@ public class S3Util {
 
     //커스텀 SSE KEY 인코딩
     public String generateSSEKey(String inputKey) {
+        if (inputKey == null || inputKey.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.SSE_KEY_MISSED);
+        }
+
         // Get an instance of SHA-256
         MessageDigest digest = null;
         try {
