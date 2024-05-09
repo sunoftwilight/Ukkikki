@@ -63,7 +63,6 @@ const SimplePass: React.FC<SimplePassProps> = ({type}) => {
           user.setIsInsert(true);
           user.setIsCheck(true);
           user.setSimplePass(password);
-          console.log('Done')
         }
       },
       (error) => {
@@ -76,7 +75,6 @@ const SimplePass: React.FC<SimplePassProps> = ({type}) => {
     const config = {
       'password': password
     }
-    console.log(config)
     await simpleCheck(
       config,
       (response) => {

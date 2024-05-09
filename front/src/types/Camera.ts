@@ -1,14 +1,14 @@
 // Props Type
 
 export interface RequestData {
-    files: ?,
-    key: string,
-    partyId: Number,
+    files: File;
+    key: string;
+    partyId: Number;
 }
 
 export interface ResponseData {
-    resultCode: string,
-    data: null
+    resultCode: string;
+    data: null;
 }
 
 

@@ -1,18 +1,32 @@
-import React from "react";
+import React, {useEffect, useRef} from "react";
+import { InsertPasswordProps } from "../../types/Group";
 
-interface InsertPasswordProps {
-  onBackBtnClick: () => void;
-  onNextBtnClick: (partyId:number, partyName:string, partyCode: string) => void
-}
 
-const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtnClick}) => {
+const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtnClick, createData, doneData}) => {
 
   const handleBackBtnClick = () => {
-    onBackBtnClick()
+    onBackBtnClick('info', createData)
   }
   const handleNextBtnClick = () => {
-    onNextBtnClick(1, '끄룹', 'www.sdfsdsd')
+    onNextBtnClick('info', doneData)
   }
+
+  const inputsRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
+
+  useEffect(() => {
+    if (inputsRefs.current[0]) {
+      inputsRefs.current[0]?.focus();
+    }
+  }, []);
+
+  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    if (value.length === 1 && index < 5 && inputsRefs.current[index + 1]) {
+      inputsRefs.current[index + 1]?.focus();
+    } else if (value.length === 0 && index > 0 && inputsRefs.current[index - 1]) {
+      inputsRefs.current[index - 1]?.focus();
+    }
+  };
 
   return (
     <div className="flex flex-col w-full h-full font-pre-B px-4">
@@ -24,12 +38,18 @@ const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtn
       <div className="w-full mb-10">
         <p className="text-lg mb-3">그룹 비밀번호</p>
         <div className="w-full h-14 flex justify-between">
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+        {Array(6)
+            .fill(null)
+            .map((_, index) => (
+              <input
+                key={index}
+                type="password"
+                maxLength={1}
+                className="h-14 w-12 rounded-lg bg-gray text-center"
+                ref={(el) => (inputsRefs.current[index] = el)}
+                onChange={(event) => handleInputChange(index, event)}
+              />
+            ))}
         </div>
       </div>
 
