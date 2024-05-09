@@ -41,8 +41,8 @@ public class SecurityConfig {
                     .userService(customOAuth2UserService)))
                 .successHandler(customSuccessHandler));
         // JWT 필터 추가
-//        http
-//                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .authorizeHttpRequests((auth) -> auth
