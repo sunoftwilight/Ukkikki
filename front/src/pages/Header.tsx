@@ -8,22 +8,13 @@ import SaveHeader from "../components/Header/SaveHeader";
 import { connectAlarm } from "../api/alarm";
 
 const Header: React.FC = () => {
-	const location = useLocation();
+	const location = useLocation();	
 
 	const groupBackPath = [
-		"/grouplist",
-		"/groupcreate",
-		"/createdone",
-		"/groupconfig",
-		"/groupenv",
-		"/groupprofile",
-		"/groupuser",
-		"/groupuserdetail",
-		"/groupban",
-		"/groupinfo",
-		"/grouppass",
+		"/grouplist", "/groupcreate", "/createdone", "/groupconfig",
+		"/groupenv", "/groupprofile", "/groupuser", "/groupuserdetail",
+		"/groupban", "/groupinfo", "/grouppass"
 	];
-
 	const basicPath = ["/", "/group", "/mypage", "/groupattend"];
 	const backPath = ["/setting", "/feed", "/chat", ...groupBackPath];
 	const albumPath = ["/album", "/trash"];

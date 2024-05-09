@@ -13,11 +13,12 @@ function App() {
 
       <div className="fixed top-14 w-full h-[calc(100%-56px)] overflow-scroll scrollbar-hide">
         <Outlet />
-        <Hamburger />
-        <InviteModal />
-        <GroupMemberModal />
-        <FolderModal />
       </div>
+
+      <Hamburger />
+      <InviteModal />
+      <GroupMemberModal />
+      <FolderModal />
     </div>
 	);
 }

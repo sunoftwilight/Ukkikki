@@ -3,7 +3,6 @@ import { publicApi, privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
 import { UserResponeseData } from '../types/UserInfoType';
 
-
 const url = 'member';
 
 export const userInfo = async (

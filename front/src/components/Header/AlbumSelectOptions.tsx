@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { folderStore } from "../../stores/ModalStore";
-// import { albumDoneStore } from "../../stores/HeaderStateStore";
-// import { selectModeStore } from "../../stores/AlbumStore";
+import { albumDoneStore } from "../../stores/HeaderStateStore";
+import { selectModeStore } from "../../stores/AlbumStore";
 import { AnimatePresence } from "framer-motion";
 import download from "@/assets/Header/AlbumSelectOptions/download.png";
 import move from "@/assets/Header/AlbumSelectOptions/move.png";
@@ -16,26 +16,24 @@ import { prefixStore } from "../../stores/AlbumStore";
 const AlbumSelectOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
   
-  // const { setSelectMode } = selectModeStore()
-  // const { setIsDone } = albumDoneStore()
-  const { setFolderOpen } = folderStore()
-
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
-  // const [prefix, setPrefix] = useState('')
-  
-  // const [isLoading, setIsLoading] = useState(false)
+  const [isDownDone, setIsDownDone] = useState(false)
+  const { setFolderOpen } = folderStore()
+  const { prefix } = useStore(prefixStore)
 
+  const { setSelectMode } = selectModeStore()
+  const { setIsDone } = albumDoneStore()
+
+    
+  
   const openHandler = (mode: string) => {
     if (mode === 'folder') {
       setFolderOpen()
     } else if (mode === 'down') {
       setIsPrefixOpen(true)
     }
-    // setIsDone()
-    // setSelectMode()
   }
 
-  const { prefix } = useStore(prefixStore)
   const prefixHandler = async () => {
     await multiDownloadFile(
       {  
@@ -51,7 +49,7 @@ const AlbumSelectOptions: React.FC = () => {
         link.setAttribute('download', `${prefix}.zip`)
         document.body.appendChild(link)
         link.click()
-        // setIsLoading(true)
+        doneHandler()
       },
       (err) => { 
         console.error(err)
@@ -59,16 +57,34 @@ const AlbumSelectOptions: React.FC = () => {
       },
     )
   }
+      
+  const doneHandler = () => {
+    setIsPrefixOpen(false)
+    setIsDownDone(true)
+    setTimeout(() => {
+      setIsDone()
+      setSelectMode()
+    }, 2000)
+  }
 
   return (
     <AnimatePresence>
       { isPrefixOpen && (
         <Modal 
+          key='isPrefixOpen'
           modalItems={{ title: '파일명 수정', content: '', modalType: 'input', btn: 2 }}
           onSubmitBtnClick={() => prefixHandler()}
           onCancelBtnClick={() => setIsPrefixOpen(false)}
         />
       )}
+
+      { isDownDone && (
+          <Modal
+            key='isDownDone'
+            modalItems={{ content: '다운로드가 완료되었습니다.', modalType: 'done', btn: 1 }}
+            onSubmitBtnClick={() => setIsDownDone(false)}
+          />
+        )}
 
       {/* { isLoading && 
         <Modal modalItems={{ content: '다운로드 진행 중입니다', modalType: 'ing', btn: 0 }} />

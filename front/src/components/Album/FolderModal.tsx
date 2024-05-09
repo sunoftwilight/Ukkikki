@@ -29,7 +29,7 @@ const FolderModal: React.FC = () => {
     <AnimatePresence>
       { folderOpen &&
         <motion.div 
-          className={`fixed top-0 start-0 h-screen w-screen flex justify-end`}
+          className={`fixed top-0 start-0 h-screen w-screen z-30 flex justify-end`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
