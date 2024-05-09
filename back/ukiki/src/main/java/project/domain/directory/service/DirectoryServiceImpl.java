@@ -22,6 +22,7 @@ import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.response.DirDto;
+import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirInnerDtov2;
@@ -98,6 +99,27 @@ public class DirectoryServiceImpl implements DirectoryService {
             // 결과 리스트에 넣어주기
             response.add(getDirListDto);
         }
+        return response;
+    }
+
+    @Override
+    public List<GetChildDirDto> getChildDir(String dirId) {
+        log.info("come in Service");
+        List<GetChildDirDto> response = new ArrayList<>();
+        Directory directory = directoryRepository.findById(dirId).orElseThrow(
+            () -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+        List<String> childDirIdList = directory.getChildDirIdList();
+        log.info("childDirIdList = {}", childDirIdList);
+        if(childDirIdList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.NO_MORE_CHILD_DIR);
+        }
+        for (Directory childDir:directoryRepository.findAllById(childDirIdList)){
+            response.add(GetChildDirDto.builder()
+                .pk(childDir.getId())
+                .name(childDir.getDirName())
+                .build());
+        }
+        log.info("service response = {}", response);
         return response;
     }
 
