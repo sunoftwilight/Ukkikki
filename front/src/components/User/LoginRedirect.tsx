@@ -4,7 +4,6 @@ import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router';
 import { userStore } from '../../stores/UserStore';
 import { useStore } from 'zustand';
-
 import { tokenRefresh, userInfo } from '../../api/user';
 
 const LoginRedirect: React.FC = () => {
@@ -13,10 +12,9 @@ const LoginRedirect: React.FC = () => {
   const user = useStore(userStore);
 
   useEffect(() => {
-    console.log('test1');
     getAccess();
-    getUserInfo();
-  }, [])
+    
+  })
 
   const getAccess = async () => {
     if (Boolean(cookies.isLogin)){
@@ -25,6 +23,7 @@ const LoginRedirect: React.FC = () => {
         (response) => {
           user.setAccessToken(response.headers['access']);
           user.setIsLogin(true);
+          getUserInfo();
         },
         (error) => {
           console.error(error)
@@ -34,8 +33,8 @@ const LoginRedirect: React.FC = () => {
   }
 
   const getUserInfo = async () => {
+    console.log(user.accessToken)
     if (user.accessToken !== '') {
-      console.log('test3');
       await userInfo(
         (response) => {
           const userData = response.data.data;
