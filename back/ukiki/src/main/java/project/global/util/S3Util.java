@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -53,7 +54,7 @@ public class S3Util {
     private String changedImageName(String originName) {
         String random = UUID.randomUUID().toString();
         String ext = originName.substring(originName.lastIndexOf("."));
-        return random + "." + ext;
+        return random + LocalDateTime.now() + ext;
     }
 
     //단일 파일 업로드
