@@ -13,12 +13,28 @@ export const userInfo = async (
 		.catch(Error)
   }
 
-  export const tokenRefresh = async(
-    Response : (Response : AxiosResponse<ResponseData>) => void, 
-    Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await publicApi.post(`/${url}/reissue`)
+export const tokenRefresh = async(
+  Response : (Response : AxiosResponse<ResponseData>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await publicApi.post(`/${url}/reissue`)
+  .then(Response)
+  .catch(Error)
+}
+  
+export const simpleInsert = async(
+  params: any,
+  Response : (Response : AxiosResponse<ResponseData>) => void,
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.post(`/${url}/password`, params)
     .then(Response)
     .catch(Error)
   }
-  
-  
+
+export const simpleCheck = async(
+  data: Record<string,string>,
+  Response : (Response : AxiosResponse<ResponseData>) => void,
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/mykey`,{headers: {...data}})
+    .then(Response)
+    .catch(Error)
+  }

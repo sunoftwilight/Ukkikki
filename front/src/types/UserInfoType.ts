@@ -8,4 +8,6 @@ export interface UserInfo {
     userId: string;
     userName: string;
     profileUrl: string;
+    uploadGroupId: number|null;
+    isInsertPass: boolean;
 }
