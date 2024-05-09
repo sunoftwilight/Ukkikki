@@ -70,6 +70,8 @@ public class MemberController implements MemberDocs{
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @Override
     @PostMapping("/password")
     public ResponseEntity<ResultResponse> setPassword(@RequestBody SetPasswordDto setPasswordDto) {
 
@@ -78,6 +80,7 @@ public class MemberController implements MemberDocs{
 
     }
 
+    @Override
     @GetMapping("/mykey")
     public ResponseEntity<ResultResponse> getKeyGroup(@RequestHeader HttpHeaders headers){
 

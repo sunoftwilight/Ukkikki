@@ -65,12 +65,15 @@ public class MemberServiceImpl implements MemberService{
                 infoDto.setProfileUrl(member.getProfileUrl());
                 infoDto.setUserName(member.getUserName());
                 infoDto.setUserId(member.getId());
-
+                infoDto.setMainDirId(member.getMainDirId());
+                infoDto.setPassword(member.isPass());
             } else{
                 infoDto = new InfoDto();
                 infoDto.setUserId(userId);
                 infoDto.setUserName(userDetails.getUsername());
                 infoDto.setProfileUrl(null);
+                infoDto.setMainDirId(null);
+                infoDto.setPassword(false);
             }
         }
 
@@ -178,7 +181,9 @@ public class MemberServiceImpl implements MemberService{
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         //멤버 password 컬럼에 값추가
         member.setPassword(bcryptUtil.encodeBcrypt(password));
+        member.setPass(true);
         memberRepository.save(member);
+
     }
 
     @Override
