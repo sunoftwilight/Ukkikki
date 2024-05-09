@@ -120,9 +120,8 @@ public class MemberServiceImpl implements MemberService{
         }
 
 //        refresh = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 4));
-        refresh = jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 10));
 
-        return refresh;
+        return jwtUtil.createJWT("access", id, reUsername, reProviderId, ((1000L * 60) * 60 * 24 * 10));
     }
 
     @Override
