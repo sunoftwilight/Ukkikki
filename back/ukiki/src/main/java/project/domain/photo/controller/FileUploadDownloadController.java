@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,8 +47,12 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     }
 
     @GetMapping("/download")
-    public void fileDownload(FileDownloadDto fileDownloadDto, HttpServletResponse response) {
-        S3Object object = fileUploadDownloadService.fileDownload(fileDownloadDto);
+    public void fileDownload(FileDownloadDto fileDownloadDto,
+                             HttpServletResponse response,
+                             @RequestHeader HttpHeaders httpHeaders) {
+        String sseKey = httpHeaders.getFirst("sseKey");
+        log.info("sseKey: {}", sseKey);
+        S3Object object = fileUploadDownloadService.fileDownload(fileDownloadDto, sseKey);
         String contentType = object.getObjectMetadata().getContentType().split("/")[1];
         InputStream inputStream = object.getObjectContent();
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileDownloadDto.getPrefix() + "." + contentType + "\"");
@@ -72,8 +77,11 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
     }
 
     @GetMapping("/multi-select-download")
-    public void multiSelectDownload(MultiFileDownloadDto multiFileDownloadDto, HttpServletResponse response) throws Exception {
-        HashMap<String, List<File>> map = (HashMap<String, List<File>>) fileUploadDownloadService.multiFileDownload(multiFileDownloadDto);
+    public void multiSelectDownload(MultiFileDownloadDto multiFileDownloadDto,
+                                    HttpServletResponse response,
+                                    @RequestHeader HttpHeaders httpHeaders) throws Exception {
+        String sseKey = httpHeaders.getFirst("sseKey");
+        HashMap<String, List<File>> map = (HashMap<String, List<File>>) fileUploadDownloadService.multiFileDownload(multiFileDownloadDto, sseKey);
         String path = map.keySet().iterator().next();
         List<File> files = map.get(path);
         response.setHeader("Content-type", "application/zip");
