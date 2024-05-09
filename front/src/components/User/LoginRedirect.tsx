@@ -13,12 +13,10 @@ const LoginRedirect: React.FC = () => {
 
   useEffect(() => {
     getAccess();
-    
   })
 
   const getAccess = async () => {
     if (Boolean(cookies.isLogin)){
-      console.log('test2');
       await tokenRefresh(
         (response) => {
           user.setAccessToken(response.headers['access']);
@@ -35,6 +33,7 @@ const LoginRedirect: React.FC = () => {
   const getUserInfo = async () => {
     console.log(user.accessToken)
     if (user.accessToken !== '') {
+      console.log('plz')
       await userInfo(
         (response) => {
           const userData = response.data.data;
