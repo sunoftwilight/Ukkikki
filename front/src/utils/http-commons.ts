@@ -38,8 +38,8 @@ export const downloadApi = (sseKey: string) => {
     if (stored) {
       const obj = JSON.parse(stored);
       if (obj.state.accessToken !== '') {
-        config.headers['authorization'] = `Bearer ${obj.state.accessToken}`;
-        // config.headers['authorization'] = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk"
+        config.headers['authorization'] = obj.state.accessToken;
+        // config.headers['authorization'] = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk"
       }
     }
     return config;
@@ -63,7 +63,7 @@ privateApi.interceptors.request.use(
 			const obj = JSON.parse(stored)
 			if (obj.state.accessToken !== ''){
 				config.headers['authorization'] = obj.state.accessToken;
-				// config.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjo1MiwidXNlcm5hbWUiOiLshLHqt5wiLCJwcm92aWRlcklkIjoia2FrYW8gMzQ1ODY4OTQzNyIsImlhdCI6MTcxNTEzMzkzNywiZXhwIjoxNzE1OTk3OTM3fQ.JZUCLuNRLK71yot5hBo13cfVkvKnEHDpZIebJUqX6dc';
+				// config.headers['authorization'] = 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjo1MiwidXNlcm5hbWUiOiLshLHqt5wiLCJwcm92aWRlcklkIjoia2FrYW8gMzQ1ODY4OTQzNyIsImlhdCI6MTcxNTEzMzkzNywiZXhwIjoxNzE1OTk3OTM3fQ.JZUCLuNRLK71yot5hBo13cfVkvKnEHDpZIebJUqX6dc';
 			}
 		}
     return config;
@@ -104,7 +104,7 @@ formDataApi.interceptors.request.use(
 			const obj = JSON.parse(stored)
 			if (obj.state.accessToken !== ''){
 				config.headers['authorization'] = obj.state.accessToken;
-				// config.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjo1MiwidXNlcm5hbWUiOiLshLHqt5wiLCJwcm92aWRlcklkIjoia2FrYW8gMzQ1ODY4OTQzNyIsImlhdCI6MTcxNTEzMzkzNywiZXhwIjoxNzE1OTk3OTM3fQ.JZUCLuNRLK71yot5hBo13cfVkvKnEHDpZIebJUqX6dc';
+				// config.headers['authorization'] = 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjo1MiwidXNlcm5hbWUiOiLshLHqt5wiLCJwcm92aWRlcklkIjoia2FrYW8gMzQ1ODY4OTQzNyIsImlhdCI6MTcxNTEzMzkzNywiZXhwIjoxNzE1OTk3OTM3fQ.JZUCLuNRLK71yot5hBo13cfVkvKnEHDpZIebJUqX6dc';
 			}
 		}
     return config;
