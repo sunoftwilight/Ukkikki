@@ -73,7 +73,6 @@ public class MemberController implements MemberDocs{
     @Override
     @PostMapping("/password")
     public ResponseEntity<ResultResponse> setPassword(SetPasswordDto setPasswordDto) {
-
         memberService.setPassword(setPasswordDto.getPassword());
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_USERLIST_SUCCESS));
     }
@@ -81,7 +80,6 @@ public class MemberController implements MemberDocs{
     @Override
     @GetMapping("/mykey")
     public ResponseEntity<ResultResponse> getKeyGroup(HttpHeaders headers) {
-
         List<KeyGroupDto> response = memberService.getKeyGroup(headers.getFirst("password"));
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_KEYGROUP_SUCCESS, response));
     }

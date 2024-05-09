@@ -77,7 +77,6 @@ public class JWTFilter extends OncePerRequestFilter {
         memberDto.setProviderId(providerId);
         memberDto.setId(id);
 
-        System.out.println("memberDto = " + memberDto);
 
         // UserDetails에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(memberDto);
