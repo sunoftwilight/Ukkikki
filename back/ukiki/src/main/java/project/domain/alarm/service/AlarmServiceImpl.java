@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.repository.EmitterRepository;
 import project.domain.member.dto.request.CustomOAuth2User;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.entity.Profile;
 import project.domain.member.repository.MemberRepository;
@@ -94,10 +96,10 @@ public class AlarmServiceImpl implements AlarmService {
 
 
     @Override
-    public SseEmitter createEmitter(UserDetails userDetails){
+    public SseEmitter createEmitter(){
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         if (memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
@@ -177,10 +179,10 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public AlarmPageDto getAlarmList(UserDetails userDetails, AlarmPageableDto alarmPageableDto) {
+    public AlarmPageDto getAlarmList(AlarmPageableDto alarmPageableDto) {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         memberRepository.findById(memberId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
