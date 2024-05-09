@@ -19,7 +19,7 @@ const LoginRedirect: React.FC = () => {
     if (Boolean(cookies.isLogin)){
       await tokenRefresh(
         (response) => {
-          user.setAccessToken(response.headers['Authorization']);
+          user.setAccessToken(response.headers['authorization']);
           user.setIsLogin(true);
           getUserInfo();
         },
