@@ -6,8 +6,8 @@ server:
 spring:
 #  ?? ? ??? ?? ???? ?? => local
   profiles:
-    active: local
-    include: key
+    active: server
+    include: key  
   jpa:
     hibernate:
       ddl-auto: update
