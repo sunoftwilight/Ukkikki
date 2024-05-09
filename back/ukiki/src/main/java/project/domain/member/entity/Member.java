@@ -56,8 +56,8 @@ public class Member extends BaseEntity {
     @Builder.Default
     private boolean isDeactivate = false;
 
-    @Column(name = "main_directory")
-    private String mainDirId;
+    @Column(name = "upload_group_id")
+    private String uploadGroupId;
 
     // 연관관계 총 9 개
 

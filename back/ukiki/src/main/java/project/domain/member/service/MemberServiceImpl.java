@@ -65,15 +65,15 @@ public class MemberServiceImpl implements MemberService{
                 infoDto.setProfileUrl(member.getProfileUrl());
                 infoDto.setUserName(member.getUserName());
                 infoDto.setUserId(member.getId());
-                infoDto.setMainDirId(member.getMainDirId());
-                infoDto.setPassword(member.getPassword() != null);
+                infoDto.setUploadGroupId(member.getUploadGroupId());
+                infoDto.setInsertPass(member.getPassword() != null);
             } else{
                 infoDto = new InfoDto();
                 infoDto.setUserId(userId);
                 infoDto.setUserName(userDetails.getUsername());
                 infoDto.setProfileUrl(null);
-                infoDto.setMainDirId(null);
-                infoDto.setPassword(false);
+                infoDto.setUploadGroupId(null);
+                infoDto.setInsertPass(false);
             }
         }
 

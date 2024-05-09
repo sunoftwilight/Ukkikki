@@ -72,7 +72,7 @@ public class DirectoryServiceImpl implements DirectoryService {
             () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
         );
         // 해당 유저의 즐겨찾기 지정 폴더
-        String mainDirId = member.getMainDirId();
+        String mainDirId = member.getUploadGroupId();
         // 해당 유저가 포함된 모든 party 찾기
         List<MemberParty> memberPartyList = memberpartyRepository.findMemberPartiesByMember(
             member);
@@ -162,7 +162,7 @@ public class DirectoryServiceImpl implements DirectoryService {
             () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
         );
         // 유저의 기본 폴더 id 변경
-        member.setMainDirId(dirId);
+        member.setUploadGroupId(dirId);
     }
 
     @Override
