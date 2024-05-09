@@ -16,16 +16,16 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @OpenAPIDefinition(
     info = @Info(title = "ukiki API", version = "v1", description = "SSAFY 자율 프로젝트"),
-//    security = @SecurityRequirement(name = "Authorization"),
+    security = @SecurityRequirement(name = "Authorization"),
     servers = {
         @Server(url="http://localhost:5000/api", description = "Local Swagger")
     }
 )
-//@SecurityScheme(name = "Authorization",
-//    type = SecuritySchemeType.HTTP,
-//    scheme = "bearer",
-//    bearerFormat = "JWT",
-//    in = SecuritySchemeIn.HEADER)
+@SecurityScheme(name = "Authorization",
+    type = SecuritySchemeType.HTTP,
+    scheme = "bearer",
+    bearerFormat = "JWT",
+    in = SecuritySchemeIn.HEADER)
 public class LocalConfig {
 
     @Bean

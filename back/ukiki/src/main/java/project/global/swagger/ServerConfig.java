@@ -16,10 +16,16 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @OpenAPIDefinition(
     info = @Info(title = "ukiki API", version = "v1", description = "SSAFY 자율 프로젝트"),
-    servers = {
+        security = @SecurityRequirement(name = "Authorization"),
+        servers = {
         @Server(url="https://k10d202.p.ssafy.io/api", description = "Server Swagger")
     }
 )
+@SecurityScheme(name = "Authorization",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        in = SecuritySchemeIn.HEADER)
 public class ServerConfig {
     @Bean
     public GroupedOpenApi publicApi() {
