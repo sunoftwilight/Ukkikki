@@ -28,6 +28,9 @@ public class JWTFilter extends OncePerRequestFilter {
         // 쿠키에서 토큰 가져오기
         String access = request.getHeader("access").split(" ")[1];
 
+        System.out.println(request);
+        System.out.println(access);
+
         // 토큰 널값체크
         if(access == null){
             filterChain.doFilter(request, response);
