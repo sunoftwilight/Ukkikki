@@ -3,7 +3,9 @@ package project.domain.test;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import project.global.util.S3Util;
 import project.global.util.gptutil.GptUtil;
 
 @RestController
@@ -12,6 +14,7 @@ import project.global.util.gptutil.GptUtil;
 public class TestController {
 
     private final GptUtil gptUtil;
+    private final S3Util s3Util;
 
     @GetMapping("/test/post_thread")
     public String testController1() throws Exception {
@@ -55,5 +58,23 @@ public class TestController {
         return response;
     }
 
+    @PostMapping("/test/file-key-change")
+    public String testController8(String oldKey, String newKey, String filename) throws Exception {
+        return s3Util.changeKey(oldKey, newKey, filename);
+    }
 
+    @GetMapping("/test/key")
+    public String testController9(String key) throws Exception {
+        return s3Util.generateSSEKey(key);
+    }
+
+    @PostMapping("/test/file-expier")
+    public void testController8(String key, String filename) throws Exception {
+        s3Util.fileExpire(key, filename);
+    }
+
+    @PostMapping("/test/file-undo")
+    public void testController9(String key, String filename) throws Exception {
+        s3Util.fileUndo(key, filename);
+    }
 }

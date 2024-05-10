@@ -59,7 +59,10 @@ public enum ResultCode {
     CHAT_SEND_SUCCESS(200, "채팅 전송에 성공하였습니다."),
 
     // Article 관련
-    CREATE_ARTICLE_SUCCESS(201, "게시판 생성에 성공하였습니다.")
+    CREATE_ARTICLE_SUCCESS(201, "게시판 생성에 성공하였습니다."),
+    
+    // Photo
+    CREATE_MEMO_SUCCESS(200, "메모 등록에 성공하였습니다."),
     ;
 
     private final int status;
