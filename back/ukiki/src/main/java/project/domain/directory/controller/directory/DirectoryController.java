@@ -21,6 +21,7 @@ import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
+import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.FileService;
 import project.domain.member.dto.request.CustomOAuth2User;
@@ -153,6 +154,15 @@ public class DirectoryController implements DirectoryDocs {
         List<GetChildDirDto> response = directoryService.getChildDir(dirId);
         log.info("controller response = {}", response);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_CHILD_DIR_SUCCESS, response));
+    }
+
+    @Override
+    @GetMapping("/{dirId}/thumbnail2")
+    public ResponseEntity<ResultResponse> getDirThumbUrl2(@PathVariable String dirId) {
+        log.info("come in controller");
+        List<GetDirThumbUrl2> response = directoryService.getDirThumbUrl2(dirId);
+        log.info("controller response = {}", response);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_THUMBNAIL_URL_2_SUCCESS, response));
     }
 
     @Override

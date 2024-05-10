@@ -27,6 +27,7 @@ import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirInnerDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
+import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.directory.mapper.DirMapper;
 import project.domain.directory.mapper.GetDirMapper;
@@ -94,6 +95,8 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .pk(party.getRootDirId())
                 .name(directory.getDirName())
                 .thumbnail(party.getThumbnail())
+                .createDate(party.getCreateDate().toLocalDate())
+                .fileNum(getFileNum(directory))
                 .isStar(directory.getId().equals(mainDirId))
                 .build();
             // 결과 리스트에 넣어주기
@@ -475,5 +478,56 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .build())
             .deadLine(LocalDate.now().plusWeeks(2))
             .build());
+    }
+
+    @Override
+    public List<GetDirThumbUrl2> getDirThumbUrl2(String dirId) {
+        log.info("come in service");
+        Directory dir = findById(dirId);
+        List<GetDirThumbUrl2> response = new ArrayList<>();
+        List<String> fileIdList = dir.getFileIdList();
+        log.info("fileIdList = {}", fileIdList);
+        if(fileIdList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.FILE_NOT_FOUND);
+        }
+        for(File file : fileRepository.findAllById(fileIdList)) {
+            response.add(
+                GetDirThumbUrl2.builder()
+                    .pk(file.getId())
+                    .thumbUrl2(file.getPhotoDto().getThumbUrl2())
+                    .build());
+        }
+        log.info("service response = {}", response);
+        return response;
+    }
+
+    public Integer getFileNum(Directory directory) {
+        // 초기화
+        deque.addFirst(directory);
+        visitedSet.add(directory.getId());
+
+        int fileNum = 0;
+        while(!deque.isEmpty()) {
+            // pop + 해당 폴더의 파일 수 카운트
+            Directory curDirectory = deque.pop();
+            fileNum += curDirectory.getFileIdList().size();
+            // 탐색
+            List<String> childDirIdList = curDirectory.getChildDirIdList();
+            if(childDirIdList.isEmpty()) {
+                continue;
+            }
+            for(Directory childDirectory : directoryRepository.findAllById(childDirIdList)){
+                // 유효성 검사
+                if(visitedSet.contains(childDirectory.getId())) {
+                    continue;
+                }
+                // 인큐
+                deque.addFirst(childDirectory);
+                // 방첵
+                visitedSet.add(childDirectory.getId());
+            }
+        }
+        visitedSet.clear();
+        return fileNum;
     }
 }

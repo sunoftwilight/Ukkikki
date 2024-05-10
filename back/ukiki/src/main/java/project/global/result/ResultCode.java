@@ -46,6 +46,7 @@ public enum ResultCode {
     GET_DIRECTORYLIST_SUCCESS(200, "해당 유저의 모든 그룹 조회에 성공하였습니다."),
     SET_MAIN_DIRECTORY_SUCCESS(200, "메인 폴더 설정 변경에 성공하였습니다."),
     GET_CHILD_DIR_SUCCESS(200, "하위 폴더 조회에 성공하였습니다."),
+    GET_THUMBNAIL_URL_2_SUCCESS(200, "해당 폴더의 모든 썸네일2 사진 조회에 성공하였습니다."),
 
     // 휴지통 관련
     GET_TRASH_BIN_SUCCESS(200, "휴지통 조회에 성공하였습니다."),

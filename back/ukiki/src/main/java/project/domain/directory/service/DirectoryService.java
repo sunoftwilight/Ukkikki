@@ -10,6 +10,7 @@ import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
+import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.party.entity.Party;
 
@@ -65,5 +66,7 @@ public interface DirectoryService {
     String getRootDirId(Directory dir);
 
     public Trash saveFileToTrash(File file, String dirId);
+
+    List<GetDirThumbUrl2> getDirThumbUrl2(String dirId);
 
 }
