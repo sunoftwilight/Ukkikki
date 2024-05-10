@@ -3,6 +3,7 @@ import check from "@/assets/Album/check.png"
 import { useStore } from "zustand";
 import { selectStore } from "../../stores/AlbumStore";
 import { contentListData } from "../../types/AlbumType";
+import SecureImg from "./SecureImg";
 
 interface SelectModeImgProps {
   item : contentListData
@@ -28,7 +29,8 @@ const SelectModeImg: React.FC<SelectModeImgProps> = ({ item }) => {
           :
           <div className="w-[18px] h-[18px] rounded-full absolute top-1 right-1 bg-soft-gray border-[0.3px] border-disabled-gray " />
         }
-        <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />
+        {/* <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" /> */}
+        <SecureImg />
       </div>
     </div>
   )
