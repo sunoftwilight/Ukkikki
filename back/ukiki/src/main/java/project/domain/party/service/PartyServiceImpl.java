@@ -451,40 +451,16 @@ public class PartyServiceImpl implements PartyService {
 
         // S3 이미지 암호키 변경
         for (Photo photo : photos) {
-            // 원본 이미지와 썸네일의 url 가져오기
-            PhotoUrl photoUrl = photo.getPhotoUrl();
-            // 원본 이미지의 얼굴 분류 사진 리스트 가져오기
-            List<Face> faceList = faceRepository.findByOriginImageUrl(photoUrl.getPhotoUrl());
-            // 얼굴 분류 사진의 키 변경 후 변경된 url 로 Entity 업데이트
-            for (Face face : faceList){
+            List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
+            for (Face face : faceList) {
                 String url = face.getFaceImageUrl();
                 String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
-                face.setFaceImageUrl(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
+                s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
             }
-            {   // 메인이미지 키 변경 후 변경된 url 로 Entity 업데이트
-                String url = photoUrl.getPhotoUrl();
+            for(String url : photo.getPhotoUrl().photoUrls()){
                 String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
-                photoUrl.setPhotoUrl(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
+                s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
             }
-            // 얼굴 분류 사진 Entity 의 메인이미지 url 업데이트
-            for (Face face : faceList){
-                face.setOriginImageUrl(photoUrl.getPhotoUrl());
-                // 얼굴 분류 DB 업데이트
-                faceRepository.save(face);
-            }
-            {   // 썸네일 1번 키 변경 후 변경된 url 로 Entity 업데이트
-                String url = photoUrl.getThumb_url1();
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
-                photoUrl.setThumb_url1(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
-            }
-            {   // 썸네일 2번 키 변경 후 변경된 url 로 Entity 업데이트
-                String url = photoUrl.getThumb_url2();
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
-                photoUrl.setThumb_url2(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
-            }
-            // photo Entity 업데이트 후 DB 저장
-            photo.setPhotoUrl(photoUrl);
-            photoRepository.save(photo);
         }
         CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
         checkPasswordDto.setPartyId(party.getId());

@@ -17,7 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -142,8 +145,8 @@ public class S3Util {
 
     //sse-c 키값 변경
     public String changeKey(String originKey, String newKey, String fileName){
-        SSECustomerKey originSseKey = new SSECustomerKey(generateSSEKey(originKey));
-        SSECustomerKey newSseKey = new SSECustomerKey(generateSSEKey(newKey));
+        SSECustomerKey originSseKey = new SSECustomerKey(originKey);
+        SSECustomerKey newSseKey = new SSECustomerKey(newKey);
 
         S3Object object = fileDownload(originSseKey, fileName);
         InputStream inputStream = object.getObjectContent();
@@ -151,13 +154,50 @@ public class S3Util {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(object.getObjectMetadata().getContentLength());
         metadata.setContentType(object.getObjectMetadata().getContentType());
-        String changedName = changedImageName(fileName);
-
-        amazonS3.putObject(new PutObjectRequest("ukkikki", changedName, inputStream, metadata
-        ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(newSseKey));
 
         fileDelete(originSseKey, fileName);
 
-        return amazonS3.getUrl("ukkikki", changedName).toString();
+        amazonS3.putObject(new PutObjectRequest("ukkikki", fileName, inputStream, metadata
+        ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(newSseKey));
+
+        return amazonS3.getUrl("ukkikki", fileName).toString();
     }
+
+    public void fileExpire(String Key, String fileName) {
+        SSECustomerKey sseKey = new SSECustomerKey(Key);
+
+        S3Object object = fileDownload(sseKey, fileName);
+        InputStream inputStream = object.getObjectContent();
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(object.getObjectMetadata().getContentLength());
+        metadata.setContentType(object.getObjectMetadata().getContentType());
+        metadata.addUserMetadata("expire-on", LocalDateTime.now().plusMinutes(5).format(DateTimeFormatter.ISO_DATE));
+
+        Tag tag = new Tag("expire", "expire");
+        ObjectTagging tagging = new ObjectTagging(List.of(tag));
+
+        fileDelete(sseKey, fileName);
+
+        amazonS3.putObject(new PutObjectRequest("ukkikki", fileName, inputStream, metadata
+        ).withCannedAcl(CannedAccessControlList.PublicRead).withTagging(tagging).withSSECustomerKey(sseKey));
+    }
+
+    public void fileUndo(String Key, String fileName) {
+        SSECustomerKey sseKey = new SSECustomerKey(Key);
+
+        S3Object object = fileDownload(sseKey, fileName);
+        InputStream inputStream = object.getObjectContent();
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(object.getObjectMetadata().getContentLength());
+        metadata.setContentType(object.getObjectMetadata().getContentType());
+        metadata.addUserMetadata("expire-on", LocalDateTime.now().plusMinutes(5).format(DateTimeFormatter.ISO_DATE));
+
+        fileDelete(sseKey, fileName);
+
+        amazonS3.putObject(new PutObjectRequest("ukkikki", fileName, inputStream, metadata
+        ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(sseKey));
+    }
+
 }
