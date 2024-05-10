@@ -10,7 +10,6 @@ const baseURL: string = "https://k10d202.p.ssafy.io/api";
 export const publicApi: AxiosInstance = axios.create({
 	baseURL: baseURL,
 	headers: {
-		'Access-Control-Allow-Origin': '*',
 		'Content-Type': 'application/json',
 	}
 });
@@ -18,7 +17,6 @@ export const publicApi: AxiosInstance = axios.create({
 export const privateApi: AxiosInstance = axios.create({
   baseURL: baseURL,
   headers: {
-    'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
   },
 });
@@ -28,7 +26,6 @@ export const downloadApi = (sseKey: string) => {
   baseURL: baseURL,
   responseType: 'blob',
   headers: {
-    'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
     'sseKey': sseKey 
   }})
@@ -50,7 +47,6 @@ export const downloadApi = (sseKey: string) => {
 export const formDataApi: AxiosInstance = axios.create({
 	baseURL: baseURL,
 	headers: {
-		"Access-Control-Allow-Origin": "*",
 		"Content-Type": "multipart/form-data",
 	},
 });
