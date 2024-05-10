@@ -1,10 +1,14 @@
 package project.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import project.dto.MQDto;
 import project.result.ResultCode;
 import project.result.ResultResponse;
@@ -22,9 +26,17 @@ public class MQController {
     @params String partyId;
     @params String key;
      */
-    @PostMapping("/upload")
-    public ResponseEntity<ResultResponse> fileUpload(@ModelAttribute MQDto mqDto){
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResultResponse> fileUpload(
+            @RequestPart("file")MultipartFile multipartFile,
+            @RequestPart("partyId") String partyId,
+            @RequestPart("key") String key
+            ){
 
+        MQDto mqDto = new MQDto();
+        mqDto.setFile(multipartFile);
+        mqDto.setPartyId(partyId);
+        mqDto.setKey(key);
         mqService.fileUpload(mqDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
