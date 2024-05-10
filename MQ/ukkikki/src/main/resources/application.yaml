@@ -1,0 +1,10 @@
+server:
+  port: 5555
+  servlet:
+    context-path: /mq
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
