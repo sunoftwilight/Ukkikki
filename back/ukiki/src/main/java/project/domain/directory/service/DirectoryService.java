@@ -62,7 +62,7 @@ public interface DirectoryService {
     String getParentDirName(Directory directory);
     List<String> getChildDirNameList(Directory directory);
     List<String> getPhotoUrlList(Directory directory);
-
+    List<String> getFullRootByDirId(String dirId);
     String getRootDirId(Directory dir);
 
     public Trash saveFileToTrash(File file, String dirId);

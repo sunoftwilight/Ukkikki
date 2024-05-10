@@ -20,7 +20,7 @@ public interface TrashBinController {
     @Operation(summary = "폴더 및 파일 복원 요청", description = "PathVariable로 trashBinId와 trashId를 받아 해당 쓰레기를 복원하고 쓰레기통 정보를 반환")
     @ApiResponse(responseCode = "201", description = "폴더 또는 파일복원에 성공하였습니다.")
     @PatchMapping("/{trashBinId}/trashes/{trashId}")
-    ResponseEntity<ResultResponse> restoreTrash(Long trashBinId, String trashId);
+    ResponseEntity<ResultResponse> restoreOneTrash(Long trashBinId, String trashId);
 
 
     // 휴지통 비우기

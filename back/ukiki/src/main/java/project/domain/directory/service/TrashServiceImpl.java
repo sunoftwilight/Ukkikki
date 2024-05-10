@@ -58,7 +58,7 @@ public class TrashServiceImpl implements TrashService{
     @Override
     @Transactional
     // trashId != rawId
-    public void restoreTrash(String trashId, Long trashBinId) {
+    public void restoreOneTrash(String trashId, Long trashBinId) {
         TrashBin trashBin = trashBinService.findById(trashBinId);
         Trash trash = trashRepository.findById(trashId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
@@ -144,6 +144,7 @@ public class TrashServiceImpl implements TrashService{
 
             // 연관관계에 있는 directory, file 불러오기
             // 해당 dir 마저 삭제된 상태면 복구 불가
+            // setDir
             Directory dir = directoryService.findById(trashFileDto.getDirId());
 
             // 없을떄(휴지통에 있는 파일이 마지막일때) 그냥 file을 새로 만들어서 dir와 관계 설정 해줘야됨
@@ -182,6 +183,11 @@ public class TrashServiceImpl implements TrashService{
             return;
         }
         throw new BusinessLogicException(ErrorCode.TRASH_CLASSIFICATION_FAIL);
+    }
+
+    @Override
+    public void restoreTrashList(List<String> trashIdList, Long trashBinId) {
+
     }
 
     @Override

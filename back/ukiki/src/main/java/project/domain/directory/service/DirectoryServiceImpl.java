@@ -54,6 +54,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     private static Deque<Directory> deque = new ArrayDeque<>();
     private static HashSet<String> visitedSet = new HashSet<>();
 
+
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
@@ -170,6 +171,7 @@ public class DirectoryServiceImpl implements DirectoryService {
                 GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
                     .type(DataType.FILE)
                     .pk(file.getId())
+                    .photoId(file.getPhotoDto().getId())
                     .name("None")
                     .url(file.getPhotoDto().getThumbUrl1())
                     .build();
@@ -432,6 +434,23 @@ public class DirectoryServiceImpl implements DirectoryService {
         return dir.getId();
     }
 
+    public List<String> getFullRootByDirId(String dirId) {
+        Deque<String> dequeDirId = new ArrayDeque<>();
+
+        dequeDirId.addFirst(dirId);
+        Directory dir = findById(dirId);
+        int cnt = 0;
+        while(!dir.getParentDirId().equals("")) {
+            dir = findById(dir.getParentDirId());
+            dequeDirId.addFirst(dir.getId());
+            cnt++;
+            if(cnt > 100){
+                throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
+            }
+        }
+        return dequeDirId.stream().toList();
+    }
+
     public Trash saveDirtoTrash(Directory dir) {
         return trashRepository.save(Trash.builder()
             .id(generateId())
@@ -439,6 +458,7 @@ public class DirectoryServiceImpl implements DirectoryService {
             .dataType(DataType.DIRECTORY)
             .content(dir)
             .deadLine(LocalDate.now().plusWeeks(2))
+                .fullRoot(getFullRootByDirId(dir.getParentDirId()))
             .build());
     }
 

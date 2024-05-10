@@ -1,5 +1,6 @@
 package project.domain.directory.service;
 
+import jakarta.transaction.TransactionScoped;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -73,9 +74,7 @@ public class FileServiceImpl implements FileService{
         fileRepository.save(newFile);
         setDirFileRelation(rootDirId, newFileId);
     }
-
     @Override
-    @Transactional
     public void copyFile(String fileId, String fromDirId, String toDirId) {
         setDirFileRelation(toDirId, fileId);
         // photo num ++1
@@ -88,6 +87,16 @@ public class FileServiceImpl implements FileService{
 
     @Override
     @Transactional
+    public void copyFileList(List<String> fileIdList, String fromDirId,  String toDirId) {
+        if(fileIdList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.EMPTY_FILE_ID_LIST);
+        }
+        for (String fileId : fileIdList) {
+            copyFile(fileId, fromDirId, toDirId);
+        }
+    }
+
+    @Override
     public void moveFile(String fileId, String fromDirId, String toDirId) {
         setDirFileRelation(toDirId, fileId);
         deleteDirFileRelation(fromDirId, fileId);
@@ -95,6 +104,16 @@ public class FileServiceImpl implements FileService{
 
     @Override
     @Transactional
+    public void moveFileList(List<String> fileIdList, String fromDirId, String toDirId) {
+        if(fileIdList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.EMPTY_FILE_ID_LIST);
+        }
+        for (String fileId : fileIdList) {
+            moveFile(fileId, fromDirId, toDirId);
+        }
+    }
+
+    @Override
     public void deleteOneFile(String fileId, String dirId) {
         // 쓰레기에 file 등록
         File file = findById(fileId);
@@ -111,6 +130,17 @@ public class FileServiceImpl implements FileService{
 
     @Override
     @Transactional
+    public void deleteFileList(List<String> fileIdList, String dirId) {
+        if(fileIdList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.EMPTY_FILE_ID_LIST);
+        }
+        for (String fileId : fileIdList) {
+            deleteOneFile(fileId, dirId);
+        }
+    }
+
+    @Override
+    @Transactional
     public GetDirDto deleteAllFile(String fileId, String dirId) {
         return null;
     }
@@ -122,7 +152,6 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    @Transactional
     public void setDirFileRelation(String dirId, String fileId) {
         // dir에 fileId 추가
         Directory findDir = directoryService.findById(dirId);
@@ -135,7 +164,6 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    @Transactional
     public void deleteDirFileRelation(String dirId, String fileId) {
         // dir에서 fileId 제거
         Directory findDir = directoryService.findById(dirId);
@@ -181,6 +209,7 @@ public class FileServiceImpl implements FileService{
                 .dirId(dirId)
                 .build())
             .deadLine(LocalDate.now().plusWeeks(2))
+            .fullRoot(directoryService.getFullRootByDirId(dirId))
             .build());
     }
 }

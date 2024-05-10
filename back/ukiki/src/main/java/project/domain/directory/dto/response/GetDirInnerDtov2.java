@@ -11,6 +11,7 @@ import project.domain.directory.collection.DataType;
 public class GetDirInnerDtov2 {
     private DataType type;
     private String pk;
+    private Long photoId;
     private String name;
     private String url;
 }

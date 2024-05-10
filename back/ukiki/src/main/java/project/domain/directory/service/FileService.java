@@ -4,7 +4,6 @@ import java.util.List;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.response.GetDirDto;
-import project.domain.directory.dto.response.GetFileDto;
 import project.domain.photo.entity.Photo;
 
 public interface FileService {
@@ -15,12 +14,18 @@ public interface FileService {
     // 사진 복사
     void copyFile(String fileId, String fromDirId, String toDirId);
 
+    // 복수 사진 복사
+    void copyFileList(List<String> fileIdList, String fromDirId, String toDirId);
+
     // 사진 이동
     void moveFile(String fileId, String fromDirId, String toDirId);
 
+    // 복수 사진 이동
+    void moveFileList(List<String> fileIdList, String fromDirId, String toDirId);
+
     // 단일 사진 삭제
     void deleteOneFile(String fileId, String dirId);
-
+    void deleteFileList(List<String> fileIdList, String dirId);
     // 전체 사진 삭제
     GetDirDto deleteAllFile(String fileId, String dirId);
 

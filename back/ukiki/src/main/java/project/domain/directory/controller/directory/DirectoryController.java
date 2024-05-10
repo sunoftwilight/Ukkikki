@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.request.CreateDirDto;
+import project.domain.directory.dto.request.FileListDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
@@ -126,6 +127,17 @@ public class DirectoryController implements DirectoryDocs {
     }
 
     @Override
+    @PatchMapping("/{dirId}/files/copy")
+    public ResponseEntity<ResultResponse> copyFileList(
+        @PathVariable(name = "dirId") String fromDirId,
+        @RequestParam(name = "toDirId") String toDirId,
+        @RequestBody FileListDto fileListDto
+    ) {
+        fileService.copyFileList(fileListDto.getFileIdList(), fromDirId, toDirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_COPY_SUCCESS));
+    }
+
+    @Override
     @PatchMapping("/{dirId}/files/{fileId}/move")
     public ResponseEntity<ResultResponse> moveFile(
         @PathVariable(name = "fileId") String fileId,
@@ -133,6 +145,17 @@ public class DirectoryController implements DirectoryDocs {
         @RequestParam(name = "toDirId") String toDirId
     ) {
         fileService.moveFile(fileId, fromDirId, toDirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS));
+    }
+
+    @Override
+    @PatchMapping("/{dirId}/files/move")
+    public ResponseEntity<ResultResponse> moveFileList(
+        @PathVariable(name = "dirId") String fromDirId,
+        @RequestParam(name = "toDirId") String toDirId,
+        @RequestBody FileListDto fileListDto
+    ) {
+        fileService.moveFileList(fileListDto.getFileIdList(), fromDirId, toDirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS));
     }
 
@@ -146,6 +169,18 @@ public class DirectoryController implements DirectoryDocs {
         fileService.deleteOneFile(fileId, dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS));
     }
+
+    @Override
+    @DeleteMapping("/{dirId}/files")
+    public ResponseEntity<ResultResponse> deleteFileList(
+        @PathVariable(name = "dirId") String dirId,
+        @RequestBody FileListDto fileListDto
+    ) {
+
+        fileService.deleteFileList(fileListDto.getFileIdList(), dirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS));
+    }
+
 
     @Override
     @GetMapping("/{dirId}/child")
