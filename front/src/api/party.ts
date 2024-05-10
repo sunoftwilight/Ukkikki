@@ -1,6 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { formDataApi, privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
+// import { ResponseData } from '../types/Group';
 
 const url = 'party'
 
@@ -16,7 +17,7 @@ export const createParty = async (
 export const getPartyList = async (
 	Response: (Response: AxiosResponse<ResponseData>) => void,
 	Error: (Error: AxiosResponse<ResponseData>) => void) => {
-		await privateApi.get(`/${url}/getList`)
+		await privateApi.get(`/${url}/list`)
 		.then(Response)
 		.catch(Error)
 	}

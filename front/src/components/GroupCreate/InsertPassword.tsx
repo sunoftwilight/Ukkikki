@@ -1,17 +1,14 @@
-import React, {useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { InsertPasswordProps } from "../../types/Group";
+import { createParty } from "../../api/party"; 
+import { userStore } from "../../stores/UserStore";
+import { useStore } from "zustand";
 
-
-const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtnClick, createData, doneData}) => {
-
-  const handleBackBtnClick = () => {
-    onBackBtnClick('info', createData)
-  }
-  const handleNextBtnClick = () => {
-    onNextBtnClick('info', doneData)
-  }
-
-  const inputsRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
+const InsertPassword: React.FC<InsertPasswordProps> = ({ onBackBtnClick, onNextBtnClick, createData, doneData }) => {
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const inputsRefs = useRef<(HTMLInputElement | null)[]>(Array(12).fill(null));
+  const user = useStore(userStore)
 
   useEffect(() => {
     if (inputsRefs.current[0]) {
@@ -19,14 +16,57 @@ const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtn
     }
   }, []);
 
+
+  const handleBackBtnClick = () => {
+    onBackBtnClick('info', createData);
+  };
+
+  const handleNextBtnClick = () => {
+    if (password === confirmPassword) {
+      createData.partyPass = password;
+      createRequest();
+    } else {
+      alert('다시 입력해주세요.')
+    }
+  };
+
   const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    if (value.length === 1 && index < 5 && inputsRefs.current[index + 1]) {
+    if (index < 6) {
+      setPassword((prevPassword) => prevPassword.substring(0, index) + value + prevPassword.substring(index + 1));
+    } else {
+      setConfirmPassword((prevConfirmPassword) => prevConfirmPassword.substring(0, index - 6) + value + prevConfirmPassword.substring(index - 6 + 1));
+    }
+    if (value.length === 1 && index < 11 && inputsRefs.current[index + 1]) {
       inputsRefs.current[index + 1]?.focus();
     } else if (value.length === 0 && index > 0 && inputsRefs.current[index - 1]) {
       inputsRefs.current[index - 1]?.focus();
     }
   };
+
+  const createRequest = async () => {
+    const param = {
+      password: createData.partyPass,
+      partyName: createData.partyName,
+      simplePassword: user.simplePass
+    }
+
+    const formData = new FormData();
+    const key = new Blob([JSON.stringify(param)], {type: 'application/json',});
+    const file = new File([createData.partyProfile], 'image.jpeg', {type: 'image/jpeg'});
+    formData.append('createPartyDto', key);
+    formData.append('photo', file);
+    console.log(formData.get('createPartyDto'))
+    console.log(formData.get('photo'))
+    await createParty(formData,
+      (response) => {
+        console.log(response)
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
 
   return (
     <div className="flex flex-col w-full h-full font-pre-B px-4">
@@ -38,14 +78,14 @@ const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtn
       <div className="w-full mb-10">
         <p className="text-lg mb-3">그룹 비밀번호</p>
         <div className="w-full h-14 flex justify-between">
-        {Array(6)
+          {Array(6)
             .fill(null)
             .map((_, index) => (
               <input
                 key={index}
                 type="password"
                 maxLength={1}
-                className="h-14 w-12 rounded-lg bg-gray text-center"
+                className="h-14 w-12 rounded-lg bg-gray text-center outline-none"
                 ref={(el) => (inputsRefs.current[index] = el)}
                 onChange={(event) => handleInputChange(index, event)}
               />
@@ -56,14 +96,21 @@ const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtn
       <div className="w-full mb-10">
         <p className="text-lg mb-3">그룹 비밀번호 확인</p>
         <div className="w-full h-14 flex justify-between">
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-          <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+          {Array(6)
+            .fill(null)
+            .map((_, index) => (
+              <input
+                key={index + 6}
+                type="password"
+                maxLength={1}
+                className="h-14 w-12 rounded-lg bg-gray text-center outline-none"
+                ref={(el) => (inputsRefs.current[index + 6] = el)}
+                onChange={(event) => handleInputChange(index + 6, event)}
+              />
+            ))}
         </div>
       </div>
+
 
       <div className="w-full text-xl text-white">
         <button className="w-full h-[60px] bg-main-blue rounded-2xl" onClick={handleNextBtnClick}>
@@ -74,8 +121,7 @@ const InsertPassword:React.FC<InsertPasswordProps> = ({onBackBtnClick, onNextBtn
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default InsertPassword;
-

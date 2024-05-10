@@ -14,7 +14,6 @@ const InsertInfo:React.FC<InsertInfoProps> = ({ onNextBtnClick, createData }) =>
     const file = e.target.files?.[0];
 
     if (file) {
-      console.log(file)
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
       createData.partyProfile = file;
@@ -51,7 +50,7 @@ const InsertInfo:React.FC<InsertInfoProps> = ({ onNextBtnClick, createData }) =>
           onChange={handleImageChange}/>
       </div>
       <div className="px-4 w-full">
-        <input ref={inputNameRef} type="text" className="w-full h-[60px] bg-soft-gray rounded-2xl mb-3 text-xl font-pre-SB text-center focus:none" placeholder="그룹이름을 설정해 주세요."/>
+        <input ref={inputNameRef} type="text" className="w-full h-[60px] bg-soft-gray rounded-2xl mb-3 text-xl font-pre-SB text-center outline-none" placeholder="그룹이름을 설정해 주세요."/>
         <button className="w-full h-[60px] bg-main-blue rounded-2xl" onClick={handleNextBtnClick}>
           <p className="font-pre-B text-xl text-white">다음</p>
         </button>
