@@ -5,50 +5,48 @@ import BackHeader from "../components/Header/BackHeader";
 import LogoHeader from "../components/Header/LogoHeader";
 import WriteHeader from "../components/Header/WriteHeader";
 import SaveHeader from "../components/Header/SaveHeader";
-import { connectAlarm } from "../api/alarm";
-import { EventSourcePolyfill } from 'event-source-polyfill';
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 const Header: React.FC = () => {
-	const location = useLocation();	
+	const location = useLocation();
 
 	const groupBackPath = [
-		"/grouplist", "/groupcreate", "/createdone", "/groupconfig",
-		"/groupenv", "/groupprofile", "/groupuser", "/groupuserdetail",
-		"/groupban", "/groupinfo", "/grouppass"
+		"/grouplist",
+		"/groupcreate",
+		"/createdone",
+		"/groupconfig",
+		"/groupenv",
+		"/groupprofile",
+		"/groupuser",
+		"/groupuserdetail",
+		"/groupban",
+		"/groupinfo",
+		"/grouppass",
 	];
+
 	const basicPath = ["/", "/group", "/mypage", "/groupattend"];
 	const backPath = ["/setting", "/feed", "/chat", ...groupBackPath];
 	const albumPath = ["/album", "/trash"];
 
 	useEffect(() => {
-		connectAlarm(
-			(res) => {
-				console.log("연결 성공", res);
-			},
-			(err) => {
-				console.error("연결 실패", err);
-			},
-		);
-		const eventSource = new EventSourcePolyfill('/api/alarm/sub',{
+		const sse = new EventSourcePolyfill("https://k10d202.p.ssafy.io/api/alarm/sub", {
 			headers: {
-				'authorization': `Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk`,
+				authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk",
+				"Content-Type": "text/event-stream",
 			},
 		});
-	
-		eventSource.addEventListener('connect', () => {
-			//'new_thread' 이벤트가 오면 할 동작
-			console.log('연결')
-		});
-	
-		eventSource.onerror = () => {
-			//에러 발생시 할 동작
-			console.log('에러')
-			eventSource.close(); //연결 끊기
-		};
 		
-		return () => {
-			eventSource.close();
-		};
+		sse.addEventListener("CHECK", (event) => {
+			const e = event as MessageEvent; // 이벤트 타입을 MessageEvent로 캐스팅
+			console.log("connect event data: ", e.data); // 이제 e.data를 안전하게 사용할 수 있습니다.
+		});
+
+		sse.addEventListener("COMMENT", (event) => {
+			const e = event as MessageEvent; // 이벤트 타입을 MessageEvent로 캐스팅
+			console.log("connect event data: ", e.data); // 이제 e.data를 안전하게 사용할 수 있습니다.
+		});
+
+		return () => sse.close(); // 컴포넌트 언마운트 시 EventSource 연결을 닫습니다.
 	}, []);
 
 	if (basicPath.includes(location.pathname)) return <LogoHeader />;
@@ -64,8 +62,6 @@ const Header: React.FC = () => {
 };
 
 export default Header;
-
-
 
 // "id:1_1715326312683
 // event:CHECK
