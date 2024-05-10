@@ -1,28 +1,44 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import InsertInfo from "../components/GroupCreate/InsertInfo";
 import InsertPassword from "../components/GroupCreate/InsertPassword";
 import CreateDone from "../components/GroupCreate/CreateDone";
+import { CreatePartyData, CreateDoneProps } from "../types/Group";
 
 const GroupCreate: React.FC = () => {
+  const emptyFile: File = new File([], '');
+
   const [isState, setIsState] = useState<String>('info')
-  const [doneData, setDoneData] = useState<[number | null, string, string]>([null, '', ''])
-  const insertDataChange = (type:string) => {
+  const doneData = useRef<CreateDoneProps>({partyPk: null, partyName: '', inviteCode: ''})
+  const createData = useRef<CreatePartyData>({partyName: '', partyPass: '', simplePass: '', partyProfile: emptyFile})
+
+  const insertDataChange = (type:string, data:CreatePartyData) => {
+    setIsState(type);
+    createData.current = data;
+  }
+
+  const doneDataChange = (type:string, data:CreateDoneProps) => {
     setIsState(type)
+    doneData.current = data;
   }
-  const doneDataChange = (id:number, name:string, code:string) => {
-    setIsState('done')
-    setDoneData([id, name, code])
-  }
+
   return (
     <div className="w-full h-full p-4">
       {isState === 'info' && (
-        <InsertInfo onNextBtnClick={() => insertDataChange('pass')}/>
+        <InsertInfo
+          onNextBtnClick={(type, data) => {insertDataChange(type, data)}}
+          createData={createData.current}
+        />
       )}
       {isState === 'pass' && (
-        <InsertPassword onBackBtnClick={() => insertDataChange('info')} onNextBtnClick={(id, name, code) => {doneDataChange(id, name, code)}}/>
+        <InsertPassword
+          onBackBtnClick={(type, data) => {insertDataChange(type, data)}}
+          onNextBtnClick={(type, data) => {doneDataChange(type, data)}}
+          createData={createData.current}
+          doneData={doneData.current}
+          />
       )}
-      {isState === 'done' && doneData[0] !== null && (
-        <CreateDone id={doneData[0]} name={doneData[1]} code={doneData[2]} />
+      {isState === 'done' && doneData.current.partyPk !== null && (
+        <CreateDone {...doneData.current}/>
       )}
 
     </div>

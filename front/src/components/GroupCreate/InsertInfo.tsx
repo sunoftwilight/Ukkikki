@@ -1,14 +1,14 @@
 import React, { useState, useRef } from "react";
 import plusBtn from "@/assets/GroupCreate/plus-btn.png";
 import defaultimg from "@/assets/GroupCreate/defaultimg.png";
+import { InsertInfoProps } from "../../types/Group";
 
-interface InsertInfoProps {
-  onNextBtnClick: (type:string) => void;
-}
 
-const InsertInfo:React.FC<InsertInfoProps> = ({ onNextBtnClick }) => {
+const InsertInfo:React.FC<InsertInfoProps> = ({ onNextBtnClick, createData }) => {
   const [selectedImage, setSelectedImage] = useState<string>('');
+  
   const inputImgRef = useRef<HTMLInputElement>(null);
+  const inputNameRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -16,12 +16,16 @@ const InsertInfo:React.FC<InsertInfoProps> = ({ onNextBtnClick }) => {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
+      createData.partyProfile = file;
     }
+
   };
 
 
   const handleNextBtnClick = () => {
-    onNextBtnClick('pass')
+    if (!inputNameRef.current || inputNameRef.current.value === '') return;
+    createData.partyName = inputNameRef.current.value;
+    onNextBtnClick('pass', createData);
   }
 
   return (
@@ -46,7 +50,7 @@ const InsertInfo:React.FC<InsertInfoProps> = ({ onNextBtnClick }) => {
           onChange={handleImageChange}/>
       </div>
       <div className="px-4 w-full">
-        <input type="text" className="w-full h-[60px] bg-soft-gray rounded-2xl mb-3 text-xl font-pre-SB text-center focus:none" placeholder="그룹이름을 설정해 주세요.          "/>
+        <input ref={inputNameRef} type="text" className="w-full h-[60px] bg-soft-gray rounded-2xl mb-3 text-xl font-pre-SB text-center outline-none" placeholder="그룹이름을 설정해 주세요."/>
         <button className="w-full h-[60px] bg-main-blue rounded-2xl" onClick={handleNextBtnClick}>
           <p className="font-pre-B text-xl text-white">다음</p>
         </button>

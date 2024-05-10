@@ -1,23 +1,20 @@
 import React from "react";
 import { inviteStore } from "../../stores/ModalStore";
 import { useNavigate } from "react-router-dom";
-interface CreateDoneProps {
-    id: number,
-    name: string,
-    code: string
-}
+import { CreateDoneProps } from "../../types/Group";
 
-const CreateDone:React.FC<CreateDoneProps> = ({name}) => {
-  const GroupName = name;
-  //   const GroupId = id;
-  //   const GroupCode = code;
+const CreateDone:React.FC<CreateDoneProps> = ({partyPk, partyName, inviteCode}) => {
+  const name = partyName
+  const pk = partyPk
+  const code = inviteCode
+  console.log(name, pk, code)
   const btnStyle = "w-full h-[50px] rounded-[15px] flex justify-center items-center hover:scale-95 active:scale-95 active:bg-main-blue transition-transform duration-75"
   const { setInviteOpen } = inviteStore()
   const navi = useNavigate();
   return (
     <div className="flex flex-col w-full h-full px-4">
       <div className="font-pre-B text-2xl mt-28 mb-24">
-        <p>'{GroupName}' 이</p>
+        <p>'{partyName}' 이</p>
         <p>생성되었습니다!</p>
       </div>
       <div className="font-pre-B text-white text-xl flex flex-col gap-4">

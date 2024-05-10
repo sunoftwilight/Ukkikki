@@ -1,4 +1,3 @@
-
 export interface UserResponeseData {
     resultCode: string;
     data: UserInfo;
@@ -9,5 +8,5 @@ export interface UserInfo {
     userName: string;
     profileUrl: string;
     uploadGroupId: number|null;
-    isInsertPass: boolean;
+    insertPass: boolean;
 }
