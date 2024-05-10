@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import project.domain.directory.collection.File;
+import project.domain.directory.repository.FileRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
@@ -24,6 +26,7 @@ public class PhotoServiceImpl implements PhotoService{
     private final MemoRepository memoRepository;
     private final MemberRepository memberRepository;
     private final PhotoRepository photoRepository;
+    private final FileRepository fileRepository;
 
     @Override
     @Transactional
@@ -45,8 +48,12 @@ public class PhotoServiceImpl implements PhotoService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
+
+        File file = fileRepository.findById(memoDto.getFileId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+
         // 사진 정보 조회
-        Photo photo = photoRepository.findById(memoDto.getPhotoId())
+        Photo photo = photoRepository.findById(file.getPhotoDto().getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
 
 

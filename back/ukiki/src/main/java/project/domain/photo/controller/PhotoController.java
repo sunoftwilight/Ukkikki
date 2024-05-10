@@ -23,7 +23,6 @@ public class PhotoController implements PhotoDocs {
     @PostMapping("/memo/create")
     public ResponseEntity<ResultResponse> memoCreate(MemoDto memoDto) {
 
-        System.out.println(memoDto.getPhotoId());
         photoService.memoCreate(memoDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.CREATE_MEMO_SUCCESS));

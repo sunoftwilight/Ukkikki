@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemoDto {
-    private Long photoId;
+    private String fileId;
     private String content;
 }
