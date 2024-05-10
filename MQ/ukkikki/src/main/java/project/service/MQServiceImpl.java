@@ -107,7 +107,7 @@ public class MQServiceImpl implements MQService {
     @Override
     public void queSize() {
         System.out.println(waitLinkedDeque.size());
-        for(int i=0;i<4;i++){
+        for(int i=0;i<workLinkedDeque.length;i++){
             System.out.println("workLinkedDeque" + i + " = " + workLinkedDeque[i].size());
         }
     }
