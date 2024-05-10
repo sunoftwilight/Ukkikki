@@ -14,5 +14,5 @@ public class PartyLinkDto {
     String partyName;
     Long party;
     String sseKey;
-
+    String rootDirId;
 }

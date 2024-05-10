@@ -13,10 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import project.domain.member.entity.MemberRole;
 import project.domain.party.dto.request.*;
-import project.domain.party.dto.response.CheckPasswordDto;
-import project.domain.party.dto.response.PartyEnterDto;
-import project.domain.party.dto.response.PartyLinkDto;
-import project.domain.party.dto.response.SimpleMemberPartyDto;
+import project.domain.party.dto.response.*;
 import project.domain.party.service.PartyService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
@@ -29,14 +26,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PartyController implements PartyDocs {
 
+
     private final PartyService partyService;
 
     @Override
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create", consumes = {"application/json", "multipart/form-data"})
     public ResponseEntity<ResultResponse> createParty(@RequestPart @Valid CreatePartyDto createPartyDto,
                                                       @RequestPart(required = false) MultipartFile photo) {
         PartyLinkDto response = partyService.createParty(createPartyDto, photo);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_PARTY_SUCCESS, response));
+    }
+
+    @Override
+    @GetMapping("/list")
+    public ResponseEntity<ResultResponse> getPartyList() {
+        List<SimplePartyDto> res = partyService.getPartyList();
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_PARTY_LIST_SUCCESS, res));
     }
 
     @Override

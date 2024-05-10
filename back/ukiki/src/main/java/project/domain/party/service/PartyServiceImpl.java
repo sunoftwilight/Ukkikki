@@ -33,10 +33,7 @@ import project.domain.member.repository.KeyGroupRepository;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
 import project.domain.party.dto.request.*;
-import project.domain.party.dto.response.CheckPasswordDto;
-import project.domain.party.dto.response.PartyEnterDto;
-import project.domain.party.dto.response.PartyLinkDto;
-import project.domain.party.dto.response.SimpleMemberPartyDto;
+import project.domain.party.dto.response.*;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.mapper.MemberPartyMapper;
@@ -45,7 +42,10 @@ import project.domain.party.redis.PartyLink;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyLinkRedisRepository;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Face;
 import project.domain.photo.entity.Photo;
+import project.domain.photo.entity.PhotoUrl;
+import project.domain.photo.repository.FaceRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
@@ -71,6 +71,7 @@ public class PartyServiceImpl implements PartyService {
     private final ProfileRepository profileRepository;
     private final ChatRepository chatRepository;
     private final KeyGroupRepository keyGroupRepository;
+    private final FaceRepository faceRepository;
 
     private final PartyLinkMapper partyLinkMapper;
     private final MemberPartyMapper memberPartyMapper;
@@ -160,7 +161,20 @@ public class PartyServiceImpl implements PartyService {
 
         PartyLinkDto partyLinkDto = partyLinkMapper.toPartyLinkDto(partyLink);
         partyLinkDto.setSseKey(sseKey);
+        partyLinkDto.setRootDirId(party.getRootDirId());
         return partyLinkDto;
+    }
+
+    @Override
+    public List<SimplePartyDto> getPartyList() {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        List<Party> partyList = partyRepository.findPartyListByMemberId(memberId);
+        List<SimplePartyDto> res = memberPartyMapper.toSimplePartyDtoList(partyList);
+
+        return res;
     }
 
     @Override
@@ -243,7 +257,7 @@ public class PartyServiceImpl implements PartyService {
         checkPasswordDto.setSseKey(sseKey);
 
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         //DB UPDATE
         StringEncryptor encryptor = jasyptUtil.customEncryptor(checkChangePasswordDto.getSimplePassword());
@@ -423,7 +437,7 @@ public class PartyServiceImpl implements PartyService {
             }
             Member targetMember = targetMemberParty.getMember();
             KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetMember, party)
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
             keyGroup.setSseKey("expired");
             keyGroupRepository.save(keyGroup);
@@ -431,7 +445,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 마스터 유저는 바로 키그룹에 반영
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         StringEncryptor encryptor = jasyptUtil.customEncryptor(partyPasswordDto.getSimplePassword());
         String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
@@ -444,13 +458,42 @@ public class PartyServiceImpl implements PartyService {
         // S3 이미지 비밀번호 바꾸기
         List<Photo> photos = party.getPhotoList();
 
+        // S3 이미지 암호키 변경
         for (Photo photo : photos) {
-            for (String url : photo.getPhotoUrl().photoUrls()){
-                String fileName = url.substring(
-                    url.lastIndexOf("/"),
-                    url.lastIndexOf(".") - 1);
-                s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
+            // 원본 이미지와 썸네일의 url 가져오기
+            PhotoUrl photoUrl = photo.getPhotoUrl();
+            // 원본 이미지의 얼굴 분류 사진 리스트 가져오기
+            List<Face> faceList = faceRepository.findByOriginImageUrl(photoUrl.getPhotoUrl());
+            // 얼굴 분류 사진의 키 변경 후 변경된 url 로 Entity 업데이트
+            for (Face face : faceList){
+                String url = face.getFaceImageUrl();
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                face.setFaceImageUrl(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
             }
+            {   // 메인이미지 키 변경 후 변경된 url 로 Entity 업데이트
+                String url = photoUrl.getPhotoUrl();
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                photoUrl.setPhotoUrl(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
+            }
+            // 얼굴 분류 사진 Entity 의 메인이미지 url 업데이트
+            for (Face face : faceList){
+                face.setOriginImageUrl(photoUrl.getPhotoUrl());
+                // 얼굴 분류 DB 업데이트
+                faceRepository.save(face);
+            }
+            {   // 썸네일 1번 키 변경 후 변경된 url 로 Entity 업데이트
+                String url = photoUrl.getThumb_url1();
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                photoUrl.setThumb_url1(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
+            }
+            {   // 썸네일 2번 키 변경 후 변경된 url 로 Entity 업데이트
+                String url = photoUrl.getThumb_url2();
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                photoUrl.setThumb_url2(s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName));
+            }
+            // photo Entity 업데이트 후 DB 저장
+            photo.setPhotoUrl(photoUrl);
+            photoRepository.save(photo);
         }
         CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
         checkPasswordDto.setPartyId(party.getId());
@@ -558,7 +601,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 자신 키그룹에서 파티 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, memberParty.getParty())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         keyGroupRepository.delete(keyGroup);
 
@@ -618,7 +661,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 차단 멤버의 키그룹에서 키 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         keyGroupRepository.delete(keyGroup);
 
@@ -650,7 +693,7 @@ public class PartyServiceImpl implements PartyService {
         profileRepository.delete(targetProfile);
         // 추방 멤버의 키그룹에서 키 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         keyGroupRepository.delete(keyGroup);
     }
@@ -752,19 +795,21 @@ public class PartyServiceImpl implements PartyService {
         List<String> linkList = new ArrayList<>(linkKeyMap.keySet());
         List<Long> idList = new ArrayList<>(idMap.keySet());
         // 해당 key를 돌면서 hash 값이 없다면 삭제 -> ttl로 자동제거가 안됨
-        for (int i=0; i< linkList.size();i++) {
+        for (String link : linkList) {
 
-            Optional<PartyLink> partyLink = partyLinkRedisRepository.findByPartyLink(linkList.get(i));
+            Optional<PartyLink> partyLink = partyLinkRedisRepository.findByPartyLink(link);
             if(!partyLink.isPresent()){
                 try {
-                    redisTemplate.delete(linkKeyMap.get(linkList.get(i)));
-                    redisTemplate.opsForSet().remove("partyLink", linkList.get(i));
+                    redisTemplate.delete(linkKeyMap.get(link));
+                    redisTemplate.opsForSet().remove("partyLink", link);
                 }catch (Exception ignore){}
             }
-            Optional<PartyLink> partyId = partyLinkRedisRepository.findByParty(idList.get(i));
+        }
+        for (Long id : idList) {
+            Optional<PartyLink> partyId = partyLinkRedisRepository.findByParty(id);
             if(!partyId.isPresent()){
                 try {
-                    redisTemplate.delete(idMap.get(idList.get(i)));
+                    redisTemplate.delete(idMap.get(id));
 
                 }catch (Exception ignore){}
             }

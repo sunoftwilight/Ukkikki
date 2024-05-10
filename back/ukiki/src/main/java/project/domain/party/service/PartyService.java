@@ -5,16 +5,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
 import project.domain.party.dto.request.*;
-import project.domain.party.dto.response.CheckPasswordDto;
-import project.domain.party.dto.response.PartyEnterDto;
-import project.domain.party.dto.response.PartyLinkDto;
-import project.domain.party.dto.response.SimpleMemberPartyDto;
+import project.domain.party.dto.response.*;
 
 import java.util.List;
 
 public interface PartyService {
 
     PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo);
+
+    List<SimplePartyDto> getPartyList();
 
     PartyLinkDto createLink(Long partyId);
 

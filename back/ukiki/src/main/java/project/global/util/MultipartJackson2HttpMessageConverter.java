@@ -20,7 +20,7 @@ public class MultipartJackson2HttpMessageConverter extends AbstractJackson2HttpM
 
     @Override
     public boolean canWrite(Class<?> clazz, MediaType mediaType) {
-        return true;
+        return false;
     }
 
     @Override

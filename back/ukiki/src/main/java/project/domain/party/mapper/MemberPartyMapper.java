@@ -4,7 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import project.domain.party.dto.response.SimpleMemberPartyDto;
+import project.domain.party.dto.response.SimplePartyDto;
 import project.domain.party.entity.MemberParty;
+import project.domain.party.entity.Party;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +23,15 @@ public interface MemberPartyMapper {
     default List<SimpleMemberPartyDto> toSimplePartyMemberDtoList(List<MemberParty> memberPartyList){
         return memberPartyList.stream()
             .map(this::toSimplePartyMemberDto)
+            .collect(Collectors.toList());
+    }
+
+    @Mapping(source = "thumbnail", target = "partyProfile")
+    SimplePartyDto toSimplePartyDto(Party party);
+
+    default List<SimplePartyDto> toSimplePartyDtoList(List<Party> partyList){
+        return partyList.stream()
+            .map(this::toSimplePartyDto)
             .collect(Collectors.toList());
     }
 }

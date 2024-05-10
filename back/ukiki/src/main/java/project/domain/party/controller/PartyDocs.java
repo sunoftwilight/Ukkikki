@@ -65,4 +65,7 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 썸네일 변경")
     ResponseEntity<ResultResponse> changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
+
+    @Operation(summary = "파티 리스트 조회")
+    ResponseEntity<ResultResponse> getPartyList();
 }
