@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import project.domain.party.entity.ArticlePhoto;
+import project.domain.article.entity.ArticlePhoto;
 import project.domain.party.entity.Party;
 import project.domain.member.entity.Member;
 import project.domain.photo.entity.mediatable.DownloadLog;

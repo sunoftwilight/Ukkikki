@@ -68,7 +68,10 @@ public enum ErrorCode {
     JSON_PARSE_EXCEPTION(400, "JSON 파싱에 실패했습니다."),
 
     // Chat
-    NOT_JOIN_CHAT(400, "채팅에서 유저를 찾을 수 없습니다.")
+    NOT_JOIN_CHAT(400, "채팅에서 유저를 찾을 수 없습니다."),
+
+    // Article 관련
+    NOT_ROLE_EDIT(401, "편집 권한이 없습니다."),
     ;
 
     private final int status;
