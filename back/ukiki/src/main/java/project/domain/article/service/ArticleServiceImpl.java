@@ -43,13 +43,6 @@ public class ArticleServiceImpl implements ArticleService{
     private final PhotoRepository photoRepository;
     private final ArticlePhotoRepository articlePhotoRepository;
     private final FileRepository fileRepository;
-
-    private final MemberRepository memberRepository;
-    private final PartyRepository partyRepository;
-    private final MemberpartyRepository memberpartyRepository;
-    private final ArticleRepository articleRepository;
-    private final PhotoRepository photoRepository;
-    private final ArticlePhotoRepository articlePhotoRepository;
     private final ProfileRepository profileRepository;
 
     private final ArticleMapper articleMapper;
