@@ -3,10 +3,12 @@ package project.domain.directory.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.DataType;
@@ -15,13 +17,21 @@ import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.PhotoDto;
 import project.domain.directory.dto.TrashFileDto;
+import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashRepository;
+import project.domain.member.dto.request.CustomUserDetails;
+import project.domain.member.entity.Member;
+import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
+import project.domain.photo.entity.mediatable.DownloadLog;
+import project.domain.photo.entity.mediatable.Likes;
+import project.domain.photo.repository.DownloadLogRepository;
+import project.domain.photo.repository.LikesRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
@@ -39,6 +49,9 @@ public class FileServiceImpl implements FileService{
     private final FileRepository fileRepository;
     private final PhotoRepository photoRepository;
     private final TrashRepository trashRepository;
+    private final DownloadLogRepository downloadLogRepository;
+    private final LikesRepository likesRepository;
+    private final MemberRepository memberRepository;
 
 
     @Override
@@ -184,9 +197,30 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public String getFile(String fileId) {
-        File file = findById(fileId);
-        return file.getPhotoDto().getPhotoUrl();
+    public GetDetailFileDto getFile(String fileId) {
+        // member 찾기(다운 여부, 좋아요 여부 찾을때 사용)
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        File file = fileRepository.findById(fileId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+
+        Photo photo = photoRepository.findById(file.getPhotoDto().getId())
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+
+        Optional<DownloadLog> opDownloadLog = downloadLogRepository.findByMemberAndPhoto(
+            member, photo);
+        Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
+            photo);
+
+        return GetDetailFileDto.builder()
+                .url(file.getPhotoDto().getPhotoUrl())
+                .isDownload(opDownloadLog.isPresent())
+                .isLikes(opLikes.isPresent())
+                .build();
 
     }
 

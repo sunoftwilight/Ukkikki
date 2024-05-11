@@ -19,6 +19,7 @@ import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.FileListDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
+import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
@@ -111,7 +112,7 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String dirId,
         @PathVariable(name = "fileId") String fileId
     ) {
-        String response = fileService.getFile(fileId);
+        GetDetailFileDto response = fileService.getFile(fileId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_FILE_SUCCESS, response));
     }
 

@@ -14,4 +14,6 @@ public class GetDirInnerDtov2 {
     private Long photoId;
     private String name;
     private String url;
+    private Boolean isDownload;
+    private Boolean isLikes;
 }

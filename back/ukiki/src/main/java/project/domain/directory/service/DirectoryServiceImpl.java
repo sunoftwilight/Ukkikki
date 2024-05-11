@@ -9,9 +9,11 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.DataType;
@@ -37,12 +39,19 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Photo;
+import project.domain.photo.entity.mediatable.DownloadLog;
+import project.domain.photo.entity.mediatable.Likes;
+import project.domain.photo.repository.DownloadLogRepository;
+import project.domain.photo.repository.LikesRepository;
+import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -62,6 +71,9 @@ public class DirectoryServiceImpl implements DirectoryService {
     private final TrashBinRepository trashBinRepository;
     private final MemberRepository memberRepository;
     private final MemberpartyRepository memberpartyRepository;
+    private final PhotoRepository photoRepository;
+    private final LikesRepository likesRepository;
+    private final DownloadLogRepository downloadLogRepository;
 
     private final DirMapper dirMapper;
     private final RenameDirMapper renameDirMapper;
@@ -140,6 +152,13 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public GetDirDtov2 getDirv2(String dirId) {
+        // member 찾기(다운 여부, 좋아요 여부 찾을때 사용)
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         Directory dir = findById(dirId);
 
         GetDirDtov2 getDirDtov2 = GetDirDtov2.builder()
@@ -156,7 +175,6 @@ public class DirectoryServiceImpl implements DirectoryService {
                     .type(DataType.DIRECTORY)
                     .pk(childDir.getId())
                     .name(childDir.getDirName())
-                    .url("None")
                     .build();
                 contentList.add(dirTypeDto);
             }
@@ -168,12 +186,21 @@ public class DirectoryServiceImpl implements DirectoryService {
             List<File> fileList = fileRepository.findAllById(fileIdList);
             // 썸네일을 줘야됨
             for (File file : fileList) {
+                Photo photo = photoRepository.findById(file.getPhotoDto().getId())
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+
+                Optional<DownloadLog> opDownloadLog = downloadLogRepository.findByMemberAndPhoto(
+                    member, photo);
+                Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
+                    photo);
+
                 GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
                     .type(DataType.FILE)
                     .pk(file.getId())
                     .photoId(file.getPhotoDto().getId())
-                    .name("None")
                     .url(file.getPhotoDto().getThumbUrl1())
+                    .isDownload(opDownloadLog.isPresent())
+                    .isLikes(opLikes.isPresent())
                     .build();
                 contentList.add(fileType);
             }
