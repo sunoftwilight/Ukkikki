@@ -63,6 +63,7 @@ public class DirectoryController implements DirectoryDocs {
     }
 
     @Override
+    @GetMapping("/{dirId}/main")
     public ResponseEntity<ResultResponse> patchMainDir(
         @AuthenticationPrincipal UserDetails userDetails, String dirId) {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
