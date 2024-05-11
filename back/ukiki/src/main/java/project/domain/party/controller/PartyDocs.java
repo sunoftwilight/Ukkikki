@@ -68,4 +68,7 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 리스트 조회")
     ResponseEntity<ResultResponse> getPartyList();
+
+    @Operation(summary = "파티 디테일 조회")
+    ResponseEntity<ResultResponse> getPartyDetail(Long partyId);
 }

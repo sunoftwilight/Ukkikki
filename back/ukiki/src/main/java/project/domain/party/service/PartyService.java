@@ -15,6 +15,8 @@ public interface PartyService {
 
     List<SimplePartyDto> getPartyList();
 
+    PartyDto getPartyDetail(Long partyId);
+
     PartyLinkDto createLink(Long partyId);
 
     void enterParty(String partyLink);

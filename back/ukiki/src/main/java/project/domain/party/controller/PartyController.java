@@ -45,6 +45,13 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
+    @GetMapping("/{partyId}")
+    public ResponseEntity<ResultResponse> getPartyDetail(@PathVariable(name = "partyId")Long partyId) {
+        PartyDto res = partyService.getPartyDetail(partyId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_PARTY_DETAIL_SUCCESS, res));
+    }
+
+    @Override
     @GetMapping("/link/{partyId}")
     public ResponseEntity<ResultResponse> makePartyLink(@PathVariable Long partyId) {
         PartyLinkDto response = partyService.createLink(partyId);
