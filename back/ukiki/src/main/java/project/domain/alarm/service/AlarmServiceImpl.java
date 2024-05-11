@@ -132,11 +132,15 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public void sendAlarm(SseEmitter emitter, Long userId, Alarm alarm){
+        System.out.println("toSimpleAlarm = " + alarmMapper.toSimpleAlarm(alarm).toString());
         try{
-            emitter.send(SseEmitter.event()
-                .id(makeEmitterId(userId))
+            emitter.send(
+                SseEmitter.event()
+                .id(alarm.getAlarmType().toString())
                 .name(String.valueOf(alarm.getAlarmType()))
                 .data(alarmMapper.toSimpleAlarm(alarm))
+
+                
             );
         }catch (IOException e){
             alarm.setIsRead(false);
@@ -186,10 +190,10 @@ public class AlarmServiceImpl implements AlarmService {
         Pageable pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.Direction.DESC, "createDate");
 
         Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(memberId, pageable);
-        List<SimpleAlarm> alarmList = alarmPage.stream()
+        List<SimpleAlarm> simpleAlarmList = alarmPage.stream()
             .map(alarmMapper::toSimpleAlarm)
             .toList();
-
+        List<SimpleAlarm> alarmList = new ArrayList<>(simpleAlarmList);
         AlarmPageDto res = AlarmPageDto.builder()
             .pageNo(alarmPageableDto.getPageNo())
             .pageSize(alarmPageableDto.getPageSize())

@@ -8,10 +8,17 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import project.domain.member.service.CustomOAuth2UserService;
 import project.global.jwt.CustomSuccessHandler;
 import project.global.jwt.JWTFilter;
 import project.global.jwt.JWTUtil;
+
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -21,6 +28,8 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
 
     private final JWTUtil jwtUtil;
+//    private final CorsFilter corsFilter;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -28,6 +37,10 @@ public class SecurityConfig {
         // csrf disable
         http
             .csrf(AbstractHttpConfigurer::disable);
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+//        http
+//            .addFilter(corsFilter);
         // From 로그인 방식 disable
         http
             .formLogin(AbstractHttpConfigurer::disable);
@@ -55,5 +68,20 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+
     }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "https://j10d103.p.ssafy.io")); // 모든 출처 허용
+        configuration.setAllowedMethods(
+            Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // 허용할 HTTP 메소드 지정
+        configuration.setAllowedHeaders(Arrays.asList("Authorization","text/event-stream" ,"authorization", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers")); // 모든 헤더 허용
+        configuration.setAllowCredentials(true); // 크레덴셜 허용
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 위 설정 적용
+        return source;
+    }
+
 }

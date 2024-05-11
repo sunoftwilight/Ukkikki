@@ -838,7 +838,7 @@ public class PartyServiceImpl implements PartyService {
 
     // 비밀번호 유효성 확인 함수
     public void checkPassword(String password) {
-        Pattern passwordPattern = Pattern.compile("^[0-9a-zA-Z\\!@#$%^*+=-]{8,15}$");    // 따옴표 안에 있는 패턴 추출.
+        Pattern passwordPattern = Pattern.compile("^[0-9a-zA-Z\\!@#$%^*+=-]{6}$");    // 따옴표 안에 있는 패턴 추출.
         Matcher matcher2 = passwordPattern.matcher(password);
         if (!matcher2.matches()) {
             throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);

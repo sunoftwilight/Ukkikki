@@ -43,20 +43,23 @@ public class AlarmController implements AlarmDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_ALARM_SUCCESS, res));
     }
 
-//    @GetMapping("/test-alarm")
-//    public void testAlarm(){
-//
-//        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        Long userId = userDetails.getId();
-//
-//        SseEmitter asd = alarmService.findEmitterByUserId(userId);
-//        Alarm dsa = alarmService.createAlarm(
-//            AlarmType.REPLY,
-//            1L,1L, 53L, 53L,  "어해진 바보"
-//        );
-//        dsa.setMemberId(userId);
-//        alarmRedisRepository.save(dsa);
-//        alarmService.sendAlarm(asd,userId,dsa);
-//    }
+    @GetMapping("/test-alarm")
+    public void testAlarm(){
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = userDetails.getId();
+
+        SseEmitter asd = alarmService.findEmitterByUserId(userId);
+        if(asd != null){
+            System.out.println("Emitter IS NOT NULL");
+        }
+        Alarm dsa = alarmService.createAlarm(
+            AlarmType.COMMENT,
+            4L,1L, 53L, 6L,  "어해진 바보"
+        );
+        dsa.setMemberId(userId);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+    }
 
 }

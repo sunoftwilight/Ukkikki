@@ -54,7 +54,6 @@ public enum ErrorCode {
     FIND_PARENT_OF_ROOT_NOT_AVAILABLE(404, "최상위 폴더의 상위 폴더 입니다."),
     NO_MORE_CHILD_DIR(404, "마지막 폴더입니다."),
 
-
     // 휴지통 과련
     TRASHBIN_NOT_FOUND(404, "존재하지 않는 휴지통 입니다."),
     TRASH_CLASSIFICATION_FAIL(422, "분류 불가능한 쓰레기 타입입니다."),
@@ -72,6 +71,7 @@ public enum ErrorCode {
 
     // Article 관련
     NOT_ROLE_EDIT(401, "편집 권한이 없습니다."),
+    ARTICLE_NOT_FOUND(404, "게시판을 찾을 수 없습니다."),
     ;
 
     private final int status;
