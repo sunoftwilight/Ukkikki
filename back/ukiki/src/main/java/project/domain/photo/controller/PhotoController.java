@@ -3,6 +3,8 @@ package project.domain.photo.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,5 +28,23 @@ public class PhotoController implements PhotoDocs {
         photoService.memoCreate(memoDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.CREATE_MEMO_SUCCESS));
+    }
+
+    @Override
+    @PostMapping("/{fileId}/likes")
+    public ResponseEntity<ResultResponse> likesCreate(@PathVariable String fileId) {
+        log.info("come in likesCreate controller");
+        photoService.likesCreate(fileId);
+        log.info("result controller = void");
+        return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_LIKES_SUCCESS));
+    }
+
+    @Override
+    @DeleteMapping("/{fileId}/likes")
+    public ResponseEntity<ResultResponse> likesDelete(String fileId) {
+        log.info("come in likesDelete");
+        photoService.likesDelete(fileId);
+        log.info("result controller = void");
+        return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_LIKES_SUCCESS));
     }
 }
