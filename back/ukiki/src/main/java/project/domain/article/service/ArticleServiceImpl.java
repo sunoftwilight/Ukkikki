@@ -12,6 +12,8 @@ import project.domain.article.mapper.ArticleMapper;
 import project.domain.article.mapper.ArticlePhotoMapper;
 import project.domain.article.repository.ArticlePhotoRepository;
 import project.domain.article.repository.ArticleRepository;
+import project.domain.directory.collection.File;
+import project.domain.directory.repository.FileRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.entity.MemberRole;
@@ -33,6 +35,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService{
+
+    private final MemberRepository memberRepository;
+    private final PartyRepository partyRepository;
+    private final MemberpartyRepository memberpartyRepository;
+    private final ArticleRepository articleRepository;
+    private final PhotoRepository photoRepository;
+    private final ArticlePhotoRepository articlePhotoRepository;
+    private final FileRepository fileRepository;
 
     private final MemberRepository memberRepository;
     private final PartyRepository partyRepository;
@@ -75,7 +85,7 @@ public class ArticleServiceImpl implements ArticleService{
 
         Profile profile = profileRepository.findByMemberIdAndPartyId(memberId, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
-        
+
         Article article = articleRepository.save(
             Article.builder()
                 .title(articleCreateDto.getTitle())
@@ -88,13 +98,16 @@ public class ArticleServiceImpl implements ArticleService{
         // 게시판 사진 리스트
         List<ArticlePhoto> articlePhotoList = new ArrayList<>();
 
-        for (Long photoPk : articleCreateDto.getPhotoIdList()) {
-
-            Photo photo = photoRepository.findById(photoPk)
+        for (String filePk : articleCreateDto.getPhotoIdList()) {
+            // 파일 찾기
+            File file = fileRepository.findById(filePk)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+            // 파일로 사진 찾기
+            Photo photo = photoRepository.findById(file.getPhotoDto().getId())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
-
+            // ArticlePhoto 생성
             ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
-
+            // 리스트에 넣고 저장
             articlePhotoList.add(articlePhotoRepository.save(articlePhoto));
         }
 
@@ -117,7 +130,7 @@ public class ArticleServiceImpl implements ArticleService{
 
         // 회원인증
         if(memberId != 0){
-            
+
             memberRepository.findById(memberId)
                 .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
             MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(memberId, partyId)

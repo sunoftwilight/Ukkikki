@@ -11,5 +11,5 @@ public class ArticleCreateDto {
 
     String title;
     String content;
-    List<Long> photoIdList;
+    List<String> photoIdList;
 }
