@@ -27,6 +27,7 @@ public enum ResultCode {
     GET_BLOCK_USER_LIST_SUCCESS(200, "차단유저리스트 검색에 성공하였습니다."),
     CHANGE_THUMB_SUCCESS(200, "썸네일 변경에 성공하였습니다."),
     GET_PARTY_LIST_SUCCESS(200, "파티 리스트 조회에 성공하였습니다."),
+    GET_PARTY_DETAIL_SUCCESS(200, "파티 정보 조회에 성공하였습니다."),
 
     //File
     FILE_UPLOAD_SUCCESS(200, "파일이 정상적으로 업로드 되었습니다."),

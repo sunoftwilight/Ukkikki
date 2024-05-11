@@ -28,7 +28,9 @@ import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.TrashBinService;
 import project.domain.member.dto.request.CustomOAuth2User;
 import project.domain.member.dto.request.CustomUserDetails;
+import project.domain.member.dto.response.SimpleProfileDto;
 import project.domain.member.entity.*;
+import project.domain.member.mapper.ProfileMapper;
 import project.domain.member.repository.KeyGroupRepository;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
@@ -38,6 +40,7 @@ import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.mapper.MemberPartyMapper;
 import project.domain.party.mapper.PartyLinkMapper;
+import project.domain.party.mapper.PartyMapper;
 import project.domain.party.redis.PartyLink;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyLinkRedisRepository;
@@ -74,7 +77,9 @@ public class PartyServiceImpl implements PartyService {
     private final FaceRepository faceRepository;
 
     private final PartyLinkMapper partyLinkMapper;
+    private final ProfileMapper profileMapper;
     private final MemberPartyMapper memberPartyMapper;
+    private final PartyMapper partyMapper;
     private final S3Util s3Util;
     private final JasyptUtil jasyptUtil;
     private final BcryptUtil bcryptUtil;
@@ -171,8 +176,31 @@ public class PartyServiceImpl implements PartyService {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
 
+        memberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         List<Party> partyList = partyRepository.findPartyListByMemberId(memberId);
         List<SimplePartyDto> res = memberPartyMapper.toSimplePartyDtoList(partyList);
+
+        return res;
+    }
+
+    @Override
+    public PartyDto getPartyDetail(Long partyId) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        memberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+        PartyDto res = partyMapper.toPartyDto(party);
+        List<SimpleProfileDto> profileList = profileMapper.toSimpleProfileDtoList(
+            profileRepository.findAllByPartyId(partyId));
+        res.setPartyMembers(profileList);
 
         return res;
     }
