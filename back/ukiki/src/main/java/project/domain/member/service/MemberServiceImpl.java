@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jasypt.encryption.StringEncryptor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 import project.global.jwt.JWTUtil;
 import project.global.util.BcryptUtil;
+import project.global.util.JasyptUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +40,8 @@ public class MemberServiceImpl implements MemberService{
     private final KeyGroupRepository keyGroupRepository;
     private final KeyGroupMapper keyGroupMapper;
     private final BcryptUtil bcryptUtil;
+    private final JasyptUtil jasyptUtil;
+
     /*
     내 정보를 처음 가져올 때 사용할 함수.
      */
@@ -196,6 +200,12 @@ public class MemberServiceImpl implements MemberService{
         }
         //keyGroup 정보 가져다가 반환
         List<KeyGroup> keyGroupList = keyGroupRepository.findByMember(member);
+        
+        //sseKey 복호화 하기
+        StringEncryptor customEncryptor = jasyptUtil.customEncryptor(password);
+        for (KeyGroup keyGroup : keyGroupList) {
+            keyGroup.setSseKey(jasyptUtil.keyDecrypt(customEncryptor, keyGroup.getSseKey()));
+        }
 
         return keyGroupMapper.toKeyGroupDtoList(keyGroupList);
     }
