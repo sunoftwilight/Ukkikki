@@ -11,6 +11,8 @@ public interface TrashBinService {
 
     public void createTrashBin(Party party);
 
+    public void createTrashBinTest(Long partyId);
+
     public List<GetTrashDto> getTrashBin(Long trashBinId);
 
     void clearTrashBin(Long trashBinId);

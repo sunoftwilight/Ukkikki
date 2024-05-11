@@ -1,6 +1,5 @@
 package project.domain.directory.service;
 
-import jakarta.transaction.TransactionScoped;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,12 +15,7 @@ import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.PhotoDto;
 import project.domain.directory.dto.TrashFileDto;
-import project.domain.directory.dto.TrashPhotoDto;
 import project.domain.directory.dto.response.GetDirDto;
-import project.domain.directory.dto.response.GetFileDto;
-import project.domain.directory.mapper.GetDirMapper;
-import project.domain.directory.mapper.GetFileMapper;
-import project.domain.directory.mapper.TrashFileMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashRepository;
@@ -209,7 +203,8 @@ public class FileServiceImpl implements FileService{
                 .dirId(dirId)
                 .build())
             .deadLine(LocalDate.now().plusWeeks(2))
-            .fullRoot(directoryService.getFullRootByDirId(dirId))
+            .fullRout(directoryService.getFullRootByDirId(dirId))
+            .fullName(directoryService.getFullNameByDirId(dirId))
             .build());
     }
 }

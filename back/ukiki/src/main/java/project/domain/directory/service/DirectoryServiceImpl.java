@@ -54,7 +54,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     private static Deque<Directory> deque = new ArrayDeque<>();
     private static HashSet<String> visitedSet = new HashSet<>();
 
-
+    private final TrashBinService trashBinService;
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
@@ -237,76 +237,139 @@ public class DirectoryServiceImpl implements DirectoryService {
         );
     }
 
-    @Override
-    @Transactional
-    public void deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
-        // 폴더에서 제거, file에서 제거, 휴지통에 저장, 쓰레기 등록
+//    @Override
+//    @Transactional
+//    public void deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
+//        // 폴더에서 제거, file에서 제거, 휴지통에 저장, 쓰레기 등록
+//
+//        Directory dir = findById(dirId);
+//        if (dir.getParentDirId().equals("")) {
+//            throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+//        }
+//
+//        Directory parentDir = findById(dir.getParentDirId());
+//        parentDir.getChildDirIdList().remove(dirId);
+//        directoryRepository.save(parentDir);
+//
+//        // 초기화 작업
+//        deque.push(dir);
+//        visitedSet.add(dir.getId());
+//        while (!deque.isEmpty()) {
+//            // pop
+//            Directory curDir = deque.pop();
+//            // 현재 폴더 휴지통에 저장(폴더에 남아있는 상황)
+//            saveDirtoTrash(curDir);
+//            // 현재 폴더의 파일 휴지통에 저장후 폴더에서 삭제
+//            // fileList가 null이 아닐 경우에만 작업
+//            if (!curDir.getFileIdList().isEmpty()) {
+//                List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
+//                for (File file : fileList) {
+//                    saveFileToTrash(file, curDir.getId());
+//                    // 사진의 DirIdList 에서 curDirId 제외하기
+//                    file.getDirIdList().remove(curDir.getId());
+//                    fileRepository.save(file);
+//                    // 사진이 이제 전체 폴더에 존재하지 않는 경우에 삭제
+//                    if(file.getDirIdList().isEmpty()) {
+//                        fileRepository.delete(file);
+//                        fileRepository.save(file);
+//                    }
+//                }
+//            }
+//            // curDir의 자식 폴더 탐색
+//            // childIdList가 null면 현재 폴더 지우고 다음 deque의 dir 탐색
+//            if (curDir.getChildDirIdList().isEmpty()) {
+//                directoryRepository.delete(curDir);
+//                continue;
+//            }
+//            // childIsList가 null이 아닌경우 탐색
+//            for (String nextDirId : curDir.getChildDirIdList()) {
+//                if(visitedSet.contains(nextDirId)){
+//                    continue;
+//                }
+//                Directory nextDir = directoryRepository.findById(nextDirId)
+//                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+//                // push
+//                deque.push(nextDir);
+//                // 방문 체크
+//                visitedSet.add(nextDirId);
+//            }
+//            // 탐색 끝난 폴더 삭제
+//            directoryRepository.delete(curDir);
+//        }
+//        // 다음 요청 수행을 위해 visitedSet 비워주기
+//        visitedSet.clear();
+//
+//        // 해당 휴지통에 삭제된 dirTrashId 추가
+//        Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
+//            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+//        Long trashBinId = getTrashBinId(dir);
+//        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+//            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+//        trashBin.getDirTrashIdList().add(dirTrash.getId());
+//        trashBinRepository.save(trashBin);
+//    }
+@Override
+@Transactional
+public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한다.
+    // 루트 폴더에서 부모 폴더를 찾는 것은 불가능합니다.
+    Directory dir = findById(dirId);
+    if (dir.getParentDirId().equals("")) {
+        throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+    }
 
-        Directory dir = findById(dirId);
-        if (dir.getParentDirId().equals("")) {
-            throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+    // 부모 폴더에서 이 폴더를 제거
+    Directory parentDir = findById(dir.getParentDirId());
+    parentDir.getChildDirIdList().remove(dirId);
+    directoryRepository.save(parentDir);
+
+    // 모든 폴더와 파일을 순회하고 후위 탐색 방식으로 삭제
+    postOrderDelete(dir);
+
+    // 다음 요청을 위해 visitedSet 비워주기
+    visitedSet.clear();
+
+    // 휴지통에 삭제된 dirTrashId 추가
+    Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
+        .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+    Long trashBinId = getTrashBinId(dir);
+    TrashBin trashBin = trashBinRepository.findById(trashBinId)
+        .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+    trashBin.getDirTrashIdList().add(dirTrash.getId());
+    trashBinRepository.save(trashBin);
+}
+
+    private void postOrderDelete(Directory curDir) {
+        // 현재 디렉토리를 이미 방문한 경우 패스
+        if (visitedSet.contains(curDir.getId())) {
+            return;
         }
 
-        Directory parentDir = findById(dir.getParentDirId());
-        parentDir.getChildDirIdList().remove(dirId);
-        directoryRepository.save(parentDir);
+        // 방문 기록에 추가
+        visitedSet.add(curDir.getId());
 
-        // 초기화 작업
-        deque.push(dir);
-        visitedSet.add(dir.getId());
-        while (!deque.isEmpty()) {
-            // pop
-            Directory curDir = deque.pop();
-            // 현재 폴더 휴지통에 저장(폴더에 남아있는 상황)
-            saveDirtoTrash(curDir);
-            // 현재 폴더의 파일 휴지통에 저장후 폴더에서 삭제
-            // fileList가 null이 아닐 경우에만 작업
-            if (!curDir.getFileIdList().isEmpty()) {
-                List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
-                for (File file : fileList) {
-                    saveFileToTrash(file, curDir.getId());
-                    // 사진의 DirIdList 에서 curDirId 제외하기
-                    file.getDirIdList().remove(curDir.getId());
-                    fileRepository.save(file);
-                    // 사진이 이제 전체 폴더에 존재하지 않는 경우에 삭제
-                    if(file.getDirIdList().isEmpty()) {
-                        fileRepository.delete(file);
-                        fileRepository.save(file);
-                    }
-                }
-            }
-            // curDir의 자식 폴더 탐색
-            // childIdList가 null면 현재 폴더 지우고 다음 deque의 dir 탐색
-            if (curDir.getChildDirIdList().isEmpty()) {
-                directoryRepository.delete(curDir);
-                continue;
-            }
-            // childIsList가 null이 아닌경우 탐색
-            for (String nextDirId : curDir.getChildDirIdList()) {
-                if(visitedSet.contains(nextDirId)){
-                    continue;
-                }
-                Directory nextDir = directoryRepository.findById(nextDirId)
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
-                // push
-                deque.push(nextDir);
-                // 방문 체크
-                visitedSet.add(nextDirId);
-            }
-            // 탐색 끝난 폴더 삭제
-            directoryRepository.delete(curDir);
+        // 자식 디렉토리를 재귀적으로 삭제
+        for (String nextDirId : curDir.getChildDirIdList()) {
+            Directory nextDir = directoryRepository.findById(nextDirId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+            postOrderDelete(nextDir);
         }
-        // 다음 요청 수행을 위해 visitedSet 비워주기
-        visitedSet.clear();
 
-        // 해당 휴지통에 삭제된 dirTrashId 추가
-        Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
-        Long trashBinId = getTrashBinId(dir);
-        TrashBin trashBin = trashBinRepository.findById(trashBinId)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
-        trashBin.getDirTrashIdList().add(dirTrash.getId());
-        trashBinRepository.save(trashBin);
+        // 현재 디렉토리의 파일을 휴지통에 저장하고 삭제
+        if (!curDir.getFileIdList().isEmpty()) {
+            List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
+            for (File file : fileList) {
+                saveFileToTrash(file, curDir.getId());
+                file.getDirIdList().remove(curDir.getId());
+                fileRepository.save(file);
+                if (file.getDirIdList().isEmpty()) {
+                    fileRepository.delete(file);
+                }
+            }
+        }
+
+        // 현재 디렉토리를 휴지통에 저장하고 삭제
+        saveDirtoTrash(curDir);
+        directoryRepository.delete(curDir);
     }
 
     @Override
@@ -348,6 +411,8 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .dirName("root")
                 .parentDirId("")
                 .build());
+        trashBinService.createTrashBinTest(1L);
+
         // party에 rootDirId 저장
         findParty.setRootDirId(rootDir.getId());
         return dirMapper.toDirDto(rootDir);
@@ -451,6 +516,24 @@ public class DirectoryServiceImpl implements DirectoryService {
         return dequeDirId.stream().toList();
     }
 
+    @Override
+    public List<String> getFullNameByDirId(String dirId) {
+        Deque<String> dequeName = new ArrayDeque<>();
+
+        Directory dir = findById(dirId);
+        dequeName.addFirst(dir.getDirName());
+        int cnt = 0;
+        while(!dir.getParentDirId().equals("")) {
+            dir = findById(dir.getParentDirId());
+            dequeName.addFirst(dir.getDirName());
+            cnt++;
+            if(cnt > 100){
+                throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
+            }
+        }
+        return dequeName.stream().toList();
+    }
+
     public Trash saveDirtoTrash(Directory dir) {
         return trashRepository.save(Trash.builder()
             .id(generateId())
@@ -458,7 +541,8 @@ public class DirectoryServiceImpl implements DirectoryService {
             .dataType(DataType.DIRECTORY)
             .content(dir)
             .deadLine(LocalDate.now().plusWeeks(2))
-                .fullRoot(getFullRootByDirId(dir.getParentDirId()))
+            .fullRout(getFullRootByDirId(dir.getParentDirId()))
+            .fullName(getFullNameByDirId(dir.getParentDirId()))
             .build());
     }
 

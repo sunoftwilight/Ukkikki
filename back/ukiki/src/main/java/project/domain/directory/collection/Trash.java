@@ -27,5 +27,6 @@ public class Trash {
     private DataType dataType;
     private Object content;
     private LocalDate deadLine;
-    private List<String> fullRoot;
+    private List<String> fullRout;
+    private List<String> fullName;
 }
