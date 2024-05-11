@@ -1,7 +1,10 @@
 package project.domain.directory.controller.directory;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.FileListDto;
+import project.domain.directory.dto.response.GetChildDirDto;
+import project.domain.directory.dto.response.GetDetailFileDto;
+import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirListDto;
+import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.global.result.ResultResponse;
 
 @Tag(name ="공유 앨범 폴더및 사진 조작 관련(휴지통 아님) Controller", description = "폴더 조작 및 사진 파일 조작 API ")
@@ -27,12 +35,36 @@ public interface DirectoryDocs {
     public ResponseEntity<ResultResponse> initDirPartyTest(@PathVariable Long partyId);
 
     @Operation(summary = "해당 유저의 보유 그룹 리스트 조회 요청(회원 로직이 완료되면 pathVariable 제외 예정)", description = "PathVariable로 userId를 받아 해당 그룹 리스트 반환")
-    @ApiResponse(responseCode = "200", description = "해당 유저의 모든 그룹 조회에 성공하였습니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "0", description = "응답 양식",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResultResponse.class)
+            )
+        ),
+        @ApiResponse(responseCode = "200", description = "data 내용 아래의 DTO가 List에 싸여옵니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = GetDirListDto.class)
+            ))
+    })
     @GetMapping("")
     public ResponseEntity<ResultResponse> getDirList(Long userId);
 
     @Operation(summary = "폴더 조회 요청", description = "PathVariable로 dirId를 받아 해당 폴더 정보를 반환")
-    @ApiResponse(responseCode = "200", description = "폴더 조회에 성공하였습니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "0", description = "응답 양식",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResultResponse.class)
+            )
+        ),
+        @ApiResponse(responseCode = "200", description = "data 내용 dir과 file 타입에 따라 속성이 비어있을 수 있습니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = GetDirDtov2.class)
+            ))
+    })
     @GetMapping("/{dirId}")
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId);
 
@@ -70,7 +102,19 @@ public interface DirectoryDocs {
 
     // 사진 조회
     @Operation(summary = "특정 폴더 내 사진파일 상세 조회", description = "PathVariable로 dirId와 fileId를 받아 해당 사진 정보를 반환")
-    @ApiResponse(responseCode = "200", description = "파일 조회에 성공하였습니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "0", description = "응답 양식",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResultResponse.class)
+            )
+        ),
+        @ApiResponse(responseCode = "200", description = "data 내용",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = GetDetailFileDto.class)
+            ))
+    })
     @GetMapping("/{dirId}/files/{fileId}")
     ResponseEntity<ResultResponse> getFile(String dirId, String fileId);
 
@@ -119,12 +163,38 @@ public interface DirectoryDocs {
     );
 
     @Operation(summary = "특정 폴더의 하위 폴더 조회요청", description = "PathVariable로 dirId(부모 폴더 Id)를 받아 하위 폴더의 pk와 name을 반환")
-    @ApiResponse(responseCode = "200", description = "하위 폴더 조회에 성공하였습니다.")
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "0", description = "하위 폴더 조회에 성공하였습니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResultResponse.class)
+            )
+        ),
+        @ApiResponse(responseCode = "200", description = "data 내용 아래의 DTO가 List에 쌓여옵니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = GetChildDirDto.class)
+            ))
+    })
     @GetMapping("/{dirId}/child")
     ResponseEntity<ResultResponse> getChildDir(String dirId);
 
     @Operation(summary = "사진 상세 조회시 thumnailurl2 조회 요청", description = "PathVariable로 dirId를 해당 폴더의 모든 사진을 반환")
-    @ApiResponse(responseCode = "200", description = "해당 폴더의 모든 썸네일2 사진 조회에 성공하였습니다.")
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "0", description = "해당 폴더의 모든 썸네일2 사진 조회에 성공하였습니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResultResponse.class)
+            )
+        ),
+        @ApiResponse(responseCode = "200", description = "data 내용 아래의 DTO가 list에 쌓여옵니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = GetDirThumbUrl2.class)
+            ))
+    })
     @GetMapping("/{dirId}/thumbnail2")
     ResponseEntity<ResultResponse> getDirThumbUrl2(String dirId);
 
