@@ -2,6 +2,7 @@ package project.domain.directory.collection;
 
 import jakarta.persistence.Enumerated;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,4 +27,6 @@ public class Trash {
     private DataType dataType;
     private Object content;
     private LocalDate deadLine;
+    private List<String> fullRout;
+    private List<String> fullName;
 }

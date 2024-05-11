@@ -63,6 +63,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
+        log.info("유저 Id = {]", memberId);
 
         String key = fileUploadDto.getKey();
 

@@ -9,9 +9,11 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.DataType;
@@ -27,6 +29,7 @@ import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirInnerDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
+import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.directory.mapper.DirMapper;
 import project.domain.directory.mapper.GetDirMapper;
@@ -36,12 +39,19 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Photo;
+import project.domain.photo.entity.mediatable.DownloadLog;
+import project.domain.photo.entity.mediatable.Likes;
+import project.domain.photo.repository.DownloadLogRepository;
+import project.domain.photo.repository.LikesRepository;
+import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -53,6 +63,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     private static Deque<Directory> deque = new ArrayDeque<>();
     private static HashSet<String> visitedSet = new HashSet<>();
 
+    private final TrashBinService trashBinService;
     private final FileRepository fileRepository;
     private final PartyRepository partyRepository;
     private final DirectoryRepository directoryRepository;
@@ -60,6 +71,9 @@ public class DirectoryServiceImpl implements DirectoryService {
     private final TrashBinRepository trashBinRepository;
     private final MemberRepository memberRepository;
     private final MemberpartyRepository memberpartyRepository;
+    private final PhotoRepository photoRepository;
+    private final LikesRepository likesRepository;
+    private final DownloadLogRepository downloadLogRepository;
 
     private final DirMapper dirMapper;
     private final RenameDirMapper renameDirMapper;
@@ -94,6 +108,8 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .pk(party.getRootDirId())
                 .name(directory.getDirName())
                 .thumbnail(party.getThumbnail())
+                .createDate(party.getCreateDate().toLocalDate())
+                .fileNum(getFileNum(directory))
                 .isStar(directory.getId().equals(mainDirId))
                 .build();
             // 결과 리스트에 넣어주기
@@ -136,6 +152,13 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public GetDirDtov2 getDirv2(String dirId) {
+        // member 찾기(다운 여부, 좋아요 여부 찾을때 사용)
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         Directory dir = findById(dirId);
 
         GetDirDtov2 getDirDtov2 = GetDirDtov2.builder()
@@ -152,7 +175,6 @@ public class DirectoryServiceImpl implements DirectoryService {
                     .type(DataType.DIRECTORY)
                     .pk(childDir.getId())
                     .name(childDir.getDirName())
-                    .url("None")
                     .build();
                 contentList.add(dirTypeDto);
             }
@@ -164,11 +186,21 @@ public class DirectoryServiceImpl implements DirectoryService {
             List<File> fileList = fileRepository.findAllById(fileIdList);
             // 썸네일을 줘야됨
             for (File file : fileList) {
+                Photo photo = photoRepository.findById(file.getPhotoDto().getId())
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+
+                Optional<DownloadLog> opDownloadLog = downloadLogRepository.findByMemberAndPhoto(
+                    member, photo);
+                Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
+                    photo);
+
                 GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
                     .type(DataType.FILE)
                     .pk(file.getId())
-                    .name("None")
+                    .photoId(file.getPhotoDto().getId())
                     .url(file.getPhotoDto().getThumbUrl1())
+                    .isDownload(opDownloadLog.isPresent())
+                    .isLikes(opLikes.isPresent())
                     .build();
                 contentList.add(fileType);
             }
@@ -232,76 +264,139 @@ public class DirectoryServiceImpl implements DirectoryService {
         );
     }
 
-    @Override
-    @Transactional
-    public void deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
-        // 폴더에서 제거, file에서 제거, 휴지통에 저장, 쓰레기 등록
+//    @Override
+//    @Transactional
+//    public void deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
+//        // 폴더에서 제거, file에서 제거, 휴지통에 저장, 쓰레기 등록
+//
+//        Directory dir = findById(dirId);
+//        if (dir.getParentDirId().equals("")) {
+//            throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+//        }
+//
+//        Directory parentDir = findById(dir.getParentDirId());
+//        parentDir.getChildDirIdList().remove(dirId);
+//        directoryRepository.save(parentDir);
+//
+//        // 초기화 작업
+//        deque.push(dir);
+//        visitedSet.add(dir.getId());
+//        while (!deque.isEmpty()) {
+//            // pop
+//            Directory curDir = deque.pop();
+//            // 현재 폴더 휴지통에 저장(폴더에 남아있는 상황)
+//            saveDirtoTrash(curDir);
+//            // 현재 폴더의 파일 휴지통에 저장후 폴더에서 삭제
+//            // fileList가 null이 아닐 경우에만 작업
+//            if (!curDir.getFileIdList().isEmpty()) {
+//                List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
+//                for (File file : fileList) {
+//                    saveFileToTrash(file, curDir.getId());
+//                    // 사진의 DirIdList 에서 curDirId 제외하기
+//                    file.getDirIdList().remove(curDir.getId());
+//                    fileRepository.save(file);
+//                    // 사진이 이제 전체 폴더에 존재하지 않는 경우에 삭제
+//                    if(file.getDirIdList().isEmpty()) {
+//                        fileRepository.delete(file);
+//                        fileRepository.save(file);
+//                    }
+//                }
+//            }
+//            // curDir의 자식 폴더 탐색
+//            // childIdList가 null면 현재 폴더 지우고 다음 deque의 dir 탐색
+//            if (curDir.getChildDirIdList().isEmpty()) {
+//                directoryRepository.delete(curDir);
+//                continue;
+//            }
+//            // childIsList가 null이 아닌경우 탐색
+//            for (String nextDirId : curDir.getChildDirIdList()) {
+//                if(visitedSet.contains(nextDirId)){
+//                    continue;
+//                }
+//                Directory nextDir = directoryRepository.findById(nextDirId)
+//                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+//                // push
+//                deque.push(nextDir);
+//                // 방문 체크
+//                visitedSet.add(nextDirId);
+//            }
+//            // 탐색 끝난 폴더 삭제
+//            directoryRepository.delete(curDir);
+//        }
+//        // 다음 요청 수행을 위해 visitedSet 비워주기
+//        visitedSet.clear();
+//
+//        // 해당 휴지통에 삭제된 dirTrashId 추가
+//        Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
+//            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+//        Long trashBinId = getTrashBinId(dir);
+//        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+//            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+//        trashBin.getDirTrashIdList().add(dirTrash.getId());
+//        trashBinRepository.save(trashBin);
+//    }
+@Override
+@Transactional
+public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한다.
+    // 루트 폴더에서 부모 폴더를 찾는 것은 불가능합니다.
+    Directory dir = findById(dirId);
+    if (dir.getParentDirId().equals("")) {
+        throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+    }
 
-        Directory dir = findById(dirId);
-        if (dir.getParentDirId().equals("")) {
-            throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+    // 부모 폴더에서 이 폴더를 제거
+    Directory parentDir = findById(dir.getParentDirId());
+    parentDir.getChildDirIdList().remove(dirId);
+    directoryRepository.save(parentDir);
+
+    // 모든 폴더와 파일을 순회하고 후위 탐색 방식으로 삭제
+    postOrderDelete(dir);
+
+    // 다음 요청을 위해 visitedSet 비워주기
+    visitedSet.clear();
+
+    // 휴지통에 삭제된 dirTrashId 추가
+    Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
+        .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+    Long trashBinId = getTrashBinId(dir);
+    TrashBin trashBin = trashBinRepository.findById(trashBinId)
+        .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+    trashBin.getDirTrashIdList().add(dirTrash.getId());
+    trashBinRepository.save(trashBin);
+}
+
+    private void postOrderDelete(Directory curDir) {
+        // 현재 디렉토리를 이미 방문한 경우 패스
+        if (visitedSet.contains(curDir.getId())) {
+            return;
         }
 
-        Directory parentDir = findById(dir.getParentDirId());
-        parentDir.getChildDirIdList().remove(dirId);
-        directoryRepository.save(parentDir);
+        // 방문 기록에 추가
+        visitedSet.add(curDir.getId());
 
-        // 초기화 작업
-        deque.push(dir);
-        visitedSet.add(dir.getId());
-        while (!deque.isEmpty()) {
-            // pop
-            Directory curDir = deque.pop();
-            // 현재 폴더 휴지통에 저장(폴더에 남아있는 상황)
-            saveDirtoTrash(curDir);
-            // 현재 폴더의 파일 휴지통에 저장후 폴더에서 삭제
-            // fileList가 null이 아닐 경우에만 작업
-            if (!curDir.getFileIdList().isEmpty()) {
-                List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
-                for (File file : fileList) {
-                    saveFileToTrash(file, curDir.getId());
-                    // 사진의 DirIdList 에서 curDirId 제외하기
-                    file.getDirIdList().remove(curDir.getId());
-                    fileRepository.save(file);
-                    // 사진이 이제 전체 폴더에 존재하지 않는 경우에 삭제
-                    if(file.getDirIdList().isEmpty()) {
-                        fileRepository.delete(file);
-                        fileRepository.save(file);
-                    }
-                }
-            }
-            // curDir의 자식 폴더 탐색
-            // childIdList가 null면 현재 폴더 지우고 다음 deque의 dir 탐색
-            if (curDir.getChildDirIdList().isEmpty()) {
-                directoryRepository.delete(curDir);
-                continue;
-            }
-            // childIsList가 null이 아닌경우 탐색
-            for (String nextDirId : curDir.getChildDirIdList()) {
-                if(visitedSet.contains(nextDirId)){
-                    continue;
-                }
-                Directory nextDir = directoryRepository.findById(nextDirId)
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
-                // push
-                deque.push(nextDir);
-                // 방문 체크
-                visitedSet.add(nextDirId);
-            }
-            // 탐색 끝난 폴더 삭제
-            directoryRepository.delete(curDir);
+        // 자식 디렉토리를 재귀적으로 삭제
+        for (String nextDirId : curDir.getChildDirIdList()) {
+            Directory nextDir = directoryRepository.findById(nextDirId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+            postOrderDelete(nextDir);
         }
-        // 다음 요청 수행을 위해 visitedSet 비워주기
-        visitedSet.clear();
 
-        // 해당 휴지통에 삭제된 dirTrashId 추가
-        Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
-        Long trashBinId = getTrashBinId(dir);
-        TrashBin trashBin = trashBinRepository.findById(trashBinId)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
-        trashBin.getDirTrashIdList().add(dirTrash.getId());
-        trashBinRepository.save(trashBin);
+        // 현재 디렉토리의 파일을 휴지통에 저장하고 삭제
+        if (!curDir.getFileIdList().isEmpty()) {
+            List<File> fileList = fileRepository.findAllById(curDir.getFileIdList());
+            for (File file : fileList) {
+                saveFileToTrash(file, curDir.getId());
+                file.getDirIdList().remove(curDir.getId());
+                fileRepository.save(file);
+                if (file.getDirIdList().isEmpty()) {
+                    fileRepository.delete(file);
+                }
+            }
+        }
+
+        // 현재 디렉토리를 휴지통에 저장하고 삭제
+        saveDirtoTrash(curDir);
+        directoryRepository.delete(curDir);
     }
 
     @Override
@@ -343,6 +438,8 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .dirName("root")
                 .parentDirId("")
                 .build());
+        trashBinService.createTrashBinTest(1L);
+
         // party에 rootDirId 저장
         findParty.setRootDirId(rootDir.getId());
         return dirMapper.toDirDto(rootDir);
@@ -429,6 +526,41 @@ public class DirectoryServiceImpl implements DirectoryService {
         return dir.getId();
     }
 
+    public List<String> getFullRootByDirId(String dirId) {
+        Deque<String> dequeDirId = new ArrayDeque<>();
+
+        dequeDirId.addFirst(dirId);
+        Directory dir = findById(dirId);
+        int cnt = 0;
+        while(!dir.getParentDirId().equals("")) {
+            dir = findById(dir.getParentDirId());
+            dequeDirId.addFirst(dir.getId());
+            cnt++;
+            if(cnt > 100){
+                throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
+            }
+        }
+        return dequeDirId.stream().toList();
+    }
+
+    @Override
+    public List<String> getFullNameByDirId(String dirId) {
+        Deque<String> dequeName = new ArrayDeque<>();
+
+        Directory dir = findById(dirId);
+        dequeName.addFirst(dir.getDirName());
+        int cnt = 0;
+        while(!dir.getParentDirId().equals("")) {
+            dir = findById(dir.getParentDirId());
+            dequeName.addFirst(dir.getDirName());
+            cnt++;
+            if(cnt > 100){
+                throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
+            }
+        }
+        return dequeName.stream().toList();
+    }
+
     public Trash saveDirtoTrash(Directory dir) {
         return trashRepository.save(Trash.builder()
             .id(generateId())
@@ -436,6 +568,8 @@ public class DirectoryServiceImpl implements DirectoryService {
             .dataType(DataType.DIRECTORY)
             .content(dir)
             .deadLine(LocalDate.now().plusWeeks(2))
+            .fullRout(getFullRootByDirId(dir.getParentDirId()))
+            .fullName(getFullNameByDirId(dir.getParentDirId()))
             .build());
     }
 
@@ -475,5 +609,56 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .build())
             .deadLine(LocalDate.now().plusWeeks(2))
             .build());
+    }
+
+    @Override
+    public List<GetDirThumbUrl2> getDirThumbUrl2(String dirId) {
+        log.info("come in service");
+        Directory dir = findById(dirId);
+        List<GetDirThumbUrl2> response = new ArrayList<>();
+        List<String> fileIdList = dir.getFileIdList();
+        log.info("fileIdList = {}", fileIdList);
+        if(fileIdList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.FILE_NOT_FOUND);
+        }
+        for(File file : fileRepository.findAllById(fileIdList)) {
+            response.add(
+                GetDirThumbUrl2.builder()
+                    .pk(file.getId())
+                    .thumbUrl2(file.getPhotoDto().getThumbUrl2())
+                    .build());
+        }
+        log.info("service response = {}", response);
+        return response;
+    }
+
+    public Integer getFileNum(Directory directory) {
+        // 초기화
+        deque.addFirst(directory);
+        visitedSet.add(directory.getId());
+
+        int fileNum = 0;
+        while(!deque.isEmpty()) {
+            // pop + 해당 폴더의 파일 수 카운트
+            Directory curDirectory = deque.pop();
+            fileNum += curDirectory.getFileIdList().size();
+            // 탐색
+            List<String> childDirIdList = curDirectory.getChildDirIdList();
+            if(childDirIdList.isEmpty()) {
+                continue;
+            }
+            for(Directory childDirectory : directoryRepository.findAllById(childDirIdList)){
+                // 유효성 검사
+                if(visitedSet.contains(childDirectory.getId())) {
+                    continue;
+                }
+                // 인큐
+                deque.addFirst(childDirectory);
+                // 방첵
+                visitedSet.add(childDirectory.getId());
+            }
+        }
+        visitedSet.clear();
+        return fileNum;
     }
 }

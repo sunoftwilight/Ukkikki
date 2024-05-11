@@ -1,15 +1,16 @@
 package project.domain.directory.service;
 
 import java.util.List;
+import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.Trash;
-import project.domain.directory.dto.response.GetTrashBinDto;
+import project.domain.directory.dto.TrashFileDto;
 
 public interface TrashService {
 
     void getTrash();
 
-    void restoreTrash(String trashId, Long trashBinId);
-
+    void restoreOneTrash(String trashId, Long trashBinId);
+    void restoreTrashList(List<String> trashIdList, Long trashBinId);
     public Integer realDelete();
 
     public Trash findById(String directoryId);
@@ -33,5 +34,11 @@ public interface TrashService {
      * @return : 유저가 찍은 폴더와 사진, 해당 하위 폴더와 사진 Trash를 반환
      */
     List<Trash> getAllTrash(String TrashIdDirType);
+    // 파일 생성
+    public void setFile(Trash trash, TrashFileDto trashFileDto);
+    // 디렉토리 생성
+    public void setDir(Trash trash, Directory trashDirDto);
+    public void setConnection(Trash trash);
+    public void setEndPoint(Trash trash, List<String> fullRoutList, int sizeOfFullRoutList);
 
 }

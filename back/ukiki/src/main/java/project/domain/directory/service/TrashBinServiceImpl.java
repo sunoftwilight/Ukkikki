@@ -48,6 +48,16 @@ public class TrashBinServiceImpl implements TrashBinService {
     }
 
     @Override
+    public void createTrashBinTest(Long partyId) {
+        // TrashBin 생성
+        trashBinRepository.save(
+            TrashBin.builder()
+                .id(partyId)
+                .trashBinName(" 휴지통")
+                .build());
+    }
+
+    @Override
     public List<GetTrashDto> getTrashBin(Long trashBinId) {
         log.info("getTrashBin service");
         TrashBin trashBin = findById(trashBinId);

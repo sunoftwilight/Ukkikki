@@ -63,6 +63,7 @@ public enum ErrorCode {
     // 사진 파일 관련
     PHOTO_FILE_NOT_FOUND(404, "해당 사진 파일을 찾을 수 없습니다."),
     SSE_KEY_MISSED(400, "파일 암호키 입력이 없습니다."),
+    EMPTY_FILE_ID_LIST(404, "요청 파일 목록이 비어있습니다."),
 
     // GptUtil 관련
     JSON_PARSE_EXCEPTION(400, "JSON 파싱에 실패했습니다."),
@@ -72,6 +73,9 @@ public enum ErrorCode {
 
     // Article 관련
     NOT_ROLE_EDIT(401, "편집 권한이 없습니다."),
+
+    // Likes 관련
+    LIKES_NOT_FOUND(404, "좋아요 이력을 찾을 수 없습니다."),
     ;
 
     private final int status;

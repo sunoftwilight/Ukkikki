@@ -16,11 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.request.CreateDirDto;
+import project.domain.directory.dto.request.FileListDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
+import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
+import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.FileService;
 import project.domain.member.dto.request.CustomOAuth2User;
@@ -109,7 +112,7 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String dirId,
         @PathVariable(name = "fileId") String fileId
     ) {
-        String response = fileService.getFile(fileId);
+        GetDetailFileDto response = fileService.getFile(fileId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_FILE_SUCCESS, response));
     }
 
@@ -125,6 +128,17 @@ public class DirectoryController implements DirectoryDocs {
     }
 
     @Override
+    @PatchMapping("/{dirId}/files/copy")
+    public ResponseEntity<ResultResponse> copyFileList(
+        @PathVariable(name = "dirId") String fromDirId,
+        @RequestParam(name = "toDirId") String toDirId,
+        @RequestBody FileListDto fileListDto
+    ) {
+        fileService.copyFileList(fileListDto.getFileIdList(), fromDirId, toDirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_COPY_SUCCESS));
+    }
+
+    @Override
     @PatchMapping("/{dirId}/files/{fileId}/move")
     public ResponseEntity<ResultResponse> moveFile(
         @PathVariable(name = "fileId") String fileId,
@@ -132,6 +146,17 @@ public class DirectoryController implements DirectoryDocs {
         @RequestParam(name = "toDirId") String toDirId
     ) {
         fileService.moveFile(fileId, fromDirId, toDirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS));
+    }
+
+    @Override
+    @PatchMapping("/{dirId}/files/move")
+    public ResponseEntity<ResultResponse> moveFileList(
+        @PathVariable(name = "dirId") String fromDirId,
+        @RequestParam(name = "toDirId") String toDirId,
+        @RequestBody FileListDto fileListDto
+    ) {
+        fileService.moveFileList(fileListDto.getFileIdList(), fromDirId, toDirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS));
     }
 
@@ -147,12 +172,33 @@ public class DirectoryController implements DirectoryDocs {
     }
 
     @Override
+    @DeleteMapping("/{dirId}/files")
+    public ResponseEntity<ResultResponse> deleteFileList(
+        @PathVariable(name = "dirId") String dirId,
+        @RequestBody FileListDto fileListDto
+    ) {
+
+        fileService.deleteFileList(fileListDto.getFileIdList(), dirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS));
+    }
+
+
+    @Override
     @GetMapping("/{dirId}/child")
     public ResponseEntity<ResultResponse> getChildDir(@PathVariable(name = "dirId") String dirId) {
         log.info("come in Controller");
         List<GetChildDirDto> response = directoryService.getChildDir(dirId);
         log.info("controller response = {}", response);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_CHILD_DIR_SUCCESS, response));
+    }
+
+    @Override
+    @GetMapping("/{dirId}/thumbnail2")
+    public ResponseEntity<ResultResponse> getDirThumbUrl2(@PathVariable String dirId) {
+        log.info("come in controller");
+        List<GetDirThumbUrl2> response = directoryService.getDirThumbUrl2(dirId);
+        log.info("controller response = {}", response);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_THUMBNAIL_URL_2_SUCCESS, response));
     }
 
     @Override

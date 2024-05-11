@@ -37,11 +37,11 @@ public class TrashBinControllerImpl implements TrashBinController {
 
     @Override
     @PatchMapping("/{trashBinId}/trashes/{trashId}")
-    public ResponseEntity<ResultResponse> restoreTrash(
+    public ResponseEntity<ResultResponse> restoreOneTrash(
         @PathVariable(name = "trashBinId") Long trashBinId,
         @PathVariable(name = "trashId") String trashId
     ) {
-        trashService.restoreTrash(trashId, trashBinId);
+        trashService.restoreOneTrash(trashId, trashBinId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.RESTORE_DIRECTORY_OR_FILE_SUCCESS));
     }
 
