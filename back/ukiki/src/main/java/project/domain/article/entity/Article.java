@@ -38,6 +38,9 @@ public class Article extends BaseEntity {
     @Column(name = "title")
     private String title;
 
+    @Column(name= "writer")
+    private String writer;
+
     @Column(name = "content")
     private String content;
 

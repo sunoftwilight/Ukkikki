@@ -14,4 +14,6 @@ public interface ArticleDocs {
     
     @Operation(summary = "게시판 디테일")
     ResponseEntity<ResultResponse> articleDetail(Long partyId, Long articleId);
+
+
 }

@@ -5,6 +5,7 @@ package project.domain.alarm.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import project.domain.alarm.redis.AlarmType;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@ToString
 public class SimpleAlarm {
 
     Long partyId;
