@@ -76,7 +76,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "https://j10d103.p.ssafy.io")); // 모든 출처 허용
         configuration.setAllowedMethods(
             Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // 허용할 HTTP 메소드 지정
-        configuration.setAllowedHeaders(Arrays.asList("Authorization","text/event-stream" ,"authorization", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers")); // 모든 헤더 허용
+        configuration.setAllowedHeaders(Arrays.asList("Authorization","text/event-stream" ,"authorization", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "password")); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 크레덴셜 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

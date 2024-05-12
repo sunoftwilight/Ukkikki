@@ -71,4 +71,7 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 디테일 조회")
     ResponseEntity<ResultResponse> getPartyDetail(Long partyId);
+    
+    @Operation(summary = "파티 프로필 사진 변경")
+    ResponseEntity<ResultResponse> profilePhotoChange(Long partyId);
 }
