@@ -8,6 +8,7 @@ import { headerStore } from "../../stores/HeaderStateStore";
 import { getAlarm } from "../../api/alarm";
 import { AlarmItemType } from "../../types/AlarmType";
 import AlarmItem from "./AlarmItem";
+import LoadingGif from "./LoadingGif";
 
 // const alarmDummy = [
 // 	{
@@ -71,6 +72,8 @@ const Hamburger: React.FC = () => {
     )
   }, [alarmOpen])
 
+  const [isLoading, setIsLoading] = useState(false)
+
 	return (
 		<AnimatePresence>
 			{(alarmOpen || menuOpen) && (
@@ -113,10 +116,16 @@ const Hamburger: React.FC = () => {
 						)}
 
 						{/* 알림함 */}
-						{alarmOpen &&
-							alarmList.map((alarmItem, idx) => (
-                <AlarmItem key={idx} alarmItem={alarmItem} />
-							))}
+						{alarmOpen && 
+              <div className="flex flex-col gap-y-7">
+                {alarmList.map((alarmItem, idx) => (
+                  <AlarmItem key={idx} alarmItem={alarmItem} />
+                ))}
+                <div id='observer' className="h-[30px] w-full flex justify-center">
+                  {isLoading && <LoadingGif /> }
+                </div>
+              </div>
+            }
 					</motion.div>
 				</div>
 			)}
