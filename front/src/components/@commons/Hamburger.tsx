@@ -39,7 +39,6 @@ const Hamburger: React.FC = () => {
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
     const target = entries[0];
 
-    console.log(isLast)
     if (target.isIntersecting && !isLoading && !isLast) {
       setIsLoading(true)
     }
@@ -61,8 +60,8 @@ const Hamburger: React.FC = () => {
   // useEffect가 isLoading의 상태 변화를 계속 추적하며 api 쏘므로
   // setTimeout을 통해 api 요청 한번만 갈 수 있도록 수정
   useEffect(() => {
-    console.log('isLast', isLast)
-    if (isLoading && !isLast) {
+    if (isLast === true) return
+    if (isLoading) {
       setPage((page) => page + 1);
       setTimeout(() => {
         fetchDataHandler();
@@ -71,21 +70,18 @@ const Hamburger: React.FC = () => {
   }, [isLoading])
 
   useEffect(() => {
-    setIsLast(false)
     setAlarmList([])
     setPage(1)
     setIsLoading(true)
+    setIsLast(false)
   }, [alarmOpen])
 
   // 데이터 추가 및 loading상태 변경
   const fetchDataHandler = async () => {
-    console.log(page)
     await getAlarm(
       { pageNo: page, pageSize: 20 },
       (res) => {
-        console.log(page, res.data)
         setAlarmList(prevList => prevList.concat(res.data.data.alarmList))
-
         if (res.data.data.last === true) {
           setIsLast(true)
         }
@@ -94,19 +90,6 @@ const Hamburger: React.FC = () => {
     )
     setIsLoading(false)
   }
-
-  
-  // useEffect(() => {
-  //   getAlarm(
-  //     { pageNo: 1, pageSize: 20 },
-  //     (res) => {
-  //       console.log(res.data)
-  //       setAlarmList(res.data.data.alarmList)
-  //     },
-  //     (err) => { console.error(err) }
-  //   )
-  // }, [alarmOpen])
-
 
 	return (
 		<AnimatePresence>
@@ -157,7 +140,7 @@ const Hamburger: React.FC = () => {
                     <AlarmItem key={idx} alarmItem={alarmItem} />
                   ))}
                   <div id='observer' className="h-[30px] w-full flex justify-center">
-                    {isLoading && <LoadingGif /> }
+                    {(isLoading && !isLast) && <LoadingGif /> }
                   </div>
                 </div>
               }
