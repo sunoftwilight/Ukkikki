@@ -52,6 +52,11 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
+    public ResponseEntity<ResultResponse> profilePhotoChange(Long partyId) {
+        return null;
+    }
+
+    @Override
     @GetMapping("/link/{partyId}")
     public ResponseEntity<ResultResponse> makePartyLink(@PathVariable Long partyId) {
         PartyLinkDto response = partyService.createLink(partyId);
