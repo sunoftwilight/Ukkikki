@@ -28,7 +28,7 @@ const Main: React.FC = () => {
         <Carousel />
       </div>
 
-      <div className="flex flex-col gap-4 h-full">
+      <div className="flex flex-col gap-4 h-full pb-4">
         {/* 유저 정보 */}
         <div>
           <div className="font-pre-SB text-lg text-black">
