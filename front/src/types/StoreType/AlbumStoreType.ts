@@ -12,3 +12,10 @@ export interface PrefixStoreType {
   prefix: string;
   setPrefix: (txt: string) => void; 
 }
+
+export interface CurrentDirType {
+  currentDir: string;
+  parentDir: string;
+  setCurrentDir: (txt: string) => void; 
+  setParentDir: (txt: string) => void; 
+}

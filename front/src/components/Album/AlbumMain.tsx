@@ -3,7 +3,7 @@ import folder from "@/assets/Album/folder.png"
 import { Link } from "react-router-dom";
 import { useStore } from "zustand";
 import { DetailImgStore } from "../../stores/DetailImgStore";
-import { selectModeStore } from "../../stores/AlbumStore";
+import { currentDirStore, selectModeStore } from "../../stores/AlbumStore";
 import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
@@ -12,32 +12,33 @@ import SecureImg from "./SecureImg";
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
+  const { currentDir, setCurrentDir, parentDir, setParentDir } = useStore(currentDirStore)
 
   const [albumList, setAlbumList] = useState<contentListData[]>([])
-  const [parentId, setParentId] = useState('')
   
-  const [dirId, setDirId] = useState('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
+  // const [dirId, setDirId] = useState('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
   
   useEffect(() => {
+    // setCurrentDir(dirId)
     getDirectory(
-      dirId,
+      currentDir,
       (res) => {
         console.log(res.data.data.contentList)
-        setParentId(res.data.data.parentId)
+        setParentDir(res.data.data.parentId)
         setAlbumList(res.data.data.contentList)
       },
       (err) => {
         console.error(err)
       }
     )
-  }, [dirId])
+  }, [currentDir])
 
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
-      { parentId!= '' && 
+      { parentDir!= '' && 
         <div 
-          onClick={() => setDirId(parentId)}
+          onClick={() => setCurrentDir(parentDir)}
           className="flex flex-col justify-center items-center gap-1"
         >
           <img src={folder} className="w-[82px] h-[65px]" />
@@ -47,7 +48,7 @@ const AlbumMain: React.FC = () => {
       {albumList!.map((item, idx) => (
         ( item.type === 'DIRECTORY' ?
           <div 
-            key={idx} onClick={() => setDirId(item.pk)}
+            key={idx} onClick={() => setCurrentDir(item.pk)}
             className="flex flex-col justify-center items-center gap-1"
           >
             <img src={folder} className="w-[82px] h-[65px]" />

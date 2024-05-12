@@ -5,11 +5,20 @@ import { AlbumResponse } from '../types/AlbumType';
 
 const url = 'directories';
 
-export const getDirectory = async(
+export const getDirectory = async (
   dirId: string,
   Response : (Response : AxiosResponse<AlbumResponse>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.get(`/${url}/${dirId}`)
+  .then(Response)
+  .catch(Error)
+}
+
+export const delDirectory = async (
+  dirId: string,
+  Response : (Response : AxiosResponse<AlbumResponse>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.delete(`/${url}/${dirId}`)
   .then(Response)
   .catch(Error)
 }

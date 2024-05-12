@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { selectModeStoreType, selectListStoreType, PrefixStoreType } from '../types/StoreType/AlbumStoreType'
+import { selectModeStoreType, selectListStoreType, PrefixStoreType, CurrentDirType } from '../types/StoreType/AlbumStoreType'
 
 export const selectModeStore = create(
   persist<selectModeStoreType>((set) => ({
@@ -26,6 +26,17 @@ export const prefixStore = create(
     prefix: '',
 
     setPrefix: (txt: string) => set(() => ({ prefix: txt }))
+  }),
+  { name: 'ALBUM_STORE' }
+))
+
+export const currentDirStore = create(
+  persist<CurrentDirType>((set) => ({
+    currentDir: '',
+    parentDir: '',
+
+    setCurrentDir: (txt: string) => set(() => ({ currentDir: txt })),
+    setParentDir: (txt: string) => set(() => ({ parentDir: txt }))
   }),
   { name: 'ALBUM_STORE' }
 ))
