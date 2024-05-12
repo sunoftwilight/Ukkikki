@@ -11,22 +11,21 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
     getPartyDetail(
       alarmItem.partyId,
       (res) => {
-        console.log(res.data)
+        // console.log(res.data)
         setPartyName(res.data.data.partyName)
-        setPartyThumb(res.data.data.thumbnail)
 
-        downloadFile(
-          'jA4k9zv1/nk9xF5fkLWpaCwMs0X1JN3vd6soWbk1LVI=',
-          {
-            fileId : res.data.data.thumbnail,
-            prefix: ''
-          },
-          (res) => { 
-            const url = window.URL.createObjectURL(new Blob([res.data]))
-            setPartyThumb(url)
-          },
-          (err) => { console.error(err) },
-        )
+        // downloadFile(
+        //   'jA4k9zv1/nk9xF5fkLWpaCwMs0X1JN3vd6soWbk1LVI=',
+        //   {
+        //     fileId : res.data.data.thumbnail,
+        //     prefix: ''
+        //   },
+        //   (res) => { 
+        //     const url = window.URL.createObjectURL(new Blob([res.data]))
+        //     setPartyThumb(url)
+        //   },
+        //   (err) => { console.error(err) },
+        // )
       },
       (err) => {
         console.error(err)
@@ -44,7 +43,7 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
         </div>
         <div>
           <div className="text-xs font-pre-R text-black">
-            <span className="font-pre-SB">{alarmItem.member}</span>
+            <span className="font-pre-SB">{alarmItem.member}</span> 님께서 댓글을 작성했습니다.
           </div>
           <div className="font-pre-R text-xs text-black">
             {alarmItem.content}
