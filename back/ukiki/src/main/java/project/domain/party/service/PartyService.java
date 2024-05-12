@@ -7,6 +7,7 @@ import project.domain.member.entity.MemberRole;
 import project.domain.member.entity.Profile;
 import project.domain.party.dto.request.*;
 import project.domain.party.dto.response.*;
+import project.domain.party.redis.PartyLink;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface PartyService {
 
     PartyLinkDto createLink(Long partyId);
 
-    void enterParty(String partyLink);
+    PartyLink enterParty(String partyLink);
 
     CheckPasswordDto checkChangedPassword(CheckChangePasswordDto checkChangePasswordDto);
 

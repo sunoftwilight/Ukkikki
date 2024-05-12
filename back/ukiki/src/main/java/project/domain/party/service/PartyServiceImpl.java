@@ -255,10 +255,11 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional(readOnly = true)
-    public void enterParty(String link) {
+    public PartyLink enterParty(String link) {
         // redis에 없는 파티 참여 링크라면 에러 반환
-        partyLinkRedisRepository.findById(link)
+        PartyLink partyLink = partyLinkRedisRepository.findById(link)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
+        return partyLink;
     }
 
     @Override
