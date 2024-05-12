@@ -1,4 +1,4 @@
-import { GroupKey } from "./Group";
+import { GroupKey } from "./GroupType";
 
 export interface UserResponeseData {
     resultCode: string;

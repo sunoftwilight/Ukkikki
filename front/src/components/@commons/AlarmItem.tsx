@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AlarmItemProps } from "../../types/AlarmType";
-import { getPartyDetail } from "../../api/group";
+import { getPartyDetail } from "../../api/party";
 // import { downloadFile } from "../../api/file";
 
 const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {

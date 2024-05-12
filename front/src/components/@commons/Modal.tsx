@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { ModalProps } from "../../types/Modal";
+import { ModalProps } from "../../types/ModalType";
 import warn from "@/assets/Modal/warn.png";
 import done from "@/assets/Modal/done.png";
 import ModalBackground from "./ModalBackground";

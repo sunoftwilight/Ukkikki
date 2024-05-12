@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { formDataApi } from "../utils/http-commons";
-import { ResponseData } from "../types/Camera";
+import { ResponseData } from "../types/CameraType";
 
 export const upLoadPhoto = async (
 	params: FormData,
