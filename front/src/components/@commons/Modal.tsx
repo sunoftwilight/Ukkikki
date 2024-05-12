@@ -29,8 +29,9 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 				return (
 					<div className={`${containClass} gap-5`}>
 						<img src={warn} />
-						<div className={`${contentClass} h-[70px]`}>
-							{modalItems.content}
+						<div className={`${contentClass} h-[70px] flex-col`}>
+							{modalItems?.title}
+              <div className="w-full font-pre-R text-sm text-black">{modalItems.content}</div>
 						</div>
 					</div>
 				);
@@ -123,7 +124,7 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 				>
-					<div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
+					<div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-3 flex flex-wrap content-between">
 						{contentHandler()}
 						{btnHandler()}
 					</div>
