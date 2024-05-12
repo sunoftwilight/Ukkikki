@@ -19,7 +19,6 @@ const AlbumMain: React.FC = () => {
   // const [dirId, setDirId] = useState('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
   
   useEffect(() => {
-    // setCurrentDir(dirId)
     getDirectory(
       currentDir,
       (res) => {
