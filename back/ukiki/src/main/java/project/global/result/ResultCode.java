@@ -52,6 +52,7 @@ public enum ResultCode {
 
     // 휴지통 관련
     GET_TRASH_BIN_SUCCESS(200, "휴지통 조회에 성공하였습니다."),
+    DELETE_TRASH_SUCCESS(204, "쓰렉기 삭제에 성공하였습니다."),
 
     // alarm
     GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다."),

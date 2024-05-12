@@ -6,8 +6,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,8 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
+import project.domain.photo.entity.Photo;
+import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -41,6 +45,7 @@ public class TrashServiceImpl implements TrashService{
     private final TrashBinRepository trashBinRepository;
     private final TrashRepository trashRepository;
     private final FileRepository fileRepository;
+    private final PhotoRepository photoRepository;
 
     @Override
     public void getTrash() {
@@ -48,7 +53,6 @@ public class TrashServiceImpl implements TrashService{
     }
 
     @Override
-    @Transactional
     // trashId != rawId
     public void restoreOneTrash(String trashId, Long trashBinId) {
         TrashBin trashBin = trashBinService.findById(trashBinId);
@@ -112,12 +116,18 @@ public class TrashServiceImpl implements TrashService{
     }
 
     @Override
+    @Transactional
     public void restoreTrashList(List<String> trashIdList, Long trashBinId) {
-
+        log.info("come in restoreTrashList service");
+        for (String trashId : trashIdList) {
+            restoreOneTrash(trashId, trashBinId);
+        }
+        log.info("response restoreTrashList = void");
     }
 
     @Override
     public List<Trash> getAllTrash(String trashIdDirType) {
+        long startTime = System.nanoTime();
         List<Trash> result = new ArrayList<>();
 
         // 초기화
@@ -128,7 +138,6 @@ public class TrashServiceImpl implements TrashService{
         visitedSet.add(trashIdDirType);
         result.add(trash);
 
-        LocalDate deadLine = trash.getDeadLine();
         while (!deque.isEmpty()) {
             // 디큐, result에 저장, 모든 file의 TrashId 저장
             Trash curTrash = deque.pollLast();
@@ -177,15 +186,166 @@ public class TrashServiceImpl implements TrashService{
         }
         // 다음 요청을 위해 방문체크 지워주기
         visitedSet.clear();
+
+        long endTime = System.nanoTime();  // 종료 시간 측정
+        long duration = (endTime - startTime);  // 실행 시간 계산 (나노초 단위)
+        // 로깅
+        log.info("getAllTrash duration time: {} nanoseconds", duration);
         return result;
     }
 
+    @Override
+    public List<Trash> getAllTrashV2(String trashIdDirType) {
+        long startTime = System.nanoTime();
+
+        List<Trash> result = new ArrayList<>();
+        Map<String, Trash> cache = new HashMap<>();
+
+        Deque<Trash> deque = new ArrayDeque<>();
+        HashSet<String> visitedSet = new HashSet<>();
+        Trash initialTrash = findById(trashIdDirType);
+        deque.add(initialTrash);
+        visitedSet.add(trashIdDirType);
+        result.add(initialTrash);
+
+        while (!deque.isEmpty()) {
+            Trash currentTrash = deque.poll();
+            Directory directoryInTrash = modelMapper.map(currentTrash.getContent(),
+                Directory.class);
+
+            // 파일 처리
+            processFiles(directoryInTrash, result, cache);
+
+            // 디렉토리 처리
+            processDirectories(directoryInTrash, deque, visitedSet, result, cache);
+        }
+
+        long endTime = System.nanoTime();  // 종료 시간 측정
+        long duration = (endTime - startTime);  // 실행 시간 계산 (나노초 단위)
+        // 로깅
+        log.info("getAllTrashV2 duration time: {} nanoseconds", duration);
+        return result;
+    }
+
+    private void processFiles(Directory directory, List<Trash> result, Map<String, Trash> cache) {
+        for (String fileId : directory.getFileIdList()) {
+            if (cache.containsKey(fileId)) {
+                result.add(cache.get(fileId));
+                continue;
+            }
+            List<Trash> trashes = trashRepository.findByRawId(fileId);
+            for (Trash trash : trashes) {
+                TrashFileDto dto = modelMapper.map(trash.getContent(), TrashFileDto.class);
+                if (dto.getDirId().equals(directory.getId())) {
+                    cache.put(fileId, trash);
+                    result.add(trash);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void processDirectories(Directory directory, Deque<Trash> deque,
+        HashSet<String> visitedSet, List<Trash> result, Map<String, Trash> cache) {
+        for (String dirId : directory.getChildDirIdList()) {
+            if (!visitedSet.contains(dirId)) {
+                visitedSet.add(dirId);
+                if (cache.containsKey(dirId)) {
+                    Trash cachedTrash = cache.get(dirId);
+                    deque.addFirst(cachedTrash);
+                    result.add(cachedTrash);
+                    continue;
+                }
+                Trash newTrash = trashRepository.findFirstByRawId(dirId)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+                cache.put(dirId, newTrash);
+                deque.addFirst(newTrash);
+                result.add(newTrash);
+            }
+        }
+    }
+
+    @Override
+    public void deleteOneTrash(String trashId, Long trashBinId) {
+        Trash trash = findById(trashId);
+        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+
+        switch (trash.getDataType()) {
+            case FILE:
+                TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
+                Long photoId = trashFileDto.getPhotoDto().getId();
+
+                // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
+                setPhotoAndS3(photoId);
+
+                // 쓰레기에서 trash 지우기
+                trashRepository.deleteById(trash.getId());
+                // 쓰레기통에서 trashId 지우기
+                trashBin.getFileTrashIdList().remove(trash.getId());
+                trashBinRepository.save(trashBin);
+                break;
+
+            case DIRECTORY:
+                // 쓰레기가 폴더인 경우
+                // trashBin에서 trashId 제거
+                trashBin.getDirTrashIdList().remove(trashId);
+
+                // 해당 쓰레기 디렉토리 하위 모든 쓰레기 검색(본인 포함)
+                List<Trash> allTrash = getAllTrash(trashId);
+                for (Trash oneTrash : allTrash) {
+                    switch (oneTrash.getDataType()) {
+                        case DIRECTORY:
+                            trashRepository.delete(oneTrash);
+                            break;
+                        case FILE:
+                            trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
+                            photoId = trashFileDto.getPhotoDto().getId();
+
+                            // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
+                            setPhotoAndS3(photoId);
+
+                            // 쓰레기에서 trash 지우기
+                            trashRepository.deleteById(trash.getId());
+                            break;
+                    }
+                }
+                break;
+        }
+    }
+
+    @Override
     @Transactional
-    public Integer realDelete() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Trash> trashes = trashRepository.deleteTrashesByDeadLineIsBefore(now);
-        // 삭제 로직 보충 필요!!
-        return trashes.size();
+    public void deleteTrashList(Long trashBinId, List<String> trashIdList) {
+        log.info("come in deleteTrashList service");
+        for (String trashId : trashIdList) {
+            deleteOneTrash(trashId, trashBinId);
+        }
+        log.info("response deleteTrashList = void");
+    }
+
+
+    public void setPhotoAndS3(Long photoId) {
+        // 포토 수 - 1감소
+        Photo photo = photoRepository.findById(photoId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+
+        int photoNum = photo.getPhotoNum();
+        photoNum = photoNum - 1;
+        log.info("갱신된 photoNum = {}", photoNum);
+
+        if (photoNum != 0) {
+            log.info("photoNum 갱신 로직 실행");
+            // 그냥 photoNum 갱신하고 return
+            photo.setPhotoNum(photoNum);
+            return;
+        }
+        log.info("photo, s3 삭제 로직 실행");
+        // 0일경우 S3에서 관련 url 삭제와 photo에서 삭제
+        // S3 처리 부분은 여기에
+
+        // photo 처리 부분
+        photoRepository.delete(photo);
     }
 
     @Override
@@ -330,5 +490,4 @@ public class TrashServiceImpl implements TrashService{
         }
         directoryRepository.save(directory);
     }
-
 }

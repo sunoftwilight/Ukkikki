@@ -60,8 +60,8 @@ import project.global.exception.ErrorCode;
 @Slf4j
 public class DirectoryServiceImpl implements DirectoryService {
 
-    private static Deque<Directory> deque = new ArrayDeque<>();
-    private static HashSet<String> visitedSet = new HashSet<>();
+    private static final Deque<Directory> deque = new ArrayDeque<>();
+    private static final HashSet<String> visitedSet = new HashSet<>();
 
     private final TrashBinService trashBinService;
     private final FileRepository fileRepository;
@@ -221,7 +221,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     @Transactional
-    public GetDirDto createDir(CreateDirDto request) {
+    public void createDir(CreateDirDto request) {
         // 새로운 dir 생성
         Directory childDir = Directory.builder()
             .id(generateId())
@@ -233,18 +233,11 @@ public class DirectoryServiceImpl implements DirectoryService {
         parentDir.getChildDirIdList().add(childDir.getId());
 
         directoryRepository.saveAll(toList(childDir, parentDir));
-
-        return getDirMapper.toGetDirDto(
-            parentDir,
-            getParentDirName(parentDir),
-            getChildNameList(parentDir),
-            getPhotoUrlList(parentDir)
-        );
     }
 
     @Override
     @Transactional
-    public GetDirDto moveDir(String dirId, String toDirId) {
+    public void moveDir(String dirId, String toDirId) {
         Directory dir = findById(dirId);
         Directory fromDir = findById(dir.getParentDirId());
         Directory toDir = findById(toDirId);
@@ -256,12 +249,6 @@ public class DirectoryServiceImpl implements DirectoryService {
         dir.setParentDirId(toDirId);
 
         directoryRepository.saveAll(toList(dir, fromDir, toDir));
-        return getDirMapper.toGetDirDto(
-            fromDir,
-            getParentDirName(fromDir),
-            getChildNameList(fromDir),
-            getPhotoUrlList(fromDir)
-        );
     }
 
 //    @Override
@@ -401,11 +388,10 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
 
     @Override
     @Transactional
-    public RenameDirDto renameDir(String dirId, String newName) {
+    public void renameDir(String dirId, String newName) {
         Directory dir = findById(dirId);
         dir.setDirName(newName);
         directoryRepository.save(dir);
-        return renameDirMapper.toRenameDirDto(dir);
     }
 
     @Override

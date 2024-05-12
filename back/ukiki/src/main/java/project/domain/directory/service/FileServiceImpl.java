@@ -147,18 +147,6 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    @Transactional
-    public GetDirDto deleteAllFile(String fileId, String dirId) {
-        return null;
-    }
-
-    @Override
-    @Transactional
-    public GetDirDto deleteSelectedFile(List<String> fileIdList, String dirId) {
-        return null;
-    }
-
-    @Override
     public void setDirFileRelation(String dirId, String fileId) {
         // dir에 fileId 추가
         Directory findDir = directoryService.findById(dirId);
