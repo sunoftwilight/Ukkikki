@@ -1,32 +1,36 @@
 import React, { useState } from "react";
 import upload from "@/assets/Header/AlbumEditOptions/upload.png";
+import addFolder from "@/assets/Header/AlbumEditOptions/addFolder.png";
 import edit from "@/assets/Header/AlbumEditOptions/edit.png";
 import trash from "@/assets/Header/AlbumEditOptions/trash.png";
 import { albumEditStore } from "../../stores/HeaderStateStore";
 import { AnimatePresence } from "framer-motion";
 import Modal from "../@commons/Modal";
 import { useStore } from "zustand";
-import { currentDirStore } from "../../stores/AlbumStore";
-import { delDirectory } from "../../api/directory";
+import { currentDirStore, prefixStore } from "../../stores/AlbumStore";
+import { createDirectory, delDirectory } from "../../api/directory";
 
 const AlbumEditOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
   const { setIsEdit } = albumEditStore()
+  const { prefix } = useStore(prefixStore)
   const { currentDir, parentDir, setCurrentDir } = useStore(currentDirStore)
   const [isOkOpen, setIsOkOpen] = useState(false)
+  const [isNamingOpen, setIsNamingOpen] = useState(false)
 
   const openHandler = (mode: string) => {
     if (mode === 'delete') {
       setIsOkOpen(true)
+    } else if (mode === 'add Folder') {
+      setIsNamingOpen(true)
     }
   }
 
+  // 
   const deleteFolderHandler = () => {
     delDirectory(
       currentDir,
-      (res) => {
-        console.log(res.data)
-        console.log(parentDir)
+      () => {
         setCurrentDir(parentDir)
         doneHandler()
       },
@@ -37,10 +41,26 @@ const AlbumEditOptions: React.FC = () => {
     )
   }
 
+  const createFolderHandler = () => {
+    createDirectory(
+      { parentDirId: currentDir, dirName: prefix },
+      (res) => {
+        console.log(res.data)
+        doneHandler()
+        setCurrentDir(currentDir)
+      },
+      (err) => {
+        console.error(err)
+      }      
+    )
+  }
+
   const doneHandler = () => {
     setIsOkOpen(false)
+    setIsNamingOpen(false)
     setIsEdit()
   }
+
   return (
     <AnimatePresence>
       { isOkOpen && 
@@ -51,10 +71,23 @@ const AlbumEditOptions: React.FC = () => {
         onCancelBtnClick={() => setIsOkOpen(false)}
         />
       }
-      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[120px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
+      { isNamingOpen && 
+        <Modal 
+        key='isNamingOpen'
+        modalItems={{ title: '폴더명', content: '', modalType: 'input', btn: 2 }}
+        onSubmitBtnClick={() => createFolderHandler()}
+        onCancelBtnClick={() => setIsNamingOpen(false)}
+        />
+      }
+      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[160px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
         <div className={`${optionStyle}`} onClick={() => setIsEdit()}>
           <img src={upload} className="w-4" />
           업로드
+        </div>
+
+        <div className={`${optionStyle}`} onClick={() => openHandler('add Folder')}>
+          <img src={addFolder} className="w-4" />
+          하위 폴더 생성
         </div>
 
         <div className={`${optionStyle}`} onClick={() => setIsEdit()}>

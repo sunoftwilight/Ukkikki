@@ -33,3 +33,8 @@ export interface AlbumResponse {
   resultCode: string;
   data: AlbumData
 }
+
+export interface DirInfoType {
+  parentDirId: string;
+  dirName: string;
+}
