@@ -74,8 +74,8 @@ public class DirectoryController implements DirectoryDocs {
 
     @PostMapping("")
     public ResponseEntity<ResultResponse> createDir(@RequestBody CreateDirDto request) {
-        GetDirDto response = directoryService.createDir(request);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_DIRECTORY_SUCCESS, response));
+        directoryService.createDir(request);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_DIRECTORY_SUCCESS));
     }
 
     @Override
@@ -84,8 +84,8 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String dirId,
         @RequestParam(name = "toDirId") String toDirId
     ) {
-        GetDirDto response = directoryService.moveDir(dirId, toDirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.MOVE_DIRECTORY_SUCCESS, response));
+        directoryService.moveDir(dirId, toDirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.MOVE_DIRECTORY_SUCCESS));
     }
 
     @Override
@@ -102,9 +102,8 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String dirId,
         @RequestParam(name = "newName") String newName
     ) {
-        project.domain.directory.dto.response.RenameDirDto response = directoryService.renameDir(
-            dirId, newName);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.RENAME_DIRECTORY_SUCCESS, response));
+        directoryService.renameDir(dirId, newName);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.RENAME_DIRECTORY_SUCCESS));
     }
 
     @Override
@@ -201,17 +200,4 @@ public class DirectoryController implements DirectoryDocs {
         log.info("controller response = {}", response);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_THUMBNAIL_URL_2_SUCCESS, response));
     }
-
-    @Override
-    public ResponseEntity<ResultResponse> deleteAllFile(String fileId, String dirId) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<ResultResponse> deleteSelectedFile(List<String> fileIdList,
-        String dirId) {
-        return null;
-    }
-
-
 }

@@ -9,20 +9,20 @@ import project.domain.party.entity.Party;
 
 public interface TrashBinService {
 
-    public void createTrashBin(Party party);
+    void createTrashBin(Party party);
 
-    public void createTrashBinTest(Long partyId);
+    void createTrashBinTest(Long partyId);
 
-    public List<GetTrashDto> getTrashBin(Long trashBinId);
+    List<GetTrashDto> getTrashBin(Long trashBinId);
 
     void clearTrashBin(Long trashBinId);
 
-    public List<String> getDirNameList(TrashBin trashBin);
+    List<String> getDirNameList(TrashBin trashBin);
 
-    public List<String> getPhotoUrlList(TrashBin trashBin);
+    List<String> getPhotoUrlList(TrashBin trashBin);
 
-    public TrashBin findById(Long trashBinId);
+    TrashBin findById(Long trashBinId);
 
-    public void saveFileToTrashBin(Trash fileTrash);
+    void saveFileToTrashBin(Trash fileTrash);
 
 }

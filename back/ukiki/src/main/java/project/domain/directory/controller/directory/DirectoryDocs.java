@@ -198,9 +198,4 @@ public interface DirectoryDocs {
     @GetMapping("/{dirId}/thumbnail2")
     ResponseEntity<ResultResponse> getDirThumbUrl2(String dirId);
 
-    // 전체 사진 삭제
-    ResponseEntity<ResultResponse> deleteAllFile(String fileId, String dirId);
-
-    // 선택 사진 삭제
-    ResponseEntity<ResultResponse> deleteSelectedFile(List<String> fileIdList, String dirId);
 }

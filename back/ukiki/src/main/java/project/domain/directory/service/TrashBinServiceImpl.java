@@ -14,7 +14,6 @@ import project.domain.directory.collection.TrashBin;
 import project.domain.directory.dto.PhotoDto;
 import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.response.GetTrashDto;
-import project.domain.directory.mapper.GetTrashBinMapper;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
@@ -177,7 +176,4 @@ public class TrashBinServiceImpl implements TrashBinService {
         }
         return photoUrlList;
     }
-
-
-
 }
