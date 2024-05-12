@@ -28,12 +28,14 @@ import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.TrashBinService;
 import project.domain.member.dto.request.CustomOAuth2User;
 import project.domain.member.dto.request.CustomUserDetails;
+import project.domain.member.dto.response.KeyGroupDto;
 import project.domain.member.dto.response.SimpleProfileDto;
 import project.domain.member.entity.*;
 import project.domain.member.mapper.ProfileMapper;
 import project.domain.member.repository.KeyGroupRepository;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
+import project.domain.member.service.MemberService;
 import project.domain.party.dto.request.*;
 import project.domain.party.dto.response.*;
 import project.domain.party.entity.MemberParty;
@@ -64,12 +66,14 @@ public class PartyServiceImpl implements PartyService {
 
     private final DirectoryService directoryService;
     private final TrashBinService trashBinService;
+    private final AlarmService alarmService;
+    private final MemberService memberService;
+
     private final MemberRepository memberRepository;
     private final PartyRepository partyRepository;
     private final MemberpartyRepository memberpartyRepository;
     private final PartyLinkRedisRepository partyLinkRedisRepository;
     private final AlarmRedisRepository alarmRedisRepository;
-    private final AlarmService alarmService;
     private final PhotoRepository photoRepository;
     private final ProfileRepository profileRepository;
     private final ChatRepository chatRepository;
@@ -80,11 +84,12 @@ public class PartyServiceImpl implements PartyService {
     private final ProfileMapper profileMapper;
     private final MemberPartyMapper memberPartyMapper;
     private final PartyMapper partyMapper;
+
     private final S3Util s3Util;
     private final JasyptUtil jasyptUtil;
     private final BcryptUtil bcryptUtil;
-    private final RedisTemplate redisTemplate;
 
+    private final RedisTemplate redisTemplate;
     private final JWTUtil jwtUtil;
 
     @Override
@@ -471,7 +476,7 @@ public class PartyServiceImpl implements PartyService {
             keyGroupRepository.save(keyGroup);
         }
 
-        // 마스터 유저는 바로 키그룹에 반영
+          // 마스터 유저는 바로 키그룹에 반영
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, party)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
@@ -598,6 +603,9 @@ public class PartyServiceImpl implements PartyService {
         // 자신 프로필 조회
         Profile profile = profileRepository.findByMemberIdAndPartyId(memberId, partyId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
+
+        // TODO 자신 프로필 사진 삭제해야함
+
 
         // 자신 파티에서 삭제
         memberpartyRepository.delete(memberParty);
@@ -818,6 +826,64 @@ public class PartyServiceImpl implements PartyService {
                 }catch (Exception ignore){}
             }
         }
+    }
+
+    @Override
+    public Profile partyProfileChange(Long partyId, ChangeProfileDto profileDto, MultipartFile photo) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        memberRepository.findById(memberId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+        Profile profile = profileRepository.findByMemberIdAndPartyId(memberId, partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
+
+        if(profileDto.getNickName() != null){
+            profile.setNickname(profileDto.getNickName());
+        }
+
+        if (photo.isEmpty()){
+            return profile;
+        }
+
+        //파티 sse 키 가지고 오기
+        List<KeyGroupDto> myKeyList =  memberService.getKeyGroup(profileDto.getPassword());
+        Optional<KeyGroupDto> findPartyKeyGroup = myKeyList.stream()
+            .filter(keyGroupDto -> keyGroupDto.getPartyId().equals(partyId))
+            .findFirst();
+
+        if(findPartyKeyGroup.isEmpty()){
+            throw new BusinessLogicException(ErrorCode.PARTY_KEY_NOT_FOUND);
+        }
+        // 복호화 하기
+        String partySseJasyptKey = findPartyKeyGroup.get().getSseKey();
+
+        StringEncryptor customEncryptor = jasyptUtil.customEncryptor(profileDto.getPassword());
+
+        // 나의 SseKey
+        String partySseKey = customEncryptor.decrypt(partySseJasyptKey);
+
+        SSECustomerKey sseCustomerKey = new SSECustomerKey(partySseKey);
+
+        if (profile.getType().equals(ProfileType.S3)){
+            // 프로필 삭제
+            String thumbnail = profile.getProfileUrl();
+            s3Util.fileDelete(sseCustomerKey, thumbnail.substring(
+                thumbnail.lastIndexOf("/"),
+                thumbnail.lastIndexOf(".") - 1));
+        }
+
+        // 프로필 넣기
+        String partyThumbnailImg = s3Util.fileUpload(photo, sseCustomerKey);
+        profile.setProfileUrl(partyThumbnailImg);
+        profileRepository.save(profile);
+
+        return profile;
     }
 
 

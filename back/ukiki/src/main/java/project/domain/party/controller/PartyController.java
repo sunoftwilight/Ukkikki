@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import project.domain.member.entity.MemberRole;
+import project.domain.member.entity.Profile;
 import project.domain.party.dto.request.*;
 import project.domain.party.dto.response.*;
 import project.domain.party.service.PartyService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,6 +51,13 @@ public class PartyController implements PartyDocs {
     public ResponseEntity<ResultResponse> getPartyDetail(@PathVariable(name = "partyId")Long partyId) {
         PartyDto res = partyService.getPartyDetail(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_PARTY_DETAIL_SUCCESS, res));
+    }
+
+    @Override
+    @PostMapping(value = "/change-profile/{partyId}", consumes = {"application/json", "multipart/form-data"})
+    public ResponseEntity<Object> chagneProfile(@PathVariable(name = "partyId") Long partyId, @RequestPart ChangeProfileDto profileDto, @RequestPart(required = false)MultipartFile photo) {
+        Profile res = partyService.partyProfileChange(partyId, profileDto, photo);
+        return ResponseEntity.ok(res);
     }
 
     @Override
@@ -156,6 +165,16 @@ public class PartyController implements PartyDocs {
                                                            @RequestPart MultipartFile photo) {
         partyService.changePartyThumb(partyId, changeThumbDto, photo);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CHANGE_THUMB_SUCCESS));
+    }
+
+    @GetMapping("/test/test")
+    public ResponseEntity<Object> tesdasd(){
+        List<String> asd = new ArrayList<String>();
+        asd.add("test1");
+        asd.add("test1");
+        asd.add("test1");
+
+        return ResponseEntity.ok(asd);
     }
 
 }

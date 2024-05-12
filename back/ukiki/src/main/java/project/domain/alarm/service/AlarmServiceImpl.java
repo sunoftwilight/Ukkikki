@@ -83,6 +83,7 @@ public class AlarmServiceImpl implements AlarmService {
         return Alarm.builder()
             .alarmType(type)
             .partyId(partyId)
+            .memberId(targetId)
             .contentsId(contentsId)
             .targetId(targetId)
             .content(message)
@@ -187,7 +188,7 @@ public class AlarmServiceImpl implements AlarmService {
         memberRepository.findById(memberId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        Pageable pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.Direction.DESC, "createDate");
+        PageRequest pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.by(Sort.Direction.DESC, "createDate"));
 
         Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(memberId, pageable);
         List<SimpleAlarm> simpleAlarmList = alarmPage.stream()

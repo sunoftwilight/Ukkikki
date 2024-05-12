@@ -39,6 +39,7 @@ public enum ErrorCode {
     PARTY_ALREADY_HAVE_ROOT_DIR(400, "이미 그룹 폴더가 존재 합니다."),
     MEMBER_NOT_PROFILE(400, "프로필을 찾을 수 없습니다."),
     NOT_ROLE_GUEST(400, "게스트에게 없는 권한입니다."),
+    PARTY_KEY_NOT_FOUND(400, "파티키를 찾을 수 없습니다."),
 
     // 사진 업로드, 다운로드 관련
     META_CODE_NOT_FOUND(404, "해당 메타코드 분류가 존재하지 않습니다."),

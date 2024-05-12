@@ -71,4 +71,8 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 디테일 조회")
     ResponseEntity<ResultResponse> getPartyDetail(Long partyId);
+    
+    @Operation(summary = "파티 프로필 변경")
+    @Parameter(name = "nickName", description = "바꿀 프로필 이름")
+    ResponseEntity<Object> chagneProfile(Long partyId, ChangeProfileDto profileDto, MultipartFile photo);
 }
