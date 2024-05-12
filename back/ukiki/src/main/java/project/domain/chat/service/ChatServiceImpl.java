@@ -6,6 +6,7 @@ import org.jasypt.encryption.StringEncryptor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import project.domain.chat.repository.ChatRepository;
 import project.domain.chat.repository.ChatMemberRedisRepository;
 import project.domain.directory.service.DirectoryService;
 import project.domain.member.dto.request.CustomOAuth2User;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.entity.MemberRole;
 import project.domain.member.entity.Profile;
@@ -49,11 +51,10 @@ public class ChatServiceImpl implements ChatService{
 
     @Transactional
     @Override
-    public void sendChat(Long partyId, ChatDto chatDto, UserDetails userDetails) {
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-//        Long memberId = customOAuth2User.getId();
-        // TODO memberId 가져와야함
-        Long memberId = 1L;
+    public void sendChat(Long partyId, ChatDto chatDto) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));

@@ -24,10 +24,11 @@ public class ChatController implements ChatDocs{
 
     private final ChatService chatService;
 
+    @Override
     @ResponseBody
     @MessageMapping("/message/{partyId}")
-    public void sendMessage(@AuthenticationPrincipal UserDetails userDetails, @DestinationVariable("partyId") Long partyId, @Payload ChatDto chatDto) {
+    public void sendMessage(@DestinationVariable("partyId") Long partyId, @Payload ChatDto chatDto) {
         log.info("SEND TEST");
-        chatService.sendChat(partyId, chatDto, userDetails);
+        chatService.sendChat(partyId, chatDto);
     }
 }

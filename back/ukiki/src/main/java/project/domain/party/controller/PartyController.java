@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import project.domain.member.entity.MemberRole;
+import project.domain.member.entity.Profile;
 import project.domain.party.dto.request.*;
 import project.domain.party.dto.response.*;
 import project.domain.party.service.PartyService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -52,8 +54,10 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
-    public ResponseEntity<ResultResponse> profilePhotoChange(Long partyId) {
-        return null;
+    @PostMapping(value = "/change-profile/{partyId}", consumes = {"application/json", "multipart/form-data"})
+    public ResponseEntity<Object> chagneProfile(@PathVariable(name = "partyId") Long partyId, @RequestPart ChangeProfileDto profileDto, @RequestPart(required = false)MultipartFile photo) {
+        Profile res = partyService.partyProfileChange(partyId, profileDto, photo);
+        return ResponseEntity.ok(res);
     }
 
     @Override

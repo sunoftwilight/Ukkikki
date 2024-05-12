@@ -4,6 +4,7 @@ package project.domain.party.service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
+import project.domain.member.entity.Profile;
 import project.domain.party.dto.request.*;
 import project.domain.party.dto.response.*;
 
@@ -47,4 +48,6 @@ public interface PartyService {
     void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
     void linkDelete();
+
+    Profile partyProfileChange(Long partyId, ChangeProfileDto profileDto, MultipartFile photo);
 }
