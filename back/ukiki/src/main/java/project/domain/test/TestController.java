@@ -85,6 +85,6 @@ public class TestController {
 
     @GetMapping("/test/photo-group")
     public List<GroupbrieflyDto> testController10() throws Exception {
-        return photoGroupServiceImpl.getGroups();
+        return photoGroupServiceImpl.getGroups(1L);
     }
 }

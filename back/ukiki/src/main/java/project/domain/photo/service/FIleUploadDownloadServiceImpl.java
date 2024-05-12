@@ -119,6 +119,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                     .contentType(MediaType.IMAGE_JPEG);
             bodyBuilder.part("partyId", fileUploadDto.getPartyId());
             bodyBuilder.part("key", key);
+            bodyBuilder.part("photoId", photo.getId());
 
             webClient
                     .post()

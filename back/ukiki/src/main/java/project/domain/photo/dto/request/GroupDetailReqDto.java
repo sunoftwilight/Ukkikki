@@ -1,15 +1,11 @@
-package project.domain.photo.dto.response;
-
+package project.domain.photo.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class GroupbrieflyDto {
-
+public class GroupDetailReqDto {
     private Integer type;
     private String groupName;
-    private String thumbnailUrl;
-
 }

@@ -39,4 +39,6 @@ public class Face {
     @Column(name = "face_Group_number")
     private Integer faceGroupNumber;
 
+    @Column(name = "photo_id")
+    private Long photoId;
 }
