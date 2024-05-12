@@ -18,7 +18,7 @@ const CreateDone:React.FC<CreateDoneProps> = ({partyPk, partyName, inviteCode}) 
         <p>생성되었습니다!</p>
       </div>
       <div className="font-pre-B text-white text-xl flex flex-col gap-4">
-        <button className={btnStyle + ' bg-main-blue'} onClick={() => navi('/group')}>
+        <button className={btnStyle + ' bg-main-blue'} onClick={() => navi(`/group/${pk}`)}>
           <p>바로가기</p>
         </button>
         <button className={btnStyle + ' bg-soft-blue'} onClick={setInviteOpen}>

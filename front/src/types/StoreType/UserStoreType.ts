@@ -6,7 +6,7 @@ export interface UserStoreType {
   userProfile : string;
   isInsertPass : boolean;
   isCheckPass : boolean;
-  groupKey : string[];
+  groupKey : Record<number, string>;
   uploadGroupId: number|null;
   simplePass : string;
 
@@ -17,7 +17,7 @@ export interface UserStoreType {
   setUserProfile : (newUrl: string) => void;
   setIsInsert: (newBool: boolean) => void;
   setIsCheck: (newBool: boolean) => void;
-  setGroupKey: (newList: string[]) => void;
+  setGroupKey: (newList: Record<number, string>) => void;
   setUploadGroupId: (newId: number|null) => void;
   setSimplePass: (newPass: string) => void;
 }

@@ -24,4 +24,31 @@ export interface CreateDoneProps {
   inviteCode: string;
 }
 
-// API type
+export interface GroupKey {
+  partyId: number;
+  sseKey: string;
+}
+
+export interface PartyData {
+  party: number;
+  partyLink: string;
+  partyName: string;
+  sseKey: string;
+}
+
+export interface PartyListData{
+  id: number;
+  partyName: string;
+  partyProfile: string;
+}
+
+// API
+export interface CreateDoenResponesData{
+  resultCode: string;
+  data: PartyData;
+}
+
+export interface PartyListResponesData {
+  resultCode: string;
+  data: PartyListData[]
+}

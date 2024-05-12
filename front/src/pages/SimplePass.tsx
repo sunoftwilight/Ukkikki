@@ -4,7 +4,7 @@ import { httpStatusCode } from "../utils/http-status";
 import { useStore } from 'zustand';
 import { userStore } from '../stores/UserStore';
 import { useNavigate } from 'react-router-dom';
-
+import { GroupKey } from '../types/Group';
 interface SimplePassProps {
   type: string
 }
@@ -62,9 +62,7 @@ const SimplePass: React.FC<SimplePassProps> = ({type}) => {
       (response) => {
         if(response.status === httpStatusCode.OK) {
           user.setIsInsert(true);
-          user.setIsCheck(true);
-          user.setSimplePass(password);
-          navi('/')
+          sendCheckPass();
         }
       },
       (err) => {
@@ -81,12 +79,11 @@ const SimplePass: React.FC<SimplePassProps> = ({type}) => {
     await simpleCheck(
       config,
       (response) => {
-        console.log(response)
-        if(response.status === httpStatusCode.OK) {
-          user.setIsCheck(true);
-          user.setSimplePass(password);
-          navi('/')
-        }
+        console.log(response.data.data)
+        user.setIsCheck(true);
+        user.setSimplePass(password);
+        groupKeySetting(response.data.data)
+        navi('/')
       },
       (err) => {
         alert('잘못된 접근입니다. 잠시후 다시 시도해주세요.')
@@ -94,7 +91,7 @@ const SimplePass: React.FC<SimplePassProps> = ({type}) => {
       }
     )
   }
-  
+
   // 비밀번호 한 자리를 입력하는 함수
   const handleInput = (value: string) => {
     if (password.length === 4) return;
@@ -113,6 +110,16 @@ const SimplePass: React.FC<SimplePassProps> = ({type}) => {
   const handleReset = () => {
     setPassword("");
   };
+
+  const groupKeySetting = (data: GroupKey[]) => {
+    const keys:Record<number,string> = {}
+
+    data.forEach((item) => {
+      keys[item.partyId] = item.sseKey
+    })
+    user.setGroupKey(keys)
+
+  }
 
   return (
     <div className="w-screen h-screen">

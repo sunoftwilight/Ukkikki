@@ -43,19 +43,26 @@ export default function Router() {
       <Route element={<MainLayout />}> 
         <Route path="/" element={<Main />} />
 
-        <Route path="/group" element={<GroupMain />} />
-        <Route path="/grouplist" element={<GroupList />} />
-        <Route path="/groupcreate" element={<GroupCreate />} />
-        <Route path="/groupattendlogin" element={<GroupAttendLogin />} />
-        <Route path="/groupattend" element={<GroupAttend />} />
-        <Route path="/groupconfig" element={<GroupConfig />} />
-        <Route path="/groupenv" element={<GroupEnvConfig />} />
-        <Route path="/groupprofile" element={<GroupProfile />} />
-        <Route path="/groupban" element={<GroupBan />} />
-        <Route path="/groupinfo" element={<GroupInfo />} />
-        <Route path="/groupuser" element={<GroupUser />} />
-        <Route path="/groupuserdetail" element={<GroupUserDetail />} />
-        <Route path="/grouppass" element={<GroupPass />} />
+        {/*그룹 생성 및 목록*/}
+        <Route path="/group/create" element={<GroupCreate />} />
+        <Route path="/group/list" element={<GroupList />} />
+
+        {/*그룹 기본*/}
+        <Route path="/group/:groupPk" element={<GroupMain />} />
+
+        {/*그룹 참여*/}
+        <Route path="/group/:groupPk/attend" element={<GroupAttend />} />
+        <Route path="/group/:groupPk/attend/login" element={<GroupAttendLogin />} />
+
+        {/*그룹 설정*/}
+        <Route path="/group/:groupPk/config" element={<GroupConfig />} />
+        <Route path="/group/:groupPk/env" element={<GroupEnvConfig />} />
+        <Route path="/group/:groupPk/profile" element={<GroupProfile />} />
+        <Route path="/group/:groupPk/ban" element={<GroupBan />} />
+        <Route path="/group/:groupPk/info" element={<GroupInfo />} />
+        <Route path="/group/:groupPk/user" element={<GroupUser />} />
+        <Route path="/group/:groupPk/userdetail/:userPk" element={<GroupUserDetail />} />
+        <Route path="/group/:groupPk/pass" element={<GroupPass />} />
 
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />

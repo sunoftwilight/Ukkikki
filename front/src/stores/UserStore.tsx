@@ -14,7 +14,7 @@ export const userStore = create(
     userName: '',
     userProfile: '',
 
-    groupKey: [],
+    groupKey: {},
     uploadGroupId: null,
     simplePass: '',
 
@@ -28,7 +28,7 @@ export const userStore = create(
     setUserName: (newData: string) => set(() => ({userName: newData})),
     setUserProfile: (newData: string) => set(() => ({userProfile: newData})),
 
-    setGroupKey: (newData: string[]) => set(() => ({groupKey: newData})),
+    setGroupKey: (newData: Record<number, string>) => set(() => ({groupKey: newData})),
     setUploadGroupId: (newData: number|null) => set(() => ({uploadGroupId: newData})),
     setSimplePass: (newData: string) => set(() => ({simplePass: newData})),
   }),

@@ -3,6 +3,7 @@ import { InsertPasswordProps } from "../../types/Group";
 import { createParty } from "../../api/party"; 
 import { userStore } from "../../stores/UserStore";
 import { useStore } from "zustand";
+import { PartyData } from "../../types/Group";
 
 const InsertPassword: React.FC<InsertPasswordProps> = ({ onBackBtnClick, onNextBtnClick, createData, doneData }) => {
   const [password, setPassword] = useState<string>("");
@@ -15,7 +16,6 @@ const InsertPassword: React.FC<InsertPasswordProps> = ({ onBackBtnClick, onNextB
       inputsRefs.current[0]?.focus();
     }
   }, []);
-
 
   const handleBackBtnClick = () => {
     onBackBtnClick('info', createData);
@@ -54,18 +54,36 @@ const InsertPassword: React.FC<InsertPasswordProps> = ({ onBackBtnClick, onNextB
     const formData = new FormData();
     const key = new Blob([JSON.stringify(param)], {type: 'application/json',});
     const file = new File([createData.partyProfile], 'image.jpeg', {type: 'image/jpeg'});
+
     formData.append('createPartyDto', key);
     formData.append('photo', file);
-    console.log(formData.get('createPartyDto'))
-    console.log(formData.get('photo'))
+
     await createParty(formData,
       (response) => {
-        console.log(response)
+        const data = response.data.data;
+        dataSetUp(data)
       },
       (error) => {
         console.error(error)
       }
     )
+  }
+
+  const dataSetUp = (data: PartyData) => {
+    //현재 그룹키 목록
+    const currentKeys = user.groupKey
+    
+    // 생성 완료 데이터 처리
+    doneData.partyName = data.partyName;
+    doneData.partyPk = data.party;
+    doneData.inviteCode = data.partyLink;
+
+    // 그룹키 갱신
+    currentKeys[data.party] = data.sseKey;
+    user.setGroupKey(currentKeys);
+
+    // 생성완료 화면 이동
+    onNextBtnClick('done', doneData);
   }
 
   return (

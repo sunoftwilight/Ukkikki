@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { publicApi, privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { UserResponeseData } from '../types/UserInfoType';
+import { UserResponeseData, GroupKeyResponeseData } from '../types/UserInfoType';
 
 const url = 'member';
 
@@ -32,7 +32,7 @@ export const simpleInsert = async(
 
 export const simpleCheck = async(
   data: Record<string,string>,
-  Response : (Response : AxiosResponse<ResponseData>) => void,
+  Response : (Response : AxiosResponse<GroupKeyResponeseData>) => void,
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await privateApi.get(`/${url}/mykey`,{headers: {...data}})
     .then(Response)

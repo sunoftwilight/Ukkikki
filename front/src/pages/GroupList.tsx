@@ -5,11 +5,11 @@ import ListComponent from "../components/GroupList/ListComponent";
 const GroupList: React.FC = () => {
   return (
     <div className="w-full h-full px-4 flex flex-col gap-[15px] py-4">
-      <div className="w-full h-full">
+      <div className="w-full h-full overflow-scroll">
         <ListComponent />
       </div>
       <div className="pt-4 w-full">
-        <Link to={'/groupcreate'}>
+        <Link to={'/group/create'}>
           <button className="w-full h-[60px] bg-main-blue rounded-2xl">
             <p className="text-white text-2xl font-gtr-B">그룹 생성</p>
           </button>
