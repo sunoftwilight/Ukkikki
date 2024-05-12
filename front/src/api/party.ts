@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { formDataApi, privateApi, imgApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { CreateDoenResponesData, PartyListResponesData } from '../types/GroupType';
+import { CreateDoenResponesData, PartyListResponesData, PartyLinkRespone } from '../types/GroupType';
 import { PartyDetailResponse } from '../types/GroupType';
 
 const url = 'party'
@@ -33,7 +33,7 @@ export const getPartyThumb = async (
 		.catch(Error)
 	}
 
-  export const getPartyDetail = async(
+  export const getPartyDetail = async (
     partyId : number,
     Response : (Response : AxiosResponse<PartyDetailResponse>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
@@ -41,3 +41,13 @@ export const getPartyThumb = async (
     .then(Response)
     .catch(Error)
   }
+
+	export const getPartyLink = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<PartyLinkRespone>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+	

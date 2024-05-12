@@ -5,8 +5,10 @@ import { InviteStoreType, MemberStoreType, FolderStoreType } from '../types/Stor
 export const inviteStore = create(
   persist<InviteStoreType>((set) => ({
     inviteOpen: false,
+    inviteCode: '',
 
-    setInviteOpen: () => set((state) => ({inviteOpen: !state.inviteOpen}))
+    setInviteOpen: () => set((state) => ({inviteOpen: !state.inviteOpen})),
+    setInviteCode: (code:string) => set(() => ({inviteCode: code}))
   }),
   { name: 'MODAL_STORE'}
 ))

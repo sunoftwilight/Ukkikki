@@ -1,6 +1,8 @@
 export interface InviteStoreType {
   inviteOpen : boolean;
+  inviteCode : string;
   setInviteOpen: () => void;
+  setInviteCode: (code:string) => void;
 }
 
 export interface MemberStoreType {

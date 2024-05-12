@@ -7,14 +7,13 @@ import toast, { Toaster } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion"
 
 const InviteModal: React.FC = () => {
-  const { inviteOpen, setInviteOpen } = inviteStore()
-
+  const invite = inviteStore()
+  
   const inviteInfo = {
-    url: 'https://www.sj10dssafy202.com/secretkey',
-    code: 'OOb28K'
+    url: `https://www.k10d202.p.ssafy.io/party/enter/${invite.inviteCode}`,
   }
 
-  const clipTxt = `우리의 추억에 당신을 초대합니다! \n ${inviteInfo.url} \n 참여 코드: ${inviteInfo.code}`
+  const clipTxt = `우리의 추억에 당신을 초대합니다! \n ${inviteInfo.url} \n `
 
   const copyUrlHandler = async () => {
     try {
@@ -29,20 +28,20 @@ const InviteModal: React.FC = () => {
     <>
       <Toaster />
       <AnimatePresence>
-        { inviteOpen &&
+        { invite.inviteOpen &&
           <motion.div 
             className={`fixed top-0 start-0 h-screen w-screen flex justify-end`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div onClick={() => setInviteOpen()}><ModalBackground /></div>
+            <div onClick={() => invite.setInviteOpen()}><ModalBackground /></div>
 
             <div className="flex justify-center items-center w-full h-full">
               <div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] px-4 py-5 flex flex-col gap-y-5">
                 <div className="flex justify-end items-center gap-20">
                   <div className="text-center font-pre-SB text-black text-xl">초대 링크</div>
-                  <img src={close} onClick={() => setInviteOpen()} />
+                  <img src={close} onClick={() => invite.setInviteOpen()} />
                 </div>
 
                 <div className="flex flex-col gap-4">
@@ -62,8 +61,7 @@ const InviteModal: React.FC = () => {
 
                   {/* 가입 코드  */}
                   <div className="flex gap-3 justify-end items-center">
-                    <div className="text-main-blue text-base font-pre-SB">가입 코드</div>
-                    <div className="flex items-center justify-center w-20 h-8 rounded-[10px] bg-main-blue text-white text-base font-pre-M">{inviteInfo.code}</div>
+                    <div className="flex items-center justify-center w-20 h-8 rounded-[10px] bg-main-blue text-white text-base font-pre-M" onClick={() => copyUrlHandler()} >초대하기</div>
                   </div>
                 </div>
               </div>
