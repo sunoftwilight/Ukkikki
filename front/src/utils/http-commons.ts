@@ -7,7 +7,6 @@ axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
 // const baseURL: string = "http://localhost:5000/api";
-// const accessToken = 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjo1MiwidXNlcm5hbWUiOiLshLHqt5wiLCJwcm92aWRlcklkIjoia2FrYW8gMzQ1ODY4OTQzNyIsImlhdCI6MTcxNTEzMzkzNywiZXhwIjoxNzE1OTk3OTM3fQ.JZUCLuNRLK71yot5hBo13cfVkvKnEHDpZIebJUqX6dc';
 
 
 //img Test API 

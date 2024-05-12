@@ -1,13 +1,11 @@
 import React from "react";
 import camera from "@/assets/Main/Buttons/camera.png"
-import gallery from "@/assets/Main/Buttons/gallery.png"
 import group from "@/assets/Main/Buttons/group.png"
 import setting from "@/assets/Main/Buttons/setting.png"
 import { Link } from "react-router-dom";
 
 const buttonList = [
   { img: camera, name: '카메라', router: '/camera' },
-  { img: gallery, name: '마이 앨범', router: '/mypage' },
   { img: group, name: '참여 중인 그룹', router: '/group/list' },
   { img: setting, name: '설정', router: '/setting' }
 ]
