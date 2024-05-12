@@ -62,3 +62,9 @@ export interface PartyDetailResponse {
   };
   resultCode: string;
 }
+export interface PartyLinkRespone {
+  data: {
+    partyLink : string,
+  };
+  resultCode: string;
+}

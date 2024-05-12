@@ -2,7 +2,7 @@ import React from "react";
 import settings from "@/assets/GroupMain/settings.png"
 import etc from "@/assets/GroupMain/etc.png"
 import { memberStore } from "../../stores/ModalStore";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const groupInfo = {
   img: 'https://pbs.twimg.com/profile_images/1044938826727055361/_2tCfp7B_400x400.jpg',
@@ -19,7 +19,8 @@ const groupInfo = {
 
 const GroupProfile: React.FC = () => { 
   const { setMemberOpen } = memberStore()
-
+  const { groupPk } = useParams();
+  
   const memberThumb = () => {
     const memberThumbs = []
 
@@ -39,7 +40,7 @@ const GroupProfile: React.FC = () => {
 
       <div className="flex items-center gap-4">
         <div className="text-black text-xl font-gtr-B">{groupInfo.name}</div>
-        <Link to={'/groupconfig'}>
+        <Link to={`/group/${groupPk}/config`}>
           <img src={settings} className="w-3 h-3" />
         </Link>
       </div>
