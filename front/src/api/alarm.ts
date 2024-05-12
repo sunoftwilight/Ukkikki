@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { AlarmRequestType } from '../types/AlarmType';
+import { AlarmRequestType, AlarmResponseType } from '../types/AlarmType';
 
 const url = 'alarm';
 
@@ -15,7 +15,7 @@ export const connectAlarm = async(
 
 export const getAlarm = async(
   alarmPageDto : AlarmRequestType,
-  Response : (Response : AxiosResponse<ResponseData>) => void, 
+  Response : (Response : AxiosResponse<AlarmResponseType>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.get(`/${url}/list`, { params: alarmPageDto })
   .then(Response)

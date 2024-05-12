@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import close from "@/assets/Hamburger/close.png";
 import ModalBackground from "./ModalBackground";
 import { Link } from "react-router-dom";
@@ -6,37 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "zustand";
 import { headerStore } from "../../stores/HeaderStateStore";
 import { getAlarm } from "../../api/alarm";
-
-const alarmDummy = [
-	{
-		groupImg:
-			"https://i.namu.wiki/i/VMIHkLm6DcUT4d9-vN4yFw7Yfitr8luT_U2YwJsugGodCQ01ooGH_kHX0D6sJ3HDS1YHfvy9B81al8rKCxqKYw.webp",
-		groupName: "폼폼푸린은귀여워",
-		member: "훈지훈",
-		content: "이 사진 왜캐 잘나옴? 사기 ㄴ",
-	},
-	{
-		groupImg:
-			"https://i.namu.wiki/i/VMIHkLm6DcUT4d9-vN4yFw7Yfitr8luT_U2YwJsugGodCQ01ooGH_kHX0D6sJ3HDS1YHfvy9B81al8rKCxqKYw.webp",
-		groupName: "폼폼푸린은귀여워",
-		member: "성규규성",
-		content: "오 이거 쩐다 레전드",
-	},
-	{
-		groupImg:
-			"https://i.namu.wiki/i/77QbC6SyC4wLmwtoCMzxvC-8OgmQ191Ve79xM2r5xMBb5-sqpqZem9lVMxNz9FffLio1RuGSDla-4gISPO4jAQ.webp",
-		groupName: "시나모롤도귀여워",
-		member: "용수용수선생",
-		content: "ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ형님",
-	},
-	{
-		groupImg:
-			"https://i.namu.wiki/i/77QbC6SyC4wLmwtoCMzxvC-8OgmQ191Ve79xM2r5xMBb5-sqpqZem9lVMxNz9FffLio1RuGSDla-4gISPO4jAQ.webp",
-		groupName: "시나모롤도귀여워",
-		member: "상수시치",
-		content: "에반데 ;;;;;;",
-	},
-];
+import { AlarmItemType } from "../../types/AlarmType";
+import AlarmItem from "./AlarmItem";
+import LoadingGif from "./LoadingGif";
 
 const Hamburger: React.FC = () => {
 	const menuList = [
@@ -46,8 +18,9 @@ const Hamburger: React.FC = () => {
 		{ name: "설정", router: "/setting" },
 	];
 
-	const { alarmOpen, setAlarmOpen } = useStore(headerStore)
   const { menuOpen, setMenuOpen } = useStore(headerStore)
+	const { alarmOpen, setAlarmOpen } = useStore(headerStore)
+  const [alarmList, setAlarmList] = useState<AlarmItemType[]>([])
 
 	const closeHandler = () => {
 		if (alarmOpen) {
@@ -57,13 +30,83 @@ const Hamburger: React.FC = () => {
 		}
 	};
 
+  // ========== 무한스크롤 ==================
+  const [page, setPage] = useState<number>(1)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLast, setIsLast] = useState<boolean>(false)
+
+  // observer 컴포넌트 만나면 발생하는 콜백 함수 -> loading중 표시
+  const handleObserver = (entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+
+    console.log(isLast)
+    if (target.isIntersecting && !isLoading && !isLast) {
+      setIsLoading(true)
+    }
+  };
+  
+  // threshold : Intersection Observer의 옵션, 0 ~ 1 (0: 일 때는 교차점이 한 번만 발생해도 실행, 1은 모든 영역이 교차해야 콜백 함수가 실행)
+  const observer = new IntersectionObserver(handleObserver, { threshold: 0 });
+
   useEffect(() => {
-    getAlarm(
-      { pageNo: 1, pageSize: 5 },
-      (res) => { console.log(res, '알람')},
+    // 최하단 요소를 관찰 대상으로 지정함
+    const observerTarget = document.getElementById("observer");
+    // 관찰 시작
+    if (observerTarget) {
+      observer.observe(observerTarget);
+    }
+  }, [])
+
+  // 로딩중이면 페이지 상승 + api 요청
+  // useEffect가 isLoading의 상태 변화를 계속 추적하며 api 쏘므로
+  // setTimeout을 통해 api 요청 한번만 갈 수 있도록 수정
+  useEffect(() => {
+    console.log('isLast', isLast)
+    if (isLoading && !isLast) {
+      setPage((page) => page + 1);
+      setTimeout(() => {
+        fetchDataHandler();
+      }, 10)
+    }
+  }, [isLoading])
+
+  useEffect(() => {
+    setIsLast(false)
+    setAlarmList([])
+    setPage(1)
+    setIsLoading(true)
+  }, [alarmOpen])
+
+  // 데이터 추가 및 loading상태 변경
+  const fetchDataHandler = async () => {
+    console.log(page)
+    await getAlarm(
+      { pageNo: page, pageSize: 20 },
+      (res) => {
+        console.log(page, res.data)
+        setAlarmList(prevList => prevList.concat(res.data.data.alarmList))
+
+        if (res.data.data.last === true) {
+          setIsLast(true)
+        }
+      },
       (err) => { console.error(err) }
     )
-  }, [alarmOpen])
+    setIsLoading(false)
+  }
+
+  
+  // useEffect(() => {
+  //   getAlarm(
+  //     { pageNo: 1, pageSize: 20 },
+  //     (res) => {
+  //       console.log(res.data)
+  //       setAlarmList(res.data.data.alarmList)
+  //     },
+  //     (err) => { console.error(err) }
+  //   )
+  // }, [alarmOpen])
+
 
 	return (
 		<AnimatePresence>
@@ -73,7 +116,7 @@ const Hamburger: React.FC = () => {
 
 					<motion.div
 						key={menuOpen ? "메뉴" : "알림함"}
-						className="h-full w-72 z-20 bg-white p-4 flex flex-col gap-y-7"
+						className="h-full w-72 z-20 bg-white p-4 flex flex-col gap-y-7 overflow-scroll scrollbar-hide"
 						initial={{ opacity: 0, translateX: "88px" }}
 						animate={{ opacity: 1, translateX: "0px" }}
 						exit={{ opacity: 0, translateX: "88px" }}
@@ -90,46 +133,35 @@ const Hamburger: React.FC = () => {
 							/>
 						</div>
 
-						{/* 메뉴바 */}
-						{menuOpen && (
-							<div>
-								{menuList.map((menuItem, idx) => (
-									<Link
-										onClick={() => closeHandler()}
-										to={menuItem.router}
-										key={idx}
-										className="w-full h-12 flex items-center px-1"
-									>
-										{menuItem.name}
-									</Link>
-								))}
-							</div>
-						)}
+            <div className=" overflow-scroll scrollbar-hide">
+              {/* 메뉴바 */}
+              {menuOpen && (
+                <div>
+                  {menuList.map((menuItem, idx) => (
+                    <Link
+                      onClick={() => closeHandler()}
+                      to={menuItem.router}
+                      key={idx}
+                      className="w-full h-12 flex items-center px-1"
+                    >
+                      {menuItem.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-						{/* 알림함 */}
-						{alarmOpen &&
-							alarmDummy.map((alarmItem, idx) => (
-								<div key={idx} className="flex gap-3">
-									<img
-										src={alarmItem.groupImg}
-										className="rounded-full w-12 h-12"
-									/>
-									<div className="flex flex-col gap-2">
-										<div className="font-gtr-B text-xs">
-											{alarmItem.groupName}
-										</div>
-										<div>
-											<div className="text-xs font-pre-R text-black">
-												<span className="font-pre-SB">{alarmItem.member}</span>
-												님께서 댓글을 작성하였습니다.
-											</div>
-											<div className="font-pre-R text-xs text-black">
-												{alarmItem.content}
-											</div>
-										</div>
-									</div>
-								</div>
-							))}
+              {/* 알림함 */}
+              {alarmOpen && 
+                <div className="flex flex-col gap-y-7">
+                  {alarmList.map((alarmItem, idx) => (
+                    <AlarmItem key={idx} alarmItem={alarmItem} />
+                  ))}
+                  <div id='observer' className="h-[30px] w-full flex justify-center">
+                    {isLoading && <LoadingGif /> }
+                  </div>
+                </div>
+              }
+            </div>
 					</motion.div>
 				</div>
 			)}
