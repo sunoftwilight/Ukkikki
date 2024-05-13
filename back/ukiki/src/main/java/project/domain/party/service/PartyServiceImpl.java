@@ -938,6 +938,8 @@ public class PartyServiceImpl implements PartyService {
             s3Util.fileDelete(thumbnail.split("/")[3]);
         }
 
+        profile.setType(ProfileType.S3);
+
         // 프로필 넣기
         String partyThumbnailImg = s3Util.fileUpload(photo, profileDto.getSseKey());
         profile.setProfileUrl(partyThumbnailImg);
