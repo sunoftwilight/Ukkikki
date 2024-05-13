@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import project.domain.directory.dto.request.GetSseKeyDto;
 import project.domain.directory.dto.request.TrashIdListDto;
 import project.domain.directory.dto.response.GetTrashDto;
 import project.global.result.ResultResponse;
@@ -39,9 +40,9 @@ public interface TrashBinController {
     @Operation(summary = "(테스트용)폴더 및 파일 복원 요청", description = "PathVariable로 trashBinId와 trashId를 받아 해당 쓰레기복원")
     @ApiResponse(responseCode = "201", description = "폴더 또는 파일복원에 성공하였습니다.")
     @PatchMapping("/{trashBinId}/trashes/{trashId}")
-    ResponseEntity<ResultResponse> restoreOneTrash(Long trashBinId, String trashId);
+    ResponseEntity<ResultResponse> restoreOneTrash(Long trashBinId, String trashId, GetSseKeyDto getSseKeyDto);
 
-    @Operation(summary = "(실 서비스 용)다중 폴더 및 파일 복원 요청", description = "PathVariable로 trashBinId, Body로 trashIdList를 받아 해당 쓰레기복원")
+    @Operation(summary = "(실 서비스 용)다중 폴더 및 파일 복원 요청", description = "PathVariable로 trashBinId, Body로 trashIdList와 sseKey를 받아 해당 쓰레기복원")
     @ApiResponse(responseCode = "201", description = "폴더 또는 파일복원에 성공하였습니다.")
     @PatchMapping("/{trashBinId}/trashes")
     ResponseEntity<ResultResponse> restoreTrashList(Long trashBinId, TrashIdListDto trashIdListDto);

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -27,10 +28,15 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
+import project.domain.photo.entity.Face;
+import project.domain.photo.entity.FaceGroup;
 import project.domain.photo.entity.Photo;
+import project.domain.photo.repository.FaceGroupRepository;
+import project.domain.photo.repository.FaceRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
+import project.global.util.S3Util;
 
 @Service
 @AllArgsConstructor
@@ -39,6 +45,7 @@ public class TrashServiceImpl implements TrashService{
 
 
     private static ModelMapper modelMapper = new ModelMapper();
+    private final S3Util s3Util;
 
     private TrashBinService trashBinService;
     private final DirectoryRepository directoryRepository;
@@ -46,6 +53,8 @@ public class TrashServiceImpl implements TrashService{
     private final TrashRepository trashRepository;
     private final FileRepository fileRepository;
     private final PhotoRepository photoRepository;
+    private final FaceRepository faceRepository;
+    private final FaceGroupRepository faceGroupRepository;
 
     @Override
     public void getTrash() {
@@ -55,7 +64,7 @@ public class TrashServiceImpl implements TrashService{
     @Override
     // trashId != rawId
     @Transactional
-    public void restoreOneTrash(String trashId, Long trashBinId) {
+    public void restoreOneTrash(String trashId, Long trashBinId, String sseKey) {
         TrashBin trashBin = trashBinService.findById(trashBinId);
         Trash trash = trashRepository.findById(trashId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
@@ -90,7 +99,7 @@ public class TrashServiceImpl implements TrashService{
                     TrashFileDto oneTrashFileDto = modelMapper.map(oneTrash.getContent(),
                         TrashFileDto.class);
                     // file 복원
-                    setFile(oneTrash, oneTrashFileDto);
+                    setFile(oneTrash, oneTrashFileDto, sseKey);
                     // 쓰레기 지우기
                     trashRepository.delete(oneTrash);
                 }
@@ -107,7 +116,7 @@ public class TrashServiceImpl implements TrashService{
             // dir 관계 복구
             setConnection(trash);
             // file 복구
-            setFile(trash, trashFileDto);
+            setFile(trash, trashFileDto, sseKey);
             // trashBin 제거
             deleteFileFromTrashBin(trash.getId(), trashBinId);
             // trash 제거
@@ -119,10 +128,10 @@ public class TrashServiceImpl implements TrashService{
 
     @Override
     @Transactional
-    public void restoreTrashList(List<String> trashIdList, Long trashBinId) {
+    public void restoreTrashList(List<String> trashIdList, Long trashBinId, String sseKey) {
         log.info("come in restoreTrashList service");
         for (String trashId : trashIdList) {
-            restoreOneTrash(trashId, trashBinId);
+            restoreOneTrash(trashId, trashBinId, sseKey);
         }
         log.info("response restoreTrashList = void");
     }
@@ -281,7 +290,7 @@ public class TrashServiceImpl implements TrashService{
             Long photoId = trashFileDto.getPhotoDto().getId();
 
             // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
-            setPhotoAndS3(photoId);
+            setPhotoAndS3(photoId, trashBinId);
 
             // 쓰레기에서 trash 지우기
             trashRepository.deleteById(trash.getId());
@@ -309,7 +318,7 @@ public class TrashServiceImpl implements TrashService{
                     Long photoId = oneTrashFileDto.getPhotoDto().getId();
 
                     // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
-                    setPhotoAndS3(photoId);
+                    setPhotoAndS3(photoId, trashBinId);
 
                     // 쓰레기에서 trash 지우기
                     trashRepository.deleteById(oneTrash.getId());
@@ -329,7 +338,7 @@ public class TrashServiceImpl implements TrashService{
     }
 
 
-    public void setPhotoAndS3(Long photoId) {
+    public void setPhotoAndS3(Long photoId, Long trashBinId) {
         // 포토 수 - 1감소
         Photo photo = photoRepository.findById(photoId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
@@ -347,10 +356,56 @@ public class TrashServiceImpl implements TrashService{
         }
         log.info("photo, s3 삭제 로직 실행");
         // 0일경우 S3에서 관련 url 삭제와 photo에서 삭제
-        // S3 처리 부분은 여기에
-
+        // == S3로직 시작
+        // photo와 연관되어 있는 얼굴 분류 사진 삭제
+        List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
+        for (Face face : faceList) {
+            String url = face.getFaceImageUrl();
+            String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+            //S3 파일 삭제
+            s3Util.fileDelete(fileName);
+            //FaceGroup DB 수정
+            FaceGroup faceGroup = faceGroupRepository.findByPartyIdAndFaceGroupNumber(trashBinId , face.getFaceGroupNumber())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FACE_GROUP_NOT_FOUND));
+            List<Integer> faces = stringToListFormatter(faceGroup.getFaceList());
+            //FaceGroup Entity faceList 에서 해당 faceId 삭제
+            faces.remove((Long)face.getFaceId());
+            //Entity update
+            faceGroup.setFaceList(faces.toString());
+            //리스트가 비었다면 group 삭제
+            if(faces.isEmpty()) {
+                faceGroupRepository.delete(faceGroup);
+            }else{
+                faceGroupRepository.save(faceGroup);
+            }
+            // DB 에서 해당 face 삭제
+            faceRepository.delete(face);
+        }
+        // 썸네일 사진 삭제
+        for(String url : photo.getPhotoUrl().photoUrls()){
+            String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+            s3Util.fileDelete(fileName);
+        }
+        // 원본 사진 삭제
+        s3Util.fileDelete(photo.getFileName());
+        //== s3 로직 종료
         // photo 처리 부분
         photoRepository.delete(photo);
+    }
+
+    public List<Integer> stringToListFormatter(String input) {
+        // 괄호 제거
+        String trimmed = input.substring(1, input.length() - 1);
+
+        // 쉼표로 분리하고 각 요소를 정수로 변환하여 리스트 생성
+        List<Integer> numbers = Arrays.stream(trimmed.split(","))
+            .map(String::trim) // 공백 제거
+            .map(Integer::parseInt) // 정수로 변환
+            .collect(Collectors.toList());
+
+        // 결과 출력
+        log.info("numbers: {}", numbers);
+        return numbers;
     }
 
     @Override
@@ -423,7 +478,7 @@ public class TrashServiceImpl implements TrashService{
 
     // file 생성
     @Override
-    public void setFile(Trash trash, TrashFileDto trashFileDto) {
+    public void setFile(Trash trash, TrashFileDto trashFileDto, String sseKey) {
         log.info("come in setFile");
         Optional<File> opFile = fileRepository.findById(trash.getRawId());
         // 폴더에 이미 file이 있는경우 그놈한테 dirId 등록
@@ -441,6 +496,29 @@ public class TrashServiceImpl implements TrashService{
                 .dirIdList(Arrays.asList(trashFileDto.getDirId()))
                 .build()
         );
+
+        // ===s3 시작
+        // 만약 새로 생성되는 file의 매핑되는 photo의 num = 1 인경우 undo
+        Photo photo = photoRepository.findById(trashFileDto.getPhotoDto().getId())
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+        if(photo.getPhotoNum() == 1) {
+            // undo 실행
+            List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
+            // 얼굴 분류 사진 만료 설정 취소
+            for (Face face : faceList) {
+                String url = face.getFaceImageUrl();
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                s3Util.fileUndo(sseKey, fileName);
+            }
+            // 썸네일 사진 만료일 설정 취소
+            for(String url : photo.getPhotoUrl().photoUrls()){
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                s3Util.fileUndo(sseKey, fileName);
+            }
+            // 원본 사진 만료일 설정 취소
+            s3Util.fileUndo(sseKey, photo.getFileName());
+        }
+        // ===s3 종료
     }
 
 

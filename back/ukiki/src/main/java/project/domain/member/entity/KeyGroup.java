@@ -21,11 +21,11 @@ public class KeyGroup {
     private String sseKey;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @JoinColumn(name = "party_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Party party;
 
 }

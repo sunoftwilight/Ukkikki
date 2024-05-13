@@ -654,7 +654,7 @@ public class PartyServiceImpl implements PartyService {
 
             // TODO directory[O], comment[X], Chat[O] 삭제 코드 추가해야함
             chatRepository.deleteAllByPartyId(partyId);
-            directoryService.deleteDir(party.getRootDirId());
+            directoryService.deleteDir(party.getRootDirId(), key);
         }
 
     }

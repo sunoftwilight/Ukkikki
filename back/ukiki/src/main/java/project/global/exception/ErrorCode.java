@@ -84,6 +84,9 @@ public enum ErrorCode {
     // Memo 관련
     MEMO_NOT_FOUND(404, "해당 메모를 찾을 수 없습니다."),
 
+    // FaceGroup 관련
+    FACE_GROUP_NOT_FOUND(404, "해당 얼굴 그룹을 찾을 수 없습니다.")
+
     ;
 
     private final int status;

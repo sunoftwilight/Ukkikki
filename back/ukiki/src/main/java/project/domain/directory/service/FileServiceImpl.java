@@ -27,19 +27,24 @@ import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Face;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.DownloadLog;
 import project.domain.photo.entity.mediatable.Likes;
 import project.domain.photo.repository.DownloadLogRepository;
+import project.domain.photo.repository.FaceRepository;
 import project.domain.photo.repository.LikesRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
+import project.global.util.S3Util;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class FileServiceImpl implements FileService{
+
+    private final S3Util s3Util;
 
     private final DirectoryService directoryService;
     private final TrashBinService trashBinService;
@@ -52,6 +57,8 @@ public class FileServiceImpl implements FileService{
     private final DownloadLogRepository downloadLogRepository;
     private final LikesRepository likesRepository;
     private final MemberRepository memberRepository;
+    private final FaceRepository faceRepository;
+
 
 
     @Override
@@ -122,7 +129,7 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public void deleteOneFile(String fileId, String dirId) {
+    public void deleteOneFile(String fileId, String dirId, String sseKey) {
         // 쓰레기에 file 등록
         File file = findById(fileId);
         Trash fileTrash = saveFileToTrash(file, dirId);
@@ -130,20 +137,42 @@ public class FileServiceImpl implements FileService{
         trashBinService.saveFileToTrashBin(fileTrash);
         // 폴더에서 제거
         deleteDirFileRelation(dirId, fileId);
-        // file에서 제거
+        // 마지막 file 이었다면
         if(file.getDirIdList().isEmpty()){
+            // === s3 로직 시작
+            // s3 만료일 설정
+            Long photoId = file.getPhotoDto().getId();
+            Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+
+            // 인물 분류 사진 만료일 설정
+            List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
+            for (Face face : faceList) {
+                String url = face.getFaceImageUrl();
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                s3Util.fileExpire(sseKey, fileName);
+            }
+            // 썸네일 사진 만료일 설정
+            for(String url : photo.getPhotoUrl().photoUrls()){
+                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                s3Util.fileExpire(sseKey, fileName);
+            }
+            // 원본 사진 만료일 설정
+            s3Util.fileExpire(sseKey, photo.getFileName());
+            fileRepository.delete(file);
+            // === s3 로직 종료
             fileRepository.deleteById(file.getId());
         }
     }
 
     @Override
     @Transactional
-    public void deleteFileList(List<String> fileIdList, String dirId) {
+    public void deleteFileList(List<String> fileIdList, String dirId, String sseKey) {
         if(fileIdList.isEmpty()) {
             throw new BusinessLogicException(ErrorCode.EMPTY_FILE_ID_LIST);
         }
         for (String fileId : fileIdList) {
-            deleteOneFile(fileId, dirId);
+            deleteOneFile(fileId, dirId, sseKey);
         }
     }
 

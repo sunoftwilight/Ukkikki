@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.domain.directory.dto.request.CreateDirDto;
+import project.domain.directory.dto.request.DeleteFileListDto;
+import project.domain.directory.dto.request.GetSseKeyDto;
 import project.domain.directory.dto.request.PatchCopyFileListDto;
 import project.domain.directory.dto.request.GetRenameDto;
 import project.domain.directory.dto.request.PatchCopyFileDto;
@@ -91,10 +93,11 @@ public interface DirectoryDocs {
         @RequestParam PatchMoveDirDto patchMoveDirDto
     );
 
-    @Operation(summary = "폴더 삭제 요청", description = "PathVariable로 dirId(삭제 대상 폴더 Id)를 받아 삭제")
+    @Operation(summary = "폴더 삭제 요청", description = "PathVariable로 dirId(삭제 대상 폴더 Id), Body로 sseKey를 받아 해당 폴더 삭제")
     @ApiResponse(responseCode = "204", description = "폴더 삭제에 성공하였습니다.")
     @DeleteMapping("/{dirId}")
-    public ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId);
+    public ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId, @RequestBody
+        GetSseKeyDto getSseKeyDto);
 
     @Operation(summary = "폴더명 수정 요청", description = "PathVariable로 dirId(이름 수정 대상 폴더 Id), RequestBody로 newName을 받아 이름을 수정")
     @ApiResponse(responseCode = "200", description = "폴더 이름 수정에 성공하였습니다.")
@@ -151,17 +154,17 @@ public interface DirectoryDocs {
     );
 
     // 단일 사진 삭제
-    @Operation(summary = "(테스트 용도)단일 사진 삭제 요청", description = "PathVariable로 dirId와 fileId를 받아 사진을 삭제합니다.")
+    @Operation(summary = "(테스트 용도)단일 사진 삭제 요청", description = "PathVariable로 dirId와 fileId를 받고 body로 sseKey를 받아 사진을 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "사진 삭제에 성공하였습니다.")
     @DeleteMapping("/{dirId}/files/{fileId}")
-    ResponseEntity<ResultResponse> deleteOneFile(String fileId, String dirId);
+    ResponseEntity<ResultResponse> deleteOneFile(String fileId, String dirId, GetSseKeyDto getSseKeyDto);
 
-    @Operation(summary = "(실 서비스 API)복수 사진 삭제 요청", description = "Body로 fileIdList를 PathVarialbe로 dirId를 받아 사진을 삭제합니다.")
+    @Operation(summary = "(실 서비스 API)복수 사진 삭제 요청", description = "Body로 sseKey, fileIdList를 PathVarialbe로 dirId를 받아 사진을 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "사진 삭제에 성공하였습니다.")
     @DeleteMapping("/{dirId}/files")
     public ResponseEntity<ResultResponse> deleteFileList(
         @PathVariable(name = "dirId") String dirId,
-        @RequestBody PatchCopyFileListDto fileListDto
+        @RequestBody DeleteFileListDto deleteFileListDto
     );
 
     @Operation(summary = "특정 폴더의 하위 폴더 조회요청", description = "PathVariable로 dirId(부모 폴더 Id)를 받아 하위 폴더의 pk와 name을 반환")

@@ -25,9 +25,9 @@ public interface FileService {
     void moveFileList(List<String> fileIdList, String fromDirId, String toDirId);
 
     // 단일 사진 삭제
-    void deleteOneFile(String fileId, String dirId);
+    void deleteOneFile(String fileId, String dirId, String sseKey);
 
-    void deleteFileList(List<String> fileIdList, String dirId);
+    void deleteFileList(List<String> fileIdList, String dirId, String sseKey);
 
     public Trash saveFileToTrash(File file, String dirId);
 

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.request.CreateDirDto;
+import project.domain.directory.dto.request.DeleteFileListDto;
+import project.domain.directory.dto.request.GetSseKeyDto;
 import project.domain.directory.dto.request.PatchCopyFileListDto;
 import project.domain.directory.dto.request.GetRenameDto;
 import project.domain.directory.dto.request.PatchCopyFileDto;
@@ -93,8 +95,11 @@ public class DirectoryController implements DirectoryDocs {
 
     @Override
     @DeleteMapping("/{dirId}")
-    public ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId) {
-        directoryService.deleteDir(dirId);
+    public ResponseEntity<ResultResponse> deleteDir(
+        @PathVariable String dirId,
+        @RequestBody GetSseKeyDto getSseKeyDto
+    ) {
+        directoryService.deleteDir(dirId, getSseKeyDto.getSseKey());
         return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_DIRECTORY_SUCCESS));
     }
 
@@ -165,10 +170,11 @@ public class DirectoryController implements DirectoryDocs {
     @DeleteMapping("/{dirId}/files/{fileId}")
     public ResponseEntity<ResultResponse> deleteOneFile(
         @PathVariable(name = "dirId") String dirId,
-        @PathVariable(name = "fileId") String fileId
+        @PathVariable(name = "fileId") String fileId,
+        @RequestBody GetSseKeyDto getSseKeyDto
     ) {
 
-        fileService.deleteOneFile(fileId, dirId);
+        fileService.deleteOneFile(fileId, dirId, getSseKeyDto.getSseKey());
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS));
     }
 
@@ -176,10 +182,10 @@ public class DirectoryController implements DirectoryDocs {
     @DeleteMapping("/{dirId}/files")
     public ResponseEntity<ResultResponse> deleteFileList(
         @PathVariable(name = "dirId") String dirId,
-        @RequestBody PatchCopyFileListDto fileListDto
+        @RequestBody DeleteFileListDto deleteFileListDto
     ) {
 
-        fileService.deleteFileList(fileListDto.getFileIdList(), dirId);
+        fileService.deleteFileList(deleteFileListDto.getFileIdList(), dirId, deleteFileListDto.getSseKey());
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_DELETE_SUCCESS));
     }
 

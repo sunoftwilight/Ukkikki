@@ -10,25 +10,25 @@ public interface TrashService {
 
     void getTrash();
 
-    void restoreOneTrash(String trashId, Long trashBinId);
+    void restoreOneTrash(String trashId, Long trashBinId, String sseKey);
 
-    void restoreTrashList(List<String> trashIdList, Long trashBinId);
+    void restoreTrashList(List<String> trashIdList, Long trashBinId, String sseKey);
 
-    public void deleteOneTrash(String trashId, Long trashBinId);
+    void deleteOneTrash(String trashId, Long trashBinId);
 
-    public void deleteTrashList(Long trashBinId, List<String> trashIdList);
+    void deleteTrashList(Long trashBinId, List<String> trashIdList);
 
-    public Trash findById(String directoryId);
+    Trash findById(String directoryId);
 
-    public Boolean isOutOfRecoveryPeriod(Trash deletedData);
+    Boolean isOutOfRecoveryPeriod(Trash deletedData);
 
-    public String generateId();
-
-    // 휴지통에서 제거
-    public void deleteDirFromTrashBin(String dirId, Long trashBinId);
+    String generateId();
 
     // 휴지통에서 제거
-    public void deleteFileFromTrashBin(String fileId, Long trashBinId);
+    void deleteDirFromTrashBin(String dirId, Long trashBinId);
+
+    // 휴지통에서 제거
+    void deleteFileFromTrashBin(String fileId, Long trashBinId);
 
     // 해당 폴더를 포함한 모든 자식폴더, 사진 폴더를 반환함
     List<Trash> getAllTrash(String TrashIdDirType);
@@ -36,12 +36,12 @@ public interface TrashService {
     List<Trash> getAllTrashV2(String trashIdDirType);
 
     // 파일 생성
-    public void setFile(Trash trash, TrashFileDto trashFileDto);
+    void setFile(Trash trash, TrashFileDto trashFileDto, String sseKey);
 
     // 디렉토리 생성
-    public void setDir(Trash trash, Directory trashDirDto);
+    void setDir(Trash trash, Directory trashDirDto);
 
-    public void setConnection(Trash trash);
+    void setConnection(Trash trash);
 
-    public void setEndPoint(Trash trash, List<String> fullRoutList, int sizeOfFullRoutList);
+    void setEndPoint(Trash trash, List<String> fullRoutList, int sizeOfFullRoutList);
 }

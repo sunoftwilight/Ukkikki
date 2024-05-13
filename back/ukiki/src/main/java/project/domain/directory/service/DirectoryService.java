@@ -5,6 +5,7 @@ import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.request.CreateDirDto;
+import project.domain.directory.dto.request.GetSseKeyDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
@@ -37,7 +38,7 @@ public interface DirectoryService {
     void moveDir(String dirId, String toDirId);
 
     // 폴더 삭제
-    void deleteDir(String dirId);
+    void deleteDir(String dirId, String sseKey);
 
     // 폴더 이름 수정
     void renameDir(String dirId, String newName);

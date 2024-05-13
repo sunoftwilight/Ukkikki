@@ -14,5 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class TrashIdListDto {
-    List<String> trashIdList = new ArrayList<>();
+    private String sseKey;
+    private List<String> trashIdList = new ArrayList<>();
 }

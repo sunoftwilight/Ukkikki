@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import project.domain.directory.dto.request.GetSseKeyDto;
 import project.domain.directory.dto.request.TrashIdListDto;
 import project.domain.directory.dto.response.GetTrashBinDto;
 import project.domain.directory.dto.response.GetTrashDto;
@@ -42,9 +43,10 @@ public class TrashBinControllerImpl implements TrashBinController {
     @PatchMapping("/{trashBinId}/trashes/{trashId}")
     public ResponseEntity<ResultResponse> restoreOneTrash(
         @PathVariable(name = "trashBinId") Long trashBinId,
-        @PathVariable(name = "trashId") String trashId
+        @PathVariable(name = "trashId") String trashId,
+        @RequestBody GetSseKeyDto getSseKeyDto
     ) {
-        trashService.restoreOneTrash(trashId, trashBinId);
+        trashService.restoreOneTrash(trashId, trashBinId, getSseKeyDto.getSseKey());
         return ResponseEntity.ok(new ResultResponse(ResultCode.RESTORE_DIRECTORY_OR_FILE_SUCCESS));
     }
 
@@ -54,7 +56,7 @@ public class TrashBinControllerImpl implements TrashBinController {
         @PathVariable(name = "trashBinId") Long trashBinId,
         @RequestBody TrashIdListDto trashIdListDto
     ) {
-        trashService.restoreTrashList(trashIdListDto.getTrashIdList(), trashBinId);
+        trashService.restoreTrashList(trashIdListDto.getTrashIdList(), trashBinId, trashIdListDto.getSseKey());
         return ResponseEntity.ok(new ResultResponse(ResultCode.RESTORE_DIRECTORY_OR_FILE_SUCCESS));
     }
 

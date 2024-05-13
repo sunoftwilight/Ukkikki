@@ -41,19 +41,23 @@ import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
+import project.domain.member.repository.KeyGroupRepository;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
+import project.domain.photo.entity.Face;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.DownloadLog;
 import project.domain.photo.entity.mediatable.Likes;
 import project.domain.photo.repository.DownloadLogRepository;
+import project.domain.photo.repository.FaceRepository;
 import project.domain.photo.repository.LikesRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
+import project.global.util.S3Util;
 
 @Service
 @AllArgsConstructor
@@ -74,6 +78,9 @@ public class DirectoryServiceImpl implements DirectoryService {
     private final PhotoRepository photoRepository;
     private final LikesRepository likesRepository;
     private final DownloadLogRepository downloadLogRepository;
+    private final FaceRepository faceRepository;
+    private final KeyGroupRepository keyGroupRepository;
+    private final S3Util s3Util;
 
     private final DirMapper dirMapper;
     private final RenameDirMapper renameDirMapper;
@@ -324,7 +331,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 //    }
 @Override
 @Transactional
-public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한다.
+public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고려해줘야 한다.
     // 루트 폴더에서 부모 폴더를 찾는 것은 불가능합니다.
     Directory dir = findById(dirId);
     if (dir.getParentDirId().equals("")) {
@@ -337,7 +344,7 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
     directoryRepository.save(parentDir);
 
     // 모든 폴더와 파일을 순회하고 후위 탐색 방식으로 삭제
-    postOrderDelete(dir);
+    postOrderDelete(dir, sseKey);
 
     // 다음 요청을 위해 visitedSet 비워주기
     visitedSet.clear();
@@ -352,7 +359,7 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
     trashBinRepository.save(trashBin);
 }
 
-    private void postOrderDelete(Directory curDir) {
+    private void postOrderDelete(Directory curDir, String sseKey) {
         // 현재 디렉토리를 이미 방문한 경우 패스
         if (visitedSet.contains(curDir.getId())) {
             return;
@@ -365,7 +372,7 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
         for (String nextDirId : curDir.getChildDirIdList()) {
             Directory nextDir = directoryRepository.findById(nextDirId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
-            postOrderDelete(nextDir);
+            postOrderDelete(nextDir, sseKey);
         }
 
         // 현재 디렉토리의 파일을 휴지통에 저장하고 삭제
@@ -376,6 +383,27 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
                 file.getDirIdList().remove(curDir.getId());
                 fileRepository.save(file);
                 if (file.getDirIdList().isEmpty()) {
+                    //=== s3 만료일 설정 시작
+                    Long photoId = file.getPhotoDto().getId();
+                    Photo photo = photoRepository.findById(photoId)
+                        .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+
+                    // 인물 분류 사진 만료일 설정
+                    List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
+                    for (Face face : faceList) {
+                        String url = face.getFaceImageUrl();
+                        String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                        s3Util.fileExpire(sseKey, fileName);
+                    }
+                    // 썸네일 사진 만료일 설정
+                    for(String url : photo.getPhotoUrl().photoUrls()){
+                        String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                        s3Util.fileExpire(sseKey, fileName);
+                    }
+                    // 원본 사진 만료일 설정
+                    s3Util.fileExpire(sseKey, photo.getFileName());
+                    //=== s3 만료일 설정종료
+
                     fileRepository.delete(file);
                 }
             }
