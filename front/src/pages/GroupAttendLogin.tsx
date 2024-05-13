@@ -23,7 +23,7 @@ const GroupAttendLogin:React.FC = () => {
 
   const guestBtn = () => {
     guest.setIsGuest(true);
-    navi(-1);
+    navi(`/group/${guest.viewPartyPk}/attend`)
   }
 
 

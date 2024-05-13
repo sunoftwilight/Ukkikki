@@ -29,7 +29,7 @@ export interface GroupKey {
   sseKey: string;
 }
 
-export interface PartyData {
+export interface PartyCreateData {
   party: number;
   partyLink: string;
   partyName: string;
@@ -42,10 +42,25 @@ export interface PartyListData{
   partyProfile: string;
 }
 
+export interface MemberData {
+  type:string;
+  nickname: string;
+  profileUrl: string;
+  memberId: number;
+  partyId: number;
+}
+
+export interface PartyDetailData {
+  partyMembers : MemberData[],
+  partyName : string,
+  rootDirId : string,
+  thumbnail : string
+}
+
 // API
 export interface CreateDoenResponesData{
   resultCode: string;
-  data: PartyData;
+  data: PartyCreateData;
 }
 
 export interface PartyListResponesData {
@@ -54,17 +69,36 @@ export interface PartyListResponesData {
 }
 
 export interface PartyDetailResponse {
-  data: {
-    partyMembers : [],
-    partyName : string,
-    rootDirId : string,
-    thumbnail : string
-  };
   resultCode: string;
+  data: PartyDetailData;
 }
-export interface PartyLinkRespone {
+
+export interface PartyLinkResponse {
+  resultCode: string;
   data: {
     partyLink : string,
   };
+}
+
+export interface PartyCheckPassRespones{
   resultCode: string;
+  data: GroupKey;
+}
+
+export interface EnterGuestRespones {
+  resultCode: string;
+  data: {
+    partyId: number;
+    token: string;
+  }
+}
+
+export interface PartyUserListRespones {
+  resultCode: string;
+  data: {
+    userId: number;
+    userName: string;
+    profileUrl: string;
+    memberRole: string;
+  }
 }

@@ -21,19 +21,21 @@ const GroupAttend:React.FC = () => {
   const checkPass = async () => {
     await checkPartyPass(Number(groupPk), password, user.simplePass,
       (res) => {
-        console.log(res)
+        console.log(res.data.data)
         if(guest.isGuest) {
-          const sse = res.data.sseKey
-          const pk = res.data.partyId
+
+          const sse = res.data.data.sseKey
+          const pk = res.data.data.partyId
           const key:Record<number,string> = {}
           key[pk] = sse
           guest.setPartyPk(pk)
           user.setGroupKey(key)
+          console.log(key)
           attendGuest();
         }
         else if(user.isLogin) {
 		      const currentKeys = user.groupKey;
-		      currentKeys[res.data.partyId] = res.data.sseKey;
+		      currentKeys[res.data.data.partyId] = res.data.data.sseKey;
           user.setGroupKey(currentKeys);
           attentMember();
         }
@@ -60,7 +62,8 @@ const GroupAttend:React.FC = () => {
   const attendGuest = async () => {
     await enterPartyGuest(Number(groupPk),
       (res) => {
-        console.log(res)
+        console.log(res.data.data)
+        user.setAccessToken('Bearer ' + res.data.data.token);
         navi(`/group/${groupPk}`)
       },
       (err) => {
