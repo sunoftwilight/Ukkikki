@@ -15,5 +15,6 @@ import lombok.Setter;
 @Builder
 public class TrashIdListDto {
     private String sseKey;
+    @Builder.Default
     private List<String> trashIdList = new ArrayList<>();
 }

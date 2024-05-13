@@ -117,7 +117,8 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
         }
         //face 그룹인 경우
         if (type == 2) {
-            FaceGroup faceGroup = faceGroupRepository.findByPartyIdAndFaceGroupNumber(party, Integer.parseInt(groupName));
+            FaceGroup faceGroup = faceGroupRepository.findByPartyIdAndFaceGroupNumber(party.getId(), Integer.parseInt(groupName))
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FACE_GROUP_NOT_FOUND));
             String faceList = faceGroup.getFaceList();
             if (faceList.equals("[]")){
                 return groups;

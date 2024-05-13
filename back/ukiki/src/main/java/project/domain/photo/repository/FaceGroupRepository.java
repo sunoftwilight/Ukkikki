@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface FaceGroupRepository extends JpaRepository<FaceGroup, Long> {
     List<FaceGroup> findByPartyId(Long partyId);
-    FaceGroup findByPartyIdAndFaceGroupNumber(Party party, Integer faceGroupNumber);
+    Optional<FaceGroup> findByPartyIdAndFaceGroupNumber(Long partyId, Integer faceGroupNumber);
+
 }
