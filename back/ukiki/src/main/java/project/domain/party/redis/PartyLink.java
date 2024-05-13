@@ -30,7 +30,7 @@ public class PartyLink {
 
     @TimeToLive
     @Builder.Default
-    private long ttl = 3600*4;
+    private long ttl = 1000 * 3600 * 4;
 
     @Builder.Default
     int count = 403;
