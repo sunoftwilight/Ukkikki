@@ -20,6 +20,10 @@ public class ChatMember {
 
     @Id
     Long memberId;
+
+    @Indexed
+    String sessionId;
+
     @Indexed
     String destination; // sub한 주소
 
