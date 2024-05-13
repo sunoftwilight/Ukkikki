@@ -95,6 +95,7 @@ public class PartyServiceImpl implements PartyService {
     @Override
     @Transactional
     public PartyLinkDto createParty(CreatePartyDto createPartyDto, MultipartFile photo) {
+        //password = sseKey 변환 전 데이터, partyName = 파티네임, simplePassword = 사용자 계정 비밀번호
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
@@ -107,7 +108,9 @@ public class PartyServiceImpl implements PartyService {
 
         // 비밀번호 규칙 확인
         checkPassword(createPartyDto.getPassword());
+        // sseKey 로 변환
         String sseKey = s3Util.generateSSEKey(createPartyDto.getPassword());
+        // sseKey 를 bcrypt 인코딩 하여 저장
         Party party = Party.builder()
             .partyName(createPartyDto.getPartyName())
             .password(bcryptUtil.encodeBcrypt(sseKey))
@@ -115,10 +118,11 @@ public class PartyServiceImpl implements PartyService {
 
         // 이미지 저장 해야함
         if (photo != null){
-            String partyThumbnailImg = s3Util.fileUpload(photo,
-                s3Util.generateSSEKey(createPartyDto.getPassword()));
+            // s3Util.fileUpload = 저장 후 url 반환
+            String partyThumbnailImg = s3Util.fileUpload(photo, sseKey);
             party.setThumbnail(partyThumbnailImg);
         }
+        // 파티 생성
         partyRepository.save(party);
 
         // 해당 파티에 초기 공유 앨범디렉토리, 휴지통 부여
@@ -134,7 +138,6 @@ public class PartyServiceImpl implements PartyService {
             .member(member)
             .build();
         profileRepository.save(profile);
-
 
         MemberParty memberParty = MemberParty.customBuilder()
             .memberRole(MemberRole.MASTER)
@@ -157,7 +160,8 @@ public class PartyServiceImpl implements PartyService {
 
         partyLinkRedisRepository.save(partyLink);
 
-
+        // 마스터 키그룹에 파티 키 등록
+        // 키그룹 파티키 = sseKey 값을 simplePassword 로 jasypt 양방향 암호하한 값
         StringEncryptor encryptor = jasyptUtil.customEncryptor(createPartyDto.getSimplePassword());
         String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
 
@@ -181,12 +185,14 @@ public class PartyServiceImpl implements PartyService {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
 
+        // 요청한 사람이 실제 있는 유저인지만 확인
         memberRepository.findById(memberId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         List<Party> partyList = partyRepository.findPartyListByMemberId(memberId);
         List<SimplePartyDto> res = memberPartyMapper.toSimplePartyDtoList(partyList);
 
+        //partyId, partyName, partyProfileImg 반환
         return res;
     }
 
@@ -280,12 +286,13 @@ public class PartyServiceImpl implements PartyService {
             throw new BusinessLogicException(ErrorCode.ENTER_DENIED_BLOCK_USER);
         }
 
-        if (!bcryptUtil.matchesBcrypt(checkChangePasswordDto.getPassword(), party.getPassword())) {
+        String sseKey = s3Util.generateSSEKey(checkChangePasswordDto.getPassword());
+
+        if (!bcryptUtil.matchesBcrypt(sseKey, party.getPassword())) {
             throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
         }
 
         //리턴 DTO 생성
-        String sseKey = s3Util.generateSSEKey(checkChangePasswordDto.getPassword());
         CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
         checkPasswordDto.setPartyId(party.getId());
         checkPasswordDto.setSseKey(sseKey);
@@ -313,10 +320,10 @@ public class PartyServiceImpl implements PartyService {
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
-        String ssekey = s3Util.generateSSEKey(enterPartyDto.getPassword());
+        String sseKey = s3Util.generateSSEKey(enterPartyDto.getPassword());
 
         // 비밀번호 비교
-        if(!bcryptUtil.matchesBcrypt(ssekey, party.getPassword())) {
+        if(!bcryptUtil.matchesBcrypt(sseKey, party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거
                 partyLinkRedisRepository.delete(partyLink);
                 throw new BusinessLogicException(ErrorCode.INPUT_NUMBER_EXCEED);
@@ -327,7 +334,6 @@ public class PartyServiceImpl implements PartyService {
             throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
         }
 
-        String sseKey = s3Util.generateSSEKey(enterPartyDto.getPassword());
         CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
         checkPasswordDto.setPartyId(party.getId());
         checkPasswordDto.setSseKey(sseKey);
@@ -407,7 +413,7 @@ public class PartyServiceImpl implements PartyService {
         }
 
         memberpartyRepository.save(memberParty);
-
+        // 로그인 멤버 입장은 토큰 없음
         PartyEnterDto res = partyLinkMapper.toPartyEnterDto(partyLink);
         return res;
     }
@@ -459,21 +465,24 @@ public class PartyServiceImpl implements PartyService {
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER);
         }
 
+        String beforeSseKey = s3Util.generateSSEKey(partyPasswordDto.getBeforePassword());
+
         // 기존 비밀번호가 확인
-        if (!bcryptUtil.matchesBcrypt(partyPasswordDto.getBeforePassword(), party.getPassword())) {
+        if (!bcryptUtil.matchesBcrypt(beforeSseKey, party.getPassword())) {
             throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
         }
         // 바뀔 비밀번호 유효성 체크
         checkPassword(partyPasswordDto.getAfterPassword());
 
-        // 바뀐 party에 비밀번호 적용
-        party.setPassword(bcryptUtil.encodeBcrypt(partyPasswordDto.getAfterPassword()));
-        partyRepository.save(party);
+        String afterSseKey = s3Util.generateSSEKey(partyPasswordDto.getAfterPassword());
 
-        String sseKey = s3Util.generateSSEKey(partyPasswordDto.getAfterPassword());
+        // 바뀐 party에 비밀번호 적용
+        party.setPassword(bcryptUtil.encodeBcrypt(afterSseKey));
+        partyRepository.save(party);
 
         List<MemberParty> memberPartyList = party.getMemberPartyList();
 
+        // 소속 멤버들 키그룹에서 파티에 해당하는 키 값을 변경
         for (MemberParty targetMemberParty : memberPartyList) {
             if(targetMemberParty.getMemberRole() == MemberRole.BLOCK){
                 continue;
@@ -491,7 +500,7 @@ public class PartyServiceImpl implements PartyService {
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
 
         StringEncryptor encryptor = jasyptUtil.customEncryptor(partyPasswordDto.getSimplePassword());
-        String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
+        String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, afterSseKey);
         keyGroup.setSseKey(encryptorPassword);
         keyGroupRepository.save(keyGroup);
 
@@ -502,23 +511,45 @@ public class PartyServiceImpl implements PartyService {
         List<Photo> photos = party.getPhotoList();
 
         // S3 이미지 암호키 변경 TODO 그룹 썸네일 사진 암호화 키 변경해야함
+        String partyThumbnailUrl = party.getThumbnail();
+        String partyThumbnailFileName = partyThumbnailUrl.split("/")[3];
+        s3Util.changeKey(beforeSseKey, afterSseKey, partyThumbnailFileName);
+
+        //TODO 그룹 참여원이 프로필 업로드 한 사진 있으면 해당 사진도 변경해야함
+        List<Profile> profileList = profileRepository.findAllByPartyId(partyId);
+        for (Profile profile : profileList){
+            if(profile.getType().equals(ProfileType.KAKAO)){
+                continue;
+            }
+            String profileUrl = profile.getProfileUrl();
+            String profileFileName = profileUrl.split("/")[3];
+            s3Util.changeKey(beforeSseKey, afterSseKey, profileFileName);
+        }
+
         for (Photo photo : photos) {
             List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
             for (Face face : faceList) {
                 String url = face.getFaceImageUrl();
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
-                s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
+                String fileName = url.split("/")[3];
+                s3Util.changeKey(beforeSseKey, afterSseKey, fileName);
             }
             for(String url : photo.getPhotoUrl().photoUrls()){
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
-                s3Util.changeKey(partyPasswordDto.getBeforePassword(), partyPasswordDto.getAfterPassword(), fileName);
+                String fileName = url.split("/")[3];
+                s3Util.changeKey(beforeSseKey, afterSseKey, fileName);
             }
         }
+
         CheckPasswordDto checkPasswordDto = new CheckPasswordDto();
         checkPasswordDto.setPartyId(party.getId());
-        checkPasswordDto.setSseKey(sseKey);
+        checkPasswordDto.setSseKey(afterSseKey);
 
         return checkPasswordDto;
+    }
+
+    public static void main(String[] args) {
+        String url = "https://ukkikki.s3.ap-northeast-2.amazonaws.com/20240509_215538.030-4bd00d99-840c-4571-acdc-c30b0906c8d83.jpg";
+        String filename = url.split("/")[3];
+        System.out.println(filename);
     }
 
     @Override
@@ -615,7 +646,9 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
 
         // TODO 자신 프로필 사진 삭제해야함
-
+        String myProfileUrl = profile.getProfileUrl();
+        String myProfileFileName = myProfileUrl.split("/")[3];
+        s3Util.fileDelete(myProfileFileName);
 
         // 자신 파티에서 삭제
         memberpartyRepository.delete(memberParty);
@@ -635,20 +668,18 @@ public class PartyServiceImpl implements PartyService {
 
             // 파티 썸네일 삭제
             String thumbnail = party.getThumbnail();
-            s3Util.fileDelete(thumbnail.substring(
-                thumbnail.lastIndexOf("/"),
-                thumbnail.lastIndexOf(".") - 1));
+            s3Util.fileDelete(thumbnail.split("/")[3]);
             // 파티 내 사진 삭제
             List<Photo> photos = party.getPhotoList();
             for (Photo photo : photos) {
                 List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
                 for (Face face : faceList) {
                     String url = face.getFaceImageUrl();
-                    String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                    String fileName = url.split("/")[3];
                     s3Util.fileDelete(fileName);
                 }
                 for(String url : photo.getPhotoUrl().photoUrls()){
-                    String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                    String fileName = url.split("/")[3];
                     s3Util.fileDelete(fileName);
                 }
             }
@@ -785,9 +816,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 썸네일 변경
         String thumbUrl = memberParty.getParty().getThumbnail();
-        s3Util.fileDelete(thumbUrl.substring(
-            thumbUrl.lastIndexOf("/"),
-            thumbUrl.lastIndexOf(".") - 1));
+        s3Util.fileDelete(thumbUrl.split("/")[3]);
         String newThumbUrl = s3Util.fileUpload(photo, changeThumbDto.getKey());
 
         memberParty.getParty().setThumbnail(newThumbUrl);
@@ -817,6 +846,7 @@ public class PartyServiceImpl implements PartyService {
         if (!bcryptUtil.matchesBcrypt(changeThumbDto.getKey(), party.getPassword())){
             throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
         }
+
         // 파티 이름 바꾸기
         if(!changeThumbDto.getPartyName().isEmpty()){
             party.setPartyName(changeThumbDto.getPartyName());
@@ -826,31 +856,11 @@ public class PartyServiceImpl implements PartyService {
             return;
         }
 
-        //파티 sse 키 가지고 오기
-        List<KeyGroupDto> myKeyList =  memberService.getKeyGroup(changeThumbDto.getKey());
-        Optional<KeyGroupDto> findPartyKeyGroup = myKeyList.stream()
-            .filter(keyGroupDto -> keyGroupDto.getPartyId().equals(partyId))
-            .findFirst();
-
-        if(findPartyKeyGroup.isEmpty()){
-            throw new BusinessLogicException(ErrorCode.PARTY_KEY_NOT_FOUND);
-        }
-        // 복호화 하기
-        String partySseJasyptKey = findPartyKeyGroup.get().getSseKey();
-
-        StringEncryptor customEncryptor = jasyptUtil.customEncryptor(changeThumbDto.getSimplePassword());
-
-        // 나의 SseKey
-        String partySseKey = customEncryptor.decrypt(partySseJasyptKey);
-
         String url = party.getThumbnail();
 
+        s3Util.fileDelete(url.split("/")[3]);
 
-        s3Util.fileDelete(url.substring(
-            url.lastIndexOf("/"),
-            url.lastIndexOf(".") - 1));
-
-        String partyThumbnailImg = s3Util.fileUpload(photo, partySseKey);
+        String partyThumbnailImg = s3Util.fileUpload(photo, changeThumbDto.getKey());
         party.setThumbnail(partyThumbnailImg);
         partyRepository.save(party);
 
@@ -922,33 +932,14 @@ public class PartyServiceImpl implements PartyService {
             return profile;
         }
 
-        //파티 sse 키 가지고 오기
-        List<KeyGroupDto> myKeyList =  memberService.getKeyGroup(profileDto.getPassword());
-        Optional<KeyGroupDto> findPartyKeyGroup = myKeyList.stream()
-            .filter(keyGroupDto -> keyGroupDto.getPartyId().equals(partyId))
-            .findFirst();
-
-        if(findPartyKeyGroup.isEmpty()){
-            throw new BusinessLogicException(ErrorCode.PARTY_KEY_NOT_FOUND);
-        }
-        // 복호화 하기
-        String partySseJasyptKey = findPartyKeyGroup.get().getSseKey();
-
-        StringEncryptor customEncryptor = jasyptUtil.customEncryptor(profileDto.getPassword());
-
-        // 나의 SseKey
-        String partySseKey = customEncryptor.decrypt(partySseJasyptKey);
-
         if (profile.getType().equals(ProfileType.S3)){
             // 프로필 삭제
             String thumbnail = profile.getProfileUrl();
-            s3Util.fileDelete(thumbnail.substring(
-                thumbnail.lastIndexOf("/"),
-                thumbnail.lastIndexOf(".") - 1));
+            s3Util.fileDelete(thumbnail.split("/")[3]);
         }
 
         // 프로필 넣기
-        String partyThumbnailImg = s3Util.fileUpload(photo, partySseKey);
+        String partyThumbnailImg = s3Util.fileUpload(photo, profileDto.getSseKey());
         profile.setProfileUrl(partyThumbnailImg);
         profileRepository.save(profile);
 

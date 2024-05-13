@@ -149,12 +149,12 @@ public class FileServiceImpl implements FileService{
             List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
             for (Face face : faceList) {
                 String url = face.getFaceImageUrl();
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                String fileName = url.split("/")[3];
                 s3Util.fileExpire(sseKey, fileName);
             }
             // 썸네일 사진 만료일 설정
             for(String url : photo.getPhotoUrl().photoUrls()){
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                String fileName = url.split("/")[3];
                 s3Util.fileExpire(sseKey, fileName);
             }
             // 원본 사진 만료일 설정

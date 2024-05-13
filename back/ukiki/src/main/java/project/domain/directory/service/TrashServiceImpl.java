@@ -361,7 +361,7 @@ public class TrashServiceImpl implements TrashService{
         List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
         for (Face face : faceList) {
             String url = face.getFaceImageUrl();
-            String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+            String fileName = url.split("/")[3];
             //S3 파일 삭제
             s3Util.fileDelete(fileName);
             //FaceGroup DB 수정
@@ -383,7 +383,7 @@ public class TrashServiceImpl implements TrashService{
         }
         // 썸네일 사진 삭제
         for(String url : photo.getPhotoUrl().photoUrls()){
-            String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+            String fileName = url.split("/")[3];
             s3Util.fileDelete(fileName);
         }
         // 원본 사진 삭제
@@ -507,12 +507,12 @@ public class TrashServiceImpl implements TrashService{
             // 얼굴 분류 사진 만료 설정 취소
             for (Face face : faceList) {
                 String url = face.getFaceImageUrl();
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                String fileName = url.split("/")[3];
                 s3Util.fileUndo(sseKey, fileName);
             }
             // 썸네일 사진 만료일 설정 취소
             for(String url : photo.getPhotoUrl().photoUrls()){
-                String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                String fileName = url.split("/")[3];
                 s3Util.fileUndo(sseKey, fileName);
             }
             // 원본 사진 만료일 설정 취소

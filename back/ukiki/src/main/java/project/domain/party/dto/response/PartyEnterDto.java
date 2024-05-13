@@ -10,5 +10,4 @@ public class PartyEnterDto {
     private Long partyId;
     private String token;
 
-
 }

@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ChangeProfileDto {
 
-    String password;
+    String sseKey;
     String nickName;
 }
