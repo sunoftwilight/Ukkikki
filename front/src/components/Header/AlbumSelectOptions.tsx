@@ -19,6 +19,8 @@ const AlbumSelectOptions: React.FC = () => {
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
   const [isIng, setIsIng] = useState(false)
   const [isDownDone, setIsDownDone] = useState(false)
+  const [isDelete, setIsDelete] = useState(false)
+
   const { setFolderOpen } = folderStore()
   const { prefix } = useStore(prefixStore)
 
@@ -32,6 +34,8 @@ const AlbumSelectOptions: React.FC = () => {
       setFolderOpen()
     } else if (mode === 'down') {
       setIsPrefixOpen(true)
+    } else if (mode === 'delete') {
+
     }
   }
 
@@ -59,6 +63,10 @@ const AlbumSelectOptions: React.FC = () => {
       },
     )
     doneHandler()
+  }
+
+  const delFileHandler = () => {
+
   }
       
   const doneHandler = () => {
@@ -100,6 +108,15 @@ const AlbumSelectOptions: React.FC = () => {
         />
       )}
 
+      { isDelete && (
+        <Modal
+          key='isDelete'
+          modalItems={{ title: '사진을 삭제합니다', content: '삭제된 사진은 휴지통에 2주간 보관되며 기간 내 복구 가능합니다', modalType: 'warn', btn: 2 }}
+          onSubmitBtnClick={() => delFileHandler()}
+          onCancelBtnClick={() => setIsDelete(false)}
+        />
+      )}
+
       <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[186px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
         <div className={`${optionStyle}`} onClick={() => openHandler('down')}>
           <img src={download} className="w-4" />
@@ -116,7 +133,7 @@ const AlbumSelectOptions: React.FC = () => {
           복제
         </div>
 
-        <div className={`${optionStyle}`} onClick={() => openHandler('')}>
+        <div className={`${optionStyle}`} onClick={() => openHandler('delete')}>
           <img src={trash} className="w-4" />
           삭제
         </div>

@@ -7,7 +7,7 @@ import albumOption from "@/assets/Header/albumOption.png";
 import selectOption from "@/assets/Header/selectOptn.png";
 import AlbumEditOptions from "./AlbumEditOptions";
 import AlbumSelectOptions from "./AlbumSelectOptions";
-import { selectModeStore } from "../../stores/AlbumStore";
+import { selectModeStore, selectStore } from "../../stores/AlbumStore";
 import { albumDoneStore, albumEditStore } from "../../stores/HeaderStateStore";
 import TrashOptions from "./TrashOptions";
 import { currentDirStore } from "../../stores/AlbumStore";
@@ -30,6 +30,7 @@ const AlbumHeader: React.FC = () => {
 	const { isDone, setIsDone } = albumDoneStore();
 
 	const { currentDirId } = useStore(currentDirStore)
+	const { setSelectList } = useStore(selectStore)
 
 	const navigate = useNavigate();
 	const goBackHandler = () => {
@@ -39,6 +40,11 @@ const AlbumHeader: React.FC = () => {
 			navigate(-1);
 		}
 	};
+
+	const cancelHandler = () => {
+		setSelectList(-1, false)
+		setSelectMode()
+	}
 
 	const isGuest = false;
 
@@ -91,7 +97,7 @@ const AlbumHeader: React.FC = () => {
 			) : (
 				<>
 					<button
-						onClick={() => setSelectMode()}
+						onClick={() => cancelHandler()}
 						className={`${btnStyle} text-lg bg-disabled-gray`}
 					>
 						취소

@@ -60,3 +60,12 @@ export const getThumbnailNav = async (
   .then(Response)
   .catch(Error)
 }
+
+export const delFiles = async (
+  dirId : string,
+  Response : (Response : AxiosResponse<thumbNailResponseType>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.get(`/${url}/${dirId}/files`)
+  .then(Response)
+  .catch(Error)
+}
