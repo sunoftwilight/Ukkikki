@@ -32,11 +32,11 @@ public class Memo {
     private String content;
 
     // 연관관계
-    @JoinColumn(name = "photo_id")
+    @JoinColumn(name = "photo")
     @ManyToOne(fetch = FetchType.LAZY)
     private Photo photo;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 

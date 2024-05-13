@@ -3,15 +3,16 @@ package project.domain.photo.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.domain.photo.dto.request.MemoDto;
+import project.domain.photo.dto.request.MemoModifyDto;
+import project.domain.photo.dto.response.MemoListDto;
+import project.domain.photo.entity.mediatable.Memo;
 import project.domain.photo.service.PhotoService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -22,12 +23,39 @@ public class PhotoController implements PhotoDocs {
     private final PhotoService photoService;
 
     @Override
-    @PostMapping("/memo/create")
+    @GetMapping("/{fileId}/memo")
+    public ResponseEntity<ResultResponse> memo(String fileId) {
+
+        List<MemoListDto> memos = photoService.memo(fileId);
+
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_MEMO_LIST_SUCCESS, memos));
+    }
+
+    @Override
+    @PostMapping("/{fileId}/memo/create")
     public ResponseEntity<ResultResponse> memoCreate(MemoDto memoDto) {
 
         photoService.memoCreate(memoDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.CREATE_MEMO_SUCCESS));
+    }
+
+    @Override
+    @PostMapping("/{fileId}/memo/modify")
+    public ResponseEntity<ResultResponse> memoModify(MemoModifyDto memoModifyDto) {
+
+        photoService.memoModify(memoModifyDto);
+
+        return ResponseEntity.ok().body(new ResultResponse(ResultCode.MODIFY_MEMO_SUCCESS));
+    }
+
+    @Override
+    @DeleteMapping("/{fileId}/memo/delete")
+    public ResponseEntity<ResultResponse> memoDelete(Long memoId) {
+
+        photoService.memoDelete(memoId);
+
+        return ResponseEntity.ok().body(new ResultResponse(ResultCode.DELETE_MEMO_SUCCESS));
     }
 
     @Override

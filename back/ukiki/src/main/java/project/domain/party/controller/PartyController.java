@@ -11,13 +11,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project.domain.member.entity.MemberRole;
+import project.domain.member.entity.Profile;
 import project.domain.party.dto.request.*;
 import project.domain.party.dto.response.*;
+import project.domain.party.redis.PartyLink;
 import project.domain.party.service.PartyService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -52,12 +56,14 @@ public class PartyController implements PartyDocs {
     }
 
     @Override
-    public ResponseEntity<ResultResponse> profilePhotoChange(Long partyId) {
-        return null;
+    @PostMapping(value = "/change-profile/{partyId}", consumes = {"application/json", "multipart/form-data"})
+    public ResponseEntity<Object> chagneProfile(@PathVariable(name = "partyId") Long partyId, @RequestPart ChangeProfileDto profileDto, @RequestPart(required = false)MultipartFile photo) {
+        Profile res = partyService.partyProfileChange(partyId, profileDto, photo);
+        return ResponseEntity.ok(res);
     }
 
     @Override
-    @GetMapping("/link/{partyId}")
+    @GetMapping("/link/{partyId}")  // 링크 만들기
     public ResponseEntity<ResultResponse> makePartyLink(@PathVariable Long partyId) {
         PartyLinkDto response = partyService.createLink(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_PARTY_LINK_SUCCESS, response));
@@ -65,9 +71,11 @@ public class PartyController implements PartyDocs {
 
     @Override
     @GetMapping("/enter/{partyLink}")  //파티 링크 유효 여부를 확인
-    public ResponseEntity<ResultResponse> enterParty(@PathVariable(name = "partyLink") String partyLink) {
-        partyService.enterParty(partyLink);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.PARTY_LINK_VALID));
+    public String enterParty(RedirectAttributes redirect, @PathVariable(name = "partyLink") String partyLink) {
+        PartyLink link = partyService.enterParty(partyLink);
+
+        redirect.addAttribute(link.getParty());
+        return String.format("/group/%d/attend/login", link.getParty());
     }
 
     @Override

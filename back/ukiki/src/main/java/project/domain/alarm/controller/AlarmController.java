@@ -53,13 +53,16 @@ public class AlarmController implements AlarmDocs {
         if(asd != null){
             System.out.println("Emitter IS NOT NULL");
         }
-        Alarm dsa = alarmService.createAlarm(
-            AlarmType.COMMENT,
-            4L,1L, 53L, 6L,  "어해진 바보"
-        );
-        dsa.setMemberId(userId);
-        alarmRedisRepository.save(dsa);
-        alarmService.sendAlarm(asd,userId,dsa);
+        for (int i = 0; i < 100 ; i++){
+
+            Alarm dsa = alarmService.createAlarm(
+                AlarmType.COMMENT,
+                5L,1L, 1L, 1L,  "어해진 바보"
+            );
+            dsa.setMemberId(userId);
+            alarmRedisRepository.save(dsa);
+//            alarmService.sendAlarm(asd,userId,dsa);
+        }
     }
 
 }

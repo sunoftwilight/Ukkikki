@@ -5,8 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import project.domain.photo.dto.response.GroupbrieflyDto;
+import project.domain.photo.service.PhotoGroupServiceImpl;
 import project.global.util.S3Util;
 import project.global.util.gptutil.GptUtil;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,6 +19,7 @@ public class TestController {
 
     private final GptUtil gptUtil;
     private final S3Util s3Util;
+    private final PhotoGroupServiceImpl photoGroupServiceImpl;
 
     @GetMapping("/test/post_thread")
     public String testController1() throws Exception {
@@ -76,5 +81,10 @@ public class TestController {
     @PostMapping("/test/file-undo")
     public void testController9(String key, String filename) throws Exception {
         s3Util.fileUndo(key, filename);
+    }
+
+    @GetMapping("/test/photo-group")
+    public List<GroupbrieflyDto> testController10() throws Exception {
+        return photoGroupServiceImpl.getGroups(1L);
     }
 }

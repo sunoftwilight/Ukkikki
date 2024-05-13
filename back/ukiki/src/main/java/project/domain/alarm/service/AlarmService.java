@@ -1,6 +1,7 @@
 package project.domain.alarm.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import project.domain.alarm.dto.request.AlarmPageableDto;
 import project.domain.alarm.dto.response.AlarmPageDto;
@@ -22,4 +23,5 @@ public interface AlarmService {
     Alarm createAlarm(AlarmType type, Long partyId, Long articleId, Long targetId, Long writerId, String data);
 
     SseEmitter findEmitterByUserId(Long memberId);
+
 }

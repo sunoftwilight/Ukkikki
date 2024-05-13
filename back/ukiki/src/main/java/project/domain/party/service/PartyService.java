@@ -4,8 +4,10 @@ package project.domain.party.service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
+import project.domain.member.entity.Profile;
 import project.domain.party.dto.request.*;
 import project.domain.party.dto.response.*;
+import project.domain.party.redis.PartyLink;
 
 import java.util.List;
 
@@ -19,7 +21,7 @@ public interface PartyService {
 
     PartyLinkDto createLink(Long partyId);
 
-    void enterParty(String partyLink);
+    PartyLink enterParty(String partyLink);
 
     CheckPasswordDto checkChangedPassword(CheckChangePasswordDto checkChangePasswordDto);
 
@@ -47,4 +49,6 @@ public interface PartyService {
     void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
     void linkDelete();
+
+    Profile partyProfileChange(Long partyId, ChangeProfileDto profileDto, MultipartFile photo);
 }
