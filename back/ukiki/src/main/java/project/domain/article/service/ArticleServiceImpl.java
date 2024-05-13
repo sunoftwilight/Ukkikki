@@ -1,5 +1,6 @@
 package project.domain.article.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -146,4 +147,5 @@ public class ArticleServiceImpl implements ArticleService{
 
         return res;
     }
+
 }
