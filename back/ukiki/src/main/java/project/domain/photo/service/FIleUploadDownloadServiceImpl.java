@@ -71,23 +71,20 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             throw new BusinessLogicException(ErrorCode.SSE_KEY_MISSED);
         }
 
-        //S3업로드 커스텀 키 생성
-        SSECustomerKey sseKey = new SSECustomerKey(key);
-
         for(MultipartFile file : files){
             Photo photo = new Photo();
             PhotoUrl urls = new PhotoUrl();
 
             //S3 파일 업로드 후 저장
-            urls.setPhotoUrl(s3Util.fileUpload(file, sseKey));
+            urls.setPhotoUrl(s3Util.fileUpload(file, key));
             photo.setFileName(urls.getPhotoUrl().split("/")[3]);
 
             BufferedImage firstThumbnail = imageUtil.resizeImage(file, 1);
-            String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, sseKey, file);
+            String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, key, file);
             urls.setThumb_url1(firstThumbnailUrl);
 
             BufferedImage secondThumbnail = imageUtil.resizeImage(file, 1);
-            String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, sseKey, file);
+            String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, key, file);
             urls.setThumb_url2(secondThumbnailUrl);
 
             log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
