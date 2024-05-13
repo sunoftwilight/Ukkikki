@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
+
+import { getPartyUserList, getPartyBlockUserList,  } from "../../api/party";
 
 import clickBtn from "@/assets/GroupConfig/clickBtn.png";
 import eclipes1 from "@/assets/GroupConfig/Ellipse 55.png";
 import eclipes2 from "@/assets/GroupConfig/Ellipse 56.png";
 import eclipes3 from "@/assets/GroupConfig/Ellipse 57.png";
 import eclipes4 from "@/assets/GroupConfig/Ellipse 59.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 
 const userList = [
@@ -27,8 +29,40 @@ interface ListType {
 }
 
 const UserList: React.FC<ListType> = (listType) => {
-	const navi = useNavigate()
-	const type = listType.type
+	const type = listType.type;
+	const navi = useNavigate();
+	const { groupPk } = useParams();
+
+	useEffect(() => {
+		if(type === 'users') {
+			loadUserList()
+		}
+		else if(type === 'banUsers') {
+			loadBanList()
+		}
+	}, [])
+
+	const loadUserList = async () => {
+		await getPartyUserList(Number(groupPk),
+			(res) => {
+				console.log(res)
+			},
+			(err) => {
+				console.log(err)
+			})
+	}
+
+	const loadBanList = async () => {
+		await getPartyBlockUserList(Number(groupPk),
+			(res) => {
+				console.log(res)
+			},
+			(err) => {
+				console.log(err)
+			})
+	}
+
+
 	const CallType = () => {
 		switch (type) {
 			case "users":

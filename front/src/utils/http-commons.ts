@@ -5,8 +5,8 @@ import axios, { AxiosInstance } from "axios";
 
 axios.defaults.withCredentials = true;
 
-// const baseURL: string = "https://k10d202.p.ssafy.io/api";
-const baseURL: string = "http://localhost:5000/api";
+const baseURL: string = "https://k10d202.p.ssafy.io/api";
+// const baseURL: string = "http://localhost:5000/api";
 
 
 //img Test API 

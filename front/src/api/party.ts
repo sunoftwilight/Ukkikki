@@ -54,7 +54,7 @@ export const getPartyThumb = async (
 
 	// 오늘 작업예정
 
-	// 1
+	// 1차 연동완료
 	export const enterPartyMember = async (
 		partyId : number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
@@ -64,7 +64,7 @@ export const getPartyThumb = async (
     .catch(Error)
 	}
 
-	// 1
+	// 1차 완료
 	export const enterPartyGuest = async (
 		partyId : number,
 		Response : (Response : AxiosResponse<EnterGuestRespones>) => void, 
@@ -74,7 +74,7 @@ export const getPartyThumb = async (
     .catch(Error)
 	}
 
-	// 1
+	// 1차 완료
 	export const checkPartyPass = async (
 		partyId : number,
 		pass: string,
@@ -140,11 +140,12 @@ export const getPartyThumb = async (
     .catch(Error)
 	}
 
+	// 1
 	export const getPartyUserList = async (
 		partyId : number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
+    await privateApi.get(`/${url}/user-list/${partyId}`)
     .then(Response)
     .catch(Error)
 	}
