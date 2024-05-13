@@ -79,7 +79,7 @@ public interface DirectoryDocs {
     @PostMapping("")
     public ResponseEntity<ResultResponse> createDir(@RequestBody CreateDirDto request);
 
-    @Operation(summary = "폴더 위치 변경 요청", description = "PathVariable로 dirId(이동 대상이 되는 폴더Id), RequestParam으로 toDirId(목적지가 되는 폴더 Id)를 받아 부모폴더의 정보를 반환")
+    @Operation(summary = "폴더 위치 변경 요청", description = "PathVariable로 dirId(이동 대상이 되는 폴더Id), RequestParam으로 toDirId(목적지가 되는 폴더 Id)를 받아 폴더 위치 변경 ")
     @ApiResponse(responseCode = "200", description = "폴더 이동에 성공하였습니다.")
     @PatchMapping("/{dirId}")
     public ResponseEntity<ResultResponse> moveDir(
@@ -87,12 +87,12 @@ public interface DirectoryDocs {
         @RequestParam String toDirId
     );
 
-    @Operation(summary = "폴더 삭제 요청", description = "PathVariable로 dirId(삭제 대상 폴더 Id)를 받아 삭제하고 부모 폴더의 정보를 반환")
+    @Operation(summary = "폴더 삭제 요청", description = "PathVariable로 dirId(삭제 대상 폴더 Id)를 받아 삭제")
     @ApiResponse(responseCode = "204", description = "폴더 삭제에 성공하였습니다.")
     @DeleteMapping("/{dirId}")
     public ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId);
 
-    @Operation(summary = "폴더명 수정 요청", description = "PathVariable로 dirId(이름 수정 대상 폴더 Id), RequestParam으로 newName을 받아 이름을 수정하고 부모 폴더의 정보를 반환")
+    @Operation(summary = "폴더명 수정 요청", description = "PathVariable로 dirId(이름 수정 대상 폴더 Id), RequestBody로 newName을 받아 이름을 수정")
     @ApiResponse(responseCode = "200", description = "폴더 이름 수정에 성공하였습니다.")
     @PatchMapping("/{dirId}/rename")
     public ResponseEntity<ResultResponse> renameDir(

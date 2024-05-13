@@ -66,7 +66,8 @@ public class TrashServiceImpl implements TrashService{
         // 폴더인지 파일인지 분기 처리
         if (trash.getDataType() == DataType.DIRECTORY) {
             log.info("DataType = DIRECTORY");
-            List<Trash> allTrash = getAllTrash(trash.getId());
+//            List<Trash> allTrash = getAllTrash(trash.getId());
+            List<Trash> allTrash = getAllTrashV2(trash.getId());
             log.info("모든 쓰레기 = {}", allTrash);
             // 일단 가장 첫번째인 폴더는 휴지통에서 제거 + 본 디렉토리에서 관계 회복
             Directory trashDirDto = modelMapper.map(trash.getContent(), Directory.class);

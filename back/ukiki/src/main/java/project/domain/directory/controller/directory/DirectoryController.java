@@ -100,7 +100,7 @@ public class DirectoryController implements DirectoryDocs {
     @PatchMapping("/{dirId}/rename")
     public ResponseEntity<ResultResponse> renameDir(
         @PathVariable(name = "dirId") String dirId,
-        @RequestParam(name = "newName") String newName
+        @RequestBody String newName
     ) {
         directoryService.renameDir(dirId, newName);
         return ResponseEntity.ok(new ResultResponse(ResultCode.RENAME_DIRECTORY_SUCCESS));
