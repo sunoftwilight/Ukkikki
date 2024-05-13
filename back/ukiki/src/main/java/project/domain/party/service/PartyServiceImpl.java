@@ -116,7 +116,7 @@ public class PartyServiceImpl implements PartyService {
         // 이미지 저장 해야함
         if (photo != null){
             String partyThumbnailImg = s3Util.fileUpload(photo,
-                new SSECustomerKey(s3Util.generateSSEKey(createPartyDto.getPassword())));
+                s3Util.generateSSEKey(createPartyDto.getPassword()));
             party.setThumbnail(partyThumbnailImg);
         }
         partyRepository.save(party);
@@ -316,7 +316,7 @@ public class PartyServiceImpl implements PartyService {
         String ssekey = s3Util.generateSSEKey(enterPartyDto.getPassword());
 
         // 비밀번호 비교
-        if (!bcryptUtil.matchesBcrypt(ssekey, party.getPassword())) {
+        if(!bcryptUtil.matchesBcrypt(ssekey, party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거
                 partyLinkRedisRepository.delete(partyLink);
                 throw new BusinessLogicException(ErrorCode.INPUT_NUMBER_EXCEED);
@@ -338,7 +338,8 @@ public class PartyServiceImpl implements PartyService {
         try{
             userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             memberId = userDetails.getId();
-        }catch (Exception e){
+
+        }catch (Exception ignore){
             return checkPasswordDto;
         }
         //게스트일 경우 sseKey 반환
@@ -500,7 +501,7 @@ public class PartyServiceImpl implements PartyService {
         // S3 이미지 비밀번호 바꾸기
         List<Photo> photos = party.getPhotoList();
 
-        // S3 이미지 암호키 변경
+        // S3 이미지 암호키 변경 TODO 그룹 썸네일 사진 암호화 키 변경해야함
         for (Photo photo : photos) {
             List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
             for (Face face : faceList) {
@@ -586,7 +587,7 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void exitParty(Long partyId, String key) {
+    public void exitParty(Long partyId) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
@@ -628,25 +629,27 @@ public class PartyServiceImpl implements PartyService {
 
         // 자신 밖에 없을 때 party 데이터 삭제
         if (partyMemberCount == 1) {
-            // S3 key
-            SSECustomerKey sseKey = new SSECustomerKey(s3Util.generateSSEKey(key));
 
             Party party = partyRepository.findById(partyId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
             // 파티 썸네일 삭제
             String thumbnail = party.getThumbnail();
-            s3Util.fileDelete(sseKey, thumbnail.substring(
+            s3Util.fileDelete(thumbnail.substring(
                 thumbnail.lastIndexOf("/"),
                 thumbnail.lastIndexOf(".") - 1));
             // 파티 내 사진 삭제
             List<Photo> photos = party.getPhotoList();
             for (Photo photo : photos) {
-                for (String url : photo.getPhotoUrl().photoUrls()){
-                    String fileName = url.substring(
-                        url.lastIndexOf("/"),
-                        url.lastIndexOf(".") - 1);
-                    s3Util.fileDelete(sseKey, fileName);
+                List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
+                for (Face face : faceList) {
+                    String url = face.getFaceImageUrl();
+                    String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                    s3Util.fileDelete(fileName);
+                }
+                for(String url : photo.getPhotoUrl().photoUrls()){
+                    String fileName = url.substring(url.lastIndexOf("/"), url.lastIndexOf(".") - 1);
+                    s3Util.fileDelete(fileName);
                 }
             }
             // 파티 삭제
@@ -783,12 +786,10 @@ public class PartyServiceImpl implements PartyService {
 
         // 썸네일 변경
         String thumbUrl = memberParty.getParty().getThumbnail();
-        String generatedKey = s3Util.generateSSEKey(changeThumbDto.getKey());
-        SSECustomerKey sseKey = new SSECustomerKey(generatedKey);
-        s3Util.fileDelete(sseKey, thumbUrl.substring(
+        s3Util.fileDelete(thumbUrl.substring(
             thumbUrl.lastIndexOf("/"),
             thumbUrl.lastIndexOf(".") - 1));
-        String newThumbUrl = s3Util.fileUpload(photo, sseKey);
+        String newThumbUrl = s3Util.fileUpload(photo, changeThumbDto.getKey());
 
         memberParty.getParty().setThumbnail(newThumbUrl);
 
@@ -843,15 +844,14 @@ public class PartyServiceImpl implements PartyService {
         // 나의 SseKey
         String partySseKey = customEncryptor.decrypt(partySseJasyptKey);
 
-        SSECustomerKey sseCustomerKey = new SSECustomerKey(partySseKey);
         String url = party.getThumbnail();
 
 
-        s3Util.fileDelete(sseCustomerKey, url.substring(
+        s3Util.fileDelete(url.substring(
             url.lastIndexOf("/"),
             url.lastIndexOf(".") - 1));
 
-        String partyThumbnailImg = s3Util.fileUpload(photo, sseCustomerKey);
+        String partyThumbnailImg = s3Util.fileUpload(photo, partySseKey);
         party.setThumbnail(partyThumbnailImg);
         partyRepository.save(party);
 
@@ -940,18 +940,16 @@ public class PartyServiceImpl implements PartyService {
         // 나의 SseKey
         String partySseKey = customEncryptor.decrypt(partySseJasyptKey);
 
-        SSECustomerKey sseCustomerKey = new SSECustomerKey(partySseKey);
-
         if (profile.getType().equals(ProfileType.S3)){
             // 프로필 삭제
             String thumbnail = profile.getProfileUrl();
-            s3Util.fileDelete(sseCustomerKey, thumbnail.substring(
+            s3Util.fileDelete(thumbnail.substring(
                 thumbnail.lastIndexOf("/"),
                 thumbnail.lastIndexOf(".") - 1));
         }
 
         // 프로필 넣기
-        String partyThumbnailImg = s3Util.fileUpload(photo, sseCustomerKey);
+        String partyThumbnailImg = s3Util.fileUpload(photo, partySseKey);
         profile.setProfileUrl(partyThumbnailImg);
         profileRepository.save(profile);
 

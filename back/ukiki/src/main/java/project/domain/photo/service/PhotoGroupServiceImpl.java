@@ -117,24 +117,22 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
         }
         //face 그룹인 경우
         if (type == 2) {
-            List<FaceGroup> faceGroupList = faceGroupRepository.findByFaceGroupNumber(Integer.parseInt(groupName));
-            for (FaceGroup faceGroup : faceGroupList) {
-                String faceList = faceGroup.getFaceList();
-                if (faceList.equals("[]")){
-                    continue;
-                }
-                List<Integer> faces = stringToListFormatter(faceGroup.getFaceList());
-                for (Integer faceId : faces) {
-                    Face face = faceRepository.findById(Long.valueOf(faceId))
-                            .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
-                    GroupDetailResDto groupDetail = new GroupDetailResDto();
-                    Photo photo = photoRepository.findById(face.getPhotoId())
-                            .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
-                    groupDetail.setPhotoId(photo.getId());
-                    groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
-                    groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
-                    groups.add(groupDetail);
-                }
+            FaceGroup faceGroup = faceGroupRepository.findByPartyIdAndFaceGroupNumber(party, Integer.parseInt(groupName));
+            String faceList = faceGroup.getFaceList();
+            if (faceList.equals("[]")){
+                return groups;
+            }
+            List<Integer> faces = stringToListFormatter(faceGroup.getFaceList());
+            for (Integer faceId : faces) {
+                Face face = faceRepository.findById(Long.valueOf(faceId))
+                        .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+                GroupDetailResDto groupDetail = new GroupDetailResDto();
+                Photo photo = photoRepository.findById(face.getPhotoId())
+                        .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+                groupDetail.setPhotoId(photo.getId());
+                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
+                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
+                groups.add(groupDetail);
             }
         }
         // 좋아요한 사진인 경우

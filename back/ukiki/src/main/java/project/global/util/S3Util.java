@@ -61,7 +61,8 @@ public class S3Util {
     }
 
     //단일 파일 업로드
-    public String fileUpload(MultipartFile file, SSECustomerKey sseKey) {
+    public String fileUpload(MultipartFile file, String key) {
+        SSECustomerKey sseKey = new SSECustomerKey(key);
         // 허용할 MIME 타입들 설정 (이미지, 동영상 파일만 허용하는 경우)
         List<String> allowedMimeTypes = List.of("image/jpeg", "image/png", "image/gif", "video/mp4", "video/webm", "video/ogg", "video/3gpp", "video/x-msvideo", "video/quicktime");
 
@@ -92,7 +93,8 @@ public class S3Util {
     }
 
     //썸네일 생성시 버퍼드 이미지를 S3에 업로드 하는 메소드
-    public String bufferedImageUpload(BufferedImage bi, SSECustomerKey sseKey, MultipartFile file) {
+    public String bufferedImageUpload(BufferedImage bi, String key, MultipartFile file) {
+        SSECustomerKey sseKey = new SSECustomerKey(key);
         //바이트 스트림 생성
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         //파일 확장자
@@ -129,33 +131,32 @@ public class S3Util {
     }
 
     //단일 파일 다운로드
-    public S3Object fileDownload(SSECustomerKey sseKey, String fileName) {
-
+    public S3Object fileDownload(String key, String fileName) {
+        SSECustomerKey sseKey = new SSECustomerKey(key);
         GetObjectRequest getObjectRequest = new GetObjectRequest("ukkikki", fileName).withSSECustomerKey(sseKey);
         S3Object object = amazonS3.getObject(getObjectRequest);
 
         return object;
     }
 
-    //키값 변경 원본 사진 삭제
-    public void fileDelete(SSECustomerKey sseKey, String fileName) {
+    //S3 사진 삭제
+    public void fileDelete(String fileName) {
         DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest("ukkikki", fileName);
         amazonS3.deleteObject(deleteObjectRequest);
     }
 
     //sse-c 키값 변경
     public String changeKey(String originKey, String newKey, String fileName){
-        SSECustomerKey originSseKey = new SSECustomerKey(originKey);
         SSECustomerKey newSseKey = new SSECustomerKey(newKey);
 
-        S3Object object = fileDownload(originSseKey, fileName);
+        S3Object object = fileDownload(originKey, fileName);
         InputStream inputStream = object.getObjectContent();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(object.getObjectMetadata().getContentLength());
         metadata.setContentType(object.getObjectMetadata().getContentType());
 
-        fileDelete(originSseKey, fileName);
+        fileDelete(fileName);
 
         amazonS3.putObject(new PutObjectRequest("ukkikki", fileName, inputStream, metadata
         ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(newSseKey));
@@ -163,10 +164,10 @@ public class S3Util {
         return amazonS3.getUrl("ukkikki", fileName).toString();
     }
 
-    public void fileExpire(String Key, String fileName) {
-        SSECustomerKey sseKey = new SSECustomerKey(Key);
+    public void fileExpire(String key, String fileName) {
+        SSECustomerKey sseKey = new SSECustomerKey(key);
 
-        S3Object object = fileDownload(sseKey, fileName);
+        S3Object object = fileDownload(key, fileName);
         InputStream inputStream = object.getObjectContent();
 
         ObjectMetadata metadata = new ObjectMetadata();
@@ -177,16 +178,16 @@ public class S3Util {
         Tag tag = new Tag("expire", "expire");
         ObjectTagging tagging = new ObjectTagging(List.of(tag));
 
-        fileDelete(sseKey, fileName);
+        fileDelete(fileName);
 
         amazonS3.putObject(new PutObjectRequest("ukkikki", fileName, inputStream, metadata
         ).withCannedAcl(CannedAccessControlList.PublicRead).withTagging(tagging).withSSECustomerKey(sseKey));
     }
 
-    public void fileUndo(String Key, String fileName) {
-        SSECustomerKey sseKey = new SSECustomerKey(Key);
+    public void fileUndo(String key, String fileName) {
+        SSECustomerKey sseKey = new SSECustomerKey(key);
 
-        S3Object object = fileDownload(sseKey, fileName);
+        S3Object object = fileDownload(key, fileName);
         InputStream inputStream = object.getObjectContent();
 
         ObjectMetadata metadata = new ObjectMetadata();
@@ -194,7 +195,7 @@ public class S3Util {
         metadata.setContentType(object.getObjectMetadata().getContentType());
         metadata.addUserMetadata("expire-on", LocalDateTime.now().plusMinutes(5).format(DateTimeFormatter.ISO_DATE));
 
-        fileDelete(sseKey, fileName);
+        fileDelete(fileName);
 
         amazonS3.putObject(new PutObjectRequest("ukkikki", fileName, inputStream, metadata
         ).withCannedAcl(CannedAccessControlList.PublicRead).withSSECustomerKey(sseKey));
