@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { folderStore } from "../../stores/ModalStore";
 import { albumDoneStore } from "../../stores/HeaderStateStore";
-import { selectModeStore } from "../../stores/AlbumStore";
+import { currentDirStore, selectModeStore, updateAlbumStore } from "../../stores/AlbumStore";
 import { AnimatePresence } from "framer-motion";
 import download from "@/assets/Header/AlbumSelectOptions/download.png";
 import move from "@/assets/Header/AlbumSelectOptions/move.png";
@@ -12,6 +12,7 @@ import Modal from "../@commons/Modal";
 import { multiDownloadFile } from "../../api/file";
 import { useStore } from "zustand";
 import { prefixStore, selectStore } from "../../stores/AlbumStore";
+import { delFiles } from "../../api/directory";
 
 const AlbumSelectOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
@@ -23,11 +24,12 @@ const AlbumSelectOptions: React.FC = () => {
 
   const { setFolderOpen } = folderStore()
   const { prefix } = useStore(prefixStore)
-
   const { setSelectMode } = selectModeStore()
   const { setIsDone } = albumDoneStore()
+  const { currentDirId } = useStore(currentDirStore)
+  const { setNeedUpdate } = useStore(updateAlbumStore)
 
-  const { selectList, setSelectList } = useStore(selectStore)
+  const { selectList, setSelectList, selectListForPk, setSelectListForPk } = useStore(selectStore)
   
   const openHandler = (mode: string) => {
     if (mode === 'folder') {
@@ -35,7 +37,7 @@ const AlbumSelectOptions: React.FC = () => {
     } else if (mode === 'down') {
       setIsPrefixOpen(true)
     } else if (mode === 'delete') {
-
+      setIsDelete(true)
     }
   }
 
@@ -62,18 +64,37 @@ const AlbumSelectOptions: React.FC = () => {
         alert('오류가 발생했습니다. 다시 시도하십시오.')
       },
     )
-    doneHandler()
+    doneHandler('down')
   }
 
-  const delFileHandler = () => {
-
+  const delFileHandler = async () => {
+    await delFiles(
+      currentDirId,
+      {data:{
+        sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+        fileIdList: selectListForPk
+      }},
+      (res) => {
+        console.log(res)
+        doneHandler('del')
+        setNeedUpdate()
+      },
+      (err) => { 
+        console.error(err)
+        alert('오류가 발생했습니다. 다시 시도하십시오.')
+      }
+    )
   }
       
-  const doneHandler = () => {
+  const doneHandler = (mode: string) => {
+    if (mode === 'down') {
+      setIsDownDone(true)
+    }
     setIsIng(false)
-    setIsDownDone(true)
+    setIsDelete(false)
     // 셀렉 리스트 초기화
     setSelectList(-1, false)
+    setSelectListForPk('-1', false)
     setTimeout(() => {
       setIsDone()
       setSelectMode()

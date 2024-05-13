@@ -10,8 +10,8 @@ import AlbumSelectOptions from "./AlbumSelectOptions";
 import { selectModeStore, selectStore } from "../../stores/AlbumStore";
 import { albumDoneStore, albumEditStore } from "../../stores/HeaderStateStore";
 import TrashOptions from "./TrashOptions";
-import { currentDirStore } from "../../stores/AlbumStore";
 import { useStore } from "zustand";
+import { currentGroupStore } from "../../stores/GroupStore";
 
 const AlbumHeader: React.FC = () => {
 	const btnStyle = "w-14 h-8 rounded-[10px] font-pre-SB text-white flex justify-center items-center";
@@ -28,17 +28,12 @@ const AlbumHeader: React.FC = () => {
 	const { selectMode, setSelectMode } = selectModeStore();
 	const { isEdit, setIsEdit } = albumEditStore();
 	const { isDone, setIsDone } = albumDoneStore();
-
-	const { currentDirId } = useStore(currentDirStore)
 	const { setSelectList } = useStore(selectStore)
+  const { currentGroup } = useStore(currentGroupStore);
 
 	const navigate = useNavigate();
 	const goBackHandler = () => {
-		if (location.pathname.startsWith('/album/detail/')) {
-			navigate(`/album/${currentDirId}`)
-		} else {
-			navigate(-1);
-		}
+    navigate(`/group/${currentGroup}`);
 	};
 
 	const cancelHandler = () => {

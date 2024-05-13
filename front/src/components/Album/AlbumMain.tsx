@@ -4,7 +4,7 @@ import backFolder from "@/assets/Album/backFolder.png"
 import { Link } from "react-router-dom";
 import { useStore } from "zustand";
 import { DetailImgStore } from "../../stores/DetailImgStore";
-import { currentDirStore, selectModeStore } from "../../stores/AlbumStore";
+import { currentDirStore, selectModeStore, updateAlbumStore } from "../../stores/AlbumStore";
 import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
@@ -13,6 +13,7 @@ import SecureImg from "./SecureImg";
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
+  const { needUpdate } = useStore(updateAlbumStore)
   const { currentDirId, setCurrentDirId, setCurrentDirName, parentDirId, setParentDirId, parentDirName } = useStore(currentDirStore)
 
   const [albumList, setAlbumList] = useState<contentListData[]>([])
@@ -35,7 +36,7 @@ const AlbumMain: React.FC = () => {
         console.error(err)
       }
     )
-  }, [currentDirId])
+  }, [currentDirId, needUpdate])
 
   const dirHandler = (id: string, name: string) => {
     setCurrentDirId(id)

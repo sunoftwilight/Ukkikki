@@ -11,16 +11,19 @@ interface SelectModeImgProps {
 
 const SelectModeImg: React.FC<SelectModeImgProps> = ({ item }) => {
   const [isSelect, setIsSelect] = useState(false)
-  const { selectList, setSelectList } = useStore(selectStore)
+  const { setSelectList, setSelectListForPk } = useStore(selectStore)
+  const { selectList, selectListForPk } = useStore(selectStore)
 
-  const clickHandler = (id: number) => {
+  const clickHandler = (id: number, pk: string) => {
     setSelectList(id, isSelect)
+    setSelectListForPk(pk, isSelect)
     setIsSelect(!isSelect)
     console.log(selectList)
+    console.log(selectListForPk)
   }
 
   return (
-    <div onClick={() => clickHandler(item.photoId)} className="flex justify-center items-center">
+    <div onClick={() => clickHandler(item.photoId, item.pk)} className="flex justify-center items-center">
       <div className="w-[106px] h-[90px] relative">
         { isSelect ?
           <div className="w-[18px] h-[18px] rounded-full absolute top-1 right-1 bg-main-blue flex justify-center items-center">

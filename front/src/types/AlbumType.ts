@@ -1,5 +1,7 @@
 // Props Type
 
+import { delFiles } from "../api/directory";
+
 
 
 // API type
@@ -64,4 +66,9 @@ export interface thumbNailItemType {
 export interface thumbNailResponseType {
   data: thumbNailItemType[];
   resultCode: string;
+}
+
+export interface delFilesDtoType {
+  sseKey: string;
+  fileIdList: string[];
 }
