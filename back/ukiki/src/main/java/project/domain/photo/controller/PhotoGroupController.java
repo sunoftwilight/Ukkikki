@@ -17,16 +17,18 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/photo")
 @RequiredArgsConstructor
-public class PhotoGroupController {
+public class PhotoGroupController implements PhotoGroupDocs {
 
     private final PhotoGroupService photoGroupService;
 
+    @Override
     @GetMapping("/group/{partyId}")
     public ResponseEntity<ResultResponse> photoGroup(@PathVariable Long partyId){
         List<GroupbrieflyDto> groupbrieflyDtoList = photoGroupService.getGroups(partyId);
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.GET_FILE_SUCCESS, groupbrieflyDtoList));
     }
 
+    @Override
     @GetMapping("/group/detail/{partyId}")
     public ResponseEntity<ResultResponse> photoGroupDetail(GroupDetailReqDto groupDetailReqDto, @PathVariable Long partyId){
         List<GroupDetailResDto> groupDetailReqDtoList = photoGroupService.getGroupDetail(groupDetailReqDto.getType(), groupDetailReqDto.getGroupName(), partyId);
