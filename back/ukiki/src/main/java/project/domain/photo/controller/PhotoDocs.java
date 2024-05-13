@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import project.domain.photo.dto.request.MemoDto;
 import project.domain.photo.dto.request.MemoModifyDto;
@@ -12,6 +13,11 @@ import project.global.result.ResultResponse;
 
 @Tag(name = "PhotoController", description = "사진 api")
 public interface PhotoDocs {
+
+    @Operation(summary = "메모 조회")
+    @ApiResponse(responseCode = "200", description = "메모 조회에 성공하였습니다.")
+    @GetMapping("/memo")
+    ResponseEntity<ResultResponse> memo(String fileId);
 
     @Operation(summary = "메모 등록")
     @ApiResponse(responseCode = "200", description = "메모 등록에 성공하였습니다.")

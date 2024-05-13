@@ -12,6 +12,7 @@ import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.photo.dto.request.MemoDto;
 import project.domain.photo.dto.request.MemoModifyDto;
+import project.domain.photo.dto.response.MemoListDto;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.Likes;
 import project.domain.photo.entity.mediatable.Memo;
@@ -21,6 +22,7 @@ import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,6 +35,33 @@ public class PhotoServiceImpl implements PhotoService{
     private final PhotoRepository photoRepository;
     private final FileRepository fileRepository;
     private final LikesRepository likesRepository;
+
+    @Override
+    public List<MemoListDto> memo(String fileId) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 확인
+        if(userDetails == null){
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = userDetails.getId();
+
+        // GUEST 차단
+        if(memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+
+        List<MemoListDto> memos = memoRepository.findByPhotoId(file.getPhotoDto().getId());
+
+        if (memos.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.MEMO_NOT_FOUND);
+        }
+
+        return memos;
+    }
 
     @Override
     @Transactional

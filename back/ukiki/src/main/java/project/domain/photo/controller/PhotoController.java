@@ -3,16 +3,16 @@ package project.domain.photo.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.domain.photo.dto.request.MemoDto;
 import project.domain.photo.dto.request.MemoModifyDto;
+import project.domain.photo.dto.response.MemoListDto;
+import project.domain.photo.entity.mediatable.Memo;
 import project.domain.photo.service.PhotoService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -21,6 +21,15 @@ import project.global.result.ResultResponse;
 public class PhotoController implements PhotoDocs {
 
     private final PhotoService photoService;
+
+    @Override
+    @GetMapping("/memo")
+    public ResponseEntity<ResultResponse> memo(String fileId) {
+
+        List<MemoListDto> memos = photoService.memo(fileId);
+
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_MEMO_LIST_SUCCESS, memos));
+    }
 
     @Override
     @PostMapping("/memo/create")
