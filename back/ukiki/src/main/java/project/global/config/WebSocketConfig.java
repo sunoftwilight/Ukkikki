@@ -8,6 +8,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
@@ -55,46 +56,48 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 StompHeaderAccessor accessor =
                     MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-                // String user = accessor.getFirstNativeHeader("userId");
+
                 String destination = accessor.getDestination();
 
 
                 switch (accessor.getCommand()) {
                     case CONNECT:
                         log.info(" CONNECT");
+//                        StompHeaderAccessor accessor2 =
+//                            MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+
+//                            String authHeader = accessor2.getFirstNativeHeader("Authorization");
+//                            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//                                String authToken = authHeader.substring(7);
+//                                accessor2.getSessionAttributes().put("authToken", authToken);
+//                                log.info("Authorization Token stored in session: " + authToken);
+//                            }
+
+
                         break;
                     case SUBSCRIBE:
 
-                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                        if(authentication == null) {
-                            log.info("WEBSOCKET authentication NULL");
-                            return null;
-                        }
-                        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-                        Long memberId = userDetails.getId();
-
-                        log.info("TEST SUCCESS WEBSOCKET");
-                        log.info(destination);
-                        chatMemberRedisRepository.save(ChatMember.builder()
-                            .memberId(memberId)
-                            .destination(destination)
-                            .build());
+//                        chatMemberRedisRepository.save(ChatMember.builder()
+//                            .memberId(finalMemberId)
+//                            .destination(destination)
+//                            .build());
                         break;
 
                     case DISCONNECT:
 
-                        Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
-                        if(authentication2 == null) {
-                            log.info("WEBSOCKET authentication NULL");
-                            return null;
-                        }
-                        CustomUserDetails userDetails2 = (CustomUserDetails) authentication2.getPrincipal();
-                        Long memberId2 = userDetails2.getId();
+//                        Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
+//                        if(authentication2 == null) {
+//                            log.info("WEBSOCKET authentication NULL");
+//                            return null;
+//                        }
+//                        CustomUserDetails userDetails2 = (CustomUserDetails) authentication2.getPrincipal();
+//                        Long memberId2 = userDetails2.getId();
 
                         log.info("TEST DISCONNECT  ", destination);
-                        chatMemberRedisRepository.findByMemberId(memberId2).ifPresent(chatMember -> {
-                            chatMemberRedisRepository.delete(chatMember);
-                        });
+//                        chatMemberRedisRepository.findByMemberId(finalMemberId).ifPresent(chatMember -> {
+//                            chatMemberRedisRepository.delete(chatMember);
+//                        });
                         break;
                 }
 

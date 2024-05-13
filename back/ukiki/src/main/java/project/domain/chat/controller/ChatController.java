@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,11 +30,7 @@ public class ChatController implements ChatDocs{
     @Override
     @ResponseBody
     @MessageMapping("/message/{partyId}")
-    public void sendMessage(@RequestHeader HttpHeaders headers, @DestinationVariable("partyId") Long partyId, @Payload ChatDto chatDto) {
-        headers.forEach((key, value) -> {
-            System.out.println(key + " " + value);
-        });
-        log.info("SEND TEST");
-        chatService.sendChat(partyId, chatDto);
+    public void sendMessage(@Header("Authorization") String headerToken, @DestinationVariable("partyId") Long partyId, @Payload ChatDto chatDto) {
+        chatService.sendChat(headerToken, partyId, chatDto);
     }
 }

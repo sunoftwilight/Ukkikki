@@ -33,6 +33,7 @@ import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
+import project.global.jwt.JWTUtil;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 import project.global.util.JasyptUtil;
@@ -52,17 +53,21 @@ public class ChatServiceImpl implements ChatService{
     private final JasyptUtil jasyptUtil;
     private final ProfileRepository profileRepository;
 
+    private final JWTUtil jwtUtil;
+
     @Transactional
     @Override
-    public void sendChat(Long partyId, ChatDto chatDto) {
+    public void sendChat(String token, Long partyId, ChatDto chatDto) {
+        System.out.println("token = " + token);
+        System.out.println("TEST +  " + "Bearer "+token.substring(7));
 
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long memberId = userDetails.getId();
+        Long memberId = jwtUtil.getId(token.substring(7 ));
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 파티 정보
+        System.out.println("partyId = " + partyId);
         Party party = partyRepository.findById(partyId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
@@ -106,6 +111,6 @@ public class ChatServiceImpl implements ChatService{
         ResponseEntity<ResultResponse> res = ResponseEntity.ok(
             new ResultResponse(ResultCode.CHAT_SEND_SUCCESS, simpleChatDto));
 
-        template.convertAndSend("/sub/chats/party/" + partyId, res);
+        template.convertAndSend("/sub/chats/party/" + partyId, simpleChatDto);
     }
 }

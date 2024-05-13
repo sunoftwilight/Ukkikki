@@ -316,7 +316,7 @@ public class PartyServiceImpl implements PartyService {
         String ssekey = s3Util.generateSSEKey(enterPartyDto.getPassword());
 
         // 비밀번호 비교
-        if (!bcryptUtil.matchesBcrypt(ssekey, party.getPassword())) {
+        if(!bcryptUtil.matchesBcrypt(ssekey, party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거
                 partyLinkRedisRepository.delete(partyLink);
                 throw new BusinessLogicException(ErrorCode.INPUT_NUMBER_EXCEED);
@@ -339,7 +339,7 @@ public class PartyServiceImpl implements PartyService {
             userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             memberId = userDetails.getId();
 
-        }catch (NullPointerException ignore){
+        }catch (Exception ignore){
             return checkPasswordDto;
         }
         //게스트일 경우 sseKey 반환

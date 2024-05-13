@@ -6,5 +6,5 @@ import project.domain.chat.entity.Chat;
 
 public interface ChatService {
 
-    public void sendChat(Long partyId, ChatDto chatDto);
+    public void sendChat(String token, Long partyId, ChatDto chatDto);
 }
