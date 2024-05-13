@@ -1,35 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { downloadFile } from '../../api/file';
-import { useStore } from 'zustand';
-import { DetailImgStore } from '../../stores/DetailImgStore';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { getPartyThumb } from '../../api/party';
 
-const SecureImg: React.FC = () => {
-  const [imageUrl, setImageUrl] = useState('');
-  const { currentImg } = useStore(DetailImgStore)
+interface ImgProps {
+  url : string;
+}
 
-  useEffect(() => {
-    downloadFile(
-      'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
-      {  
-        fileId: currentImg,
-        prefix: 'tmp',
-      },
-      (res) => { 
-        const url = window.URL.createObjectURL(new Blob([res.data]))
-        setImageUrl(url)
-      },
-      (err) => { 
-        console.error(err)
-        // alert('오류가 발생했습니다. 다시 시도하십시오.')
-      },
-    )
-  }, [])
+const SecureImg: React.FC<ImgProps> = ({ url }) => {
+  const location = useLocation();
+  const opt = {
+    "x-amz-server-side-encryption-customer-key": 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+  };
+  
+  getPartyThumb(
+    url,
+    opt,
+    () => {},
+    (err) => { console.error(err) },
+  );
 
   return (
-    location.pathname.startsWith('/album/') ?
-      <img src={imageUrl} className="h-full object-contain" />
+    location.pathname.startsWith('/album/detail') ?
+      <img src={url} alt='로딩중' className="h-full object-contain" />
       :
-      <img src={imageUrl} className="w-[106px] h-[90px] object-cover rounded-lg" />
+      <img src={url} className="w-[106px] h-[90px] object-cover rounded-lg" />
     
   );
 }

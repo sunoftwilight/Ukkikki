@@ -29,7 +29,7 @@ const SelectModeImg: React.FC<SelectModeImgProps> = ({ item }) => {
           :
           <div className="w-[18px] h-[18px] rounded-full absolute top-1 right-1 bg-soft-gray border-[0.3px] border-disabled-gray " />
         }
-        <SecureImg />
+        <SecureImg url={item.url} />
       </div>
     </div>
   )

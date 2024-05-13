@@ -13,7 +13,7 @@ import SecureImg from "./SecureImg";
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
-  const { currentDirId, setCurrentDirId, currentDirName, setCurrentDirName, parentDirId, setParentDirId, parentDirName, setParentDirName } = useStore(currentDirStore)
+  const { currentDirId, setCurrentDirId, setCurrentDirName, parentDirId, setParentDirId, parentDirName } = useStore(currentDirStore)
 
   const [albumList, setAlbumList] = useState<contentListData[]>([])
   
@@ -42,7 +42,6 @@ const AlbumMain: React.FC = () => {
     setCurrentDirName(name)
   }
 
-
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
       { parentDirId!= '' && 
@@ -68,11 +67,11 @@ const AlbumMain: React.FC = () => {
               <SelectModeImg key={idx} item={item} />
             :
               <Link 
-                to={`/album/${item.photoId}`} state={{id: item.photoId}}
-                key={idx} onClick={() => setCurrentImg(item.photoId, item.url)}
+                to={`/album/detail/${item.pk}`} state={{url: item.url}}
+                key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.url)}
                 className="flex justify-center items-center"
               >
-                <SecureImg />
+                <SecureImg url={item.url} />
               </Link>
             
           // </div>

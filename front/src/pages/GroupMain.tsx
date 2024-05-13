@@ -9,7 +9,7 @@ const Group: React.FC = () => {
   // 이 Pk로 그룹 관련 API들을 사용할 생각
   const { groupPk } = useParams();
   console.log(groupPk)
-  
+
   return (
     <div className="w-full h-full px-4 flex flex-col gap-[52px] py-4">
       <GroupProfile />

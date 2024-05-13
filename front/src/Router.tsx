@@ -35,7 +35,7 @@ import LoginRedirect from './components/User/LoginRedirect';
 import SimplePass from './pages/SimplePass';
 
 export default function Router() {
-  const { currentImg, currentUrl } = useStore(DetailImgStore)
+  const { currentImg } = useStore(DetailImgStore)
 
   return (
     <Routes location={location} key={location.pathname}>
@@ -66,8 +66,8 @@ export default function Router() {
 
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
-        <Route path="/album" element={<Album />} />
-        <Route path={`/album/${currentImg}`} element={<DetailImg url={currentUrl} />} />
+        <Route path="/album/:groupPk" element={<Album />} />
+        <Route path={`album/detail/${currentImg}`} element={<DetailImg />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/feed/:pk" element={<ArticleDetail />} />
         <Route path="/feed/img/:pk" element={<ArticleImg />} />

@@ -1,6 +1,6 @@
 export interface DetailImgStoreType {
-  currentImg: number
-  currentUrl: string
-  setCurrentImg: (id: number, url: string) => void;
+  currentId: number;
+  currentImg: string;
+  currentUrl: string;
+  setCurrentImg: (id: number, pk: string, url: string) => void;
 }
-

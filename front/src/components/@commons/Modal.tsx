@@ -6,7 +6,7 @@ import ModalBackground from "./ModalBackground";
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "zustand";
 import { prefixStore } from "../../stores/AlbumStore";
-import LoadingGif from "./LoadingGif";
+import ModalLoadingGif from "./ModalLoadingGif";
 
 const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtnClick }) => {
 	const modalType = modalItems.modalType;
@@ -49,10 +49,11 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 			case "input":
 				const prefixInput = useRef<HTMLInputElement>(null);
 				const { prefix,setPrefix } = useStore(prefixStore)
+
 				useEffect(() => {
-					console.log(modalItems.content)
 					setPrefix(modalItems.content)
 				}, [])
+
 				return (
 					<div className={`${containClass} flex-col gap-2`}>
 						<div className="font-pre-B text-black text-xl w-full">
@@ -72,7 +73,7 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 			case "ing":
 				return (
 					<div className={`${containClass} flex-col gap-4 pt-1`}>
-						<LoadingGif />
+						<ModalLoadingGif />
 						<div className={`${contentClass} justify-center`}>
 							{modalItems.content}
 						</div>
@@ -129,7 +130,7 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 				>
-					<div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-3 flex flex-wrap content-between">
+					<div className="z-20 w-[300px] h-[174px] bg-white rounded-[15px] p-6 flex flex-wrap content-between">
 						{contentHandler()}
 						{btnHandler()}
 					</div>

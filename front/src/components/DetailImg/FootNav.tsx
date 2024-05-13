@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion"
 import trash from '@/assets/DetailImg/trash.png'
-import noStar from '@/assets/DetailImg/noStar.png'
-import star from '@/assets/DetailImg/star.png'
 import noHeart from '@/assets/DetailImg/noHeart.png'
 import heart from '@/assets/DetailImg/heart.png'
 import memo from '@/assets/DetailImg/memo.png'
@@ -14,22 +12,30 @@ import { downloadFile } from "../../api/file";
 import { useStore } from "zustand";
 import { prefixStore } from "../../stores/AlbumStore";
 import Modal from "../@commons/Modal";
+import { DetailImgStore } from "../../stores/DetailImgStore";
+import { getDetailImgDataType } from "../../types/AlbumType";
 
-const FootNav: React.FC = () => {
-  const [isStar, setIsStar] = useState<boolean>(false)
+interface NavPropsType {
+  info: getDetailImgDataType
+}
+const FootNav: React.FC<NavPropsType> = ({ info }) => {
   const [isHeart, setIsHeart] = useState<boolean>(false)
   const [isArticle, setIsArticle] = useState<boolean>(false)
   const [isMemo, setIsMemo] = useState<boolean>(false)
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
+  const [isIng, setIsIng] = useState(false)
   const [isDownDone, setIsDownDone] = useState(false)
 
   const { prefix } = useStore(prefixStore)
+  const { currentId } = useStore(DetailImgStore)
 
   const prefixHandler = async () => {
+    setIsPrefixOpen(false)
+    setIsIng(true)
     await downloadFile(
-      'mykey',
+      'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
       {
-        fileId: '',
+        fileId: currentId,
         prefix: prefix
       },
       (res) => {
@@ -39,17 +45,18 @@ const FootNav: React.FC = () => {
         link.setAttribute('download', `${prefix}.png`)
         document.body.appendChild(link)
         link.click()
-        doneHandler()
       },
       (err) => { 
+        setIsPrefixOpen(true)
         console.error(err)
         alert('오류가 발생했습니다. 다시 시도하십시오.')
       }
     )
+    doneHandler()
   }
     
   const doneHandler = () => {
-    setIsPrefixOpen(false)
+    setIsIng(false)
     setIsDownDone(true)
   }
 
@@ -86,6 +93,14 @@ const FootNav: React.FC = () => {
             onCancelBtnClick={() => setIsPrefixOpen(false)}
           />
         )}
+        { isIng && (
+          <Modal
+            key='isIng'
+            modalItems={{ content: '다운로드 진행 중입니다', modalType: 'ing', btn: 0 }}
+            onSubmitBtnClick={() => prefixHandler()}
+            onCancelBtnClick={() => setIsPrefixOpen(false)}
+          />
+        )}
 
         { isDownDone && (
           <Modal
@@ -98,13 +113,8 @@ const FootNav: React.FC = () => {
 
       <div className="bg-white w-full h-11 flex items-center justify-between px-4 fixed bottom-11">
         <img src={trash} className="w-6" />
-
-        { isStar ? 
-          <img src={star} onClick={() => setIsStar(!isStar)} className="w-6" /> 
-          : <img src={noStar} onClick={() => setIsStar(!isStar)} className="w-6" />
-        }
     
-        { isHeart ? 
+        { info.isLikes ? 
           <img src={heart} onClick={() => setIsHeart(!isHeart)} className="w-6" /> 
           : <img src={noHeart} onClick={() => setIsHeart(!isHeart)} className="w-6" />
         }

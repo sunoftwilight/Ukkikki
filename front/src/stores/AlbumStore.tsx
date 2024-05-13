@@ -16,7 +16,7 @@ export const selectStore = create<selectListStoreType>(
     selectList: [],
     
     setSelectList: (imgId: number, isSelect: boolean) => set((state) => ({
-      selectList: isSelect ? state.selectList.filter(id => id !== imgId) : [...state.selectList, imgId]
+      selectList: imgId === -1 ? [] : isSelect ? state.selectList.filter(id => id !== imgId) : [...state.selectList, imgId]
     }))
   })
 )
@@ -30,8 +30,8 @@ export const prefixStore = create(
   { name: 'ALBUM_STORE' }
 ))
 
-export const currentDirStore = create<CurrentDirType>(
-  (set) => ({
+export const currentDirStore = create(
+  persist<CurrentDirType>((set) => ({
     currentDirId: '',
     currentDirName: '',
     parentDirId: '',
@@ -41,5 +41,6 @@ export const currentDirStore = create<CurrentDirType>(
     setCurrentDirName: (txt: string) => set(() => ({ currentDirName: txt })),
     setParentDirId: (txt: string) => set(() => ({ parentDirId: txt })),
     setParentDirName: (txt: string) => set(() => ({ parentDirName: txt }))
-  })
-)
+  }),
+  { name: 'ALBUM_STORE' }
+))

@@ -17,6 +17,7 @@ const AlbumSelectOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
   
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
+  const [isIng, setIsIng] = useState(false)
   const [isDownDone, setIsDownDone] = useState(false)
   const { setFolderOpen } = folderStore()
   const { prefix } = useStore(prefixStore)
@@ -24,7 +25,7 @@ const AlbumSelectOptions: React.FC = () => {
   const { setSelectMode } = selectModeStore()
   const { setIsDone } = albumDoneStore()
 
-  const { selectList } = useStore(selectStore)
+  const { selectList, setSelectList } = useStore(selectStore)
   
   const openHandler = (mode: string) => {
     if (mode === 'folder') {
@@ -35,8 +36,10 @@ const AlbumSelectOptions: React.FC = () => {
   }
 
   const prefixHandler = async () => {
+    setIsPrefixOpen(false)
+    setIsIng(true)
     await multiDownloadFile(
-      'RNIelUcYrpKz8VpS+4Yo7xBQpr7167KhFtKoV4TkWuY=',
+      'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
       {  
         fileIdList: selectList,
         prefix: prefix,
@@ -48,18 +51,21 @@ const AlbumSelectOptions: React.FC = () => {
         link.setAttribute('download', `${prefix}.zip`)
         document.body.appendChild(link)
         link.click()
-        doneHandler()
       },
       (err) => { 
+        setIsPrefixOpen(true)
         console.error(err)
         alert('오류가 발생했습니다. 다시 시도하십시오.')
       },
     )
+    doneHandler()
   }
       
   const doneHandler = () => {
-    setIsPrefixOpen(false)
+    setIsIng(false)
     setIsDownDone(true)
+    // 셀렉 리스트 초기화
+    setSelectList(-1, false)
     setTimeout(() => {
       setIsDone()
       setSelectMode()
@@ -78,16 +84,21 @@ const AlbumSelectOptions: React.FC = () => {
       )}
 
       { isDownDone && (
-          <Modal
-            key='isDownDone'
-            modalItems={{ content: '다운로드가 완료되었습니다.', modalType: 'done', btn: 1 }}
-            onSubmitBtnClick={() => setIsDownDone(false)}
-          />
-        )}
+        <Modal
+          key='isDownDone'
+          modalItems={{ content: '다운로드가 완료되었습니다.', modalType: 'done', btn: 1 }}
+          onSubmitBtnClick={() => setIsDownDone(false)}
+        />
+      )}
 
-      {/* { isLoading && 
-        <Modal modalItems={{ content: '다운로드 진행 중입니다', modalType: 'ing', btn: 0 }} />
-      } */}
+      { isIng && (
+        <Modal
+          key='isIng'
+          modalItems={{ content: '다운로드 진행 중입니다', modalType: 'ing', btn: 0 }}
+          onSubmitBtnClick={() => prefixHandler()}
+          onCancelBtnClick={() => setIsPrefixOpen(false)}
+        />
+      )}
 
       <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[186px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
         <div className={`${optionStyle}`} onClick={() => openHandler('down')}>

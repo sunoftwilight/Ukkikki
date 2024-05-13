@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { AlbumResponse, DirInfoType } from '../types/AlbumType';
+import { AlbumResponse, DirInfoType, getDetailImgType, thumbNailResponseType } from '../types/AlbumType';
 
 const url = 'directories';
 
@@ -38,6 +38,25 @@ export const editDirectory = async (
   Response : (Response : AxiosResponse<AlbumResponse>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.patch(`/${url}/${dirId}/rename`, { 'newName': newName })
+  .then(Response)
+  .catch(Error)
+}
+
+export const getDetailImg = async (
+  dirId : string,
+  fileId: string,
+  Response : (Response : AxiosResponse<getDetailImgType>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.get(`/${url}/${dirId}/files/${fileId}`)
+  .then(Response)
+  .catch(Error)
+}
+
+export const getThumbnailNav = async (
+  dirId : string,
+  Response : (Response : AxiosResponse<thumbNailResponseType>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.get(`/${url}/${dirId}/thumbnail2`)
   .then(Response)
   .catch(Error)
 }
