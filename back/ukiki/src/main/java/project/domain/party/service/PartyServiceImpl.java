@@ -107,10 +107,10 @@ public class PartyServiceImpl implements PartyService {
 
         // 비밀번호 규칙 확인
         checkPassword(createPartyDto.getPassword());
-
+        String sseKey = s3Util.generateSSEKey(createPartyDto.getPassword());
         Party party = Party.builder()
             .partyName(createPartyDto.getPartyName())
-            .password(bcryptUtil.encodeBcrypt(createPartyDto.getPassword()))
+            .password(bcryptUtil.encodeBcrypt(sseKey))
             .build();
 
         // 이미지 저장 해야함
@@ -157,7 +157,7 @@ public class PartyServiceImpl implements PartyService {
 
         partyLinkRedisRepository.save(partyLink);
 
-        String sseKey = s3Util.generateSSEKey(createPartyDto.getPassword());
+
         StringEncryptor encryptor = jasyptUtil.customEncryptor(createPartyDto.getSimplePassword());
         String encryptorPassword = jasyptUtil.keyEncrypt(encryptor, sseKey);
 
@@ -305,12 +305,12 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public CheckPasswordDto checkPassword(EnterPartyDto enterPartyDto) {
-        PartyLink partyLink = partyLinkRedisRepository.findByPartyLink(enterPartyDto.getLink())
+    public CheckPasswordDto checkPassword(Long partyId, EnterPartyDto enterPartyDto) {
+        PartyLink partyLink = partyLinkRedisRepository.findByParty(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
 
         // 파티확인
-        Party party = partyRepository.findById(partyLink.getParty())
+        Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
         // 비밀번호 비교
@@ -357,7 +357,7 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto) {
+    public PartyEnterDto memberPartyEnter(Long partyId) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
@@ -366,7 +366,7 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 파티 링크 확인
-        PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
+        PartyLink partyLink = partyLinkRedisRepository.findByParty(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
 
         // 파티확인
@@ -404,9 +404,9 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto) {
+    public PartyEnterDto guestPartyEnter(Long partyId) {
 
-        PartyLink partyLink = partyLinkRedisRepository.findById(enterPartyDto.getLink())
+        PartyLink partyLink = partyLinkRedisRepository.findByParty(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_LINK_INVALID));
 
         //TODO 게스트용 토큰 만들어야함.
@@ -783,6 +783,69 @@ public class PartyServiceImpl implements PartyService {
         String newThumbUrl = s3Util.fileUpload(photo, sseKey);
 
         memberParty.getParty().setThumbnail(newThumbUrl);
+
+    }
+
+    @Override
+    public void changePartyInfo(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        if (memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+        //
+        memberRepository.findById(memberId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 파티 가지고 오기
+        Party party = partyRepository.findById(partyId)
+                .orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+        // 마스터 권한 확인
+        memberpartyRepository.findByMemberIdAndPartyIdAndMemberRoleIs(memberId, partyId, MemberRole.MASTER)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
+
+        // 암호 확인
+        if (!bcryptUtil.matchesBcrypt(changeThumbDto.getKey(), party.getPassword())){
+            throw new BusinessLogicException(ErrorCode.PARTY_PASSWORD_INVALID);
+        }
+        // 파티 이름 바꾸기
+        if(!changeThumbDto.getPartyName().isEmpty()){
+            party.setPartyName(changeThumbDto.getPartyName());
+        }
+
+        if(photo.isEmpty()){
+            return;
+        }
+
+        //파티 sse 키 가지고 오기
+        List<KeyGroupDto> myKeyList =  memberService.getKeyGroup(changeThumbDto.getKey());
+        Optional<KeyGroupDto> findPartyKeyGroup = myKeyList.stream()
+            .filter(keyGroupDto -> keyGroupDto.getPartyId().equals(partyId))
+            .findFirst();
+
+        if(findPartyKeyGroup.isEmpty()){
+            throw new BusinessLogicException(ErrorCode.PARTY_KEY_NOT_FOUND);
+        }
+        // 복호화 하기
+        String partySseJasyptKey = findPartyKeyGroup.get().getSseKey();
+
+        StringEncryptor customEncryptor = jasyptUtil.customEncryptor(changeThumbDto.getSimplePassword());
+
+        // 나의 SseKey
+        String partySseKey = customEncryptor.decrypt(partySseJasyptKey);
+
+        SSECustomerKey sseCustomerKey = new SSECustomerKey(partySseKey);
+        String url = party.getThumbnail();
+
+
+        s3Util.fileDelete(sseCustomerKey, url.substring(
+            url.lastIndexOf("/"),
+            url.lastIndexOf(".") - 1));
+
+        String partyThumbnailImg = s3Util.fileUpload(photo, sseCustomerKey);
+        party.setThumbnail(partyThumbnailImg);
+        partyRepository.save(party);
 
     }
 

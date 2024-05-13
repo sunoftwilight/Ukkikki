@@ -31,20 +31,17 @@ public interface PartyDocs {
     ResponseEntity<ResultResponse> checkChangedPartyKey(CheckChangePasswordDto checkChangePasswordDto);
 
     @Operation(summary = "파티 암호키 체크")
-    ResponseEntity<ResultResponse> checkPartyKey(EnterPartyDto checkPartyEnterDto);
+    ResponseEntity<ResultResponse> checkPartyKey(Long partyId, EnterPartyDto checkPartyEnterDto);
 
     @Operation(summary = "회원 파티 참가하기")
-    ResponseEntity<ResultResponse> memberPartyEnter(EnterPartyDto checkPartyEnterDto);
+    ResponseEntity<ResultResponse> memberPartyEnter(Long partyId);
 
     @Operation(summary = "게스트 파티 참가하기")
-    ResponseEntity<ResultResponse> guestPartyEnter(EnterPartyDto enterPartyDto);
+    ResponseEntity<ResultResponse> guestPartyEnter(Long partyId);
 
     @Operation(summary = "파티 암호 바꾸기")
     ResponseEntity<ResultResponse> changePartyPassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
-    @Operation(summary = "파티 이름 바꾸기")
-    @Parameter(name = "partyName", description = "바꿀 파티 이름")
-    ResponseEntity<ResultResponse> changePartyName(Long partyId, String partyName);
 
     @Operation(summary = "파티 권한 주기")
     ResponseEntity<ResultResponse> grantAuthority(Long partyId, Long opponentId, MemberRole memberRole);
@@ -54,7 +51,7 @@ public interface PartyDocs {
 
     @Operation(summary = "파티원 차단하기")
     ResponseEntity<ResultResponse> memberBlock(Long partyId, Long targetId);
-    
+
     @Operation(summary = "파티원 추방하기")
     ResponseEntity<ResultResponse> kickMember(Long partyId, Long targetId);
 
@@ -66,6 +63,12 @@ public interface PartyDocs {
 
     @Operation(summary = "파티 썸네일 변경")
     ResponseEntity<ResultResponse> changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
+    @Operation(summary = "파티 이름 바꾸기")
+    @Parameter(name = "partyName", description = "바꿀 파티 이름")
+    ResponseEntity<ResultResponse> changePartyName(Long partyId, String partyName);
+
+    @Operation(summary = "파티 이름 썸네일 바꾸기")
+    ResponseEntity<ResultResponse> changePartyInfo(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
     @Operation(summary = "파티 리스트 조회")
     ResponseEntity<ResultResponse> getPartyList();
