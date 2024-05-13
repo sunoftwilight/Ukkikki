@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.FileListDto;
+import project.domain.directory.dto.request.GetRenameDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDtov2;
@@ -97,7 +98,7 @@ public interface DirectoryDocs {
     @PatchMapping("/{dirId}/rename")
     public ResponseEntity<ResultResponse> renameDir(
         @PathVariable String dirId,
-        @RequestParam String newName
+        @RequestBody GetRenameDto getRenameDto
     );
 
     // 사진 조회

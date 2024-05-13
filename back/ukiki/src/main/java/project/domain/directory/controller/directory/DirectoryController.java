@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.FileListDto;
+import project.domain.directory.dto.request.GetRenameDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
@@ -100,9 +101,9 @@ public class DirectoryController implements DirectoryDocs {
     @PatchMapping("/{dirId}/rename")
     public ResponseEntity<ResultResponse> renameDir(
         @PathVariable(name = "dirId") String dirId,
-        @RequestBody String newName
+        @RequestBody GetRenameDto getRenameDto
     ) {
-        directoryService.renameDir(dirId, newName);
+        directoryService.renameDir(dirId, getRenameDto.getNewName());
         return ResponseEntity.ok(new ResultResponse(ResultCode.RENAME_DIRECTORY_SUCCESS));
     }
 
