@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { getPartyLink } from "../../api/party";
 
 const GroupMenu: React.FC = () => {
-  const btnStyle = "w-full h-[50px] rounded-[15p] font-pre-SB text-white text-xl flex justify-center items-center hover:scale-95 hover:bg-main-blue active:scale-95 active:bg-main-blue transition-transform duration-75";
+  const btnStyle = "w-full h-[50px] rounded-[15px] font-pre-SB text-white text-xl flex justify-center items-center hover:scale-95 hover:bg-main-blue active:scale-95 active:bg-main-blue transition-transform duration-75";
 
   const { groupPk } = useParams();
   const { setInviteCode, setInviteOpen } = inviteStore()

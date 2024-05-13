@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ModalProps } from "../../types/ModalType";
 import warn from "@/assets/Modal/warn.png";
 import done from "@/assets/Modal/done.png";
@@ -48,7 +48,11 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 
 			case "input":
 				const prefixInput = useRef<HTMLInputElement>(null);
-				const { setPrefix } = useStore(prefixStore)
+				const { prefix,setPrefix } = useStore(prefixStore)
+				useEffect(() => {
+					console.log(modalItems.content)
+					setPrefix(modalItems.content)
+				}, [])
 				return (
 					<div className={`${containClass} flex-col gap-2`}>
 						<div className="font-pre-B text-black text-xl w-full">
@@ -59,6 +63,7 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 							onChange={(e) => setPrefix(e.target.value)}
 							autoComplete="false"
 							maxLength={10}
+							value={prefix}
 							className={`${contentClass} bg-soft-gray px-3 py-2 rounded-xl h-[40px] outline-none`}
 						/>
 					</div>

@@ -1,14 +1,11 @@
 // Props Type
 
-export interface DetailImgProps {
-  url: string
-}
 
 
 // API type
 
 export interface FileDownloadDto {
-  fileId: string;
+  fileId: number;
   prefix: string;
 }
 
@@ -22,6 +19,9 @@ export interface contentListData {
   pk: string;
   name: string;
   url: string;
+  photoId: number;
+  isDownload: boolean;
+  isLikes: boolean;
 }
 
 export interface AlbumData {
@@ -37,4 +37,9 @@ export interface AlbumResponse {
 export interface DirInfoType {
   parentDirId: string;
   dirName: string;
+}
+
+export interface EditDirInfoType {
+  dirId: string;
+  newName: string;
 }

@@ -4,8 +4,8 @@ export interface selectModeStoreType {
 }
 
 export interface selectListStoreType {
-  selectList: string[];
-  setSelectList: (imgId: string, isSelect: boolean) => void;  
+  selectList: number[];
+  setSelectList: (imgId: number, isSelect: boolean) => void;  
 }
 
 export interface PrefixStoreType {
@@ -14,8 +14,12 @@ export interface PrefixStoreType {
 }
 
 export interface CurrentDirType {
-  currentDir: string;
-  parentDir: string;
-  setCurrentDir: (txt: string) => void; 
-  setParentDir: (txt: string) => void; 
+  currentDirId: string;
+  currentDirName: string;
+  parentDirId: string;
+  parentDirName: string;
+  setCurrentDirId: (txt: string) => void; 
+  setCurrentDirName: (txt: string) => void; 
+  setParentDirId: (txt: string) => void; 
+  setParentDirName: (txt: string) => void; 
 }

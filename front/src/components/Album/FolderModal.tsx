@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"
 import newFolder from "@/assets/Album/newFolder.png"
 import { folderStore } from "../../stores/ModalStore";
@@ -24,6 +24,10 @@ const parentFolderList = [
 const FolderModal: React.FC = () => {
   const btnStyle = "w-full h-full flex justify-center items-center rounded-xl font-pre-B text-white text-2xl"
   const { folderOpen, setFolderOpen } = folderStore()
+
+  useEffect(() => {
+
+  }, [])
 
   return (
     <AnimatePresence>

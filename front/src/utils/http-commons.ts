@@ -57,10 +57,10 @@ export const downloadApi = (sseKey: string) => {
     const stored = localStorage.getItem('USER_STORE');
     if (stored) {
       const obj = JSON.parse(stored);
-      if (obj.state.accessToken !== '') {
-        config.headers['authorization'] = obj.state.accessToken;
-        // config.headers['authorization'] = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk"
-      }
+      // if (obj.state.accessToken !== '') {
+        // config.headers['authorization'] = obj.state.accessToken;
+        config.headers['authorization'] = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk"
+      // }
     }
     return config;
   });
@@ -80,10 +80,10 @@ privateApi.interceptors.request.use(
 		const stored = localStorage.getItem('USER_STORE');
 		if (stored){
 			const obj = JSON.parse(stored)
-			if (obj.state.accessToken !== ''){
-				config.headers['authorization'] = obj.state.accessToken;
-				// config.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk';
-			}
+			// if (obj.state.accessToken !== ''){
+				// config.headers['authorization'] = obj.state.accessToken;
+				config.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk';
+			// }
 		}
     return config;
   },
@@ -121,10 +121,10 @@ formDataApi.interceptors.request.use(
 		const stored = localStorage.getItem('USER_STORE');
 		if (stored){
 			const obj = JSON.parse(stored)
-			if (obj.state.accessToken !== ''){
-				config.headers['authorization'] = obj.state.accessToken;
-				// config.headers['authorization'] = 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk';
-			}
+			// if (obj.state.accessToken !== ''){
+				// config.headers['authorization'] = obj.state.accessToken;
+				config.headers['authorization'] = 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk';
+			// }
 		}
     return config;
   },

@@ -31,3 +31,13 @@ export const delDirectory = async (
   .then(Response)
   .catch(Error)
 }
+
+export const editDirectory = async (
+  dirId : string,
+  newName: string,
+  Response : (Response : AxiosResponse<AlbumResponse>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.patch(`/${url}/${dirId}/rename`, { 'newName': newName })
+  .then(Response)
+  .catch(Error)
+}

@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { downloadFile } from '../../api/file';
-import { useLocation } from 'react-router-dom';
+import { useStore } from 'zustand';
+import { DetailImgStore } from '../../stores/DetailImgStore';
 
 const SecureImg: React.FC = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.log('path', location.pathname)
-  }, [location])
-
   const [imageUrl, setImageUrl] = useState('');
+  const { currentImg } = useStore(DetailImgStore)
 
   useEffect(() => {
     downloadFile(
       'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
       {  
-        fileId: '1',
-        prefix: 'z',
+        fileId: currentImg,
+        prefix: 'tmp',
       },
       (res) => { 
         const url = window.URL.createObjectURL(new Blob([res.data]))
