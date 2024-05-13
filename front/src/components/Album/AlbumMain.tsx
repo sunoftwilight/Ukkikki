@@ -9,25 +9,38 @@ import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
 import SecureImg from "./SecureImg";
+import { currentGroupStore } from "../../stores/GroupStore";
+import { getPartyDetail } from "../../api/party";
+import { error } from "console";
 
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
   const { needUpdate } = useStore(updateAlbumStore)
+  const { currentGroup } = useStore(currentGroupStore)
   const { currentDirId, setCurrentDirId, setCurrentDirName, parentDirId, setParentDirId, parentDirName } = useStore(currentDirStore)
 
   const [albumList, setAlbumList] = useState<contentListData[]>([])
   
   // const [dirId, setDirId] = useState('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
   useEffect(() => {
-    setCurrentDirId('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
+    getPartyDetail(
+      currentGroup,
+      (res) => {
+        console.log(res.data.data.rootDirId)
+        setCurrentDirId(res.data.data.rootDirId)
+      },
+      (err) => { console.error(err) }
+    )
+    // setCurrentDirId('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
   }, [])
 
   useEffect(() => {
+    console.log(currentDirId)
     getDirectory(
       currentDirId,
       (res) => {
-        console.log(res.data.data)
+        console.log(res)
         // setCurrentDirId(res.data.data.parentId)
         setParentDirId(res.data.data.parentId)
         setAlbumList(res.data.data.contentList)

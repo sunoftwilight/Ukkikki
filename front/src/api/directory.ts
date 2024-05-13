@@ -70,3 +70,12 @@ export const delFiles = async (
   .then(Response)
   .catch(Error)
 }
+
+export const getChildDir = async (
+  dirId : string,
+  Response : (Response : AxiosResponse<thumbNailResponseType>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.get(`/${url}/${dirId}/child`)
+  .then(Response)
+  .catch(Error)
+}

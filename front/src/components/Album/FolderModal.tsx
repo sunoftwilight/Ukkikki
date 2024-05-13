@@ -1,11 +1,14 @@
-// import React, { useEffect } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+// import React from "react";
 import { motion, AnimatePresence } from "framer-motion"
 import newFolder from "@/assets/Album/newFolder.png"
 import { folderStore } from "../../stores/ModalStore";
 import ModalBackground from "../@commons/ModalBackground";
 import FolderItem from "./FolderItem";
-// import { getPartyDetail } from "../../api/party";
+import { useStore } from "zustand";
+import { currentGroupStore } from "../../stores/GroupStore";
+import { getPartyDetail } from "../../api/party";
+import { getChildDir } from "../../api/directory";
 
 const parentFolderList = [
   {depth: 0, name: '나는 부모폴더'},
@@ -26,16 +29,31 @@ const parentFolderList = [
 const FolderModal: React.FC = () => {
   const btnStyle = "w-full h-full flex justify-center items-center rounded-xl font-pre-B text-white text-2xl"
   const { folderOpen, setFolderOpen } = folderStore()
+  const { currentGroup } = useStore(currentGroupStore)
+  const [rootDir, setRootDir] = useState('')
+  const [folderList, setFolderList] = useState<string[]>([])
 
-  // useEffect(() => {
-  //   getPartyDetail(
-  //     1,
-  //     (res) => {
-  //       console.log(res.data)
-  //     },
-  //     (err) => { console.error(err) }
-  //   )
-  // }, [])
+  useEffect(() => {
+    getPartyDetail(
+      currentGroup,
+      (res) => {
+        console.log(res.data.data.rootDirId)
+        setRootDir(res.data.data.rootDirId)
+      },
+      (err) => { console.error(err) }
+    )
+  }, [])
+
+  useEffect(() => {
+    console.log(rootDir)
+    getChildDir(
+      rootDir,
+      (res) => {
+        console.log(res.data.data)
+      },
+      (err) => { console.error(err) }
+    )
+  }, [])
 
   return (
     <AnimatePresence>
