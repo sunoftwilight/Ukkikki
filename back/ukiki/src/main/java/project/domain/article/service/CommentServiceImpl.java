@@ -17,6 +17,8 @@ import project.domain.member.repository.ProfileRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -103,11 +105,13 @@ public class CommentServiceImpl implements CommentService{
         CommentCollection cc = commentRepository.findById(articleId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.COMMENT_NOT_FOUND));
 
+
         // 댓글 객체 생성.
         CommentCollection.Comment newComment = CommentCollection.Comment.builder()
                 .userId(memberId)
                 .userName(member.getUserName())
                 .content(content)
+                .createdDate(myDate())
                 .profileUrl(profile.getProfileUrl())
                 .build();
 
@@ -149,6 +153,7 @@ public class CommentServiceImpl implements CommentService{
 
         // 내용 수정
         cc.getComment().get(commentIdx).setContent(content);
+        cc.getComment().get(commentIdx).setCreatedDate(myDate());
 
         commentRepository.save(cc);
     }
@@ -221,6 +226,7 @@ public class CommentServiceImpl implements CommentService{
         CommentCollection.Reply newReply = CommentCollection.Reply.builder()
                 .userId(memberId)
                 .userName(member.getUserName())
+                .createdDate(myDate())
                 .content(content)
                 .profileUrl(profile.getProfileUrl())
                 .build();
@@ -264,6 +270,8 @@ public class CommentServiceImpl implements CommentService{
         // 내용 수정
         cc.getComment().get(commentIdx).getReply().get(replyIdx).setContent(content);
 
+        cc.getComment().get(commentIdx).getReply().get(replyIdx).setCreatedDate(myDate());
+
         commentRepository.save(cc);
     }
 
@@ -296,5 +304,13 @@ public class CommentServiceImpl implements CommentService{
         cc.getComment().get(commentIdx).getReply().get(replyIdx).setIsDelete(true);
 
         commentRepository.save(cc);
+    }
+
+    public String myDate(){
+
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return format.format(date);
     }
 }

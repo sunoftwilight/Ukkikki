@@ -32,6 +32,7 @@ public class CommentCollection {
         private String content;
         private String userName;
         private String profileUrl;
+        private String createdDate;
         @Builder.Default
         private Boolean isDelete = false;
         @Builder.Default
@@ -48,6 +49,7 @@ public class CommentCollection {
         private String content;
         private String userName;
         private String profileUrl;
+        private String createdDate;
         @Builder.Default
         private Boolean isDelete = false;
     }
