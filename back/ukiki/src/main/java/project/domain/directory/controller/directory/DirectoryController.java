@@ -13,15 +13,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.directory.dto.request.CreateDirDto;
-import project.domain.directory.dto.request.FileListDto;
+import project.domain.directory.dto.request.PatchCopyFileListDto;
 import project.domain.directory.dto.request.GetRenameDto;
+import project.domain.directory.dto.request.PatchCopyFileDto;
+import project.domain.directory.dto.request.PatchMoveDirDto;
+import project.domain.directory.dto.request.PatchMoveFileDto;
+import project.domain.directory.dto.request.PatchMoveFileListDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
-import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
@@ -83,9 +85,9 @@ public class DirectoryController implements DirectoryDocs {
     @PatchMapping("/{dirId}")
     public ResponseEntity<ResultResponse> moveDir(
         @PathVariable(name = "dirId") String dirId,
-        @RequestParam(name = "toDirId") String toDirId
+        @RequestBody PatchMoveDirDto patchMoveDirDto
     ) {
-        directoryService.moveDir(dirId, toDirId);
+        directoryService.moveDir(dirId, patchMoveDirDto.getToDirId());
         return ResponseEntity.ok(new ResultResponse(ResultCode.MOVE_DIRECTORY_SUCCESS));
     }
 
@@ -122,9 +124,9 @@ public class DirectoryController implements DirectoryDocs {
     public ResponseEntity<ResultResponse> copyFile(
         @PathVariable(name = "fileId") String fileId,
         @PathVariable(name = "dirId") String fromDirId,
-        @RequestParam(name = "toDirId") String toDirId
+        @RequestBody PatchCopyFileDto patchCopyFileDto
     ) {
-        fileService.copyFile(fileId, fromDirId, toDirId);
+        fileService.copyFile(fileId, fromDirId, patchCopyFileDto.getToDirId());
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_COPY_SUCCESS));
     }
 
@@ -132,10 +134,9 @@ public class DirectoryController implements DirectoryDocs {
     @PatchMapping("/{dirId}/files/copy")
     public ResponseEntity<ResultResponse> copyFileList(
         @PathVariable(name = "dirId") String fromDirId,
-        @RequestParam(name = "toDirId") String toDirId,
-        @RequestBody FileListDto fileListDto
+        @RequestBody PatchCopyFileListDto patchCopyFileListDto
     ) {
-        fileService.copyFileList(fileListDto.getFileIdList(), fromDirId, toDirId);
+        fileService.copyFileList(patchCopyFileListDto.getFileIdList(), fromDirId, patchCopyFileListDto.getToDirId());
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_COPY_SUCCESS));
     }
 
@@ -144,9 +145,9 @@ public class DirectoryController implements DirectoryDocs {
     public ResponseEntity<ResultResponse> moveFile(
         @PathVariable(name = "fileId") String fileId,
         @PathVariable(name = "dirId") String fromDirId,
-        @RequestParam(name = "toDirId") String toDirId
+        @RequestBody PatchMoveFileDto patchMoveFileDto
     ) {
-        fileService.moveFile(fileId, fromDirId, toDirId);
+        fileService.moveFile(fileId, fromDirId, patchMoveFileDto.getToDirId());
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS));
     }
 
@@ -154,10 +155,9 @@ public class DirectoryController implements DirectoryDocs {
     @PatchMapping("/{dirId}/files/move")
     public ResponseEntity<ResultResponse> moveFileList(
         @PathVariable(name = "dirId") String fromDirId,
-        @RequestParam(name = "toDirId") String toDirId,
-        @RequestBody FileListDto fileListDto
+        @RequestBody PatchMoveFileListDto patchMoveFileListDto
     ) {
-        fileService.moveFileList(fileListDto.getFileIdList(), fromDirId, toDirId);
+        fileService.moveFileList(patchMoveFileListDto.getFileIdList(), fromDirId, patchMoveFileListDto.getToDirId());
         return ResponseEntity.ok(new ResultResponse(ResultCode.FILE_MOVE_SUCCESS));
     }
 
@@ -176,7 +176,7 @@ public class DirectoryController implements DirectoryDocs {
     @DeleteMapping("/{dirId}/files")
     public ResponseEntity<ResultResponse> deleteFileList(
         @PathVariable(name = "dirId") String dirId,
-        @RequestBody FileListDto fileListDto
+        @RequestBody PatchCopyFileListDto fileListDto
     ) {
 
         fileService.deleteFileList(fileListDto.getFileIdList(), dirId);
