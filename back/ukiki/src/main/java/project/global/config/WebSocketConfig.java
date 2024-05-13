@@ -50,15 +50,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                if(authentication == null) {
-                    log.info("WEBSOCKET authentication NULL");
-                    return null;
-                }
-                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//        Long userId = userDetails.getId();
-                // TODO 유저 아이디를 가지고 온다.
-                Long memberId = 1L;
+
+
                 StompHeaderAccessor accessor =
                     MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
@@ -71,6 +64,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         log.info(" CONNECT");
                         break;
                     case SUBSCRIBE:
+
+                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                        if(authentication == null) {
+                            log.info("WEBSOCKET authentication NULL");
+                            return null;
+                        }
+                        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                        Long memberId = userDetails.getId();
+
                         log.info("TEST SUCCESS WEBSOCKET");
                         log.info(destination);
                         chatMemberRedisRepository.save(ChatMember.builder()
@@ -80,8 +82,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         break;
 
                     case DISCONNECT:
+
+                        Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
+                        if(authentication2 == null) {
+                            log.info("WEBSOCKET authentication NULL");
+                            return null;
+                        }
+                        CustomUserDetails userDetails2 = (CustomUserDetails) authentication2.getPrincipal();
+                        Long memberId2 = userDetails2.getId();
+
                         log.info("TEST DISCONNECT  ", destination);
-                        chatMemberRedisRepository.findByMemberId(memberId).ifPresent(chatMember -> {
+                        chatMemberRedisRepository.findByMemberId(memberId2).ifPresent(chatMember -> {
                             chatMemberRedisRepository.delete(chatMember);
                         });
                         break;
