@@ -343,7 +343,7 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
     visitedSet.clear();
 
     // 휴지통에 삭제된 dirTrashId 추가
-    Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
+    Trash dirTrash = trashRepository.findFirstByRawId(dirId)
         .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
     Long trashBinId = getTrashBinId(dir);
     TrashBin trashBin = trashBinRepository.findById(trashBinId)

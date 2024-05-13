@@ -82,6 +82,7 @@ public class FileServiceImpl implements FileService{
         setDirFileRelation(rootDirId, newFileId);
     }
     @Override
+    @Transactional
     public void copyFile(String fileId, String fromDirId, String toDirId) {
         setDirFileRelation(toDirId, fileId);
         // photo num ++1
