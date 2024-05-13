@@ -3,7 +3,7 @@ import { InsertPasswordProps } from "../../types/GroupType";
 import { createParty } from "../../api/party";
 import { userStore } from "../../stores/UserStore";
 import { useStore } from "zustand";
-import { PartyData } from "../../types/GroupType";
+import { PartyCreateData } from "../../types/GroupType";
 
 const InsertPassword: React.FC<InsertPasswordProps> = ({
 	onBackBtnClick,
@@ -94,7 +94,7 @@ const InsertPassword: React.FC<InsertPasswordProps> = ({
 		);
 	};
 
-	const dataSetUp = (data: PartyData) => {
+	const dataSetUp = (data: PartyCreateData) => {
 		//현재 그룹키 목록
 		const currentKeys = user.groupKey;
 
