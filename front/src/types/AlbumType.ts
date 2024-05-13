@@ -1,7 +1,5 @@
 // Props Type
 
-import { delFiles } from "../api/directory";
-
 
 
 // API type
