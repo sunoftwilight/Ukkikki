@@ -66,6 +66,8 @@ public enum ResultCode {
 
     // Photo
     CREATE_MEMO_SUCCESS(200, "메모 등록에 성공하였습니다."),
+    MODIFY_MEMO_SUCCESS(200,"메모 수정에 성공하였습니다."),
+    DELETE_MEMO_SUCCESS(200,"메모를 정상적으로 삭제하였습니다."),
     CREATE_LIKES_SUCCESS(200, "좋아요에 성공하였습니다."),
     DELETE_LIKES_SUCCESS(204, "좋아요 취소에 성공하였습니다."),
     ;

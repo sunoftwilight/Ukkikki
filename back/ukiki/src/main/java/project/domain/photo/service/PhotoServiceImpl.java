@@ -11,6 +11,7 @@ import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.photo.dto.request.MemoDto;
+import project.domain.photo.dto.request.MemoModifyDto;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.Likes;
 import project.domain.photo.entity.mediatable.Memo;
@@ -71,6 +72,66 @@ public class PhotoServiceImpl implements PhotoService{
 
         // 메모 저장
         memoRepository.save(build);
+    }
+
+    @Override
+    @Transactional
+    public void memoModify(MemoModifyDto memoModifyDto) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 확인
+        if (userDetails == null) {
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = userDetails.getId();
+
+        // GUEST 차단
+        if (memberId == 0) {
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+        Memo memo = memoRepository.findById(memoModifyDto.getMemoId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMO_NOT_FOUND));
+
+        Long memoMemberId = memo.getMember().getId();
+
+        // 현재 회원과 메모를 등록한 회원이 다르다면.
+        if (!memberId.equals(memoMemberId)) {
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_MATCH);
+        }
+
+        memo.setContent(memoModifyDto.getContent());
+
+        memoRepository.save(memo);
+    }
+
+    @Override
+    @Transactional
+    public void memoDelete(Long memoId) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 확인
+        if (userDetails == null) {
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = userDetails.getId();
+
+        // GUEST 차단
+        if (memberId == 0) {
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+        Memo memo = memoRepository.findById(memoId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMO_NOT_FOUND));
+
+        Long memoMemberId = memo.getMember().getId();
+
+        // 현재 회원과 메모를 등록한 회원이 다르다면.
+        if (!memberId.equals(memoMemberId)) {
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_MATCH);
+        }
+
+        memo.delete();
     }
 
     @Override

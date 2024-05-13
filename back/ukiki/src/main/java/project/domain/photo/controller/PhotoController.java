@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.photo.dto.request.MemoDto;
+import project.domain.photo.dto.request.MemoModifyDto;
 import project.domain.photo.service.PhotoService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
@@ -28,6 +29,24 @@ public class PhotoController implements PhotoDocs {
         photoService.memoCreate(memoDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.CREATE_MEMO_SUCCESS));
+    }
+
+    @Override
+    @PostMapping("/memo/modify")
+    public ResponseEntity<ResultResponse> memoModify(MemoModifyDto memoModifyDto) {
+
+        photoService.memoModify(memoModifyDto);
+
+        return ResponseEntity.ok().body(new ResultResponse(ResultCode.MODIFY_MEMO_SUCCESS));
+    }
+
+    @Override
+    @DeleteMapping("/memo/delete")
+    public ResponseEntity<ResultResponse> memoDelete(Long memoId) {
+
+        photoService.memoDelete(memoId);
+
+        return ResponseEntity.ok().body(new ResultResponse(ResultCode.DELETE_MEMO_SUCCESS));
     }
 
     @Override
