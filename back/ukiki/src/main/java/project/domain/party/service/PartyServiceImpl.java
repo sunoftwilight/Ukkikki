@@ -338,8 +338,7 @@ public class PartyServiceImpl implements PartyService {
         try{
             userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             memberId = userDetails.getId();
-
-        }catch (NullPointerException ignore){
+        }catch (Exception e){
             return checkPasswordDto;
         }
         //게스트일 경우 sseKey 반환
