@@ -77,7 +77,7 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(
             Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // 허용할 HTTP 메소드 지정
-        configuration.setAllowedHeaders(Arrays.asList("X-Frame-Options","Sec-WebSocket-Extensions","Sec-WebSocket-Version","Connection","Upgrade","Sec-Websocket-Key","Authorization","text/event-stream" ,"authorization", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "password", "sseKey")); // 모든 헤더 허용
+        configuration.setAllowedHeaders(Arrays.asList("User-Agent","Sec-Ch-Ua-Platform","Sec-Ch-Ua-Mobile","Sec-Ch-Ua","Referer","X-Frame-Options","Sec-WebSocket-Extensions","Sec-WebSocket-Version","Connection","Upgrade","Sec-Websocket-Key","Authorization","text/event-stream" ,"authorization", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "password", "sseKey")); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 크레덴셜 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

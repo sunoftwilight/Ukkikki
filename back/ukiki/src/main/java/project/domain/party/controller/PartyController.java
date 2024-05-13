@@ -78,7 +78,7 @@ public class PartyController implements PartyDocs {
 
         redirect.addAttribute(link.getParty());
         response.sendRedirect(String.format("/group/%d/attend", link.getParty()));
-//        response.sendRedirect(String.format("localhost:5173/party/group/%d/attend", link.getParty()));
+//        response.sendRedirect(String.format("http://localhost:5173/group/%d/attend", link.getParty()));
 
     }
 
