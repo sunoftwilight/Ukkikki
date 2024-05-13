@@ -4,6 +4,7 @@ package project.domain.article.collection;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
+import project.domain.member.entity.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,12 @@ public class CommentCollection {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Comment {
-        private String userId;
+        private Long userId;
         private String content;
+        private String userName;
+        private String profileUrl;
+        @Builder.Default
+        private Boolean isDelete = false;
         @Builder.Default
         private List<Reply> reply = new ArrayList<>();
     }
@@ -39,7 +44,11 @@ public class CommentCollection {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Reply {
-        private String userId;
+        private Long userId;
         private String content;
+        private String userName;
+        private String profileUrl;
+        @Builder.Default
+        private Boolean isDelete = false;
     }
 }
