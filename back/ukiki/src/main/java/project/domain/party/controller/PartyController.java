@@ -140,8 +140,8 @@ public class PartyController implements PartyDocs {
 
     @Override   // 파티 나가기
     @DeleteMapping("/exit/{partyId}")
-    public ResponseEntity<ResultResponse> exitParty(@PathVariable(name = "partyId") Long partyId, @RequestParam(name = "key") String key) {
-        partyService.exitParty(partyId, key);
+    public ResponseEntity<ResultResponse> exitParty(@PathVariable(name = "partyId") Long partyId) {
+        partyService.exitParty(partyId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GRANT_TARGET_SUCCESS));
     }
 

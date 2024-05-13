@@ -49,7 +49,7 @@ public interface PartyDocs {
     ResponseEntity<ResultResponse> grantAuthority(Long partyId, Long opponentId, MemberRole memberRole);
 
     @Operation(summary = "파티 나가기")
-    ResponseEntity<ResultResponse> exitParty(Long partyId, String key);
+    ResponseEntity<ResultResponse> exitParty(Long partyId);
 
     @Operation(summary = "파티원 차단하기")
     ResponseEntity<ResultResponse> memberBlock(Long partyId, Long targetId);
