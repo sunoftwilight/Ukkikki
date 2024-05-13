@@ -75,6 +75,8 @@ public enum ErrorCode {
     // Article 관련
     NOT_ROLE_EDIT(401, "편집 권한이 없습니다."),
     ARTICLE_NOT_FOUND(404, "게시판을 찾을 수 없습니다."),
+    COMMENT_NOT_FOUND(404, "댓글을 찾을 수 없습니다."),
+    USER_NOT_MATCH(401, "작성자가 일치하지 않습니다."),
 
     // Likes 관련
     LIKES_NOT_FOUND(404, "좋아요 이력을 찾을 수 없습니다."),
