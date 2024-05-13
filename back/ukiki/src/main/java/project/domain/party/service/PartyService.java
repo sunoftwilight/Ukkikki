@@ -1,6 +1,7 @@
 package project.domain.party.service;
 
 
+import com.amazonaws.services.cloudformation.model.Change;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.entity.MemberRole;
@@ -25,15 +26,17 @@ public interface PartyService {
 
     CheckPasswordDto checkChangedPassword(CheckChangePasswordDto checkChangePasswordDto);
 
-    CheckPasswordDto checkPassword(EnterPartyDto enterPartyDto);
+    CheckPasswordDto checkPassword(Long partyId, EnterPartyDto enterPartyDto);
 
-    PartyEnterDto memberPartyEnter(EnterPartyDto enterPartyDto);
+    PartyEnterDto memberPartyEnter(Long partyId);
 
-    PartyEnterDto guestPartyEnter(EnterPartyDto enterPartyDto);
+    PartyEnterDto guestPartyEnter(Long partyId);
 
     CheckPasswordDto changePassword(Long partyId, PartyPasswordDto partyPasswordDto);
 
     void changePartyName(Long partyId, String partyName);
+    void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
+    void changePartyInfo(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
     void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole);
 
@@ -46,7 +49,6 @@ public interface PartyService {
     List<SimpleMemberPartyDto> getBlockUserList(Long partyId);
     List<SimpleMemberPartyDto> getUserList(Long partyId);
 
-    void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
     void linkDelete();
 

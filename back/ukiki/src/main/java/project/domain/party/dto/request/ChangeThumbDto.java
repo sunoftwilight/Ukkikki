@@ -8,8 +8,11 @@ import lombok.Setter;
 @Setter
 public class ChangeThumbDto {
 
+    String partyName;
+
     @NotNull
-    Long partyId;
+    String  simplePassword;
+
     @NotNull
     String key;
 }
