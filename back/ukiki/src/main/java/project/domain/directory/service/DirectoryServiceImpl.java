@@ -343,7 +343,7 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
     visitedSet.clear();
 
     // 휴지통에 삭제된 dirTrashId 추가
-    Trash dirTrash = trashRepository.findFirstByRawId(dir.getId())
+    Trash dirTrash = trashRepository.findFirstByRawId(dirId)
         .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
     Long trashBinId = getTrashBinId(dir);
     TrashBin trashBin = trashBinRepository.findById(trashBinId)
@@ -612,6 +612,7 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
                 GetDirThumbUrl2.builder()
                     .pk(file.getId())
                     .thumbUrl2(file.getPhotoDto().getThumbUrl2())
+                    .photoId(file.getPhotoDto().getId())
                     .build());
         }
         log.info("service response = {}", response);

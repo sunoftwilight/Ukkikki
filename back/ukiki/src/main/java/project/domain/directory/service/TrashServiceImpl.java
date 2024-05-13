@@ -54,6 +54,7 @@ public class TrashServiceImpl implements TrashService{
 
     @Override
     // trashId != rawId
+    @Transactional
     public void restoreOneTrash(String trashId, Long trashBinId) {
         TrashBin trashBin = trashBinService.findById(trashBinId);
         Trash trash = trashRepository.findById(trashId)
@@ -268,50 +269,52 @@ public class TrashServiceImpl implements TrashService{
 
     @Override
     public void deleteOneTrash(String trashId, Long trashBinId) {
+        log.info("come in deleteOneTrash");
+        log.info("trashId = {}", trashId);
+        log.info("trashBinId = {}", trashBinId);
         Trash trash = findById(trashId);
         TrashBin trashBin = trashBinRepository.findById(trashBinId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
 
-        switch (trash.getDataType()) {
-            case FILE:
-                TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
-                Long photoId = trashFileDto.getPhotoDto().getId();
+        if (trash.getDataType() == DataType.FILE) {
+            TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
+            Long photoId = trashFileDto.getPhotoDto().getId();
 
-                // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
-                setPhotoAndS3(photoId);
+            // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
+            setPhotoAndS3(photoId);
 
-                // 쓰레기에서 trash 지우기
-                trashRepository.deleteById(trash.getId());
-                // 쓰레기통에서 trashId 지우기
-                trashBin.getFileTrashIdList().remove(trash.getId());
-                trashBinRepository.save(trashBin);
-                break;
+            // 쓰레기에서 trash 지우기
+            trashRepository.deleteById(trash.getId());
+            // 쓰레기통에서 trashId 지우기
+            trashBin.getFileTrashIdList().remove(trash.getId());
+            trashBinRepository.save(trashBin);
+        } else if (trash.getDataType() == DataType.DIRECTORY) {
+            // 쓰레기가 폴더인 경우
+            // trashBin에서 trashId 제거
+            trashBin.getDirTrashIdList().remove(trashId);
+            trashBinRepository.save(trashBin);
+            // 해당 쓰레기 디렉토리 하위 모든 쓰레기 검색(본인 포함)
+//            List<Trash> allTrash = getAllTrash(trashId);
+            List<Trash> allTrash = getAllTrashV2(trashId);
+            for (Trash oneTrash : allTrash) {
+                log.info("oneTrashId = {}", oneTrash.getId());
+                if (oneTrash.getDataType() == DataType.DIRECTORY) {
+                    trashRepository.delete(oneTrash);
+                } else if (oneTrash.getDataType() == DataType.FILE) {
+                    TrashFileDto oneTrashFileDto = modelMapper.map(oneTrash.getContent(), TrashFileDto.class);
+                    log.info("trashFileDto = {}", oneTrashFileDto);
+                    log.info("photoDto = {}", oneTrashFileDto.getPhotoDto());
+                    log.info("photoId = {}", oneTrashFileDto.getPhotoDto().getId());
 
-            case DIRECTORY:
-                // 쓰레기가 폴더인 경우
-                // trashBin에서 trashId 제거
-                trashBin.getDirTrashIdList().remove(trashId);
+                    Long photoId = oneTrashFileDto.getPhotoDto().getId();
 
-                // 해당 쓰레기 디렉토리 하위 모든 쓰레기 검색(본인 포함)
-                List<Trash> allTrash = getAllTrash(trashId);
-                for (Trash oneTrash : allTrash) {
-                    switch (oneTrash.getDataType()) {
-                        case DIRECTORY:
-                            trashRepository.delete(oneTrash);
-                            break;
-                        case FILE:
-                            trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
-                            photoId = trashFileDto.getPhotoDto().getId();
+                    // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
+                    setPhotoAndS3(photoId);
 
-                            // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
-                            setPhotoAndS3(photoId);
-
-                            // 쓰레기에서 trash 지우기
-                            trashRepository.deleteById(trash.getId());
-                            break;
-                    }
+                    // 쓰레기에서 trash 지우기
+                    trashRepository.deleteById(oneTrash.getId());
                 }
-                break;
+            }
         }
     }
 
@@ -339,6 +342,7 @@ public class TrashServiceImpl implements TrashService{
             log.info("photoNum 갱신 로직 실행");
             // 그냥 photoNum 갱신하고 return
             photo.setPhotoNum(photoNum);
+            photoRepository.save(photo);
             return;
         }
         log.info("photo, s3 삭제 로직 실행");
@@ -352,7 +356,7 @@ public class TrashServiceImpl implements TrashService{
     @Override
     public Trash findById(String trashId) {
         return trashRepository.findById(trashId)
-            .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
     }
 
     @Override
@@ -388,6 +392,7 @@ public class TrashServiceImpl implements TrashService{
     // dir 생성
     @Override
     public void setDir(Trash trash, Directory trashDirDto) {
+        log.info("come in setDir");
         Optional<Directory> opDir = directoryRepository.findById(trash.getRawId());
         // 폴더에 없는 경우 쓰레기 정보를 바탕으로 새로 만들어 저장
         if(opDir.isEmpty()) {
@@ -419,6 +424,7 @@ public class TrashServiceImpl implements TrashService{
     // file 생성
     @Override
     public void setFile(Trash trash, TrashFileDto trashFileDto) {
+        log.info("come in setFile");
         Optional<File> opFile = fileRepository.findById(trash.getRawId());
         // 폴더에 이미 file이 있는경우 그놈한테 dirId 등록
         if (opFile.isPresent()) {
@@ -439,10 +445,13 @@ public class TrashServiceImpl implements TrashService{
 
 
     // trash 복구를 위한 빈 폴더 생성과 endPoint 연결 사전 작업
+    @Transactional
     public void setConnection(Trash trash) {
+        log.info("come in setConnection");
         List<String> fullRoutList = trash.getFullRout();
         List<String> fullNameList = trash.getFullName();
         int sizeOfFullRoutList = fullRoutList.size();
+        log.info("sizeOfFullRoutList = {}", sizeOfFullRoutList);
         // root에서 지워진 경우
         if(sizeOfFullRoutList == 1) {
             // 끝맺고 마무리
@@ -451,12 +460,15 @@ public class TrashServiceImpl implements TrashService{
         }
 
         // 깡통 폴더 생성
-        for(int i = 2; i < sizeOfFullRoutList; i++) {
+        for(int i = 1; i < sizeOfFullRoutList; i++) {
             Optional<Directory> opDir = directoryRepository.findById(fullRoutList.get(i));
-            if(!opDir.isEmpty()) {continue;}
+            log.info("{} 번째 시도", i - 1);
+            if(opDir.isPresent()) {log.info("id : {}에 해당하는 dir 존재", fullRoutList.get(i));continue;}
             //-- i에 해당하는 폴더가 없는경우 => 새로 만들어 줘야됨
+            log.info("존재하지 않습니다. 새로 만듭니다.");
             Directory parentDir = directoryRepository.findById(fullRoutList.get(i - 1))
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+            log.info("parentDirId = {}",parentDir.getId());
             // 부모에 자식 dirId 등록
             parentDir.getChildDirIdList().add(fullRoutList.get(i));
             directoryRepository.save(parentDir);
