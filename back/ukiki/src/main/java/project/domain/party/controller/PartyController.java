@@ -1,6 +1,7 @@
 package project.domain.party.controller;
 
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import project.domain.party.service.PartyService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,12 +73,13 @@ public class PartyController implements PartyDocs {
 
     @Override
     @GetMapping("/enter/{partyLink}")  //파티 링크 유효 여부를 확인
-    public String enterParty(RedirectAttributes redirect, @PathVariable(name = "partyLink") String partyLink) {
+    public void enterParty(RedirectAttributes redirect, HttpServletResponse response, @PathVariable(name = "partyLink") String partyLink) throws IOException {
         PartyLink link = partyService.enterParty(partyLink);
 
         redirect.addAttribute(link.getParty());
-        return String.format("/group/%d/attend/login", link.getParty());
-//        return String.format("localhost:5173/party/group/%d/attend", link.getParty());
+        response.sendRedirect(String.format("/group/%d/attend/login", link.getParty()));
+//        response.sendRedirect(String.format("localhost:5173/party/group/%d/attend", link.getParty()));
+
     }
 
     @Override

@@ -4,6 +4,7 @@ package project.domain.party.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +13,7 @@ import project.domain.member.entity.MemberRole;
 import project.domain.party.dto.request.*;
 import project.global.result.ResultResponse;
 
+import java.io.IOException;
 
 
 @Tag(name = "GroupController", description = "그룹 api")
@@ -25,7 +27,7 @@ public interface PartyDocs {
     ResponseEntity<ResultResponse> makePartyLink(Long partyId);
 
     @Operation(summary = "그룹 참여 링크")
-    String enterParty(RedirectAttributes redirect, String partyLink);
+    void enterParty(RedirectAttributes redirect, HttpServletResponse response, String partyLink) throws IOException;
 
     @Operation(summary = "파티 암호키 체크")
     ResponseEntity<ResultResponse> checkChangedPartyKey(CheckChangePasswordDto checkChangePasswordDto);
