@@ -62,9 +62,22 @@ export interface PartyDetailResponse {
   };
   resultCode: string;
 }
-export interface PartyLinkRespone {
+export interface PartyLinkResponse {
   data: {
     partyLink : string,
   };
   resultCode: string;
+}
+
+export interface PartyCheckPassRespones{
+  data: GroupKey;
+  resultCode: string;
+}
+
+export interface EnterGuestRespones {
+  resultCode: string;
+  data: {
+    partyId: number;
+    token: string;
+  }
 }

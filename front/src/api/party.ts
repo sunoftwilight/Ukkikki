@@ -1,9 +1,8 @@
 import { AxiosResponse } from 'axios';
 import { formDataApi, privateApi, imgApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { CreateDoenResponesData, PartyListResponesData, PartyLinkRespone } from '../types/GroupType';
+import { CreateDoenResponesData, PartyListResponesData, PartyLinkResponse, EnterGuestRespones, PartyCheckPassRespones } from '../types/GroupType';
 import { PartyDetailResponse } from '../types/GroupType';
-import { GroupKey } from '../types/GroupType';
 
 const url = 'party'
 
@@ -45,7 +44,7 @@ export const getPartyThumb = async (
 
 	export const getPartyLink = async (
 		partyId : number,
-		Response : (Response : AxiosResponse<PartyLinkRespone>) => void, 
+		Response : (Response : AxiosResponse<PartyLinkResponse>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await privateApi.get(`/${url}/link/${partyId}`)
     .then(Response)
@@ -68,7 +67,7 @@ export const getPartyThumb = async (
 	// 1
 	export const enterPartyGuest = async (
 		partyId : number,
-		Response : (Response : AxiosResponse<ResponseData>) => void, 
+		Response : (Response : AxiosResponse<EnterGuestRespones>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await privateApi.get(`/${url}/enter/guest/${partyId}`)
     .then(Response)
@@ -80,7 +79,7 @@ export const getPartyThumb = async (
 		partyId : number,
 		pass: string,
 		simplePass: string,
-		Response : (Response : AxiosResponse<GroupKey>) => void, 
+		Response : (Response : AxiosResponse<PartyCheckPassRespones>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await privateApi.post(`/${url}/check/password/${partyId}`, {"password": pass, "simplePassword" : simplePass})
     .then(Response)
