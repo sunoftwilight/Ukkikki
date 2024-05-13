@@ -116,3 +116,7 @@ jwt:
 
 webClient:
   baseUrl: ENC(Rsq3wm9AsUNAQNthqARdC8TS5XuPJCn4cjVbIDHq0Yp2Lxv7a5aH6eqbKlcC9fTa)
+
+#webClient:
+#  baseUrl: ENC(XZyRm3lrfdqGs/f9P3pDzQpR6b0+OgRWGDprxJCEdw0lvxzED5MuSnO6IrZ2ZMzU)
+
