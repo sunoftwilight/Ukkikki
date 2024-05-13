@@ -65,6 +65,7 @@ public enum ResultCode {
     GET_ARTICLE_SUCCESS(200, "아티클 조회에 성공하였습니다."),
 
     // Photo
+    GET_MEMO_LIST_SUCCESS(200, "메모 조회에 성공하였습니다."),
     CREATE_MEMO_SUCCESS(200, "메모 등록에 성공하였습니다."),
     MODIFY_MEMO_SUCCESS(200,"메모 수정에 성공하였습니다."),
     DELETE_MEMO_SUCCESS(200,"메모를 정상적으로 삭제하였습니다."),
