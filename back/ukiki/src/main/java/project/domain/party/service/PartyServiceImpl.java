@@ -313,8 +313,10 @@ public class PartyServiceImpl implements PartyService {
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
+        String ssekey = s3Util.generateSSEKey(enterPartyDto.getPassword());
+
         // 비밀번호 비교
-        if (!bcryptUtil.matchesBcrypt(enterPartyDto.getPassword(), party.getPassword())) {
+        if (!bcryptUtil.matchesBcrypt(ssekey, party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거
                 partyLinkRedisRepository.delete(partyLink);
                 throw new BusinessLogicException(ErrorCode.INPUT_NUMBER_EXCEED);
@@ -330,13 +332,20 @@ public class PartyServiceImpl implements PartyService {
         checkPasswordDto.setPartyId(party.getId());
         checkPasswordDto.setSseKey(sseKey);
 
+        CustomUserDetails userDetails = null;
+        Long memberId = 0L;
         //게스트인지 회원인지 확인
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long memberId = userDetails.getId();
-        //게스트일 경우 sseKey 반환
-        if (memberId == 0){
+        try{
+            userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            memberId = userDetails.getId();
+
+        }catch (NullPointerException ignore){
             return checkPasswordDto;
         }
+        //게스트일 경우 sseKey 반환
+//        if (memberId == 0){
+//            return checkPasswordDto;
+//        }
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));

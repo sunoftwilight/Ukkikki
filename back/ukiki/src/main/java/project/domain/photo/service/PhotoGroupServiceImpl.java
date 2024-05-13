@@ -2,7 +2,11 @@ package project.domain.photo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import project.domain.member.dto.request.CustomUserDetails;
+import project.domain.member.entity.Member;
+import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.dto.response.GroupDetailResDto;
@@ -13,6 +17,7 @@ import project.domain.photo.entity.MetaCode;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.repository.FaceGroupRepository;
 import project.domain.photo.repository.FaceRepository;
+import project.domain.photo.repository.LikesRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
@@ -31,10 +36,18 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
     private final PartyRepository partyRepository;
     private final FaceGroupRepository faceGroupRepository;
     private final FaceRepository faceRepository;
+    private final MemberRepository memberRepository;
+    private final LikesRepository likesRepository;
 
     @Override
     public List<GroupbrieflyDto> getGroups(Long partyId) {
         //파티별로 그룹화된 이름과 썸네잉 url을 반환해야한다
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = userDetails.getId();
+
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         Party party = partyRepository.findById(partyId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         //반환할 값
@@ -70,6 +83,17 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
             groups.add(group);
         }
 
+        //좋아요한 사진
+        List<Photo> likePhotoList = photoRepository.findByLike(party, member);
+        if (likePhotoList.isEmpty()) {
+            return groups;
+        }
+        GroupbrieflyDto group = new GroupbrieflyDto();
+        group.setType(3);
+        group.setGroupName("좋아요");
+        group.setThumbnailUrl(likePhotoList.getFirst().getPhotoUrl().getThumb_url1());
+        groups.add(group);
+
         return groups;
     }
 
@@ -77,9 +101,9 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
     public List<GroupDetailResDto> getGroupDetail(int type, String groupName, Long partyId) {
         //metaCode 그룹인 경우
         List<GroupDetailResDto> groups = new ArrayList<>();
+        Party party = partyRepository.findById(partyId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         if (type == 1) {
-            Party party = partyRepository.findById(partyId)
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
             MetaCode metaCode = MetaCode.valueOf(groupName);
             List<Photo> photoList = photoRepository.findByMetaCode(party, metaCode);
 
@@ -111,6 +135,23 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
                     groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
                     groups.add(groupDetail);
                 }
+            }
+        }
+        // 좋아요한 사진인 경우
+        if (type == 3) {
+            CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Long userId = userDetails.getId();
+
+            Member member = memberRepository.findById(userId)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+            List<Photo> likePhotoList = photoRepository.findByLike(party, member);
+            for (Photo photo : likePhotoList) {
+                GroupDetailResDto groupDetail = new GroupDetailResDto();
+                groupDetail.setPhotoId(photo.getId());
+                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
+                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
+                groups.add(groupDetail);
             }
         }
 
