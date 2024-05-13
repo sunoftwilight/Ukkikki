@@ -313,8 +313,10 @@ public class PartyServiceImpl implements PartyService {
         Party party = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
+        String ssekey = s3Util.generateSSEKey(enterPartyDto.getPassword());
+
         // 비밀번호 비교
-        if (!bcryptUtil.matchesBcrypt(enterPartyDto.getPassword(), party.getPassword())) {
+        if (!bcryptUtil.matchesBcrypt(ssekey, party.getPassword())) {
             if (partyLink.getCount() == 1) {   // 카운트를 다 사용했으면 링크 제거
                 partyLinkRedisRepository.delete(partyLink);
                 throw new BusinessLogicException(ErrorCode.INPUT_NUMBER_EXCEED);
