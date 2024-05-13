@@ -21,7 +21,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins("https://jiangxy.github.io/websocket-debug-tool/","https://jiangxy.github.io","http://localhost:5173", "http://localhost:5174", "https://j10d103.p.ssafy.io")
+            .allowedOrigins("https://jiangxy.github.io/websocket-debug-tool/","https://jiangxy.github.io","http://localhost:5173", "http://localhost:5174", "https://k10d202.p.ssafy.io")
             .allowedOriginPatterns("/api/ws/*, /ws/*", "/sub/*", "/pub/*")
             .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(),
                 HttpMethod.DELETE.name(), HttpMethod.HEAD.name(), HttpMethod.OPTIONS.name(),
