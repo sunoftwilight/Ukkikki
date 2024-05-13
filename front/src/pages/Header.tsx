@@ -11,20 +11,20 @@ const Header: React.FC = () => {
 	const location = useLocation();
 
 	const groupBackPath = [
-		"/grouplist",
-		"/groupcreate",
-		"/createdone",
-		"/groupconfig",
-		"/groupenv",
-		"/groupprofile",
-		"/groupuser",
-		"/groupuserdetail",
-		"/groupban",
-		"/groupinfo",
-		"/grouppass",
+		"/group/:pk/list",
+		"/group/:pk/create",
+		"/creat/:pk/edone",
+		"/group/:pk/config",
+		"/group/:pk/env",
+		"/group/:pk/profile",
+		"/group/:pk/user",
+		"/group/:pk/userdetail",
+		"/group/:pk/ban",
+		"/group/:pk/info",
+		"/group/:pk/pass",
 	];
 
-	const basicPath = ["/", "/group", "/mypage", "/groupattend"];
+	const basicPath = ["/", "/group", "/mypage", "/group/:pk/attend", ];
 	const backPath = ["/setting", "/feed", "/chat", ...groupBackPath];
 	const albumPath = ["/album", "/trash"];
 
@@ -62,7 +62,7 @@ const Header: React.FC = () => {
 		return <BackHeader />;
 	else if (
 		basicPath.includes(location.pathname) ||
-		location.pathname.startsWith("/group/")
+		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend'))
 	)
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;

@@ -10,7 +10,8 @@ const InviteModal: React.FC = () => {
   const invite = inviteStore()
   
   const inviteInfo = {
-    url: `https://www.k10d202.p.ssafy.io/party/enter/${invite.inviteCode}`,
+    // url: `https://www.k10d202.p.ssafy.io/party/enter/${invite.inviteCode}`,
+    url: `http://localhost:5000/api/party/enter/${invite.inviteCode}`,
   }
 
   const clipTxt = `우리의 추억에 당신을 초대합니다! \n ${inviteInfo.url} \n `

@@ -1,17 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LoginLogo from "../../icons/512.png";
 import LoginBtn from "@/assets/Login/kakaoLoginBtn.png";
 import InfoIcon from "@/assets/GroupAttend/info_icon.png";
+import { GuestStore } from "../stores/GuestStore";
+import { useStore } from "zustand";
+import { useNavigate, useParams } from "react-router-dom";
 
 const GroupAttendLogin:React.FC = () => {
+  const guest = useStore(GuestStore);
+  const navi = useNavigate();
+  const { groupPk } =useParams()
+
+  useEffect(() => {
+    guest.setIsInvite(true);
+    guest.setPartyPk(Number(groupPk));
+  }, [])
+
+  const login = () => {
+    window.location.href = "https://k10d202.p.ssafy.io/api/oauth2/authorization/kakao"
+    // window.location.href = "http://localhost:5000/api/oauth2/authorization/kakao"
+  }
+
+  const guestBtn = () => {
+    guest.setIsGuest(true);
+    navi(-1);
+  }
+
+
+
   return (
     <div className="w-full h-full flex flex-col justify-center items-center bg-white">
       <img src={LoginLogo} className="-mt-11 mb-5 w-[170px]"/>
       <div className="flex flex-col justify-center items-center mb-16">
-        <button >
-          <img src={LoginBtn} className="mb-3 rounded-lg w-80 h-[45px]"/>
-        </button>
-        <div className="w-80 h-[45px] bg-point-gray font-gtr-B text-base text-white rounded-lg flex justify-center items-center">
+        <img src={LoginBtn} onClick={() => login()} className="w-80 mb-4"/>
+        <div className="w-80 h-[45px] bg-point-gray font-gtr-B text-base text-white rounded-md flex justify-center items-center" onClick={() => guestBtn()}>
           <p>게스트로 시작하기</p>
         </div>
       </div>

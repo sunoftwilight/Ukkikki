@@ -3,6 +3,7 @@ import { formDataApi, privateApi, imgApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
 import { CreateDoenResponesData, PartyListResponesData, PartyLinkRespone } from '../types/GroupType';
 import { PartyDetailResponse } from '../types/GroupType';
+import { GroupKey } from '../types/GroupType';
 
 const url = 'party'
 
@@ -50,4 +51,129 @@ export const getPartyThumb = async (
     .then(Response)
     .catch(Error)
 	}
-	
+
+
+	// 오늘 작업예정
+
+	// 1
+	export const enterPartyMember = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/enter/member/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	// 1
+	export const enterPartyGuest = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/enter/guest/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	// 1
+	export const checkPartyPass = async (
+		partyId : number,
+		pass: string,
+		simplePass: string,
+		Response : (Response : AxiosResponse<GroupKey>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.post(`/${url}/check/password/${partyId}`, {"password": pass, "simplePassword" : simplePass})
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const checkChangePartyPass = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.post(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const changePartyProfile = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const changePartyGrant = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const changePartyInfo = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const changePartyPass = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const blockPartyUser = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const getPartyUserList = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const getPartyBlockUserList = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const kickPartyUser = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.get(`/${url}/link/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	//
+	export const exitParty = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.delete(`/${url}/exit/${partyId}`)
+    .then(Response)
+    .catch(Error)
+	}

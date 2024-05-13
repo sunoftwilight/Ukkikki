@@ -37,8 +37,8 @@ const ListComponent: React.FC = () => {
 		await getPartyThumb(
 			url,
 			opt,
-			(res) => {
-				console.log(res);
+			() => {
+				// console.log(res);
 			},
 			(err) => {
 				console.log(err);

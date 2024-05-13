@@ -7,6 +7,7 @@ export const userStore = create(
     isLogin: false,
     isInsertPass: false,
     isCheckPass: false,
+    
 
     accessToken: '',
 

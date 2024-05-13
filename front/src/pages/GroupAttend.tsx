@@ -1,19 +1,117 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import InfoIcon from "@/assets/GroupAttend/info_icon.png";
+import { userStore } from "../stores/UserStore";
+import { useStore } from "zustand";
+import { useNavigate, useParams } from "react-router-dom";
+import { enterPartyMember, enterPartyGuest, checkPartyPass } from "../api/party";
+import { GuestStore } from "../stores/GuestStore";
 
 const GroupAttend:React.FC = () => {
+  const user = useStore(userStore);
+  const guest = useStore(GuestStore);
+  const navi = useNavigate();
+  const{ groupPk } = useParams();
+  const [password, setPassword] = useState<string>("");
+  const inputsRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
+
+  useEffect(() => {
+    if(!guest.isGuest && !user.isLogin) navi(`/group/${groupPk}/attend/login`)
+  }, [])
+
+  const checkPass = async () => {
+    await checkPartyPass(Number(groupPk), password, user.simplePass,
+      (res) => {
+        console.log(res)
+        if(guest.isGuest) {
+          const sse = res.data.sseKey
+          const pk = res.data.partyId
+          const key:Record<number,string> = {}
+          key[pk] = sse
+          guest.setPartyPk(pk)
+          user.setGroupKey(key)
+          attendGuest();
+        }
+        else if(user.isLogin) {
+		      const currentKeys = user.groupKey;
+		      currentKeys[res.data.partyId] = res.data.sseKey;
+          user.setGroupKey(currentKeys);
+          attentMember();
+        }
+      },
+      (err) => {
+        console.log(err)
+        alert('비밀번호에 오류가 있습니다.')
+      }
+    )
+  }
+
+  const attentMember = async () => {
+    await enterPartyMember(Number(groupPk),
+      (res) => {
+        console.log(res)
+        navi(`/group/${groupPk}`)
+      },
+      (err) => {
+        console.error(err)
+      }
+    )
+  }
+
+  const attendGuest = async () => {
+    await enterPartyGuest(Number(groupPk),
+      (res) => {
+        console.log(res)
+        navi(`/group/${groupPk}`)
+      },
+      (err) => {
+        console.error(err)
+      }
+    )
+  }
+
+	const handleInputChange = (
+		index: number,
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const value = event.target.value;
+		if (index < 6) {
+			setPassword(
+				(prevPassword) =>
+					prevPassword.substring(0, index) +
+					value +
+					prevPassword.substring(index + 1),
+			);
+		}
+		if (value.length === 1 && index < 11 && inputsRefs.current[index + 1]) {
+			inputsRefs.current[index + 1]?.focus();
+		} else if (
+			value.length === 0 &&
+			index > 0 &&
+			inputsRefs.current[index - 1]
+		) {
+			inputsRefs.current[index - 1]?.focus();
+		}
+	};
+
+
   return (
-    <div className="w-full h-full flex flex-col bg-white p-4 font-pre-SB text-lg gap-3">
+    <div className="w-full h-full flex flex-col bg-white p-4 font-pre-SB text-lg gap-3 items-center">
       <p>그룹 비밀번호</p>
-      <div className="w-80 h-14 flex justify-between">
-        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
-        <input type="password" maxLength={1} className="h-14 w-12 rounded-lg bg-gray text-center"/>
+      <div className="w-80 h-14 flex justify-between items-center">
+        {Array(6)
+          .fill(null)
+          .map((_, index) => (
+            <input
+              key={index}
+              type="password"
+              maxLength={1}
+              className="h-14 w-12 rounded-lg bg-gray text-center outline-none"
+              ref={(el) => (inputsRefs.current[index] = el)}
+              onChange={(event) => handleInputChange(index, event)}
+            />
+        ))}
       </div>
-      <div className="my-5 w-80 h-[45px] bg-disabled-gray font-gtr-B text-base text-white rounded-lg flex justify-center items-center">
+      <div className="my-5 w-80 h-[45px] bg-disabled-gray font-gtr-B text-base text-white rounded-lg flex justify-center items-center" onClick={()=> checkPass()}>
         <p>다음</p>
       </div>
       <div className="w-80 h-[180px] bg-gray flex flex-col p-2 rounded-xl text-sm font-pre-M">
