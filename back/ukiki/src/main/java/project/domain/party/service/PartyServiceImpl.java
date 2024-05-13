@@ -332,13 +332,20 @@ public class PartyServiceImpl implements PartyService {
         checkPasswordDto.setPartyId(party.getId());
         checkPasswordDto.setSseKey(sseKey);
 
+        CustomUserDetails userDetails = null;
+        Long memberId = 0L;
         //게스트인지 회원인지 확인
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long memberId = userDetails.getId();
-        //게스트일 경우 sseKey 반환
-        if (memberId == 0){
+        try{
+            userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            memberId = userDetails.getId();
+
+        }catch (NullPointerException ignore){
             return checkPasswordDto;
         }
+        //게스트일 경우 sseKey 반환
+//        if (memberId == 0){
+//            return checkPasswordDto;
+//        }
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
