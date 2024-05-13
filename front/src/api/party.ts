@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { formDataApi, privateApi, imgApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { CreateDoenResponesData, PartyListResponesData, PartyLinkResponse, EnterGuestRespones, PartyCheckPassRespones } from '../types/GroupType';
+import { CreateDoenResponesData, PartyListResponesData, PartyLinkResponse, EnterGuestRespones, PartyCheckPassRespones, PartyUserListRespones } from '../types/GroupType';
 import { PartyDetailResponse } from '../types/GroupType';
 
 const url = 'party'
@@ -90,34 +90,39 @@ export const getPartyThumb = async (
 		partyId : number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.post(`/${url}/link/${partyId}`)
+    await privateApi.post(`/${url}/check/changed-password/${partyId}`)
     .then(Response)
     .catch(Error)
 	}
 
+	// 1차 완료
 	export const changePartyProfile = async (
-		partyId : number,
+		params: FormData,
+		partyId: number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
+    await formDataApi.post(`/${url}/change-profile/${partyId}`, params)
     .then(Response)
     .catch(Error)
 	}
 
 	export const changePartyGrant = async (
 		partyId : number,
+		targetId : number,
+		memberRole: string,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
+    await privateApi.patch(`/${url}/grant/${partyId}/${targetId}`, memberRole)
     .then(Response)
     .catch(Error)
 	}
 
 	export const changePartyInfo = async (
-		partyId : number,
+		// params: FormData,
+		partyId: number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
+    await formDataApi.patch(`/${url}/link/${partyId}`)
     .then(Response)
     .catch(Error)
 	}
@@ -126,7 +131,7 @@ export const getPartyThumb = async (
 		partyId : number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
+    await privateApi.patch(`/${url}/change/password/${partyId}`)
     .then(Response)
     .catch(Error)
 	}
@@ -143,7 +148,7 @@ export const getPartyThumb = async (
 	// 1
 	export const getPartyUserList = async (
 		partyId : number,
-		Response : (Response : AxiosResponse<ResponseData>) => void, 
+		Response : (Response : AxiosResponse<PartyUserListRespones>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await privateApi.get(`/${url}/user-list/${partyId}`)
     .then(Response)
@@ -152,9 +157,9 @@ export const getPartyThumb = async (
 
 	export const getPartyBlockUserList = async (
 		partyId : number,
-		Response : (Response : AxiosResponse<ResponseData>) => void, 
+		Response : (Response : AxiosResponse<PartyUserListRespones>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
+    await privateApi.get(`/${url}/block/user-list/${partyId}`)
     .then(Response)
     .catch(Error)
 	}

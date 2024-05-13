@@ -2,31 +2,28 @@ import React, { useEffect } from "react";
 import LoginLogo from "../../icons/512.png";
 import LoginBtn from "@/assets/Login/kakaoLoginBtn.png";
 import InfoIcon from "@/assets/GroupAttend/info_icon.png";
-import { GuestStore } from "../stores/GuestStore";
+import { guestStore } from "../stores/GuestStore";
 import { useStore } from "zustand";
 import { useNavigate, useParams } from "react-router-dom";
 
 const GroupAttendLogin:React.FC = () => {
-  const guest = useStore(GuestStore);
+  const guest = useStore(guestStore);
   const navi = useNavigate();
-  const { groupPk } =useParams()
+  const { groupPk } =useParams();
 
   useEffect(() => {
-    guest.setIsInvite(true);
     guest.setPartyPk(Number(groupPk));
-  }, [])
-
+    guest.setIsInvite(true);
+  })
   const login = () => {
-    window.location.href = "https://k10d202.p.ssafy.io/api/oauth2/authorization/kakao"
-    // window.location.href = "http://localhost:5000/api/oauth2/authorization/kakao"
+    // window.location.href = "https://k10d202.p.ssafy.io/api/oauth2/authorization/kakao"
+    window.location.href = "http://localhost:5000/api/oauth2/authorization/kakao"
   }
 
   const guestBtn = () => {
     guest.setIsGuest(true);
     navi(`/group/${guest.viewPartyPk}/attend`)
   }
-
-
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center bg-white">

@@ -13,7 +13,7 @@ import GroupAttendLogin from './pages/GroupAttendLogin';
 import GroupAttend from './pages/GroupAttend';
 import GroupConfig from './pages/GroupConfig/GroupConfig';
 import GroupEnvConfig from './pages/GroupConfig/GroupEnvConfig';
-import GroupProfile from './pages/GroupConfig/GroupProfile';
+import GroupProfile from './pages/GroupConfig/GroupProfileChange';
 import GroupBan from './pages/GroupConfig/GroupBan';
 import GroupInfo from './pages/GroupConfig/GroupInfo';
 import GroupUser from './pages/GroupConfig/GroupUser';
@@ -61,7 +61,7 @@ export default function Router() {
         <Route path="/group/:groupPk/ban" element={<GroupBan />} />
         <Route path="/group/:groupPk/info" element={<GroupInfo />} />
         <Route path="/group/:groupPk/user" element={<GroupUser />} />
-        <Route path="/group/:groupPk/userdetail/:userPk" element={<GroupUserDetail />} />
+        <Route path="/group/:groupPk/userdetail" element={<GroupUserDetail />} />
         <Route path="/group/:groupPk/pass" element={<GroupPass />} />
 
         <Route path="/mypage" element={<MyPage />} />

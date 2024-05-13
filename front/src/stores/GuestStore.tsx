@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { GuestStoreType } from '../types/StoreType/GuestStoreType';
 
-export const GuestStore = create(
+export const guestStore = create(
   persist<GuestStoreType>((set) => ({
     isGuest: false,
     isInvite: false,

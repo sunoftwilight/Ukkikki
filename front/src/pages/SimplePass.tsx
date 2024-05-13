@@ -5,6 +5,7 @@ import { useStore } from "zustand";
 import { userStore } from "../stores/UserStore";
 import { useNavigate } from "react-router-dom";
 import { GroupKey } from "../types/GroupType";
+import { guestStore } from "../stores/GuestStore";
 interface SimplePassProps {
 	type: string;
 }
@@ -19,7 +20,9 @@ const SimplePass: React.FC<SimplePassProps> = ({ type }) => {
 	const colOpt = "flex justify-center items-center";
 	const pageType = type;
 	const user = useStore(userStore);
+	const guest = useStore(guestStore);
 	const navi = useNavigate();
+
 	useEffect(() => {
 		setNumbers(
 			Array.from({ length: 10 }, (_, index) => String(index)).sort(
@@ -77,11 +80,18 @@ const SimplePass: React.FC<SimplePassProps> = ({ type }) => {
 		await simpleCheck(
 			config,
 			(response) => {
-				console.log(response.data.data);
 				user.setIsCheck(true);
 				user.setSimplePass(password);
 				groupKeySetting(response.data.data);
-				navi("/");
+
+				if (guest.isInvite) {
+					const rootPk = guest.viewPartyPk;
+					guest.setPartyPk(0);
+					guest.setIsInvite(false);
+					navi(`/group/${rootPk}/attend`)
+				} else {
+					navi("/");
+				}
 			},
 			(err) => {
 				alert("잘못된 접근입니다. 잠시후 다시 시도해주세요.");

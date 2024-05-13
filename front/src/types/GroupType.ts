@@ -57,6 +57,14 @@ export interface PartyDetailData {
   thumbnail : string
 }
 
+export interface UserGrantData {
+  partyId: number;
+  userId: number;
+  userName: string;
+  profileUrl: string;
+  memberRole: string;
+}
+
 // API
 export interface CreateDoenResponesData{
   resultCode: string;
@@ -95,10 +103,5 @@ export interface EnterGuestRespones {
 
 export interface PartyUserListRespones {
   resultCode: string;
-  data: {
-    userId: number;
-    userName: string;
-    profileUrl: string;
-    memberRole: string;
-  }
+  data: UserGrantData[]
 }

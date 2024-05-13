@@ -3,12 +3,14 @@ import settings from "@/assets/GroupMain/settings.png"
 import etc from "@/assets/GroupMain/etc.png"
 import { memberStore } from "../../stores/ModalStore";
 import { Link, useParams } from "react-router-dom";
-import { getPartyDetail } from "../../api/party";
+import { getPartyDetail, getPartyThumb } from "../../api/party";
 import { PartyDetailData } from "../../types/GroupType";
+import { userStore } from "../../stores/UserStore";
 
 
 const GroupProfile: React.FC = () => { 
   const { setMemberOpen } = memberStore()
+  const { groupKey } = userStore();
   const { groupPk } = useParams();
   const [groupInfo, setGroupInfo] = useState<PartyDetailData>({partyMembers: [], partyName: '', rootDirId: '', thumbnail: ''})
 
@@ -20,7 +22,14 @@ const GroupProfile: React.FC = () => {
     await getPartyDetail(Number(groupPk),
     (res) => {
       const data = res.data.data;
-      console.log(data)
+      res.data.data.partyMembers.forEach((item) => {
+        if (item.type === 'S3') {
+          const key = groupKey[Number(groupPk)];
+          console.log(item.profileUrl);
+          console.log(key);
+          getImg(item.profileUrl, key)
+        }
+      });
       setGroupInfo({
         partyMembers: data.partyMembers,
         partyName: data.partyName,
@@ -31,6 +40,20 @@ const GroupProfile: React.FC = () => {
       console.error(err)
     })
   }
+
+
+
+  const getImg = async (url: string, key: string) => {
+		const opt = {
+			"x-amz-server-side-encryption-customer-key": key,
+		};
+		await getPartyThumb(
+			url,
+			opt,
+			(res) => {console.log(res)},
+			(err) => { console.log(err); },
+		);
+	};
 
   const memberThumb = () => {
     const memberThumbs = groupInfo.partyMembers.map((data) => (

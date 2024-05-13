@@ -24,7 +24,7 @@ const Header: React.FC = () => {
 		"/group/:pk/pass",
 	];
 
-	const basicPath = ["/", "/group", "/mypage", "/group/:pk/attend", ];
+	const basicPath = ["/", "/group", "/mypage",];
 	const backPath = ["/setting", "/feed", "/chat", ...groupBackPath];
 	const albumPath = ["/album", "/trash"];
 
@@ -56,12 +56,12 @@ const Header: React.FC = () => {
 	if (
 		backPath.includes(location.pathname) ||
 		location.pathname.startsWith("/feed/") ||
-		location.pathname.startsWith("/group/list")
+		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend'))
 	)
 		return <BackHeader />;
 	else if (
-		basicPath.includes(location.pathname) ||
-		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend'))
+		basicPath.includes(location.pathname)
+		
 	)
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;

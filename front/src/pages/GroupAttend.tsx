@@ -4,11 +4,11 @@ import { userStore } from "../stores/UserStore";
 import { useStore } from "zustand";
 import { useNavigate, useParams } from "react-router-dom";
 import { enterPartyMember, enterPartyGuest, checkPartyPass } from "../api/party";
-import { GuestStore } from "../stores/GuestStore";
+import { guestStore } from "../stores/GuestStore";
 
 const GroupAttend:React.FC = () => {
   const user = useStore(userStore);
-  const guest = useStore(GuestStore);
+  const guest = useStore(guestStore);
   const navi = useNavigate();
   const{ groupPk } = useParams();
   const [password, setPassword] = useState<string>("");
@@ -30,7 +30,7 @@ const GroupAttend:React.FC = () => {
           key[pk] = sse
           guest.setPartyPk(pk)
           user.setGroupKey(key)
-          console.log(key)
+
           attendGuest();
         }
         else if(user.isLogin) {
@@ -49,8 +49,7 @@ const GroupAttend:React.FC = () => {
 
   const attentMember = async () => {
     await enterPartyMember(Number(groupPk),
-      (res) => {
-        console.log(res)
+      () => {
         navi(`/group/${groupPk}`)
       },
       (err) => {
@@ -62,7 +61,6 @@ const GroupAttend:React.FC = () => {
   const attendGuest = async () => {
     await enterPartyGuest(Number(groupPk),
       (res) => {
-        console.log(res.data.data)
         user.setAccessToken('Bearer ' + res.data.data.token);
         navi(`/group/${groupPk}`)
       },
