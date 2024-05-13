@@ -14,5 +14,5 @@ import lombok.Setter;
 public class GetDirThumbUrl2 {
     private String pk;
     private String thumbUrl2;
-    private String photoUrl;
+    private Long photoId;
 }

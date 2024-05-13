@@ -612,7 +612,7 @@ public void deleteDir(String dirId) { // photo의 경우도 고려해줘야 한�
                 GetDirThumbUrl2.builder()
                     .pk(file.getId())
                     .thumbUrl2(file.getPhotoDto().getThumbUrl2())
-                    .photoUrl(file.getPhotoDto().getPhotoUrl())
+                    .photoId(file.getPhotoDto().getId())
                     .build());
         }
         log.info("service response = {}", response);
