@@ -4,11 +4,13 @@ import { DetailImgStoreType } from '../types/StoreType/DetailImgStoreType'
 
 export const DetailImgStore = create(
   persist<DetailImgStoreType>((set) => ({
+    currentId: -1,
     currentImg: '',
     currentUrl: '',
 
-    setCurrentImg: (imgPk: string, imgUrl: string) => set(() => ({
-        currentImg: imgPk,
+    setCurrentImg: (imgId: number, imgpk: string, imgUrl: string) => set(() => ({
+        currentId: imgId,
+        currentImg: imgpk,
         currentUrl: imgUrl
       }))
   }),

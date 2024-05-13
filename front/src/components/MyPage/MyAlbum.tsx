@@ -1,8 +1,8 @@
 import React from "react";
 import folder from "@/assets/Album/folder.png"
-import { Link } from "react-router-dom";
-import { useStore } from "zustand";
-import { DetailImgStore } from "../../stores/DetailImgStore";
+// import { Link } from "react-router-dom";
+// import { useStore } from "zustand";
+// import { DetailImgStore } from "../../stores/DetailImgStore";
 
 const albumList = {
   folder: ['우리의 믿음', '우리의 사랑'],
@@ -56,7 +56,7 @@ const albumList = {
 }
 
 const MyAlbum: React.FC = () => {
-  const { setCurrentImg } = useStore(DetailImgStore)
+  // const { setCurrentImg } = useStore(DetailImgStore)
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide bg-soft-gray">
@@ -66,7 +66,7 @@ const MyAlbum: React.FC = () => {
           <div className="font-pre-R text-center text-xs">{item}</div>
         </div>
       ))}
-      {albumList.thumbnailImg.map((item, idx) => (
+      {/* {albumList.thumbnailImg.map((item, idx) => (
         <>
           <Link 
             to={`/album/${item.pk}`} state={{url: item.url}}
@@ -76,7 +76,7 @@ const MyAlbum: React.FC = () => {
             <img src={item.url} className="w-[106px] h-[90px] object-cover rounded-lg" />
           </Link>
         </>
-      ))}
+      ))} */}
     </div>
   )
 };
