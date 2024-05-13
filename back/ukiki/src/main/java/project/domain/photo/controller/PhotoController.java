@@ -23,7 +23,7 @@ public class PhotoController implements PhotoDocs {
     private final PhotoService photoService;
 
     @Override
-    @GetMapping("/memo")
+    @GetMapping("/{fileId}/memo")
     public ResponseEntity<ResultResponse> memo(String fileId) {
 
         List<MemoListDto> memos = photoService.memo(fileId);
@@ -32,7 +32,7 @@ public class PhotoController implements PhotoDocs {
     }
 
     @Override
-    @PostMapping("/memo/create")
+    @PostMapping("/{fileId}/memo/create")
     public ResponseEntity<ResultResponse> memoCreate(MemoDto memoDto) {
 
         photoService.memoCreate(memoDto);
@@ -41,7 +41,7 @@ public class PhotoController implements PhotoDocs {
     }
 
     @Override
-    @PostMapping("/memo/modify")
+    @PostMapping("/{fileId}/memo/modify")
     public ResponseEntity<ResultResponse> memoModify(MemoModifyDto memoModifyDto) {
 
         photoService.memoModify(memoModifyDto);
@@ -50,7 +50,7 @@ public class PhotoController implements PhotoDocs {
     }
 
     @Override
-    @DeleteMapping("/memo/delete")
+    @DeleteMapping("/{fileId}/memo/delete")
     public ResponseEntity<ResultResponse> memoDelete(Long memoId) {
 
         photoService.memoDelete(memoId);
