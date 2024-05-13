@@ -59,7 +59,7 @@ public class ArticleController implements ArticleDocs{
 
     @Override
     @PostMapping("/comment/modify/{articleId}/{commentIdx}")
-    public ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Long commentIdx, String content) {
+    public ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, String content) {
 
         commentService.modifyComment(articleId,commentIdx,content);
 
@@ -68,10 +68,32 @@ public class ArticleController implements ArticleDocs{
 
     @Override
     @DeleteMapping("/comment/{articleId}/{commentIdx}")
-    public ResponseEntity<ResultResponse> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Long commentIdx) {
+    public ResponseEntity<ResultResponse> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx) {
 
         commentService.deleteComment(articleId, commentIdx);
 
+        return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_COMMENT_SUCCESS));
+    }
+
+    @Override
+    @PostMapping("/reply/enter/{articleId}/{commentIdx}")
+    public ResponseEntity<ResultResponse> enterReply(@PathVariable(name = "articleId") Long articleId,@PathVariable(name = "commentIdx") Integer commentIdx, String content) {
+        commentService.enterReply(articleId,commentIdx,content);
+
+        return ResponseEntity.ok(new ResultResponse(ResultCode.ENTER_COMMENT_SUCCESS));
+    }
+
+    @Override
+    @PostMapping("/reply/modify/{articleId}/{commentIdx}/{replyIdx}")
+    public ResponseEntity<ResultResponse> modifyReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx, String content) {
+        commentService.modifyReply(articleId,commentIdx,replyIdx,content);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.MODIFY_MEMO_SUCCESS));
+    }
+
+    @Override
+    @DeleteMapping("/reply/{articleId}/{commentIdx}/{replyIdx}")
+    public ResponseEntity<ResultResponse> deleteReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx) {
+        commentService.deleteReply(articleId,commentIdx,replyIdx);
         return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_COMMENT_SUCCESS));
     }
 

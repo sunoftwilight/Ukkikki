@@ -118,7 +118,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void modifyComment(Long articleId, Long commentIdx, String content) {
+    public void modifyComment(Long articleId, Integer commentIdx, String content) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -148,14 +148,14 @@ public class CommentServiceImpl implements CommentService{
         }
 
         // 내용 수정
-        cc.getComment().get(Math.toIntExact(commentIdx)).setContent(content);
+        cc.getComment().get(commentIdx).setContent(content);
 
         commentRepository.save(cc);
     }
 
     @Override
     @Transactional
-    public void deleteComment(Long articleId, Long commentIdx) {
+    public void deleteComment(Long articleId, Integer commentIdx) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -179,9 +179,122 @@ public class CommentServiceImpl implements CommentService{
         }
 
         // 삭제 체크
-        cc.getComment().get(Math.toIntExact(commentIdx)).setIsDelete(true);
+        cc.getComment().get(commentIdx).setIsDelete(true);
 
         commentRepository.save(cc);
 
+    }
+
+    @Override
+    @Transactional
+    public void enterReply(Long articleId, Integer commentIdx, String content) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 확인
+        if(userDetails == null){
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = userDetails.getId();
+
+        // GUEST 차단
+        if(memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+
+        // 유정 정보 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        // 게시글 정보 조회
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        // 프로필 정보 조회
+        Profile profile = profileRepository.findByMemberIdAndPartyId(memberId, article.getParty().getId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        CommentCollection cc = commentRepository.findById(articleId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.COMMENT_NOT_FOUND));
+
+        // 댓글 객체 생성.
+        CommentCollection.Reply newReply = CommentCollection.Reply.builder()
+                .userId(memberId)
+                .userName(member.getUserName())
+                .content(content)
+                .profileUrl(profile.getProfileUrl())
+                .build();
+
+        cc.getComment().get(commentIdx).getReply().add(newReply);
+
+        commentRepository.save(cc);
+    }
+
+    @Override
+    @Transactional
+    public void modifyReply(Long articleId, Integer commentIdx, Integer replyIdx, String content) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 확인
+        if(userDetails == null){
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = userDetails.getId();
+
+        // GUEST 차단
+        if(memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+
+        CommentCollection cc = commentRepository.findById(articleId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.COMMENT_NOT_FOUND));
+
+        // 댓글 체크
+        if(cc.getComment().size() <= commentIdx
+                || cc.getComment().get(commentIdx).getReply().size() <= replyIdx){
+            throw new BusinessLogicException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
+        // 작성자 체크
+        if(!Objects.equals(cc.getComment().get(commentIdx).getReply().get(replyIdx).getUserId(), memberId)){
+            throw new BusinessLogicException(ErrorCode.USER_NOT_MATCH);
+        }
+
+        // 내용 수정
+        cc.getComment().get(commentIdx).getReply().get(replyIdx).setContent(content);
+
+        commentRepository.save(cc);
+    }
+
+    @Override
+    @Transactional
+    public void deleteReply(Long articleId, Integer commentIdx, Integer replyIdx) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 확인
+        if(userDetails == null){
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = userDetails.getId();
+
+        // GUEST 차단
+        if(memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+
+        CommentCollection cc = commentRepository.findById(articleId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.COMMENT_NOT_FOUND));
+
+        // 댓글 체크
+        if(cc.getComment().size() <= commentIdx
+                || cc.getComment().get(commentIdx).getReply().size() <= replyIdx){
+            throw new BusinessLogicException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
+        cc.getComment().get(commentIdx).getReply().get(replyIdx).setIsDelete(true);
+
+        commentRepository.save(cc);
     }
 }

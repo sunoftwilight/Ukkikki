@@ -8,6 +8,9 @@ public interface CommentService {
     void createComment(ArticleCreateResDto articleCreateResDto);
     CommentCollection articleComment(Long articleId);
     void enterComment(Long articleId, String content);
-    void modifyComment(Long articleId, Long commentIdx, String content);
-    void deleteComment(Long articleId, Long commentIdx);
+    void modifyComment(Long articleId, Integer commentIdx, String content);
+    void deleteComment(Long articleId, Integer commentIdx);
+    void enterReply(Long articleId, Integer commentIdx, String content);
+    void modifyReply(Long articleId, Integer commentIdx, Integer replyIdx, String content);
+    void deleteReply(Long articleId, Integer commentIdx, Integer replyIdx);
 }

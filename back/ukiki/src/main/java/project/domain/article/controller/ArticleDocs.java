@@ -29,9 +29,21 @@ public interface ArticleDocs {
 
     @Operation(summary = "댓글 수정")
     @PostMapping("/comment/modify/{articleId}/{commentIdx}")
-    ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Long commentIdx, String content);
+    ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, String content);
 
     @Operation(summary = "댓글 삭제")
     @DeleteMapping("/comment/{articleId}/{commentIdx}")
-    ResponseEntity<ResultResponse> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Long commentIdx);
+    ResponseEntity<ResultResponse> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx);
+
+    @Operation(summary = "대댓글 입력")
+    @PostMapping("/reply/enter/{articleId}/{commentIdx}")
+    ResponseEntity<ResultResponse> enterReply(@PathVariable(name = "articleId") Long articleId,@PathVariable(name = "commentIdx") Integer commentIdx, String content);
+
+    @Operation(summary = "대댓글 수정")
+    @PostMapping("/reply/modify/{articleId}/{commentIdx}/{replyIdx}")
+    ResponseEntity<ResultResponse> modifyReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx, String content);
+
+    @Operation(summary = "대댓글 삭제")
+    @DeleteMapping("/reply/{articleId}/{commentIdx}/{replyIdx}")
+    ResponseEntity<ResultResponse> deleteReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx);
 }
