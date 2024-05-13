@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,8 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.domain.directory.dto.request.CreateDirDto;
-import project.domain.directory.dto.request.FileListDto;
+import project.domain.directory.dto.request.PatchCopyFileListDto;
 import project.domain.directory.dto.request.GetRenameDto;
+import project.domain.directory.dto.request.PatchCopyFileDto;
+import project.domain.directory.dto.request.PatchMoveDirDto;
+import project.domain.directory.dto.request.PatchMoveFileDto;
+import project.domain.directory.dto.request.PatchMoveFileListDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDtov2;
@@ -80,12 +83,12 @@ public interface DirectoryDocs {
     @PostMapping("")
     public ResponseEntity<ResultResponse> createDir(@RequestBody CreateDirDto request);
 
-    @Operation(summary = "폴더 위치 변경 요청", description = "PathVariable로 dirId(이동 대상이 되는 폴더Id), RequestParam으로 toDirId(목적지가 되는 폴더 Id)를 받아 폴더 위치 변경 ")
+    @Operation(summary = "폴더 위치 변경 요청", description = "PathVariable로 dirId(이동 대상이 되는 폴더Id), body toDirId(목적지가 되는 폴더 Id)를 받아 폴더 위치 변경 ")
     @ApiResponse(responseCode = "200", description = "폴더 이동에 성공하였습니다.")
     @PatchMapping("/{dirId}")
     public ResponseEntity<ResultResponse> moveDir(
         @PathVariable String dirId,
-        @RequestParam String toDirId
+        @RequestParam PatchMoveDirDto patchMoveDirDto
     );
 
     @Operation(summary = "폴더 삭제 요청", description = "PathVariable로 dirId(삭제 대상 폴더 Id)를 받아 삭제")
@@ -120,33 +123,31 @@ public interface DirectoryDocs {
     ResponseEntity<ResultResponse> getFile(String dirId, String fileId);
 
     // 사진 복사
-    @Operation(summary = "(테스트 용도)단일 사진 복사 요청", description = "PathVariable로 fileId와 dirId(fromDirId), RequestParam으로 toDirId를 받아 사진을 복제하고 현재 폴더의 정보를 반환")
+    @Operation(summary = "(테스트 용도)단일 사진 복사 요청", description = "PathVariable로 fileId와 dirId(fromDirId), body로 toDirId를 받아 사진을 복제")
     @ApiResponse(responseCode = "200", description = "사진 복사에 성공하였습니다.")
     @PatchMapping("/{dirId}/files/{fileId}/copy")
-    ResponseEntity<ResultResponse> copyFile(String fileId, String fromDirId, String toDirId);
+    ResponseEntity<ResultResponse> copyFile(String fileId, String fromDirId, PatchCopyFileDto patchCopyFileDto);
 
-    @Operation(summary = "(실 서비스 API)사진 복사 요청", description = "Body로 fileIdList와 dirId(fromDirId), RequestParam으로 toDirId를 받아 사진을 복제합니다")
+    @Operation(summary = "(실 서비스 API)사진 복사 요청", description = "Body로 fileIdList와 dirId(fromDirId), toDirId를 받아 사진을 복제합니다")
     @ApiResponse(responseCode = "200", description = "사진 복사에 성공하였습니다.")
     @PatchMapping("/{dirId}/files/copy")
     public ResponseEntity<ResultResponse> copyFileList(
         @PathVariable(name = "dirId") String fromDirId,
-        @RequestParam(name = "toDirId") String toDirId,
-        @RequestBody FileListDto fileListDto
+        @RequestBody PatchCopyFileListDto patchCopyFileListDto
     );
 
     // 사진 이동
-    @Operation(summary = "(테스트 용도)단일 사진 이동 요청", description = "PathVariable로 fileId와 dirId(fromDirId), RequestParam으로 toDirId를 받아 사진을 이동합니다.")
+    @Operation(summary = "(테스트 용도)단일 사진 이동 요청", description = "PathVariable로 fileId와 dirId(fromDirId), body로 toDirId를 받아 사진을 이동합니다.")
     @ApiResponse(responseCode = "200", description = "사진 이동에 성공하였습니다.")
     @PatchMapping("/{dirId}/files/{fileId}/move")
-    ResponseEntity<ResultResponse> moveFile(String fileId, String fromDirId, String toDirId);
+    ResponseEntity<ResultResponse> moveFile(String fileId, String fromDirId, PatchMoveFileDto patchMoveFileDto);
 
-    @Operation(summary = "(실 서비스 API)복수 사진 이동 요청", description = "Body로 fileIdList, RequestParam으로 dirId(fromDirId), RequestParam으로 toDirId를 받아 사진을 이동합니다.")
+    @Operation(summary = "(실 서비스 API)복수 사진 이동 요청", description = "RequestVariable로 dirId(fromDirId), Body로 fileIdList, toDirId를 받아 사진을 이동합니다.")
     @ApiResponse(responseCode = "200", description = "사진 이동에 성공하였습니다.")
     @PatchMapping("/{dirId}/files/move")
     ResponseEntity<ResultResponse> moveFileList(
         @PathVariable(name = "dirId") String fromDirId,
-        @RequestParam(name = "toDirId") String toDirId,
-        @RequestBody FileListDto fileListDto
+        @RequestBody PatchMoveFileListDto patchMoveFileListDto
     );
 
     // 단일 사진 삭제
@@ -160,7 +161,7 @@ public interface DirectoryDocs {
     @DeleteMapping("/{dirId}/files")
     public ResponseEntity<ResultResponse> deleteFileList(
         @PathVariable(name = "dirId") String dirId,
-        @RequestBody FileListDto fileListDto
+        @RequestBody PatchCopyFileListDto fileListDto
     );
 
     @Operation(summary = "특정 폴더의 하위 폴더 조회요청", description = "PathVariable로 dirId(부모 폴더 Id)를 받아 하위 폴더의 pk와 name을 반환")

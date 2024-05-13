@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FileListDto {
+public class PatchCopyFileListDto {
+    private String toDirId;
     private List<String> fileIdList = new ArrayList<>();
 }
