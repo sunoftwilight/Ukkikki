@@ -203,7 +203,9 @@ public class DirectoryController implements DirectoryDocs {
 
     @Override
     @GetMapping("/{dirId}/structure")
-    public ResponseEntity<ResultResponse> getDirFullStructure(String dirId) {
+    public ResponseEntity<ResultResponse> getDirFullStructure(
+        @PathVariable String dirId
+    ) {
         List<GetDirFullStructureDto> response = directoryService.getDirFullStructure(dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_FULL_DIR_STRUCTURE, response));
     }
