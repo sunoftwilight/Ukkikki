@@ -83,8 +83,8 @@ public class MemberController implements MemberDocs{
     }
 
     @Override
-    @PostMapping("/directory")
-    public ResponseEntity<ResultResponse> setUploadDirectory(Long partyId) {
+    @PatchMapping("/directory/{partyId}")
+    public ResponseEntity<ResultResponse> setUploadDirectory(@PathVariable("partyId") Long partyId) {
 
         memberService.setUploadDirectory(partyId);
 
