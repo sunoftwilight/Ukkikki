@@ -10,9 +10,10 @@ interface MemoItemProps {
   info : {
     memoId : number;
     content : string;
-    userId : string;
+    userId : number;
     username : string;
     date : string;
+    url : string;
   }
 
   deleteMemo : (
@@ -33,7 +34,7 @@ const MemoItem: React.FC<MemoItemProps> = ({ info, deleteMemo }) => {
   },[])
 
   const mineCheck = () => {
-    if(user.userId === info.userId){
+    if(Number(user.userId) === info.userId){
       setIsMine(true);
     }
   }
@@ -74,7 +75,7 @@ const MemoItem: React.FC<MemoItemProps> = ({ info, deleteMemo }) => {
 
   return (
     <div className="w-full p-2 flex bg-white/70 rounded-[15px] gap-2">
-      {/* <img src={info.profileUrl} className="w-[50px] h-[50px] rounded-full" /> */}
+      <img src={info.url} className="w-[50px] h-[50px] rounded-full" />
 
       <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">

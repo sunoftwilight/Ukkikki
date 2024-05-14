@@ -16,7 +16,7 @@ export type MemoListType = MemoListInterface[];
 export interface MemoListInterface {
   memoId : number;
   content : string;
-  userId : string;
+  userId : number;
   username : string;
   date : string;
 }
