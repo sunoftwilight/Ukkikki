@@ -607,7 +607,7 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // 마스터 권한 부여할 때 -> 사용자 에디터로 변경 저장
-        if (memberRole.equals(MemberRole.MASTER)) {
+        if (memberRole.equals(MemberRole.MASTER.name())) {
             memberParty.setMemberRole(MemberRole.EDITOR);
             memberpartyRepository.save(memberParty);
         }
