@@ -32,7 +32,7 @@ public class PhotoController implements PhotoDocs {
 
     @Override
     @PostMapping("/memo/create/{fileId}")
-    public ResponseEntity<ResultResponse> memoCreate(@PathVariable("fileId") String fileId, String content) {
+    public ResponseEntity<ResultResponse> memoCreate(@PathVariable("fileId") String fileId, @RequestBody String content) {
 
         photoService.memoCreate(new MemoDto(fileId,content));
 
@@ -41,7 +41,7 @@ public class PhotoController implements PhotoDocs {
 
     @Override
     @PostMapping("/memo/modify/{memoId}")
-    public ResponseEntity<ResultResponse> memoModify(@PathVariable("memoId") Long memoId, String content) {
+    public ResponseEntity<ResultResponse> memoModify(@PathVariable("memoId") Long memoId, @RequestBody String content) {
 
         photoService.memoModify(new MemoModifyDto(memoId,content));
 
