@@ -14,6 +14,8 @@ import { prefixStore } from "../../stores/AlbumStore";
 import Modal from "../@commons/Modal";
 import { DetailImgStore } from "../../stores/DetailImgStore";
 import { getDetailImgDataType } from "../../types/AlbumType";
+import { useParams } from "react-router-dom";
+import { userStore } from "../../stores/UserStore";
 
 interface NavPropsType {
   info: getDetailImgDataType
@@ -29,11 +31,15 @@ const FootNav: React.FC<NavPropsType> = ({ info }) => {
   const { prefix } = useStore(prefixStore)
   const { currentId } = useStore(DetailImgStore)
 
+  const { groupKey } = useStore(userStore);
+  const { groupPk } = useParams();
+
   const prefixHandler = async () => {
     setIsPrefixOpen(false)
     setIsIng(true)
     await downloadFile(
-      'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+      groupKey[Number(groupPk)],
+      // 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
       {
         fileId: currentId,
         prefix: prefix
