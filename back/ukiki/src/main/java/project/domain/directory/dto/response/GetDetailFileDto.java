@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.domain.article.dto.response.ArticleDirDto;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,4 +20,5 @@ public class GetDetailFileDto {
     private String url;
     private Boolean isDownload;
     private Boolean isLikes;
+    private List<ArticleDirDto> articleList;
 }

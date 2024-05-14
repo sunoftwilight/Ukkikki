@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import project.domain.article.entity.PhotoType;
 import project.domain.directory.service.FileService;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
@@ -73,6 +74,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
         for(MultipartFile file : files){
             Photo photo = new Photo();
+            photo.setPhotoType(PhotoType.APP);
             PhotoUrl urls = new PhotoUrl();
 
             //S3 파일 업로드 후 저장

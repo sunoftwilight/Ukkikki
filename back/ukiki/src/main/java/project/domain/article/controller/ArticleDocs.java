@@ -2,6 +2,7 @@ package project.domain.article.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +14,8 @@ import project.domain.article.dto.request.ArticleUpdateDto;
 import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
 import project.global.result.ResultResponse;
+
+import java.io.IOException;
 
 @Tag(name = "ArticleController", description = "게시판 api")
 public interface ArticleDocs {
@@ -27,6 +30,12 @@ public interface ArticleDocs {
 
     @Operation(summary = "게시판 수정")
     ResponseEntity<SimpleArticleDto> updateArticle(Long partyId, Long articleId, ArticleUpdateDto articleUpdateDto);
+
+    @Operation(summary = "포토 이동")
+    void movePhoto(HttpServletResponse response, String fileId) throws IOException;
+
+    @Operation(summary = "게시판 이동")
+    void moveArticle(HttpServletResponse response, Long articleId) throws IOException;
 
 
     @Operation(summary = "댓글 조회")

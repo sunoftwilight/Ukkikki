@@ -11,13 +11,16 @@ import project.domain.article.dto.request.ArticleUpdateDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
 import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
+import project.domain.article.dto.response.SimpleArticlePhotoDto;
 import project.domain.article.entity.Article;
 import project.domain.article.entity.ArticlePhoto;
+import project.domain.article.entity.PhotoType;
 import project.domain.article.mapper.ArticleMapper;
 import project.domain.article.mapper.ArticlePhotoMapper;
 import project.domain.article.repository.ArticlePhotoRepository;
 import project.domain.article.repository.ArticleRepository;
 import project.domain.directory.collection.File;
+import project.domain.directory.mapper.GetFileMapper;
 import project.domain.directory.repository.FileRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
@@ -25,17 +28,21 @@ import project.domain.member.entity.MemberRole;
 import project.domain.member.entity.Profile;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
+import project.domain.party.dto.response.SimplePartyDto;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
+import project.domain.photo.mapper.PhotoMapper;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +59,8 @@ public class ArticleServiceImpl implements ArticleService{
 
     private final ArticleMapper articleMapper;
     private final ArticlePhotoMapper articlePhotoMapper;
-
+    private final GetFileMapper fileMapper;
+    private final PhotoMapper photoMapper;
 
     @Override
     public ArticleCreateResDto createArticle(Long partyId, ArticleCreateDto articleCreateDto) {
@@ -131,8 +139,10 @@ public class ArticleServiceImpl implements ArticleService{
 
             memberRepository.findById(memberId)
                 .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
             MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(memberId, partyId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
             if (memberParty.getMemberRole().equals(MemberRole.BLOCK)){
                 throw new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR);
             }
@@ -144,10 +154,29 @@ public class ArticleServiceImpl implements ArticleService{
 
         SimpleArticleDto res = articleMapper.toSimpleArticleDto(article);
 
-        res.setModify(article.getCreateDate().isEqual(article.getLastModifiedDate()));
+        res.setModify(!article.getCreateDate().isEqual(article.getLastModifiedDate()));
 
-        List<ArticlePhoto> articlePhotoList = article.getArticlePhotoList();
-        res.setPhotoList(articlePhotoMapper.toSimpleArticlePhotoDtoList(articlePhotoList));
+        List<SimpleArticlePhotoDto> fileList = article.getArticlePhotoList()
+            .stream()
+            .map(ArticlePhoto::getPhoto)
+            .map(photo -> {
+                SimpleArticlePhotoDto addList;
+                if (photo.getPhotoType().equals(PhotoType.APP)){
+                    Optional<File> asd  = fileRepository.findByPhotoDtoId(photo.getId());
+                    if(asd.isEmpty()){
+                        return null;
+                    }
+                    addList = fileMapper.toSimpleArticlePhotoDto(asd.get());
+                }else{
+                    addList = photoMapper.toSimpleArticlePhotoDto(photo);
+                }
+                addList.setId(articleId);
+                return addList;
+            })
+            .toList();
+
+
+        res.setPhotoList(fileList);
 
         return res;
     }

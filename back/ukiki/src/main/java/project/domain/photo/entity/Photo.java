@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import project.domain.article.entity.ArticlePhoto;
+import project.domain.article.entity.PhotoType;
 import project.domain.party.entity.Party;
 import project.domain.member.entity.Member;
 import project.domain.photo.entity.mediatable.DownloadLog;
@@ -41,6 +42,8 @@ public class Photo extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "photo_id")
     private Long id;
+
+    private PhotoType photoType;
 
     private String fileName;
 

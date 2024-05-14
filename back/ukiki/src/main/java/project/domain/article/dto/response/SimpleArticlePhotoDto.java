@@ -10,6 +10,7 @@ public class SimpleArticlePhotoDto {
 
     Long id;
     Long photoId;
+    String fileId;
     String photoUrl;
 
 
