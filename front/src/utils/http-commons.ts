@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-
 // import { tokenRefresh } from "../api/user";
 // import { httpStatusCode } from "./http-status";
 
@@ -8,8 +7,7 @@ axios.defaults.withCredentials = true;
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
 // const baseURL: string = "http://localhost:5000/api";
 
-
-//img Test API 
+// S3 조회 API 
 export const imgApi: AxiosInstance = axios.create({
   headers: {
     'Access-Control-Allow-Origin': '*',
@@ -18,18 +16,7 @@ export const imgApi: AxiosInstance = axios.create({
   }
 });
 
-// imgApi.interceptors.request.use((config) => {
-//   const stored = localStorage.getItem('USER_STORE');
-//   if (stored) {
-//     const obj = JSON.parse(stored);
-//     if (obj.state.accessToken !== '') {
-//       config.headers['authorization'] = obj.state.accessToken;
-//       // config.headers['authorization'] = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk"
-//     }
-//   }
-//   return config;
-// });
-
+// token이 필요 없는 api
 export const publicApi: AxiosInstance = axios.create({
 	baseURL: baseURL,
 	headers: {
@@ -37,6 +24,7 @@ export const publicApi: AxiosInstance = axios.create({
 	}
 });
 
+// token이 필요한 api
 export const privateApi: AxiosInstance = axios.create({
   baseURL: baseURL,
   headers: {
@@ -44,6 +32,7 @@ export const privateApi: AxiosInstance = axios.create({
   },
 });
 
+// S3 이미지 다운로드를 위한 api
 export const downloadApi = (sseKey: string) => {
   const downApi = axios.create({
   baseURL: baseURL,

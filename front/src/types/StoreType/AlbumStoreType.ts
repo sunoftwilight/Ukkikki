@@ -5,7 +5,9 @@ export interface selectModeStoreType {
 
 export interface selectListStoreType {
   selectList: number[];
+  selectListForPk: string[];
   setSelectList: (imgId: number, isSelect: boolean) => void;  
+  setSelectListForPk: (imgPk: string, isSelect: boolean) => void;  
 }
 
 export interface PrefixStoreType {
@@ -22,4 +24,9 @@ export interface CurrentDirType {
   setCurrentDirName: (txt: string) => void; 
   setParentDirId: (txt: string) => void; 
   setParentDirName: (txt: string) => void; 
+}
+
+export interface UpdateAlbumStoreType {
+  needUpdate: boolean;
+  setNeedUpdate: () => void;
 }

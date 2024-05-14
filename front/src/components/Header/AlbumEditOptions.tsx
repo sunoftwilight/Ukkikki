@@ -7,7 +7,7 @@ import { albumEditStore } from "../../stores/HeaderStateStore";
 import { AnimatePresence } from "framer-motion";
 import Modal from "../@commons/Modal";
 import { useStore } from "zustand";
-import { currentDirStore, prefixStore } from "../../stores/AlbumStore";
+import { currentDirStore, prefixStore, updateAlbumStore } from "../../stores/AlbumStore";
 import { createDirectory, delDirectory, editDirectory } from "../../api/directory";
 
 const AlbumEditOptions: React.FC = () => {
@@ -15,6 +15,7 @@ const AlbumEditOptions: React.FC = () => {
   const { setIsEdit } = albumEditStore()
   const { prefix } = useStore(prefixStore)
   const { currentDirId, currentDirName, parentDirId, parentDirName, setCurrentDirId, setCurrentDirName } = useStore(currentDirStore)
+  const { setNeedUpdate } = useStore(updateAlbumStore)
   const [isOkOpen, setIsOkOpen] = useState(false)
   const [isNamingOpen, setIsNamingOpen] = useState(false)
   const [isEditNameOpen, setIsEditNameOpen] = useState(false)
@@ -34,6 +35,7 @@ const AlbumEditOptions: React.FC = () => {
   const deleteFolderHandler = () => {
     delDirectory(
       currentDirId,
+      {data: {sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE='}},
       () => {
         setCurrentDirId(parentDirId)
         setCurrentDirName(parentDirName)
@@ -80,6 +82,7 @@ const AlbumEditOptions: React.FC = () => {
 
   // 모달 요청 완료 후 로직
   const doneHandler = () => {
+    setNeedUpdate()
     setIsOkOpen(false)
     setIsNamingOpen(false)
     setIsEditNameOpen(false)

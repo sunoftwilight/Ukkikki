@@ -55,6 +55,7 @@ const Header: React.FC = () => {
 
 	if (
 		backPath.includes(location.pathname) ||
+		location.pathname.startsWith("/album/detail") ||
 		location.pathname.startsWith("/feed/") ||
 		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend'))
 	)
@@ -65,7 +66,7 @@ const Header: React.FC = () => {
 	)
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;
-	else if (albumPath.includes(location.pathname) || location.pathname.startsWith("/album/")) return <AlbumHeader />;
+	else if (albumPath.includes(location.pathname) || location.pathname.startsWith("/album")) return <AlbumHeader />;
 	else if (location.pathname === "/write") return <WriteHeader />;
 };
 

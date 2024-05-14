@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { folderStore } from "../../stores/ModalStore";
 import { albumDoneStore } from "../../stores/HeaderStateStore";
-import { selectModeStore } from "../../stores/AlbumStore";
+import { currentDirStore, selectModeStore, updateAlbumStore } from "../../stores/AlbumStore";
 import { AnimatePresence } from "framer-motion";
 import download from "@/assets/Header/AlbumSelectOptions/download.png";
 import move from "@/assets/Header/AlbumSelectOptions/move.png";
@@ -12,6 +12,7 @@ import Modal from "../@commons/Modal";
 import { multiDownloadFile } from "../../api/file";
 import { useStore } from "zustand";
 import { prefixStore, selectStore } from "../../stores/AlbumStore";
+import { delFiles } from "../../api/directory";
 
 const AlbumSelectOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
@@ -19,19 +20,26 @@ const AlbumSelectOptions: React.FC = () => {
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
   const [isIng, setIsIng] = useState(false)
   const [isDownDone, setIsDownDone] = useState(false)
+  const [isDelete, setIsDelete] = useState(false)
+
   const { setFolderOpen } = folderStore()
   const { prefix } = useStore(prefixStore)
-
   const { setSelectMode } = selectModeStore()
   const { setIsDone } = albumDoneStore()
+  const { currentDirId } = useStore(currentDirStore)
+  const { setNeedUpdate } = useStore(updateAlbumStore)
 
-  const { selectList, setSelectList } = useStore(selectStore)
+  const { selectList, setSelectList, selectListForPk, setSelectListForPk } = useStore(selectStore)
   
   const openHandler = (mode: string) => {
-    if (mode === 'folder') {
-      setFolderOpen()
+    if (mode === 'move') {
+      setFolderOpen('move')
+    } else if (mode === 'copy') {
+      setFolderOpen('copy')
     } else if (mode === 'down') {
       setIsPrefixOpen(true)
+    } else if (mode === 'delete') {
+      setIsDelete(true)
     }
   }
 
@@ -58,14 +66,37 @@ const AlbumSelectOptions: React.FC = () => {
         alert('오류가 발생했습니다. 다시 시도하십시오.')
       },
     )
-    doneHandler()
+    doneHandler('down')
+  }
+
+  const delFileHandler = async () => {
+    await delFiles(
+      currentDirId,
+      {data:{
+        sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+        fileIdList: selectListForPk
+      }},
+      (res) => {
+        console.log(res)
+        doneHandler('del')
+        setNeedUpdate()
+      },
+      (err) => { 
+        console.error(err)
+        alert('오류가 발생했습니다. 다시 시도하십시오.')
+      }
+    )
   }
       
-  const doneHandler = () => {
+  const doneHandler = (mode: string) => {
+    if (mode === 'down') {
+      setIsDownDone(true)
+    }
     setIsIng(false)
-    setIsDownDone(true)
+    setIsDelete(false)
     // 셀렉 리스트 초기화
     setSelectList(-1, false)
+    setSelectListForPk('-1', false)
     setTimeout(() => {
       setIsDone()
       setSelectMode()
@@ -100,23 +131,32 @@ const AlbumSelectOptions: React.FC = () => {
         />
       )}
 
+      { isDelete && (
+        <Modal
+          key='isDelete'
+          modalItems={{ title: '사진을 삭제합니다', content: '삭제된 사진은 휴지통에 2주간 보관되며 기간 내 복구 가능합니다', modalType: 'warn', btn: 2 }}
+          onSubmitBtnClick={() => delFileHandler()}
+          onCancelBtnClick={() => setIsDelete(false)}
+        />
+      )}
+
       <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[186px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
         <div className={`${optionStyle}`} onClick={() => openHandler('down')}>
           <img src={download} className="w-4" />
           다운로드
         </div>
 
-        <div className={`${optionStyle}`} onClick={() => openHandler('folder')}>
+        <div className={`${optionStyle}`} onClick={() => openHandler('move')}>
           <img src={move} className="w-4" />
           이동
         </div>
 
-        <div className={`${optionStyle}`} onClick={() => openHandler('folder')}>
+        <div className={`${optionStyle}`} onClick={() => openHandler('copy')}>
           <img src={copy} className="w-4" />
           복제
         </div>
 
-        <div className={`${optionStyle}`} onClick={() => openHandler('')}>
+        <div className={`${optionStyle}`} onClick={() => openHandler('delete')}>
           <img src={trash} className="w-4" />
           삭제
         </div>

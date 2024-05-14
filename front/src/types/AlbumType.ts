@@ -65,3 +65,32 @@ export interface thumbNailResponseType {
   data: thumbNailItemType[];
   resultCode: string;
 }
+
+export interface delFilesDtoType {
+  data : {
+    sseKey: string;
+    fileIdList: string[];
+  }
+}
+
+export interface sseKeyDtoType {
+  data: {
+    sseKey: string;
+  }
+}
+
+export interface childDirItem {
+  depth: number;
+  pk: string;
+  name: string;
+}
+
+export interface getChildDirResponseType {
+  data: childDirItem[];
+  resultCode: string;
+}
+
+export interface handleInfoType {
+  toDirId: string;
+  fileIdList: string[];
+}

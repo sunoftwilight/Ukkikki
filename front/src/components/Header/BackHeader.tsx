@@ -5,13 +5,20 @@ import alarm from "@/assets/Header/alarm.png";
 import noAlarm from "@/assets/Header/noAlarm.png";
 import hamburger from "@/assets/Header/hamburger.png";
 import { headerStore } from "../../stores/HeaderStateStore";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useStore } from "zustand";
+import { currentGroupStore } from "../../stores/GroupStore";
 
 const BackHeader: React.FC = () => {
 	const navigate = useNavigate();
+  const location = useLocation();
+  const { currentGroup } = useStore(currentGroupStore);
 
 	const goBackHandler = () => {
+    if (location.pathname.startsWith('/album/detail/')) {
+      navigate(`/album/${currentGroup}`)
+      return
+    }
 		navigate(-1);
 	};
 

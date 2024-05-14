@@ -25,8 +25,12 @@ export const memberStore = create(
 export const folderStore = create(
   persist<FolderStoreType>((set) => ({
     folderOpen: false,
+    folderMode: '',
 
-    setFolderOpen: () => set((state) => ({folderOpen: !state.folderOpen}))
+    setFolderOpen: (mode: string) => set((state) => ({
+      folderOpen: !state.folderOpen,
+      folderMode: mode
+    }))
   }),
   { name: 'MODAL_STORE'}
 ))
