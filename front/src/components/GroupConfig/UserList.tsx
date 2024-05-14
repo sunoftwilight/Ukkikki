@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import clickBtn from "../../assets/GroupConfig/clickBtn.png";
 
-import { getPartyUserList, getPartyBlockUserList, } from "../../api/party";
+import { getPartyUserList, getPartyBlockUserList, kickPartyUser} from "../../api/party";
 import { UserGrantData } from "../../types/GroupType";
 import { useNavigate, useParams } from "react-router-dom";
 import { memberInfoStore } from "../../stores/MemberInfoStore";
@@ -48,6 +48,18 @@ const UserList: React.FC<ListType> = (listType) => {
 			})
 	}
 
+	const clickKickBtn = async (userId:number) => {
+		if (!memberInfo.data) return;
+		await kickPartyUser(memberInfo.data?.partyId, userId,
+			() => {
+				loadBanList();
+			},
+			(err) => {
+				console.log(err)
+			}
+		)
+	}
+
 
 	const CallType = () => {
 		switch (type) {
@@ -70,7 +82,7 @@ const UserList: React.FC<ListType> = (listType) => {
 						<div key={idx} className="w-full h-16 flex bg-soft-gray rounded-2xl items-center px-3 gap-5 font-pre-R text-xl relative">
 							<img src={item.profileUrl} className="w-12 h-12"/>
 							<p>{item.userName}</p>
-							<div className="absolute right-3  bg-main-blue text-base text-white w-[60px] h-[38px] flex justify-center items-center rounded-xl">
+							<div className="absolute right-3  bg-main-blue text-base text-white w-[60px] h-[38px] flex justify-center items-center rounded-xl" onClick={()=> clickKickBtn(item.userId)}>
 								<p>해제</p>
 							</div>
 						</div>

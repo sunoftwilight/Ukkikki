@@ -12,13 +12,17 @@ const UserRole: React.FC = () => {
 
 	const changeGrant = async() => {
 		if (!selectedRole || !memberInfo.data) return;
-		await changePartyGrant(Number(groupPk), memberInfo.data?.userId, selectedRole,
+		const param = {
+			memberRole: selectedRole
+		}
+		
+		await changePartyGrant(Number(groupPk), memberInfo.data?.userId, param,
 			(res) => {
-	
+				console.log(Number(groupPk), memberInfo.data?.userId, selectedRole)
 				console.log(res)
 			},
 			(err) => {
-				console.log(selectedRole)
+				console.log(Number(groupPk), memberInfo.data?.userId, selectedRole)
 				console.error(err)
 			}
 	)

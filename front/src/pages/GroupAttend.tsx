@@ -112,7 +112,9 @@ const GroupAttend:React.FC = () => {
             />
         ))}
       </div>
-      <div className="my-5 w-80 h-[45px] bg-disabled-gray font-gtr-B text-base text-white rounded-lg flex justify-center items-center" onClick={()=> checkPass()}>
+      <div
+        className={(password.length === 6 ? "bg-main-blue" : "bg-disabled-gray") + " my-5 w-80 h-[45px] font-gtr-B text-base text-white rounded-lg flex justify-center items-center"}
+        onClick={()=> checkPass()}>
         <p>다음</p>
       </div>
       <div className="w-80 h-[180px] bg-gray flex flex-col p-2 rounded-xl text-sm font-pre-M">

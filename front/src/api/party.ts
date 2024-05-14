@@ -109,7 +109,7 @@ export const getPartyThumb = async (
 	export const changePartyGrant = async (
 		partyId : number,
 		targetId : number,
-		memberRole: string,
+		memberRole: {memberRole: string},
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await privateApi.patch(`/${url}/grant/${partyId}/${targetId}`, memberRole)
@@ -136,14 +136,7 @@ export const getPartyThumb = async (
     .catch(Error)
 	}
 
-	export const blockPartyUser = async (
-		partyId : number,
-		Response : (Response : AxiosResponse<ResponseData>) => void, 
-    Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
-    .then(Response)
-    .catch(Error)
-	}
+
 
 	// 1
 	export const getPartyUserList = async (
@@ -166,9 +159,20 @@ export const getPartyThumb = async (
 
 	export const kickPartyUser = async (
 		partyId : number,
+		targetId : number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/link/${partyId}`)
+    await privateApi.delete(`/${url}/kick/${partyId}/${targetId}`)
+    .then(Response)
+    .catch(Error)
+	}
+
+	export const blockPartyUser = async (
+		partyId : number,
+		targetId : number,
+		Response : (Response : AxiosResponse<ResponseData>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.patch(`/${url}/block/${partyId}/${targetId}`)
     .then(Response)
     .catch(Error)
 	}
