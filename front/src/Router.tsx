@@ -68,7 +68,7 @@ export default function Router() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/album/:groupPk" element={<Album />} />
-        <Route path={`album/detail/${currentImg}`} element={<DetailImg />} />
+        <Route path={`album/detail/${currentImg}/:groupPk`} element={<DetailImg />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/feed/:pk" element={<ArticleDetail />} />
         <Route path="/feed/img/:pk" element={<ArticleImg />} />

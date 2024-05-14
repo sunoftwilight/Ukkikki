@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import folder from "@/assets/Album/folder.png"
 import backFolder from "@/assets/Album/backFolder.png"
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useStore } from "zustand";
 import { DetailImgStore } from "../../stores/DetailImgStore";
 import { currentDirStore, selectModeStore, updateAlbumStore } from "../../stores/AlbumStore";
@@ -21,6 +21,8 @@ const AlbumMain: React.FC = () => {
 
   const [albumList, setAlbumList] = useState<contentListData[]>([])
   
+  const {groupPk} = useParams();
+
   useEffect(() => {
     getPartyDetail(
       currentGroup,
@@ -72,7 +74,7 @@ const AlbumMain: React.FC = () => {
               <SelectModeImg key={idx} item={item} />
             :
               <Link 
-                to={`/album/detail/${item.pk}`} state={{url: item.url}}
+                to={`/album/detail/${item.pk}/${groupPk}`} state={{url: item.url}}
                 key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.url)}
                 className="flex justify-center items-center"
               >

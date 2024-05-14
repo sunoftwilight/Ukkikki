@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useStore } from "zustand";
 import { DetailImgStore } from "../../stores/DetailImgStore";
 import { currentDirStore } from "../../stores/AlbumStore";
@@ -11,6 +11,8 @@ const ThumbnailNav: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { currentDirId } = useStore(currentDirStore)
   const [thumbnailList, setThumbnailList] = useState<thumbNailItemType[]>([])
+
+  const {groupPk} = useParams();
 
   useEffect(() => {
     getThumbnailNav(
@@ -40,7 +42,7 @@ const ThumbnailNav: React.FC = () => {
   return (
     <div className="w-full h-11 flex fixed bottom-0 overflow-x-scroll scrollbar-hide">
       { thumbnailList.map((item, idx) => (
-        <Link to={`/album/detail/${item.pk}`} key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.thumbUrl2)}>
+        <Link to={`/album/detail/${item.pk}/${groupPk}`} key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.thumbUrl2)}>
           <img 
             src={item.thumbUrl2}
             className="min-w-11 h-full border-r-[1px] border-white object-cover"
