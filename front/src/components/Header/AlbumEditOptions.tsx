@@ -33,7 +33,6 @@ const AlbumEditOptions: React.FC = () => {
 
   // 현재 폴더 삭제 로직
   const deleteFolderHandler = () => {
-    console.log(currentDirId)
     delDirectory(
       currentDirId,
       {data: {sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE='}},

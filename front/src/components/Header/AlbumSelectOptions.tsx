@@ -32,8 +32,10 @@ const AlbumSelectOptions: React.FC = () => {
   const { selectList, setSelectList, selectListForPk, setSelectListForPk } = useStore(selectStore)
   
   const openHandler = (mode: string) => {
-    if (mode === 'folder') {
-      setFolderOpen()
+    if (mode === 'move') {
+      setFolderOpen('move')
+    } else if (mode === 'copy') {
+      setFolderOpen('copy')
     } else if (mode === 'down') {
       setIsPrefixOpen(true)
     } else if (mode === 'delete') {
@@ -144,12 +146,12 @@ const AlbumSelectOptions: React.FC = () => {
           다운로드
         </div>
 
-        <div className={`${optionStyle}`} onClick={() => openHandler('folder')}>
+        <div className={`${optionStyle}`} onClick={() => openHandler('move')}>
           <img src={move} className="w-4" />
           이동
         </div>
 
-        <div className={`${optionStyle}`} onClick={() => openHandler('folder')}>
+        <div className={`${optionStyle}`} onClick={() => openHandler('copy')}>
           <img src={copy} className="w-4" />
           복제
         </div>

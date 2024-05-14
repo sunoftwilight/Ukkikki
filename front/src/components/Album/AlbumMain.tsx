@@ -21,32 +21,24 @@ const AlbumMain: React.FC = () => {
 
   const [albumList, setAlbumList] = useState<contentListData[]>([])
   
-  // const [dirId, setDirId] = useState('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
   useEffect(() => {
     getPartyDetail(
       currentGroup,
       (res) => {
-        console.log(res.data.data.rootDirId)
         setCurrentDirId(res.data.data.rootDirId)
       },
       (err) => { console.error(err) }
     )
-    // setCurrentDirId('c056d136-8409-4b48-9965-49ee216f24202024-05-09T20:37:16.919633749')
   }, [])
 
   useEffect(() => {
-    console.log(currentDirId)
     getDirectory(
       currentDirId,
       (res) => {
-        console.log(res)
-        // setCurrentDirId(res.data.data.parentId)
         setParentDirId(res.data.data.parentId)
         setAlbumList(res.data.data.contentList)
       },
-      (err) => {
-        console.error(err)
-      }
+      (err) => { console.error(err) }
     )
   }, [currentDirId, needUpdate])
 

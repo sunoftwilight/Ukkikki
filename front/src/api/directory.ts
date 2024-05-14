@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { AlbumResponse, DirInfoType, delFilesDtoType, getChildDirResponseType, getDetailImgType, sseKeyDtoType, thumbNailResponseType } from '../types/AlbumType';
+import { AlbumResponse, DirInfoType, delFilesDtoType, getChildDirResponseType, getDetailImgType, handleInfoType, sseKeyDtoType, thumbNailResponseType } from '../types/AlbumType';
 
 const url = 'directories';
 
@@ -77,6 +77,26 @@ export const getDirStructure = async (
   Response : (Response : AxiosResponse<getChildDirResponseType>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.get(`/${url}/${dirId}/structure`)
+  .then(Response)
+  .catch(Error)
+}
+
+export const moveFiles = async (
+  dirId : string,
+  moveInfo: handleInfoType,
+  Response : (Response : AxiosResponse<getChildDirResponseType>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.patch(`/${url}/${dirId}/files/move`, moveInfo)
+  .then(Response)
+  .catch(Error)
+}
+
+export const copyFiles = async (
+  dirId : string,
+  copyInfo: handleInfoType,
+  Response : (Response : AxiosResponse<getChildDirResponseType>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.patch(`/${url}/${dirId}/files/copy`, copyInfo)
   .then(Response)
   .catch(Error)
 }

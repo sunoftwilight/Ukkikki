@@ -12,5 +12,6 @@ export interface MemberStoreType {
 
 export interface FolderStoreType {
   folderOpen: boolean;
-  setFolderOpen: () => void;
+  folderMode: string;
+  setFolderOpen: (mode: string) => void;
 }
