@@ -1,5 +1,6 @@
 package project.domain.article.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,9 +15,11 @@ import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
 import project.domain.article.service.ArticleService;
 import project.domain.article.service.CommentService;
+import project.domain.photo.entity.Photo;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -51,6 +54,22 @@ public class ArticleController implements ArticleDocs{
         SimpleArticleDto res = articleService.updateArticle(partyId, articleId, articleUpdateDto);
         return ResponseEntity.ok(res);
     }
+
+    @Override
+    @GetMapping("/move-photo/{fileId}")
+    public void movePhoto(HttpServletResponse response, @PathVariable(name = "fileId")String fileId) throws IOException {
+        response.sendRedirect(String.format("https://k10d202.p.ssafy.io/album/detail/%s", fileId));
+//        response.sendRedirect(String.format("http://localhost:5173/album/detail/%s", fileId));
+    }
+
+    @Override
+    @GetMapping("/move-article/{partyId}/{articleId}")
+    public void moveArticle(HttpServletResponse response, Long articleId) throws IOException {
+
+        response.sendRedirect(String.format("https://k10d202.p.ssafy.io/feed/%d", articleId));
+//        response.sendRedirect(String.format("http://localhost:5173/feed/%d", articleId));
+    }
+
     @Override
     @GetMapping("/comment/{articleId}")
     public ResponseEntity<ResultResponse> articleComment(@PathVariable(name = "articleId") Long articleId) {
@@ -110,7 +129,7 @@ public class ArticleController implements ArticleDocs{
     }
 
     @Override
-    @PatchMapping("/article-list/{partyId}")
+    @GetMapping("/article-list/{partyId}")
     public ResponseEntity<ArticlePageDto> getArticleList(@PathVariable(name = "partyId") Long partyId, @PageableDefault(sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
         ArticlePageDto res = articleService.getArticleList(partyId, pageable);
         return ResponseEntity.ok(res);

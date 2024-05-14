@@ -5,12 +5,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.domain.article.dto.response.ArticleDirDto;
+import project.domain.article.entity.Article;
+import project.domain.article.entity.ArticlePhoto;
+import project.domain.article.mapper.ArticleMapper;
+import project.domain.article.repository.ArticlePhotoRepository;
 import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
@@ -58,8 +65,9 @@ public class FileServiceImpl implements FileService{
     private final LikesRepository likesRepository;
     private final MemberRepository memberRepository;
     private final FaceRepository faceRepository;
+    private final ArticlePhotoRepository articlePhotoRepository;
 
-
+    private final ArticleMapper articleMapper;
 
     @Override
     @Transactional
@@ -234,10 +242,19 @@ public class FileServiceImpl implements FileService{
         Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
             photo);
 
+        // 포토를 이용하여 만들어진 Article 찾기
+        List<ArticleDirDto> articleList = articlePhotoRepository.findAllByPhotoId(photo.getId())
+            .stream()
+                .map(articlePhoto -> {
+                    return articleMapper.toArticleDirDto(articlePhoto.getArticle());
+                })
+            .toList();
+
         return GetDetailFileDto.builder()
                 .url(file.getPhotoDto().getPhotoUrl())
                 .isDownload(opDownloadLog.isPresent())
                 .isLikes(opLikes.isPresent())
+                .articleList(articleList)
                 .build();
 
     }

@@ -8,9 +8,11 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class) // Security 기능 제외  나중에 지워야함!!!
 @EnableJpaAuditing
+@EnableAsync
 public class UkikiApplication {
 
     public static void main(String[] args) {
