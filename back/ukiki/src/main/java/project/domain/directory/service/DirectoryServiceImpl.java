@@ -88,44 +88,6 @@ public class DirectoryServiceImpl implements DirectoryService {
     private final GetDirMapper getDirMapper;
     private final TrashFileMapper trashFileMapper;
 
-    @Override
-    public List<GetDirListDto> getDirList(Long userId) {
-
-        // 유저 찾기
-        Member member = memberRepository.findById(userId).orElseThrow(
-            () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-        // 해당 유저의 즐겨찾기 지정 폴더
-        String mainDirId = member.getUploadGroupId();
-        // 해당 유저가 포함된 모든 party 찾기
-        List<MemberParty> memberPartyList = memberpartyRepository.findMemberPartiesByMember(
-            member);
-
-        // 유저의 보유 방 리스트
-        List<GetDirListDto> response = new ArrayList<>();
-        for (MemberParty memberParty : memberPartyList) {
-            // party 구하기
-            Party party = partyRepository.findById(memberParty.getParty().getId())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
-            // directory 구하기
-            String rootDirId = party.getRootDirId();
-            Directory directory = directoryRepository.findById(rootDirId).orElseThrow(
-                () -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND)
-            );
-            // 반환 Dto 생성하기
-            GetDirListDto getDirListDto = GetDirListDto.builder()
-                .pk(party.getRootDirId())
-                .name(directory.getDirName())
-                .thumbnail(party.getThumbnail())
-                .createDate(party.getCreateDate().toLocalDate())
-                .fileNum(getFileNum(directory))
-                .isStar(directory.getId().equals(mainDirId))
-                .build();
-            // 결과 리스트에 넣어주기
-            response.add(getDirListDto);
-        }
-        return response;
-    }
 
     @Override
     public List<GetChildDirDto> getChildDir(String dirId) {
@@ -273,16 +235,6 @@ public class DirectoryServiceImpl implements DirectoryService {
         return getDirDtov2;
     }
 
-
-    @Override
-    public void patchMainDir(Long memberId, String dirId) {
-        // 유저 조회
-        Member member = memberRepository.findById(memberId).orElseThrow(
-            () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-        // 유저의 기본 폴더 id 변경
-        member.setUploadGroupId(dirId);
-    }
 
     @Override
     @Transactional

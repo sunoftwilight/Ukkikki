@@ -6,8 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 import project.domain.member.dto.request.SetPasswordDto;
 import project.global.result.ResultResponse;
 
@@ -27,4 +26,9 @@ public interface MemberDocs {
 
     @Operation(summary = "그룹 키 조회")
     ResponseEntity<ResultResponse> getKeyGroup(@RequestHeader HttpHeaders headers);
+
+    @Operation(summary = "업로드 디렉토리 변경")
+    @PatchMapping("/directory/{partyId}")
+    ResponseEntity<ResultResponse> setUploadDirectory(@PathVariable("partyId") Long partyId);
+
 }

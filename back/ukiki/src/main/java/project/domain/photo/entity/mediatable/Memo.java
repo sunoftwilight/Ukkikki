@@ -31,6 +31,9 @@ public class Memo {
     @Column(name = "memo", length = 15)
     private String content;
 
+    @Column(name = "create_date")
+    private String date;
+
     // 연관관계
     @JoinColumn(name = "photo")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,11 +45,12 @@ public class Memo {
 
     // 빌더를 사용한 객체 생성 방법을 재정의 (커스텀 빌더 사용)
     @Builder(builderMethodName = "customBuilder")
-    public static Memo create(Photo photo, Member member, String content) {
+    public static Memo create(Photo photo, Member member, String content, String date) {
         Memo memo = new Memo();
         memo.setContent(content);
         memo.setPhoto(photo);
         memo.setMember(member);
+        memo.setDate(date);
         return memo;
     }
 

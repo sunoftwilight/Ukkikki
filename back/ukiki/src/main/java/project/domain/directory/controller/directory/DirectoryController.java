@@ -53,30 +53,12 @@ public class DirectoryController implements DirectoryDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_PARTY_SUCCESS, response));
     }
 
-    @Override
-    @GetMapping("")
-    public ResponseEntity<ResultResponse> getDirList(
-        @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        List<GetDirListDto> response = directoryService.getDirList(userDetails.getId());
-        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_DIRECTORYLIST_SUCCESS, response));
-    }
 
     @Override
     @GetMapping("/{dirId}")
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId) {
         GetDirDtov2 response = directoryService.getDirv2(dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_DIRECTORY_SUCCESS, response));
-    }
-
-    @Override
-    @GetMapping("/{dirId}/main")
-    public ResponseEntity<ResultResponse> patchMainDir(
-        @AuthenticationPrincipal UserDetails userDetails, String dirId) {
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
-        directoryService.patchMainDir(memberId, dirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.SET_MAIN_DIRECTORY_SUCCESS));
     }
 
     @PostMapping("")
@@ -203,7 +185,9 @@ public class DirectoryController implements DirectoryDocs {
 
     @Override
     @GetMapping("/{dirId}/structure")
-    public ResponseEntity<ResultResponse> getDirFullStructure(String dirId) {
+    public ResponseEntity<ResultResponse> getDirFullStructure(
+        @PathVariable String dirId
+    ) {
         List<GetDirFullStructureDto> response = directoryService.getDirFullStructure(dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_FULL_DIR_STRUCTURE, response));
     }

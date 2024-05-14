@@ -30,10 +30,6 @@ public interface DirectoryService {
 
     GetDirDtov2 getDirv2(String dirId);
 
-    List<GetDirListDto> getDirList(Long userId);
-
-    void patchMainDir(Long memberId, String dirId);
-
     void createDir(CreateDirDto request);
 
     // 폴더 이동

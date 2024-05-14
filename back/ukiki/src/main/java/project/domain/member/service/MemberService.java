@@ -16,4 +16,5 @@ public interface MemberService {
     void setPassword(String password);
     List<KeyGroupDto> getKeyGroup(String password);
 
+    void setUploadDirectory(Long partyId);
 }
