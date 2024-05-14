@@ -13,10 +13,14 @@ import { multiDownloadFile } from "../../api/file";
 import { useStore } from "zustand";
 import { prefixStore, selectStore } from "../../stores/AlbumStore";
 import { delFiles } from "../../api/directory";
+import { useParams } from "react-router-dom";
+import { userStore } from "../../stores/UserStore";
 
 const AlbumSelectOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
-  
+  const { groupKey } = useStore(userStore);
+  const { groupPk } = useParams();
+
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
   const [isIng, setIsIng] = useState(false)
   const [isDownDone, setIsDownDone] = useState(false)
@@ -47,7 +51,8 @@ const AlbumSelectOptions: React.FC = () => {
     setIsPrefixOpen(false)
     setIsIng(true)
     await multiDownloadFile(
-      'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+      groupKey[Number(groupPk)],
+      // 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
       {  
         fileIdList: selectList,
         prefix: prefix,
@@ -75,7 +80,8 @@ const AlbumSelectOptions: React.FC = () => {
     await delFiles(
       currentDirId,
       {data:{
-        sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+        sseKey: groupKey[Number(groupPk)],
+        // sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
         fileIdList: selectListForPk
       }},
       (res) => {

@@ -6,13 +6,15 @@ import { currentDirStore } from "../../stores/AlbumStore";
 import { getThumbnailNav } from "../../api/directory";
 import { thumbNailItemType } from "../../types/AlbumType";
 import { getPartyThumb } from "../../api/party";
+import { userStore } from "../../stores/UserStore";
 
 const ThumbnailNav: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { currentDirId } = useStore(currentDirStore)
   const [thumbnailList, setThumbnailList] = useState<thumbNailItemType[]>([])
 
-  const {groupPk} = useParams();
+  const { groupKey } = useStore(userStore);
+  const { groupPk } = useParams();
 
   useEffect(() => {
     getThumbnailNav(
@@ -20,7 +22,8 @@ const ThumbnailNav: React.FC = () => {
       (res) => {
         setThumbnailList(res.data.data)
         res.data.data.forEach((item) => {
-          getImg(item.thumbUrl2, 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=')
+          // getImg(item.thumbUrl2, 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=')
+          getImg(item.thumbUrl2, groupKey[Number(groupPk)])
         })
       },
       (err) => { console.error(err) }

@@ -1,15 +1,21 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { getPartyThumb } from '../../api/party';
+import { useStore } from 'zustand';
+import { userStore } from '../../stores/UserStore';
 
 interface ImgProps {
   url : string;
 }
 
 const SecureImg: React.FC<ImgProps> = ({ url }) => {
+  const { groupKey } = useStore(userStore);
+  const { groupPk } = useParams();
   const location = useLocation();
+
   const opt = {
-    "x-amz-server-side-encryption-customer-key": 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+    "x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
+    // "x-amz-server-side-encryption-customer-key": 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
   };
   
   getPartyThumb(

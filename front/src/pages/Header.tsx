@@ -29,28 +29,34 @@ const Header: React.FC = () => {
 	const albumPath = ["/album", "/trash"];
 
 	useEffect(() => {
-		const sse = new EventSourcePolyfill(
-			"https://k10d202.p.ssafy.io/api/alarm/sub",
-			{
-				headers: {
-					authorization:
-						"Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk",
-					"Content-Type": "text/event-stream",
-				},
-			},
-		);
-
-		sse.addEventListener("CHECK", (event: any) => {
-			const e = event as MessageEvent; // 이벤트 타입을 MessageEvent로 캐스팅
-			console.log("connect event data: ", e.data); // 이제 e.data를 안전하게 사용할 수 있습니다.
-		});
-
-		sse.addEventListener("COMMENT", (event: any) => {
-			const e = event as MessageEvent; // 이벤트 타입을 MessageEvent로 캐스팅
-			console.log("connect event data: ", e.data); // 이제 e.data를 안전하게 사용할 수 있습니다.
-		});
-
-		return () => sse.close(); // 컴포넌트 언마운트 시 EventSource 연결을 닫습니다.
+		const stored = localStorage.getItem('USER_STORE');
+    if (stored) {
+      const obj = JSON.parse(stored);
+			console.log(obj)
+      if (obj.state.accessToken !== '') {
+				const sse = new EventSourcePolyfill(
+					"https://k10d202.p.ssafy.io/api/alarm/sub",
+					{
+						headers: {
+							authorization: obj.state.accessToken,
+							"Content-Type": "text/event-stream",
+						},
+					},
+				);
+		
+				sse.addEventListener("CHECK", (event: any) => {
+					const e = event as MessageEvent; // 이벤트 타입을 MessageEvent로 캐스팅
+					console.log("connect event data: ", e.data); // 이제 e.data를 안전하게 사용할 수 있습니다.
+				});
+		
+				sse.addEventListener("COMMENT", (event: any) => {
+					const e = event as MessageEvent; // 이벤트 타입을 MessageEvent로 캐스팅
+					console.log("connect event data: ", e.data); // 이제 e.data를 안전하게 사용할 수 있습니다.
+				});
+		
+				return () => sse.close(); // 컴포넌트 언마운트 시 EventSource 연결을 닫습니다.
+    }
+	}
 	}, []);
 
 	if (

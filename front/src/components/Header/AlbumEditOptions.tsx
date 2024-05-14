@@ -9,6 +9,8 @@ import Modal from "../@commons/Modal";
 import { useStore } from "zustand";
 import { currentDirStore, prefixStore, updateAlbumStore } from "../../stores/AlbumStore";
 import { createDirectory, delDirectory, editDirectory } from "../../api/directory";
+import { userStore } from "../../stores/UserStore";
+import { useParams } from "react-router-dom";
 
 const AlbumEditOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
@@ -19,6 +21,8 @@ const AlbumEditOptions: React.FC = () => {
   const [isOkOpen, setIsOkOpen] = useState(false)
   const [isNamingOpen, setIsNamingOpen] = useState(false)
   const [isEditNameOpen, setIsEditNameOpen] = useState(false)
+  const { groupKey } = useStore(userStore);
+  const { groupPk } = useParams();
 
   // 요청에 맞는 모달창 열기
   const openHandler = (mode: string) => {
@@ -35,7 +39,8 @@ const AlbumEditOptions: React.FC = () => {
   const deleteFolderHandler = () => {
     delDirectory(
       currentDirId,
-      {data: {sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE='}},
+      {data: {sseKey: groupKey[Number(groupPk)]}},
+      // {data: {sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE='}},
       () => {
         setCurrentDirId(parentDirId)
         setCurrentDirName(parentDirName)
