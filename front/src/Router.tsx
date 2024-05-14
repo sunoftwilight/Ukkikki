@@ -33,6 +33,7 @@ import Trash from './pages/Trash';
 
 import LoginRedirect from './components/User/LoginRedirect';
 import SimplePass from './pages/SimplePass';
+import ErrorRedirect from './pages/ErrorRedirect';
 
 export default function Router() {
   const { currentImg } = useStore(DetailImgStore)
@@ -82,6 +83,7 @@ export default function Router() {
       <Route path="/camera" element={<Camera />} />
       <Route path='/simpleinsert' element={<SimplePass type='insert'/>}/>
       <Route path='/simplecheck' element={<SimplePass type='check'/>}/>
+      <Route path='/error' element={<ErrorRedirect />}/>
     </Routes>
   );
 }
