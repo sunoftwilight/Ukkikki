@@ -19,7 +19,7 @@ export const createMemo = async (
     content: string,
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-        await privateApi.post(`${url}/memo/create/${fileId}`,content)
+        await privateApi.post(`${url}/memo/create/${fileId}`,{content})
         .then(Response)
         .catch(Error)
 }
@@ -29,7 +29,7 @@ export const modifyMemo = async (
     content: string,
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-        await privateApi.post(`${url}/memo/modify/${memoId}`,content)
+        await privateApi.post(`${url}/memo/modify/${memoId}`,{content})
         .then(Response)
         .catch(Error)
 }
