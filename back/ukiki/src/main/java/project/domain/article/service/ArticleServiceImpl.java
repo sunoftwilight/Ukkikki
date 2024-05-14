@@ -2,10 +2,13 @@ package project.domain.article.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import project.domain.article.dto.request.ArticleCreateDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
+import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
 import project.domain.article.entity.Article;
 import project.domain.article.entity.ArticlePhoto;
@@ -144,6 +147,38 @@ public class ArticleServiceImpl implements ArticleService{
 
         List<ArticlePhoto> articlePhotoList = article.getArticlePhotoList();
         res.setPhotoList(articlePhotoMapper.toSimpleArticlePhotoDtoList(articlePhotoList));
+
+        return res;
+    }
+
+    @Override
+    public ArticlePageDto getArticleList(Long partyId, Pageable pageable) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        partyRepository.findById(partyId).orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+        Page<Article> articleList = articleRepository.findAllByPartyId(partyId, pageable);
+        List<SimpleArticleDto> articleDtoList = articleList.stream()
+
+            .map((article) -> {
+                SimpleArticleDto simpleArticleDto = articleMapper.toSimpleArticleDto(article);
+                simpleArticleDto.setModify(article.getCreateDate().isEqual(article.getLastModifiedDate()));
+                List<ArticlePhoto> articlePhotoList = article.getArticlePhotoList();
+                simpleArticleDto.setPhotoList(articlePhotoMapper.toSimpleArticlePhotoDtoList(articlePhotoList));
+                return simpleArticleDto;
+            })
+            .toList();
+        ArticlePageDto res = ArticlePageDto.builder()
+            .articleDtoList(articleDtoList)
+            .size(pageable.getPageSize())
+            .page(pageable.getPageSize())
+            .next(articleList.hasNext())
+            .build();
 
         return res;
     }

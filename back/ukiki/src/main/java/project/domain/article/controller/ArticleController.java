@@ -1,16 +1,22 @@
 package project.domain.article.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.domain.article.collection.CommentCollection;
 import project.domain.article.dto.request.ArticleCreateDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
+import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
 import project.domain.article.service.ArticleService;
 import project.domain.article.service.CommentService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -96,6 +102,14 @@ public class ArticleController implements ArticleDocs{
         commentService.deleteReply(articleId,commentIdx,replyIdx);
         return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_COMMENT_SUCCESS));
     }
+
+    @Override
+    public ResponseEntity<ArticlePageDto> getArticleList(Long partyId, @PageableDefault(sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        ArticlePageDto res = articleService.getArticleList(partyId, pageable);
+        return ResponseEntity.ok(res);
+    }
+
+
 
 
 }
