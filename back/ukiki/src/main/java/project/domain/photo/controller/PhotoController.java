@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.domain.photo.dto.request.MemoDto;
-import project.domain.photo.dto.request.MemoModifyDto;
 import project.domain.photo.dto.response.MemoListDto;
 import project.domain.photo.service.PhotoService;
 import project.global.result.ResultCode;
@@ -32,18 +31,16 @@ public class PhotoController implements PhotoDocs {
 
     @Override
     @PostMapping("/memo/create/{fileId}")
-    public ResponseEntity<ResultResponse> memoCreate(@PathVariable("fileId") String fileId, @RequestBody String content) {
-
-        photoService.memoCreate(new MemoDto(fileId,content));
+    public ResponseEntity<ResultResponse> memoCreate(@PathVariable("fileId") String fileId, @RequestBody MemoDto memoDto) {
+        photoService.memoCreate(fileId, memoDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.CREATE_MEMO_SUCCESS));
     }
 
     @Override
     @PostMapping("/memo/modify/{memoId}")
-    public ResponseEntity<ResultResponse> memoModify(@PathVariable("memoId") Long memoId, @RequestBody String content) {
-
-        photoService.memoModify(new MemoModifyDto(memoId,content));
+    public ResponseEntity<ResultResponse> memoModify(@PathVariable("memoId") Long memoId, @RequestBody MemoDto memoDto) {
+        photoService.memoModify(memoId, memoDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.MODIFY_MEMO_SUCCESS));
     }

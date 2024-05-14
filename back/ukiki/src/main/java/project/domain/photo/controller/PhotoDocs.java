@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.domain.photo.dto.request.MemoDto;
 import project.global.result.ResultResponse;
 
 @Tag(name = "PhotoController", description = "사진 api")
@@ -18,12 +19,12 @@ public interface PhotoDocs {
     @Operation(summary = "메모 등록")
     @ApiResponse(responseCode = "200", description = "메모 등록에 성공하였습니다.")
     @PostMapping("/memo/create/{fileId}")
-    ResponseEntity<ResultResponse> memoCreate(@PathVariable("fileId") String fileId, @RequestBody String content);
+    ResponseEntity<ResultResponse> memoCreate(@PathVariable("fileId") String fileId, @RequestBody MemoDto memoDto);
 
     @Operation(summary = "메모 수정")
     @ApiResponse(responseCode = "200", description = "메모 수정에 성공하였습니다.")
     @PostMapping("/memo/modify/{memoId}")
-    ResponseEntity<ResultResponse> memoModify(@PathVariable("memoId") Long memoId, @RequestBody String content);
+    ResponseEntity<ResultResponse> memoModify(@PathVariable("memoId") Long memoId, @RequestBody MemoDto memoDto);
 
     @Operation(summary = "메모 삭제")
     @ApiResponse(responseCode = "200", description = "메모를 정상적으로 삭제하였습니다.")

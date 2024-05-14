@@ -11,7 +11,6 @@ import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.photo.dto.request.MemoDto;
-import project.domain.photo.dto.request.MemoModifyDto;
 import project.domain.photo.dto.response.MemoListDto;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.mediatable.Likes;
@@ -60,7 +59,7 @@ public class PhotoServiceImpl implements PhotoService{
 
     @Override
     @Transactional
-    public void memoCreate(MemoDto memoDto) {
+    public void memoCreate(String fileId, MemoDto memoDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -79,7 +78,7 @@ public class PhotoServiceImpl implements PhotoService{
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
 
-        File file = fileRepository.findById(memoDto.getFileId())
+        File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
 
         // 사진 정보 조회
@@ -101,7 +100,7 @@ public class PhotoServiceImpl implements PhotoService{
 
     @Override
     @Transactional
-    public void memoModify(MemoModifyDto memoModifyDto) {
+    public void memoModify(Long memoId, MemoDto memoDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -115,7 +114,7 @@ public class PhotoServiceImpl implements PhotoService{
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
         }
 
-        Memo memo = memoRepository.findById(memoModifyDto.getMemoId())
+        Memo memo = memoRepository.findById(memoId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMO_NOT_FOUND));
 
         Long memoMemberId = memo.getMember().getId();
@@ -125,7 +124,7 @@ public class PhotoServiceImpl implements PhotoService{
             throw new BusinessLogicException(ErrorCode.MEMBER_NOT_MATCH);
         }
 
-        memo.setContent(memoModifyDto.getContent());
+        memo.setContent(memoDto.getContent());
         memo.setDate(myDate());
 
         memoRepository.save(memo);
