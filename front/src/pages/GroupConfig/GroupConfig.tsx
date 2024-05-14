@@ -14,8 +14,7 @@ const GroupConfig: React.FC = () => {
   const exitPartyFunc = async() => {
     await exitParty(
       Number(groupPk),
-      (res) => {
-        console.log(res)
+      () => {
         navi('/group/list')
       },
       (err) => {

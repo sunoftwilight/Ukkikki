@@ -38,3 +38,11 @@ export const simpleCheck = async(
     .then(Response)
     .catch(Error)
   }
+
+  export const logOut = async (
+    Response : (Response : AxiosResponse<GroupKeyResponeseData>) => void,
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+      await privateApi.post(`/${url}/logout`)
+      .then(Response)
+      .catch(Error)
+    }

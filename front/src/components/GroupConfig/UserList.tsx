@@ -80,7 +80,7 @@ const UserList: React.FC<ListType> = (listType) => {
 				return(
 					userList.map((item, idx) => (
 						<div key={idx} className="w-full h-16 flex bg-soft-gray rounded-2xl items-center px-3 gap-5 font-pre-R text-xl relative">
-							<img src={item.profileUrl} className="w-12 h-12"/>
+							<img src={item.profileUrl} className="w-12 h-12 rounded-full"/>
 							<p>{item.userName}</p>
 							<div className="absolute right-3  bg-main-blue text-base text-white w-[60px] h-[38px] flex justify-center items-center rounded-xl" onClick={()=> clickKickBtn(item.userId)}>
 								<p>해제</p>

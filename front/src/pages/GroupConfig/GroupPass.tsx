@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import ChangePassword from "../../components/GroupConfig/ChangePassword";
-import CurrentPassword from "../../components/GroupConfig/CurrentPassword";
+import ChangePass from "../../components/GroupConfig/ChangePass";
 
 const GroupPasswordConfig: React.FC = () => {
   const [isCurrentPass] = useState<boolean>(false)
@@ -8,10 +7,7 @@ const GroupPasswordConfig: React.FC = () => {
   return (
 		<div className="w-full h-full p-4">
       {!isCurrentPass && (
-        <CurrentPassword />
-      )}
-      {isCurrentPass  && (
-        <ChangePassword />
+        <ChangePass />
       )}
 
     </div>

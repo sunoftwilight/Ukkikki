@@ -118,20 +118,21 @@ export const getPartyThumb = async (
 	}
 
 	export const changePartyInfo = async (
-		// params: FormData,
+		params: FormData,
 		partyId: number,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await formDataApi.patch(`/${url}/link/${partyId}`)
+    await formDataApi.patch(`/${url}/change/party-info/${partyId}`, params)
     .then(Response)
     .catch(Error)
 	}
 
 	export const changePartyPass = async (
 		partyId : number,
+		passInfo : Record<string, string>,
 		Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.patch(`/${url}/change/password/${partyId}`)
+    await privateApi.patch(`/${url}/change/password/${partyId}`, passInfo)
     .then(Response)
     .catch(Error)
 	}
