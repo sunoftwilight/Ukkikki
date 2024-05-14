@@ -603,7 +603,7 @@ public class PartyServiceImpl implements PartyService {
         MemberParty memberParty = memberpartyRepository.findByMemberAndPartyAndMemberRoleIs(member, party, MemberRole.MASTER)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_ROLE_MASTER));
         // 타겟 권한 가지고 오기
-        MemberParty targetMemberParty = memberpartyRepository.findByMemberAndParty(member, party)
+        MemberParty targetMemberParty = memberpartyRepository.findByMemberIdAndPartyId(opponentId, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // 마스터 권한 부여할 때 -> 사용자 에디터로 변경 저장
