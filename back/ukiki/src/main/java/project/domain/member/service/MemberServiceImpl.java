@@ -210,4 +210,27 @@ public class MemberServiceImpl implements MemberService{
         return keyGroupMapper.toKeyGroupDtoList(keyGroupList);
     }
 
+    @Override
+    public void setUploadDirectory(Long partyId) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 확인
+        if(userDetails == null){
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = userDetails.getId();
+
+        // GUEST 차단
+        if(memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.setUploadGroupId(partyId);
+
+        memberRepository.save(member);
+    }
+
 }

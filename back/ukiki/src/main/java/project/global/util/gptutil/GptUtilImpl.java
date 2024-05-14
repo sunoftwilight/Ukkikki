@@ -162,7 +162,7 @@ public class GptUtilImpl implements GptUtil {
         // Body 생성
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> map = new HashMap<>();
-        map.put("model", "gpt-3.5-turbo");
+        map.put("model", "gpt-4o");
         map.put("name", "first_ai");
         map.put("description", "첫 번째 어시스턴스");
         map.put("instructions", "json format please");

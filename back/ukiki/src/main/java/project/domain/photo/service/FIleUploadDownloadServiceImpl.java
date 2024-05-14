@@ -1,7 +1,20 @@
 package project.domain.photo.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.SSECustomerKey;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -21,41 +34,28 @@ import project.domain.party.repository.PartyRepository;
 import project.domain.photo.dto.request.FileDownloadDto;
 import project.domain.photo.dto.request.FileUploadDto;
 import project.domain.photo.dto.request.MultiFileDownloadDto;
-import project.domain.photo.entity.Meta;
-import project.domain.photo.entity.MetaCode;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.entity.mediatable.DownloadLog;
-import project.domain.photo.repository.MetaRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 import project.global.util.FileUtil;
 import project.global.util.ImageUtil;
 import project.global.util.S3Util;
-import project.global.util.gptutil.GptUtil;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.List;
-import java.util.*;
-
-import static io.jsonwebtoken.Jwts.header;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
+    private final GptService gptService;
     private final AmazonS3 amazonS3;
     private final FileService fileService;
     private final PhotoRepository photoRepository;
     private final MemberRepository memberRepository;
-    private final MetaRepository metaRepository;
     private final PartyRepository partyRepository;
     // GptUtil
-    private final GptUtil gptUtil;
     private final S3Util s3Util;
     private final ImageUtil imageUtil;
     private final FileUtil fileUtil;
@@ -64,7 +64,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
-        log.info("유저 Id = {]", memberId);
+        log.info("유저 Id = {}", memberId);
 
         String key = fileUploadDto.getKey();
 
@@ -101,6 +101,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
             photo.setMember(member);
             photoRepository.save(photo);
+            //GPT API
 
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -131,20 +132,11 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                         // Handle response from server
                         log.info(response);
                     });
-
+            log.info("MongoDB 업데이트 시작");
             //MongoDB 업데이트
             fileService.createFile(fileUploadDto.getPartyId(), photo);
 
-            //GPT API
-            for (Integer code : gptUtil.postChat(file)) {
-                // 받은 메타 코드 저장 Meta 테이블에 저장
-                metaRepository.save(
-                    Meta.builder()
-                        .photo(photo)
-                        .metaCode(MetaCode.getEnumByCode(code))
-                        .build()
-                );
-            }
+            gptService.processGptApiAsync(photo, file);
         }
     }
 

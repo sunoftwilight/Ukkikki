@@ -56,8 +56,9 @@ public class S3Util {
     //이름 중복 방지를 위해 랜덤으로 생성
     private String changedImageName(String originName) {
         String random = UUID.randomUUID().toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmssSSS");
         String ext = originName.substring(originName.lastIndexOf("."));
-        return random + LocalDateTime.now() + ext;
+        return random + LocalDateTime.now().format(formatter) + ext;
     }
 
     //단일 파일 업로드

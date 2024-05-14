@@ -27,11 +27,13 @@ import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirFullStructureDto;
 import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.FileService;
 import project.domain.member.dto.request.CustomOAuth2User;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
@@ -51,30 +53,12 @@ public class DirectoryController implements DirectoryDocs {
         return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_PARTY_SUCCESS, response));
     }
 
-    @Override
-    @GetMapping("")
-    public ResponseEntity<ResultResponse> getDirList(
-        @PathVariable("userId") Long userId
-    ) {
-        List<GetDirListDto> response = directoryService.getDirList(userId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_DIRECTORYLIST_SUCCESS, response));
-    }
 
     @Override
     @GetMapping("/{dirId}")
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId) {
         GetDirDtov2 response = directoryService.getDirv2(dirId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_DIRECTORY_SUCCESS, response));
-    }
-
-    @Override
-    @GetMapping("/{dirId}/main")
-    public ResponseEntity<ResultResponse> patchMainDir(
-        @AuthenticationPrincipal UserDetails userDetails, String dirId) {
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) userDetails;
-        Long memberId = customOAuth2User.getId();
-        directoryService.patchMainDir(memberId, dirId);
-        return ResponseEntity.ok(new ResultResponse(ResultCode.SET_MAIN_DIRECTORY_SUCCESS));
     }
 
     @PostMapping("")
@@ -197,6 +181,15 @@ public class DirectoryController implements DirectoryDocs {
         List<GetChildDirDto> response = directoryService.getChildDir(dirId);
         log.info("controller response = {}", response);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_CHILD_DIR_SUCCESS, response));
+    }
+
+    @Override
+    @GetMapping("/{dirId}/structure")
+    public ResponseEntity<ResultResponse> getDirFullStructure(
+        @PathVariable String dirId
+    ) {
+        List<GetDirFullStructureDto> response = directoryService.getDirFullStructure(dirId);
+        return ResponseEntity.ok(new ResultResponse(ResultCode.GET_FULL_DIR_STRUCTURE, response));
     }
 
     @Override

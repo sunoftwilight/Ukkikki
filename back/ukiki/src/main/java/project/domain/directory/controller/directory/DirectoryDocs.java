@@ -18,18 +18,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.DeleteFileListDto;
-import project.domain.directory.dto.request.GetSseKeyDto;
-import project.domain.directory.dto.request.PatchCopyFileListDto;
 import project.domain.directory.dto.request.GetRenameDto;
+import project.domain.directory.dto.request.GetSseKeyDto;
 import project.domain.directory.dto.request.PatchCopyFileDto;
+import project.domain.directory.dto.request.PatchCopyFileListDto;
 import project.domain.directory.dto.request.PatchMoveDirDto;
 import project.domain.directory.dto.request.PatchMoveFileDto;
 import project.domain.directory.dto.request.PatchMoveFileListDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirFullStructureDto;
 import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
+import project.domain.member.dto.request.CustomUserDetails;
 import project.global.result.ResultResponse;
 
 @Tag(name ="공유 앨범 폴더및 사진 조작 관련(휴지통 아님) Controller", description = "폴더 조작 및 사진 파일 조작 API ")
@@ -39,23 +41,6 @@ public interface DirectoryDocs {
     @ApiResponse(responseCode = "201", description = "그룹 생성에 성공하였습니다.")
     @PostMapping("/init/{partyId}")
     public ResponseEntity<ResultResponse> initDirPartyTest(@PathVariable Long partyId);
-
-    @Operation(summary = "해당 유저의 보유 그룹 리스트 조회 요청(회원 로직이 완료되면 pathVariable 제외 예정)", description = "PathVariable로 userId를 받아 해당 그룹 리스트 반환")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "0", description = "응답 양식",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ResultResponse.class)
-            )
-        ),
-        @ApiResponse(responseCode = "200", description = "data 내용 아래의 DTO가 List에 싸여옵니다.",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = GetDirListDto.class)
-            ))
-    })
-    @GetMapping("")
-    public ResponseEntity<ResultResponse> getDirList(Long userId);
 
     @Operation(summary = "폴더 조회 요청", description = "PathVariable로 dirId를 받아 해당 폴더 정보를 반환")
     @ApiResponses(value = {
@@ -73,12 +58,6 @@ public interface DirectoryDocs {
     })
     @GetMapping("/{dirId}")
     public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId);
-
-    @Operation(summary = "메인 폴더 설정 변경 요청", description = "PathVariable로 dirId를 받아 유저의 메인 폴더 속성 변경")
-    @ApiResponse(responseCode = "200", description = "메인 폴더 설정 변경에 성공하였습니다.")
-    @GetMapping("/{dirId}/main")
-    public ResponseEntity<ResultResponse> patchMainDir(
-        @AuthenticationPrincipal UserDetails userDetails, @PathVariable String dirId);
 
     @Operation(summary = "자식폴더 생성 요청(선결 조건으로 부모 폴더가 필요합니다./party/create를 통해 파티를 먼저 생성하세요)", description = "Body로 parentDirId(부모폴더 ID), dirName(생성 할 폴더명)을 받아 부모폴더의 정보를 반환")
     @ApiResponse(responseCode = "201", description = "폴더 생성에 성공하였습니다.")
@@ -167,8 +146,7 @@ public interface DirectoryDocs {
         @RequestBody DeleteFileListDto deleteFileListDto
     );
 
-    @Operation(summary = "특정 폴더의 하위 폴더 조회요청", description = "PathVariable로 dirId(부모 폴더 Id)를 받아 하위 폴더의 pk와 name을 반환")
-
+    @Operation(summary = "특정 폴더의 하위 폴더 조회요청", description = "PathVariable로 dirId를 받아 하위 폴더의 pk와 name을 반환")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "0", description = "하위 폴더 조회에 성공하였습니다.",
             content = @Content(
@@ -184,6 +162,23 @@ public interface DirectoryDocs {
     })
     @GetMapping("/{dirId}/child")
     ResponseEntity<ResultResponse> getChildDir(String dirId);
+
+    @Operation(summary = "특정 폴더의 모든 폴더 구조 조회 요청", description = "PathVariable로 dirId를 받아 하위 폴더 구조를 반환")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "0", description = "폴더 구조 조회에 성공하였습니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResultResponse.class)
+            )
+        ),
+        @ApiResponse(responseCode = "200", description = "data 내용 아래의 DTO가 List에 쌓여옵니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = GetDirFullStructureDto.class)
+            ))
+    })
+    @GetMapping("/{dirId}/structure")
+    ResponseEntity<ResultResponse> getDirFullStructure(String dirId);
 
     @Operation(summary = "사진 상세 조회시 thumnailurl2 조회 요청", description = "PathVariable로 dirId를 해당 폴더의 모든 사진을 반환")
 

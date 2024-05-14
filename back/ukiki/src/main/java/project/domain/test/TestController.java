@@ -2,9 +2,8 @@ package project.domain.test;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import project.domain.photo.dto.response.GroupbrieflyDto;
 import project.domain.photo.service.PhotoGroupServiceImpl;
 import project.global.util.S3Util;
@@ -86,5 +85,15 @@ public class TestController {
     @GetMapping("/test/photo-group")
     public List<GroupbrieflyDto> testController10() throws Exception {
         return photoGroupServiceImpl.getGroups(1L);
+    }
+
+    @GetMapping("/test/file/down")
+    public byte[] testController11(@RequestParam("key")String key, @RequestParam("filename")String filename) throws Exception {
+        return s3Util.fileDownload(key, filename).getObjectContent().readAllBytes();
+    }
+
+    @PostMapping("/test/file/upload")
+    public String testController123(@RequestPart("file") MultipartFile file, @RequestPart("key") String key){
+        return s3Util.fileUpload(file, key);
     }
 }
