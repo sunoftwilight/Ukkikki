@@ -59,14 +59,16 @@ const AlbumSelectOptions: React.FC = () => {
         link.setAttribute('download', `${prefix}.zip`)
         document.body.appendChild(link)
         link.click()
+        doneHandler('down')
       },
       (err) => { 
         setIsPrefixOpen(true)
+        setIsIng(false)
+
         console.error(err)
         alert('오류가 발생했습니다. 다시 시도하십시오.')
       },
     )
-    doneHandler('down')
   }
 
   const delFileHandler = async () => {

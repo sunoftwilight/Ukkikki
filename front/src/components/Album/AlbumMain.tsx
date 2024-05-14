@@ -9,14 +9,12 @@ import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
 import SecureImg from "./SecureImg";
-import { currentGroupStore } from "../../stores/GroupStore";
 import { getPartyDetail } from "../../api/party";
 
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
   const { needUpdate } = useStore(updateAlbumStore)
-  const { currentGroup } = useStore(currentGroupStore)
   const { currentDirId, setCurrentDirId, setCurrentDirName, parentDirId, setParentDirId, parentDirName } = useStore(currentDirStore)
 
   const [albumList, setAlbumList] = useState<contentListData[]>([])
@@ -25,13 +23,22 @@ const AlbumMain: React.FC = () => {
 
   useEffect(() => {
     getPartyDetail(
-      currentGroup,
+      Number(groupPk),
       (res) => {
         setCurrentDirId(res.data.data.rootDirId)
+
+        getDirectory(
+          res.data.data.rootDirId,
+          (res) => {
+            setParentDirId(res.data.data.parentId)
+            setAlbumList(res.data.data.contentList)
+          },
+          (err) => { console.error(err) }
+        )
       },
       (err) => { console.error(err) }
     )
-  }, [])
+  }, [groupPk])
 
   useEffect(() => {
     getDirectory(
@@ -42,7 +49,7 @@ const AlbumMain: React.FC = () => {
       },
       (err) => { console.error(err) }
     )
-  }, [currentDirId, needUpdate])
+  }, [ needUpdate, currentDirId])
 
   const dirHandler = (id: string, name: string) => {
     setCurrentDirId(id)

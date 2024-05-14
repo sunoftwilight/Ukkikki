@@ -45,14 +45,16 @@ const FootNav: React.FC<NavPropsType> = ({ info }) => {
         link.setAttribute('download', `${prefix}.png`)
         document.body.appendChild(link)
         link.click()
+        doneHandler()
       },
       (err) => { 
         setIsPrefixOpen(true)
+        setIsIng(false)
+
         console.error(err)
         alert('오류가 발생했습니다. 다시 시도하십시오.')
       }
     )
-    doneHandler()
   }
     
   const doneHandler = () => {
