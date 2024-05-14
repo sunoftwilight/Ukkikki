@@ -11,4 +11,5 @@ public interface ChatMemberRedisRepository extends CrudRepository<ChatMember, Lo
 //        List<ChatMember> findAllByDestination(String destination);
 
         Optional<ChatMember> findByMemberId(Long memberId);
+        Optional<ChatMember> findBySessionId(String sessionId);
 }

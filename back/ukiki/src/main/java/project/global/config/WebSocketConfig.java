@@ -22,6 +22,7 @@ import project.domain.chat.repository.ChatMemberRedisRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
+import project.global.jwt.JWTUtil;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -29,8 +30,9 @@ import project.global.exception.ErrorCode;
 @Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    @Autowired
-    ChatMemberRedisRepository chatMemberRedisRepository;
+
+    private final ChatMemberRedisRepository chatMemberRedisRepository;
+    private final JWTUtil jwtUtil;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry){
@@ -52,56 +54,39 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
-
                 StompHeaderAccessor accessor =
                     MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-
-                String destination = accessor.getDestination();
-
-
                 switch (accessor.getCommand()) {
                     case CONNECT:
-                        log.info(" CONNECT");
-//                        StompHeaderAccessor accessor2 =
-//                            MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-
-//                            String authHeader = accessor2.getFirstNativeHeader("Authorization");
-//                            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-//                                String authToken = authHeader.substring(7);
-//                                accessor2.getSessionAttributes().put("authToken", authToken);
-//                                log.info("Authorization Token stored in session: " + authToken);
-//                            }
-
-
+                        // 헤더에서 멤버 아이디 뽑기
+                        String accessHeader = accessor.getFirstNativeHeader("Authorization");
+                        String token = accessHeader.substring(7);
+                        Long memberId = jwtUtil.getId(token);
+                        // 멤버 토큰 넣고 저장
+                        chatMemberRedisRepository.save(ChatMember.builder()
+                            .memberId(memberId)
+                            .sessionId(accessor.getSessionId())
+                            .build());
                         break;
-                    case SUBSCRIBE:
 
-//                        chatMemberRedisRepository.save(ChatMember.builder()
-//                            .memberId(finalMemberId)
-//                            .destination(destination)
-//                            .build());
+                    case SUBSCRIBE:
+                        // Destination - sub 주소 저장
+                        chatMemberRedisRepository.findBySessionId(accessor.getSessionId())
+                            .ifPresent(chatMember -> {
+                                chatMember.setDestination(accessor.getDestination());
+                                chatMemberRedisRepository.save(chatMember);
+                            });
                         break;
 
                     case DISCONNECT:
-
-//                        Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
-//                        if(authentication2 == null) {
-//                            log.info("WEBSOCKET authentication NULL");
-//                            return null;
-//                        }
-//                        CustomUserDetails userDetails2 = (CustomUserDetails) authentication2.getPrincipal();
-//                        Long memberId2 = userDetails2.getId();
-
-                        log.info("TEST DISCONNECT  ", destination);
-//                        chatMemberRedisRepository.findByMemberId(finalMemberId).ifPresent(chatMember -> {
-//                            chatMemberRedisRepository.delete(chatMember);
-//                        });
+                        // 접속 유저 삭제
+                        chatMemberRedisRepository.findBySessionId(accessor.getSessionId())
+                            .ifPresent(chatMemberRedisRepository::delete);
                         break;
                 }
 
-            return message;
+                return message;
             }
         });
 
