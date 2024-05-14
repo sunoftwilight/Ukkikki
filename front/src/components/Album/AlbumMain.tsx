@@ -11,7 +11,6 @@ import { contentListData } from "../../types/AlbumType";
 import SecureImg from "./SecureImg";
 import { currentGroupStore } from "../../stores/GroupStore";
 import { getPartyDetail } from "../../api/party";
-import { error } from "console";
 
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)

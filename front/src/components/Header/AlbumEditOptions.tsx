@@ -36,6 +36,7 @@ const AlbumEditOptions: React.FC = () => {
     console.log(currentDirId)
     delDirectory(
       currentDirId,
+      {data: {sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE='}},
       () => {
         setCurrentDirId(parentDirId)
         setCurrentDirName(parentDirName)

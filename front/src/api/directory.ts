@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { AlbumResponse, DirInfoType, delFilesDtoType, getDetailImgType, thumbNailResponseType } from '../types/AlbumType';
+import { AlbumResponse, DirInfoType, delFilesDtoType, getDetailImgType, sseKeyDtoType, thumbNailResponseType } from '../types/AlbumType';
 
 const url = 'directories';
 
@@ -25,9 +25,10 @@ export const createDirectory = async (
 
 export const delDirectory = async (
   dirId: string,
+  sseKey: sseKeyDtoType,
   Response : (Response : AxiosResponse<AlbumResponse>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await privateApi.delete(`/${url}/${dirId}`)
+  await privateApi.delete(`/${url}/${dirId}`, sseKey)
   .then(Response)
   .catch(Error)
 }
@@ -63,7 +64,7 @@ export const getThumbnailNav = async (
 
 export const delFiles = async (
   dirId : string,
-  delFilesDto: {data:delFilesDtoType},
+  delFilesDto: delFilesDtoType,
   Response : (Response : AxiosResponse<thumbNailResponseType>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.delete(`/${url}/${dirId}/files`, delFilesDto)

@@ -67,6 +67,14 @@ export interface thumbNailResponseType {
 }
 
 export interface delFilesDtoType {
-  sseKey: string;
-  fileIdList: string[];
+  data : {
+    sseKey: string;
+    fileIdList: string[];
+  }
+}
+
+export interface sseKeyDtoType {
+  data: {
+    sseKey: string;
+  }
 }
