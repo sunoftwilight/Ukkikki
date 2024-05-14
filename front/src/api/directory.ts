@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { AlbumResponse, DirInfoType, delFilesDtoType, getDetailImgType, sseKeyDtoType, thumbNailResponseType } from '../types/AlbumType';
+import { AlbumResponse, DirInfoType, delFilesDtoType, getChildDirResponseType, getDetailImgType, sseKeyDtoType, thumbNailResponseType } from '../types/AlbumType';
 
 const url = 'directories';
 
@@ -72,11 +72,11 @@ export const delFiles = async (
   .catch(Error)
 }
 
-export const getChildDir = async (
+export const getDirStructure = async (
   dirId : string,
-  Response : (Response : AxiosResponse<thumbNailResponseType>) => void, 
+  Response : (Response : AxiosResponse<getChildDirResponseType>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await privateApi.get(`/${url}/${dirId}/child`)
+  await privateApi.get(`/${url}/${dirId}/structure`)
   .then(Response)
   .catch(Error)
 }

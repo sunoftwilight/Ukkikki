@@ -78,3 +78,13 @@ export interface sseKeyDtoType {
     sseKey: string;
   }
 }
+
+export interface childDirItem {
+  pk: string;
+  name: string;
+}
+
+export interface getChildDirResponseType {
+  data: childDirItem[];
+  resultCode: string;
+}
