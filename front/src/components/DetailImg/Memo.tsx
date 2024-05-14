@@ -1,87 +1,66 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+// import MemoItem from "./MemoItem";
+import * as M from "../../api/detailImg";
+
+import { DetailImgStore } from "../../stores/DetailImgStore";
+import { useStore } from "zustand";
+import { MemoListType } from "../../types/DetailImgType";
 import MemoItem from "./MemoItem";
 
-const memoList = [
-  {
-    profileUrl: 'https://i.pinimg.com/564x/c5/5c/76/c55c762ce418abefd071aa7e81c5a213.jpg',
-    name: '나는이해진은아님',
-    date: '12.13.12',
-    content: '미모무슨일임미쳣다미쳣어'
-  },
-  {
-    profileUrl: 'https://mblogthumb-phinf.pstatic.net/MjAxODAzMTdfMTQz/MDAxNTIxMjQzOTYzNzQ4.JLij0p2Lw0gHxyKR8Jl6QJG2aMXBWIXMHEIASV5wOpkg.ytIpqFGKa3dFKQI6ELk0NY2bxhqZzAKyIFeeToG1yy8g.JPEG.dltnwjd49/downloadfile-3.jpg?type=w800',
-    name: '나는이해진은진짜아님',
-    date: '12.13.12',
-    content: '민주가 세상을 구하고 나는 세상을 말아먹는다 민주야 세상을 잘 부탁해'
-  },
-  {
-    profileUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfpXOlTKED93nnXGthEnZB8LFkznyV0_YO04vb99c6Tg&s',
-    name: '나는이해진일수가없음',
-    date: '12.13.12',
-    content: '왁 천사가 있다면 민주겠지'
-  },
-  {
-    profileUrl: 'https://i.pinimg.com/236x/99/7a/9b/997a9b2cd93277769ca9b3d109bceed7.jpg',
-    name: '나는이해진일리없음',
-    date: '12.13.12',
-    content: '우우우~ 예쁜누나다'
-  },
-  {
-    profileUrl: 'https://i.pinimg.com/564x/c5/5c/76/c55c762ce418abefd071aa7e81c5a213.jpg',
-    name: '나는이해진은아님',
-    date: '12.13.12',
-    content: '미모무슨일임미쳣다미쳣어'
-  },
-  {
-    profileUrl: 'https://mblogthumb-phinf.pstatic.net/MjAxODAzMTdfMTQz/MDAxNTIxMjQzOTYzNzQ4.JLij0p2Lw0gHxyKR8Jl6QJG2aMXBWIXMHEIASV5wOpkg.ytIpqFGKa3dFKQI6ELk0NY2bxhqZzAKyIFeeToG1yy8g.JPEG.dltnwjd49/downloadfile-3.jpg?type=w800',
-    name: '나는이해진은진짜아님',
-    date: '12.13.12',
-    content: '민주가 세상을 구하고 나는 세상을 말아먹는다 민주야 세상을 잘 부탁해'
-  },
-  {
-    profileUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfpXOlTKED93nnXGthEnZB8LFkznyV0_YO04vb99c6Tg&s',
-    name: '나는이해진일수가없음',
-    date: '12.13.12',
-    content: '왁 천사가 있다면 민주겠지'
-  },
-  {
-    profileUrl: 'https://i.pinimg.com/236x/99/7a/9b/997a9b2cd93277769ca9b3d109bceed7.jpg',
-    name: '나는이해진일리없음',
-    date: '12.13.12',
-    content: '우우우~ 예쁜누나다'
-  },
-  {
-    profileUrl: 'https://i.pinimg.com/564x/c5/5c/76/c55c762ce418abefd071aa7e81c5a213.jpg',
-    name: '나는이해진은아님',
-    date: '12.13.12',
-    content: '미모무슨일임미쳣다미쳣어'
-  },
-  {
-    profileUrl: 'https://mblogthumb-phinf.pstatic.net/MjAxODAzMTdfMTQz/MDAxNTIxMjQzOTYzNzQ4.JLij0p2Lw0gHxyKR8Jl6QJG2aMXBWIXMHEIASV5wOpkg.ytIpqFGKa3dFKQI6ELk0NY2bxhqZzAKyIFeeToG1yy8g.JPEG.dltnwjd49/downloadfile-3.jpg?type=w800',
-    name: '나는이해진은진짜아님',
-    date: '12.13.12',
-    content: '민주가 세상을 구하고 나는 세상을 말아먹는다 민주야 세상을 잘 부탁해'
-  },
-  {
-    profileUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfpXOlTKED93nnXGthEnZB8LFkznyV0_YO04vb99c6Tg&s',
-    name: '나는이해진일수가없음',
-    date: '12.13.12',
-    content: '왁 천사가 있다면 민주겠지'
-  },
-  {
-    profileUrl: 'https://i.pinimg.com/236x/99/7a/9b/997a9b2cd93277769ca9b3d109bceed7.jpg',
-    name: '나는이해진일리없음',
-    date: '12.13.12',
-    content: '우우우~ 예쁜누나다akwlakr'
-  },
-]
 
 const Memo: React.FC = () => {
+
+  const [inputMemo,setInputMemo] = useState("");
+  const detail = useStore(DetailImgStore);
+
+  const [memoList,setMemoList] = useState<MemoListType>([]);
+  
+  useEffect(() => {
+    getMemoList();
+  },[]);
+
+  // 메모 가져오기
+  const getMemoList = async () => {
+    await M.getMemo(
+      detail.currentImg,
+      (res) => {
+        setMemoList(res.data.data);
+      },
+      (err) => {
+        console.log(err)
+      }
+    )
+  }
+
+  // 메모 작성
+  const sendMemo = async () => {
+
+    if(inputMemo.length === 0){
+      return ;
+    }
+
+    await M.createMemo(
+      detail.currentImg,
+      inputMemo,
+      () => {
+        getMemoList();
+      },
+      (err) => {
+        console.log(err)
+      }
+    )
+  }
+
+  // 메모 삭제
+  const deleteMemo = (memoId : number) => {
+    setMemoList(memoList.filter(memo => memo.memoId !== memoId));
+  }
+
   return (
     <div className="fixed bottom-24 h-[calc(100%-162px)] left-3 right-3 w-[calc(100%-24px)] bg-white bg-opacity-50 rounded-[15px] shadow-inner backdrop-blur-[20px] z-[1px] p-[10px] flex flex-col gap-6 transition-transform">
       <div className="flex flex-col h-[calc(100%-72px)] gap-2 overflow-scroll scrollbar-hide">
         {memoList.map((item, idx) => (
-          <MemoItem key={idx} info={item} />
+          <MemoItem key={idx} info={item} deleteMemo={deleteMemo}/>
         ))}
       </div>
 
@@ -90,8 +69,11 @@ const Memo: React.FC = () => {
         <input 
           placeholder="그룹원에게 메모를 남겨보세요!"
           className="py-2 px-3 w-[calc(100%-66px)] font-pre-M text-base rounded-xl text-black h-full outline-none" 
+          value={inputMemo}
+          onChange={(e) => setInputMemo(e.target.value)}
         />
-        <button className="bg-main-blue text-white font-pre-M text-base w-14 h-full rounded-xl">작성</button>
+        <button className="bg-main-blue text-white font-pre-M text-base w-14 h-full rounded-xl" 
+          onClick={sendMemo}>작성</button>
       </div>
     </div>
   )
