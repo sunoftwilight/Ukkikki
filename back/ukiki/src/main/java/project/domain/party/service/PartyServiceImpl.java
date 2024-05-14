@@ -209,8 +209,11 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
         PartyDto res = partyMapper.toPartyDto(party);
+
+        //파티에 있는 멤버 리스트 (블락유저는 안빠져있어)
         List<SimpleProfileDto> profileList = profileMapper.toSimpleProfileDtoList(
-            profileRepository.findAllByPartyId(partyId));
+            profileRepository.findAllByPartyIdWithoutBlock(party, MemberRole.BLOCK));
+
         res.setPartyMembers(profileList);
 
         return res;
@@ -544,12 +547,6 @@ public class PartyServiceImpl implements PartyService {
         checkPasswordDto.setSseKey(afterSseKey);
 
         return checkPasswordDto;
-    }
-
-    public static void main(String[] args) {
-        String url = "https://ukkikki.s3.ap-northeast-2.amazonaws.com/20240509_215538.030-4bd00d99-840c-4571-acdc-c30b0906c8d83.jpg";
-        String filename = url.split("/")[3];
-        System.out.println(filename);
     }
 
     @Override
