@@ -13,7 +13,7 @@ const LoginRedirect: React.FC = () => {
 
   useEffect(() => {
     getAccess();
-  })
+  },[])
 
   const getAccess = async () => {
     if (Boolean(cookies.isLogin)){
@@ -23,8 +23,8 @@ const LoginRedirect: React.FC = () => {
           user.setIsLogin(true);
           getUserInfo();
         },
-        (error) => {
-          console.error(error)
+        () => {
+          navi('/login')
         }
       )
     }
@@ -46,8 +46,8 @@ const LoginRedirect: React.FC = () => {
           if(userData.insertPass) navi('/simpleCheck');
           else navi('/simpleInsert')
         },
-        (error) => {
-          console.error(error)
+        () => {
+          navi('/login')
         }
       )
     }
