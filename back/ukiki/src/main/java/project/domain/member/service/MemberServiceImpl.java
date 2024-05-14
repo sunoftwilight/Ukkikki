@@ -204,6 +204,9 @@ public class MemberServiceImpl implements MemberService{
         //sseKey 복호화 하기
         StringEncryptor customEncryptor = jasyptUtil.customEncryptor(password);
         for (KeyGroup keyGroup : keyGroupList) {
+            if (keyGroup.getSseKey().equals("expired")){
+                continue;
+            }
             keyGroup.setSseKey(jasyptUtil.keyDecrypt(customEncryptor, keyGroup.getSseKey()));
         }
 
