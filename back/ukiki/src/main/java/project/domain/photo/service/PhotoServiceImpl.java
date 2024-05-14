@@ -23,7 +23,6 @@ import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,13 +53,7 @@ public class PhotoServiceImpl implements PhotoService{
         File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
 
-        List<MemoListDto> memos = memoRepository.findByPhotoId(file.getPhotoDto().getId());
-
-        if (memos.isEmpty()) {
-            throw new BusinessLogicException(ErrorCode.MEMO_NOT_FOUND);
-        }
-
-        return memos;
+        return memoRepository.findByPhotoId(file.getPhotoDto().getId());
     }
 
     @Override

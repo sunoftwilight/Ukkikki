@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import project.domain.photo.dto.request.MemoDto;
 import project.domain.photo.dto.request.MemoModifyDto;
 import project.domain.photo.dto.response.MemoListDto;
-import project.domain.photo.entity.mediatable.Memo;
 import project.domain.photo.service.PhotoService;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
@@ -23,8 +22,8 @@ public class PhotoController implements PhotoDocs {
     private final PhotoService photoService;
 
     @Override
-    @GetMapping("/{fileId}/memo")
-    public ResponseEntity<ResultResponse> memo(String fileId) {
+    @GetMapping("memo/{fileId}")
+    public ResponseEntity<ResultResponse> memo(@PathVariable("fileId") String fileId) {
 
         List<MemoListDto> memos = photoService.memo(fileId);
 
@@ -32,26 +31,26 @@ public class PhotoController implements PhotoDocs {
     }
 
     @Override
-    @PostMapping("/{fileId}/memo/create")
-    public ResponseEntity<ResultResponse> memoCreate(MemoDto memoDto) {
+    @PostMapping("/memo/create/{fileId}")
+    public ResponseEntity<ResultResponse> memoCreate(@PathVariable("fileId") String fileId, String content) {
 
-        photoService.memoCreate(memoDto);
+        photoService.memoCreate(new MemoDto(fileId,content));
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.CREATE_MEMO_SUCCESS));
     }
 
     @Override
-    @PostMapping("/{fileId}/memo/modify")
-    public ResponseEntity<ResultResponse> memoModify(MemoModifyDto memoModifyDto) {
+    @PostMapping("/memo/modify/{memoId}")
+    public ResponseEntity<ResultResponse> memoModify(@PathVariable("memoId") Long memoId, String content) {
 
-        photoService.memoModify(memoModifyDto);
+        photoService.memoModify(new MemoModifyDto(memoId,content));
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.MODIFY_MEMO_SUCCESS));
     }
 
     @Override
-    @DeleteMapping("/{fileId}/memo/delete")
-    public ResponseEntity<ResultResponse> memoDelete(Long memoId) {
+    @DeleteMapping("/memo/delete/{memoId}")
+    public ResponseEntity<ResultResponse> memoDelete(@PathVariable("memoId") Long memoId) {
 
         photoService.memoDelete(memoId);
 
@@ -59,8 +58,8 @@ public class PhotoController implements PhotoDocs {
     }
 
     @Override
-    @PostMapping("/{fileId}/likes")
-    public ResponseEntity<ResultResponse> likesCreate(@PathVariable String fileId) {
+    @PostMapping("/likes/{fileId}")
+    public ResponseEntity<ResultResponse> likesCreate(@PathVariable("fileId")  String fileId) {
         log.info("come in likesCreate controller");
         photoService.likesCreate(fileId);
         log.info("result controller = void");
@@ -68,8 +67,8 @@ public class PhotoController implements PhotoDocs {
     }
 
     @Override
-    @DeleteMapping("/{fileId}/likes")
-    public ResponseEntity<ResultResponse> likesDelete(String fileId) {
+    @DeleteMapping("/likes/{fileId}")
+    public ResponseEntity<ResultResponse> likesDelete(@PathVariable("fileId")  String fileId) {
         log.info("come in likesDelete");
         photoService.likesDelete(fileId);
         log.info("result controller = void");
