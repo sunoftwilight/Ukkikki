@@ -12,5 +12,5 @@ public class InfoDto {
     String userName;
     String profileUrl;
     boolean isInsertPass;
-    String uploadGroupId;
+    Long uploadGroupId;
 }

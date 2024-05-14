@@ -11,6 +11,7 @@ public enum ResultCode {
     GET_USERLIST_SUCCESS(200, "유저리스트 검색에 성공하였습니다."),
     GET_USERINFO_SUCCESS(200, "유정 정보 조회에 성공하였습니다."),
     GET_KEYGROUP_SUCCESS(200, "유저 키 그룹을 가져오는데 성공하였습니다."),
+    CHANGE_DIRECTORY_SUCCESS(200, "디렉토리 변경에 성공하였습니다."),
 
     //Party
     CREATE_PARTY_SUCCESS(201, "그룹 생성에 성공하였습니다."),

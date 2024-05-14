@@ -57,7 +57,7 @@ public class Member extends BaseEntity {
     private boolean isDeactivate = false;
 
     @Column(name = "upload_group_id")
-    private String uploadGroupId;
+    private Long uploadGroupId;
 
     // 연관관계 총 9 개
 
