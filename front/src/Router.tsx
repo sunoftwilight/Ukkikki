@@ -48,7 +48,7 @@ export default function Router() {
         <Route path="/group/list" element={<GroupList />} />
 
         {/*그룹 기본*/}
-        <Route path="/group/:groupPk" element={<GroupMain />} />
+        <Route path="/group/:groupPk/main" element={<GroupMain />} />
 
         {/*그룹 참여*/}
         <Route path="/group/:groupPk/attend" element={<GroupAttend />} />

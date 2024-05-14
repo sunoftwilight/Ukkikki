@@ -33,7 +33,7 @@ const AlbumHeader: React.FC = () => {
 
 	const navigate = useNavigate();
 	const goBackHandler = () => {
-    navigate(`/group/${currentGroup}`);
+    navigate(`/group/${currentGroup}/main`);
 	};
 
 	const cancelHandler = () => {

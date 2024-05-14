@@ -77,6 +77,7 @@ const SimplePass: React.FC<SimplePassProps> = ({ type }) => {
 		const config = {
 			password: password,
 		};
+		console.log(config)
 		await simpleCheck(
 			config,
 			(response) => {

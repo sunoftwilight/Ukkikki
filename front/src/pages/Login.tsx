@@ -4,8 +4,8 @@ import LoginBtn from "@/assets/Login/kakaoLoginBtn.png";
 
 const Login: React.FC = () => {
   const login = () => {
-    window.location.href = "https://k10d202.p.ssafy.io/api/oauth2/authorization/kakao"
-    // window.location.href = "http://localhost:5000/api/oauth2/authorization/kakao"
+    // window.location.href = "https://k10d202.p.ssafy.io/api/oauth2/authorization/kakao"
+    window.location.href = "http://localhost:5000/api/oauth2/authorization/kakao"
   }
 
 

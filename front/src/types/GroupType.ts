@@ -105,3 +105,8 @@ export interface PartyUserListRespones {
   resultCode: string;
   data: UserGrantData[]
 }
+
+export interface PartyPassChangeResponse {
+  resultCode: string;
+  data: GroupKey;
+}

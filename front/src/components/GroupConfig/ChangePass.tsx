@@ -3,6 +3,7 @@ import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
 import { useNavigate, useParams } from "react-router-dom";
 import { changePartyPass } from "../../api/party";
+import { GroupKey } from "../../types/GroupType";
 
 const ChangePass: React.FC = () => {
   const user = useStore(userStore);
@@ -63,13 +64,22 @@ const ChangePass: React.FC = () => {
     console.log(data)
     await changePartyPass(Number(groupPk), data, 
       (res) => {
-        console.log(res)
+				dataSetUp(res.data.data);
         navi(-1)
       },
       (err) => {
         console.error(err)
       })
   }
+
+	const dataSetUp = (data: GroupKey) => {
+		//현재 그룹키 목록
+		const currentKeys = user.groupKey;
+
+		// 그룹키 갱신
+		currentKeys[data.partyId] = data.sseKey;
+		user.setGroupKey(currentKeys);
+	};
 
   return (
     <div className="flex flex-col w-full h-full font-pre-SB px-4">

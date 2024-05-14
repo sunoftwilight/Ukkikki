@@ -50,7 +50,7 @@ const GroupAttend:React.FC = () => {
   const attentMember = async () => {
     await enterPartyMember(Number(groupPk),
       () => {
-        navi(`/group/${groupPk}`)
+        navi(`/group/${groupPk}/main`)
       },
       (err) => {
         console.error(err)
@@ -62,7 +62,7 @@ const GroupAttend:React.FC = () => {
     await enterPartyGuest(Number(groupPk),
       (res) => {
         user.setAccessToken('Bearer ' + res.data.data.token);
-        navi(`/group/${groupPk}`)
+        navi(`/group/${groupPk}/main`)
       },
       (err) => {
         console.error(err)
