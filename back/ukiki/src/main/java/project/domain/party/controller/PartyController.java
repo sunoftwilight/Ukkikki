@@ -133,8 +133,8 @@ public class PartyController implements PartyDocs {
 
     @Override   // 파티원 권한 부여    `
     @PatchMapping("/grant/{partyId}/{opponentId}")
-    public ResponseEntity<ResultResponse> grantAuthority(@PathVariable(name = "partyId") Long partyId, @PathVariable Long opponentId, @RequestParam(name = "memberRole") MemberRole memberRole) {
-        partyService.grantPartyUser(partyId, opponentId, memberRole);
+    public ResponseEntity<ResultResponse> grantAuthority(@PathVariable(name = "partyId") Long partyId, @PathVariable Long opponentId, @RequestBody MemberRoleDto memberRole) {
+        partyService.grantPartyUser(partyId, opponentId, memberRole.getMemberRole());
         return ResponseEntity.ok(new ResultResponse(ResultCode.GRANT_TARGET_SUCCESS));
     }
 

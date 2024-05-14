@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import project.domain.article.dto.request.ArticleCreateDto;
+import project.domain.article.dto.request.ArticleUpdateDto;
 import project.domain.article.dto.response.ArticlePageDto;
+import project.domain.article.dto.response.SimpleArticleDto;
 import project.global.result.ResultResponse;
 
 @Tag(name = "ArticleController", description = "게시판 api")
@@ -22,6 +24,10 @@ public interface ArticleDocs {
     ResponseEntity<ResultResponse> articleDetail(Long partyId, Long articleId);
     @Operation(summary = "게시판 리스트")
     ResponseEntity<ArticlePageDto> getArticleList(Long partyId, Pageable pageable);
+
+    @Operation(summary = "게시판 수정")
+    ResponseEntity<SimpleArticleDto> updateArticle(Long partyId, Long articleId, ArticleUpdateDto articleUpdateDto);
+
 
     @Operation(summary = "댓글 조회")
     @GetMapping("/comment/{articleId}")

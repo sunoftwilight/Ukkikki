@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project.domain.member.entity.MemberRole;
@@ -46,7 +47,7 @@ public interface PartyDocs {
 
 
     @Operation(summary = "파티 권한 주기")
-    ResponseEntity<ResultResponse> grantAuthority(Long partyId, Long opponentId, MemberRole memberRole);
+    ResponseEntity<ResultResponse> grantAuthority(Long partyId, Long opponentId, @RequestBody MemberRoleDto memberRole);
 
     @Operation(summary = "파티 나가기")
     ResponseEntity<ResultResponse> exitParty(Long partyId);

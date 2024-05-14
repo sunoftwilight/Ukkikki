@@ -209,8 +209,11 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
         PartyDto res = partyMapper.toPartyDto(party);
+
+        //파티에 있는 멤버 리스트 (블락유저는 안빠져있어)
         List<SimpleProfileDto> profileList = profileMapper.toSimpleProfileDtoList(
-            profileRepository.findAllByPartyId(partyId));
+            profileRepository.findAllByPartyIdWithoutBlock(party, MemberRole.BLOCK));
+
         res.setPartyMembers(profileList);
 
         return res;
@@ -546,12 +549,6 @@ public class PartyServiceImpl implements PartyService {
         return checkPasswordDto;
     }
 
-    public static void main(String[] args) {
-        String url = "https://ukkikki.s3.ap-northeast-2.amazonaws.com/20240509_215538.030-4bd00d99-840c-4571-acdc-c30b0906c8d83.jpg";
-        String filename = url.split("/")[3];
-        System.out.println(filename);
-    }
-
     @Override
     @Transactional
     public void changePartyName(Long partyId, String partyName) {
@@ -584,7 +581,7 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole) {
+    public void grantPartyUser(Long partyId, Long opponentId, String memberRole) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
@@ -607,13 +604,13 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // 마스터 권한 부여할 때 -> 사용자 에디터로 변경 저장
-        if (memberRole.equals(MemberRole.MASTER)) {
+        if (memberRole.equals(MemberRole.MASTER.name())) {
             memberParty.setMemberRole(MemberRole.EDITOR);
             memberpartyRepository.save(memberParty);
         }
 
         // 권한 변경 후 저장
-        targetMemberParty.setMemberRole(memberRole);
+        targetMemberParty.setMemberRole(MemberRole.valueOf(memberRole));
         memberpartyRepository.save(targetMemberParty);
     }
 
