@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.domain.article.collection.CommentCollection;
 import project.domain.article.dto.request.ArticleCreateDto;
+import project.domain.article.dto.request.ArticleUpdateDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
 import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
@@ -44,7 +45,12 @@ public class ArticleController implements ArticleDocs{
         SimpleArticleDto res = articleService.getArticleDetail(partyId, articleId);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_ARTICLE_SUCCESS, res));
     }
-
+    @Override
+    @PatchMapping("/update/{partyId}/{articleId}")
+    public ResponseEntity<SimpleArticleDto> updateArticle(@PathVariable(name = "partyId")Long partyId, @PathVariable(name = "articleId") Long articleId, @RequestBody ArticleUpdateDto articleUpdateDto) {
+        SimpleArticleDto res = articleService.updateArticle(partyId, articleId, articleUpdateDto);
+        return ResponseEntity.ok(res);
+    }
     @Override
     @GetMapping("/comment/{articleId}")
     public ResponseEntity<ResultResponse> articleComment(@PathVariable(name = "articleId") Long articleId) {
@@ -104,7 +110,8 @@ public class ArticleController implements ArticleDocs{
     }
 
     @Override
-    public ResponseEntity<ArticlePageDto> getArticleList(Long partyId, @PageableDefault(sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
+    @PatchMapping("/article-list/{partyId}")
+    public ResponseEntity<ArticlePageDto> getArticleList(@PathVariable(name = "partyId") Long partyId, @PageableDefault(sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
         ArticlePageDto res = articleService.getArticleList(partyId, pageable);
         return ResponseEntity.ok(res);
     }

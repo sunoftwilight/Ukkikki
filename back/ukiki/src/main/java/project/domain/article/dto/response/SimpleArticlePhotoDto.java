@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class SimpleArticlePhotoDto {
 
+    Long id;
     Long photoId;
     String photoUrl;
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import project.domain.article.dto.request.ArticleCreateDto;
+import project.domain.article.dto.request.ArticleUpdateDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
 import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
@@ -91,7 +92,7 @@ public class ArticleServiceImpl implements ArticleService{
                 .member(member)
                 .party(party)
                 .build());
-        
+
         // 게시판 사진 리스트
         List<ArticlePhoto> articlePhotoList = new ArrayList<>();
 
@@ -167,7 +168,7 @@ public class ArticleServiceImpl implements ArticleService{
 
             .map((article) -> {
                 SimpleArticleDto simpleArticleDto = articleMapper.toSimpleArticleDto(article);
-                simpleArticleDto.setModify(article.getCreateDate().isEqual(article.getLastModifiedDate()));
+                simpleArticleDto.setModify(!article.getCreateDate().isEqual(article.getLastModifiedDate()));
                 List<ArticlePhoto> articlePhotoList = article.getArticlePhotoList();
                 simpleArticleDto.setPhotoList(articlePhotoMapper.toSimpleArticlePhotoDtoList(articlePhotoList));
                 return simpleArticleDto;
@@ -181,6 +182,76 @@ public class ArticleServiceImpl implements ArticleService{
             .build();
 
         return res;
+    }
+
+    @Override
+    public SimpleArticleDto updateArticle(Long partyId, Long articleId, ArticleUpdateDto articleUpdateDto) {
+
+        System.out.println(articleUpdateDto.toString());
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        if(memberId == 0){
+            throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
+        }
+
+        memberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        partyRepository.findById(partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+
+        MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(memberId, partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
+
+        Article article = articleRepository.findById(articleId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        if (!memberId.equals(article.getMember().getId())){
+            throw new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR);
+        }
+
+        if (articleUpdateDto.getTitle() != null){
+            article.setTitle(articleUpdateDto.getTitle());
+        }
+
+        if (articleUpdateDto.getContent() != null){
+            article.setContent(articleUpdateDto.getContent());
+        }
+        if (articleUpdateDto.getArticlePhotoList() != null){
+            if (articleUpdateDto.isAddPhoto()){
+                // 포토 추가
+                for (Object filePk : articleUpdateDto.getArticlePhotoList()) {
+                    // 파일 찾기
+                    File file = fileRepository.findById(String.valueOf(filePk))
+                        .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+                    // 파일로 사진 찾기
+                    Photo photo = photoRepository.findById(file.getPhotoDto().getId())
+                        .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
+                    // ArticlePhoto 생성
+                    ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
+                    // 리스트에 넣고 저장
+                    article.getArticlePhotoList().add(articlePhotoRepository.save(articlePhoto));
+                }
+            }else{
+                // 포토 삭제
+                for (Object filePk : articleUpdateDto.getArticlePhotoList()) {
+                    articlePhotoRepository.findById(Long.parseLong(String.valueOf(filePk)))
+                        .ifPresent(ArticlePhoto::delete);
+                }
+            }
+        }
+        articleRepository.save(article);
+        SimpleArticleDto res = articleMapper.toSimpleArticleDto(article);
+
+        res.setModify(!article.getCreateDate().isEqual(article.getLastModifiedDate()));
+
+        List<ArticlePhoto> articlePhotoList = article.getArticlePhotoList();
+        res.setPhotoList(articlePhotoMapper.toSimpleArticlePhotoDtoList(articlePhotoList));
+        
+        return res;
+
     }
 
 }
