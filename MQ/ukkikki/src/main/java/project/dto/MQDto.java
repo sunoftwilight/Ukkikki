@@ -12,4 +12,5 @@ public class MQDto {
     private MultipartFile file;
     private String partyId;
     private String key;
+    private Long photoId;
 }

@@ -30,32 +30,35 @@ public class MQController {
     public ResponseEntity<ResultResponse> fileUpload(
             @RequestPart("file")MultipartFile multipartFile,
             @RequestPart("partyId") String partyId,
-            @RequestPart("key") String key
+            @RequestPart("key") String key,
+            @RequestPart("photoId") Long photoId
             ){
+
 
         MQDto mqDto = new MQDto();
         mqDto.setFile(multipartFile);
         mqDto.setPartyId(partyId);
         mqDto.setKey(key);
+        mqDto.setPhotoId(photoId);
         mqService.fileUpload(mqDto);
 
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
     }
 
-    @PostMapping("/finish")
-    public ResponseEntity<ResultResponse> finish(int index){
-
-        mqService.finish(index);
-
-        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
-    }
-
-    @PostMapping("/size")
-    public ResponseEntity<ResultResponse> size(){
-
-        mqService.queSize();
-
-        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
-    }
+//    @PostMapping("/finish")
+//    public ResponseEntity<ResultResponse> finish(int index){
+//
+//        mqService.finish(index);
+//
+//        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
+//    }
+//
+//    @PostMapping("/size")
+//    public ResponseEntity<ResultResponse> size(){
+//
+//        mqService.queSize();
+//
+//        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
+//    }
 
 }

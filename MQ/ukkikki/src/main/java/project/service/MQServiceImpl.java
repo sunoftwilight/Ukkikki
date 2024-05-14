@@ -1,7 +1,11 @@
 package project.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -18,6 +22,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Service
+@Slf4j
 public class MQServiceImpl implements MQService {
 
     private final ConcurrentLinkedDeque<MQDto> waitLinkedDeque;
@@ -35,6 +40,7 @@ public class MQServiceImpl implements MQService {
     }
 
     @Override
+    @Async
     public void fileUpload(MQDto mqDto) {
 
         String partyId = mqDto.getPartyId();
@@ -77,7 +83,10 @@ public class MQServiceImpl implements MQService {
     }
 
     @Override
+    @Async
     public void fileAiUpload(int index) {
+
+        log.info("index : " + index + "의 작업이 시작됩니다.");
 
         MQDto mqDto = workLinkedDeque[index].peek();
         if(mqDto == null)
@@ -100,7 +109,9 @@ public class MQServiceImpl implements MQService {
                 .contentType(MediaType.IMAGE_JPEG);
         bodyBuilder.part("partyId", mqDto.getPartyId());
         bodyBuilder.part("key", mqDto.getKey());
+        bodyBuilder.part("photoId", mqDto.getPhotoId());
         bodyBuilder.part("index", index);
+
 
         // ai 서버로 보내기.
         webClient
@@ -114,7 +125,26 @@ public class MQServiceImpl implements MQService {
                 .onErrorResume(e -> {
                     return Mono.fromRunnable(() -> finish(index));
                 })
-                .subscribe();
+                .subscribe(
+                        (response) -> {
+                            try {
+                                // Jackson ObjectMapper를 사용하여 JSON 문자열 파싱
+                                ObjectMapper objectMapper = new ObjectMapper();
+                                JsonNode rootNode = objectMapper.readTree(response);
+
+                                // "index" 필드 값 추출
+                                String responseIndex = rootNode.path("index").asText();
+
+                                // 추출한 index 값을 사용하여 원하는 작업 수행
+                                finish(Integer.parseInt(responseIndex));
+
+                            } catch (Exception e) {
+                                finish(index);
+                            }
+                        },
+                        error -> finish(index),
+                        () -> log.info("index : " + index + "의 작업이 완료되었습니다.")
+                );
     }
 
     @Override
@@ -138,13 +168,13 @@ public class MQServiceImpl implements MQService {
     }
 
 
-    @Override
-    public void queSize() {
-        System.out.println(waitLinkedDeque.size());
-        for(int i=0;i<workLinkedDeque.length;i++){
-            System.out.println("workLinkedDeque" + i + " = " + workLinkedDeque[i].size());
-        }
-    }
+//    @Override
+//    public void queSize() {
+//        System.out.println(waitLinkedDeque.size());
+//        for(int i=0;i<workLinkedDeque.length;i++){
+//            System.out.println("workLinkedDeque" + i + " = " + workLinkedDeque[i].size());
+//        }
+//    }
 
 
 }
