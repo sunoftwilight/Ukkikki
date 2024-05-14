@@ -38,7 +38,7 @@ public interface PartyService {
     void changePartyThumb(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
     void changePartyInfo(Long partyId, ChangeThumbDto changeThumbDto, MultipartFile photo);
 
-    void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole);
+    void grantPartyUser(Long partyId, Long opponentId, String memberRole);
 
     void exitParty(Long partyId);
 

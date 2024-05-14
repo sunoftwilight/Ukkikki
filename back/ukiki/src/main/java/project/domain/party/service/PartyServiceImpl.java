@@ -584,7 +584,7 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void grantPartyUser(Long partyId, Long opponentId, MemberRole memberRole) {
+    public void grantPartyUser(Long partyId, Long opponentId, String memberRole) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
@@ -613,7 +613,7 @@ public class PartyServiceImpl implements PartyService {
         }
 
         // 권한 변경 후 저장
-        targetMemberParty.setMemberRole(memberRole);
+        targetMemberParty.setMemberRole(MemberRole.valueOf(memberRole));
         memberpartyRepository.save(targetMemberParty);
     }
 
