@@ -5,11 +5,11 @@ import project.domain.directory.collection.Directory;
 import project.domain.directory.collection.File;
 import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.request.CreateDirDto;
-import project.domain.directory.dto.request.GetSseKeyDto;
 import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirFullStructureDto;
 import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
 import project.domain.party.entity.Party;
@@ -19,6 +19,8 @@ public interface DirectoryService {
     public DirDto initDirPartyTest(Long partyId);
 
     public List<GetChildDirDto> getChildDir(String dirId);
+
+    List<GetDirFullStructureDto> getDirFullStructure(String dirId);
 
     public void initDirParty(Party party);
 

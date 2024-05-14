@@ -6,6 +6,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -27,10 +28,10 @@ import project.domain.directory.dto.response.DirDto;
 import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
+import project.domain.directory.dto.response.GetDirFullStructureDto;
 import project.domain.directory.dto.response.GetDirInnerDtov2;
 import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
-import project.domain.directory.dto.response.RenameDirDto;
 import project.domain.directory.mapper.DirMapper;
 import project.domain.directory.mapper.GetDirMapper;
 import project.domain.directory.mapper.RenameDirMapper;
@@ -89,6 +90,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public List<GetDirListDto> getDirList(Long userId) {
+
         // 유저 찾기
         Member member = memberRepository.findById(userId).orElseThrow(
             () -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND)
@@ -145,6 +147,62 @@ public class DirectoryServiceImpl implements DirectoryService {
         log.info("service response = {}", response);
         return response;
     }
+
+    @Override
+    public List<GetDirFullStructureDto> getDirFullStructure(String dirId) {
+        Directory dir = findById(dirId);
+
+        // 최상단 rootDirId 검색
+        String rootDirId = getRootDirId(dir);
+        // DFS
+        return dfs_getDirFullStructure(rootDirId);
+
+    }
+
+    public List<GetDirFullStructureDto> dfs_getDirFullStructure(String rootDirId) {
+        List<GetDirFullStructureDto> result = new ArrayList<>();
+        Directory dir = findById(rootDirId);
+
+        // 초기화
+        HashMap<String, Integer> dirDepth = new HashMap<>();
+        deque.push(dir);
+        visitedSet.add(dir.getId());
+        dirDepth.put(dir.getId(), 0);
+
+        while(!deque.isEmpty()) {
+            // pop + 만들기
+            Directory curDir = deque.pop();
+            result.add(
+                GetDirFullStructureDto.builder()
+                    .depth(dirDepth.get(curDir.getId()))
+                    .name(curDir.getDirName())
+                    .pk(curDir.getId())
+                    .build()
+                );
+
+            List<String> childDirIdList = curDir.getChildDirIdList();
+            if(childDirIdList.isEmpty()) {
+                continue;
+            }
+            // 탐색
+
+            for(Directory nextDir : directoryRepository.findAllById(childDirIdList)) {
+                // 유효성 검사
+                if(visitedSet.contains(nextDir.getId())) {
+                    continue;
+                }
+                // push
+                deque.push(nextDir);
+                visitedSet.add(nextDir.getId());
+                dirDepth.put(nextDir.getId(), dirDepth.get(curDir.getId()) + 1);
+            }
+
+        }
+        visitedSet.clear();
+        return result;
+    }
+
+
 
     @Override
     public GetDirDto getDir(String dirId) {
