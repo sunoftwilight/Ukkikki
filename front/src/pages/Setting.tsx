@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import Modal from "../components/@commons/Modal";
 import { optionStore } from "../stores/OptionStore";
 import { useStore } from "zustand";
+import { logOut } from "../api/user";
 
 const Setting: React.FC = () => {
   const navi = useNavigate();
@@ -21,6 +22,16 @@ const Setting: React.FC = () => {
 			setLogoutOpen();
 		}
 	};
+
+  const reqLogOut = async() => {
+    await logOut(
+      ()=>{
+        localStorage.clear();
+        navi('/login')
+      },
+      ()=>{},
+    )
+  }
 
   return (
     <AnimatePresence>
@@ -63,7 +74,7 @@ const Setting: React.FC = () => {
         {logoutOpen &&(
           <Modal
             modalItems={{content: '로그아웃 하시겠습니까?', modalType:'warn', btn:2 }}
-            onSubmitBtnClick = {() => {closeHandler(); console.log(1);}}
+            onSubmitBtnClick = {() => {closeHandler(); reqLogOut();}}
             onCancelBtnClick = {() => {closeHandler();}}/>
         )}
 
