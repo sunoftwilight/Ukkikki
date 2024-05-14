@@ -22,6 +22,8 @@ import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -90,6 +92,7 @@ public class PhotoServiceImpl implements PhotoService{
                 .photo(photo)
                 .member(member)
                 .content(memoDto.getContent())
+                .date(myDate())
                 .build();
 
         // 메모 저장
@@ -123,6 +126,7 @@ public class PhotoServiceImpl implements PhotoService{
         }
 
         memo.setContent(memoModifyDto.getContent());
+        memo.setDate(myDate());
 
         memoRepository.save(memo);
     }
@@ -205,5 +209,14 @@ public class PhotoServiceImpl implements PhotoService{
 
         // likes 제거하기
         likes.delete();
+    }
+
+
+    public String myDate(){
+
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return format.format(date);
     }
 }
