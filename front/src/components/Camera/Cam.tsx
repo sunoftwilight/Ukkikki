@@ -14,6 +14,8 @@ import singleShot from "@/assets/Camera/singleShot.png";
 import multiShot from "@/assets/Camera/multiShot.png";
 import photo from "@/assets/Camera/photo.png";
 import video from "@/assets/Camera/video.png"
+import { useStore } from 'zustand';
+import { userStore } from '../../stores/UserStore';
 
 
 const Cam: React.FC = () => {
@@ -27,6 +29,7 @@ const Cam: React.FC = () => {
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
   const [cameras, setCameras] = useState<string[]>([]);
   // const [isRecording, setIsRecording] = useState<boolean>(false);
+  const user = useStore(userStore);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   // const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -121,10 +124,10 @@ const Cam: React.FC = () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         canvas.toBlob(async blob => {
-          if (blob) {
+          if (blob && user.uploadGroupId) {
             const formData = new FormData();
 
-            const key = new Blob([JSON.stringify({key:'Parkyd', partyId:1})], {type: 'application/json',});
+            const key = new Blob([JSON.stringify({key: user.groupKey[user.uploadGroupId], partyId:user.uploadGroupId})], {type: 'application/json',});
 
             const file = new File([blob], 'image.jpeg', {type: 'image/jpeg'});
             // 바이트 단위로 파일 크기 가져오기
