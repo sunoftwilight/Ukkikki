@@ -10,8 +10,8 @@ import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirFullStructureDto;
-import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
+import project.domain.member.entity.MemberRole;
 import project.domain.party.entity.Party;
 
 public interface DirectoryService {
@@ -65,5 +65,7 @@ public interface DirectoryService {
     Trash saveFileToTrash(File file, String dirId);
 
     List<GetDirThumbUrl2> getDirThumbUrl2(String dirId);
+
+    Boolean isValidRole(String dirId, MemberRole ... memberRoles);
 
 }

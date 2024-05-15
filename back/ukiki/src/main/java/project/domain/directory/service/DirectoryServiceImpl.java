@@ -42,6 +42,7 @@ import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
+import project.domain.member.entity.MemberRole;
 import project.domain.member.repository.KeyGroupRepository;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.MemberParty;
@@ -97,10 +98,10 @@ public class DirectoryServiceImpl implements DirectoryService {
             () -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
         List<String> childDirIdList = directory.getChildDirIdList();
         log.info("childDirIdList = {}", childDirIdList);
-        if(childDirIdList.isEmpty()) {
+        if (childDirIdList.isEmpty()) {
             throw new BusinessLogicException(ErrorCode.NO_MORE_CHILD_DIR);
         }
-        for (Directory childDir:directoryRepository.findAllById(childDirIdList)){
+        for (Directory childDir : directoryRepository.findAllById(childDirIdList)) {
             response.add(GetChildDirDto.builder()
                 .pk(childDir.getId())
                 .name(childDir.getDirName())
@@ -131,7 +132,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         visitedSet.add(dir.getId());
         dirDepth.put(dir.getId(), 0);
 
-        while(!deque.isEmpty()) {
+        while (!deque.isEmpty()) {
             // pop + 만들기
             Directory curDir = deque.pop();
             result.add(
@@ -140,17 +141,17 @@ public class DirectoryServiceImpl implements DirectoryService {
                     .name(curDir.getDirName())
                     .pk(curDir.getId())
                     .build()
-                );
+            );
 
             List<String> childDirIdList = curDir.getChildDirIdList();
-            if(childDirIdList.isEmpty()) {
+            if (childDirIdList.isEmpty()) {
                 continue;
             }
             // 탐색
 
-            for(Directory nextDir : directoryRepository.findAllById(childDirIdList)) {
+            for (Directory nextDir : directoryRepository.findAllById(childDirIdList)) {
                 // 유효성 검사
-                if(visitedSet.contains(nextDir.getId())) {
+                if (visitedSet.contains(nextDir.getId())) {
                     continue;
                 }
                 // push
@@ -165,7 +166,6 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
 
-
     @Override
     public GetDirDto getDir(String dirId) {
         Directory dir = findById(dirId);
@@ -174,13 +174,14 @@ public class DirectoryServiceImpl implements DirectoryService {
             getParentDirName(dir),
             getChildNameList(dir),
             getPhotoUrlList(dir)
-            );
+        );
     }
 
     @Override
     public GetDirDtov2 getDirv2(String dirId) {
         // member 찾기(다운 여부, 좋아요 여부 찾을때 사용)
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
 
         Member member = memberRepository.findById(memberId)
@@ -196,7 +197,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         // 우선 폴더부터 채우기
         List<String> childDirIdList = dir.getChildDirIdList();
         // childDir
-        if(!childDirIdList.isEmpty()) {
+        if (!childDirIdList.isEmpty()) {
             for (Directory childDir : directoryRepository.findAllById(childDirIdList)) {
                 GetDirInnerDtov2 dirTypeDto = GetDirInnerDtov2.builder()
                     .type(DataType.DIRECTORY)
@@ -209,7 +210,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         // 사진 채우기
         List<String> fileIdList = dir.getFileIdList();
-        if(!fileIdList.isEmpty()) {
+        if (!fileIdList.isEmpty()) {
             List<File> fileList = fileRepository.findAllById(fileIdList);
             // 썸네일을 줘야됨
             for (File file : fileList) {
@@ -239,6 +240,11 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     @Transactional
     public void createDir(CreateDirDto request) {
+        if (!isValidRole(request.getParentDirId(), MemberRole.EDITOR, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
+
         // 새로운 dir 생성
         Directory childDir = Directory.builder()
             .id(generateId())
@@ -255,6 +261,10 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     @Transactional
     public void moveDir(String dirId, String toDirId) {
+        if (!isValidRole(dirId, MemberRole.EDITOR, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
         Directory dir = findById(dirId);
         Directory fromDir = findById(dir.getParentDirId());
         Directory toDir = findById(toDirId);
@@ -268,7 +278,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         directoryRepository.saveAll(toList(dir, fromDir, toDir));
     }
 
-//    @Override
+    //    @Override
 //    @Transactional
 //    public void deleteDir(String dirId) {  // photo의 경우도 고려해줘야한다.
 //        // 폴더에서 제거, file에서 제거, 휴지통에 저장, 쓰레기 등록
@@ -339,35 +349,39 @@ public class DirectoryServiceImpl implements DirectoryService {
 //        trashBin.getDirTrashIdList().add(dirTrash.getId());
 //        trashBinRepository.save(trashBin);
 //    }
-@Override
-@Transactional
-public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고려해줘야 한다.
-    // 루트 폴더에서 부모 폴더를 찾는 것은 불가능합니다.
-    Directory dir = findById(dirId);
-    if (dir.getParentDirId().equals("")) {
-        throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+    @Override
+    @Transactional
+    public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고려해줘야 한다.
+        if (!isValidRole(dirId, MemberRole.EDITOR, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
+        // 루트 폴더에서 부모 폴더를 찾는 것은 불가능합니다.
+        Directory dir = findById(dirId);
+        if (dir.getParentDirId().equals("")) {
+            throw new BusinessLogicException(ErrorCode.FIND_PARENT_OF_ROOT_NOT_AVAILABLE);
+        }
+
+        // 부모 폴더에서 이 폴더를 제거
+        Directory parentDir = findById(dir.getParentDirId());
+        parentDir.getChildDirIdList().remove(dirId);
+        directoryRepository.save(parentDir);
+
+        // 모든 폴더와 파일을 순회하고 후위 탐색 방식으로 삭제
+        postOrderDelete(dir, sseKey);
+
+        // 다음 요청을 위해 visitedSet 비워주기
+        visitedSet.clear();
+
+        // 휴지통에 삭제된 dirTrashId 추가
+        Trash dirTrash = trashRepository.findFirstByRawId(dirId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
+        Long trashBinId = getTrashBinId(dir);
+        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+        trashBin.getDirTrashIdList().add(dirTrash.getId());
+        trashBinRepository.save(trashBin);
     }
-
-    // 부모 폴더에서 이 폴더를 제거
-    Directory parentDir = findById(dir.getParentDirId());
-    parentDir.getChildDirIdList().remove(dirId);
-    directoryRepository.save(parentDir);
-
-    // 모든 폴더와 파일을 순회하고 후위 탐색 방식으로 삭제
-    postOrderDelete(dir, sseKey);
-
-    // 다음 요청을 위해 visitedSet 비워주기
-    visitedSet.clear();
-
-    // 휴지통에 삭제된 dirTrashId 추가
-    Trash dirTrash = trashRepository.findFirstByRawId(dirId)
-        .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASH_NOT_FOUND));
-    Long trashBinId = getTrashBinId(dir);
-    TrashBin trashBin = trashBinRepository.findById(trashBinId)
-        .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
-    trashBin.getDirTrashIdList().add(dirTrash.getId());
-    trashBinRepository.save(trashBin);
-}
 
     private void postOrderDelete(Directory curDir, String sseKey) {
         // 현재 디렉토리를 이미 방문한 경우 패스
@@ -399,14 +413,15 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
                         .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
 
                     // 인물 분류 사진 만료일 설정
-                    List<Face> faceList = faceRepository.findByOriginImageUrl(photo.getPhotoUrl().getPhotoUrl());
+                    List<Face> faceList = faceRepository.findByOriginImageUrl(
+                        photo.getPhotoUrl().getPhotoUrl());
                     for (Face face : faceList) {
                         String url = face.getFaceImageUrl();
                         String fileName = url.split("/")[3];
                         s3Util.fileExpire(sseKey, fileName);
                     }
                     // 썸네일 사진 만료일 설정
-                    for(String url : photo.getPhotoUrl().photoUrls()){
+                    for (String url : photo.getPhotoUrl().photoUrls()) {
                         String fileName = url.split("/")[3];
                         s3Util.fileExpire(sseKey, fileName);
                     }
@@ -451,7 +466,7 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
         Party findParty = partyRepository.findById(partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         // 만약 party에 이미 rootDir이 있다면 나가리
-        if(findParty.getRootDirId() != null) {
+        if (findParty.getRootDirId() != null) {
             throw new BusinessLogicException(ErrorCode.PARTY_ALREADY_HAVE_ROOT_DIR);
         }
 
@@ -473,7 +488,7 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
     @Transactional
     public void initDirParty(Party party) {
         // 만약 party에 이미 rootDir이 있다면 나가리
-        if(party.getRootDirId() != null) {
+        if (party.getRootDirId() != null) {
             throw new BusinessLogicException(ErrorCode.PARTY_ALREADY_HAVE_ROOT_DIR);
         }
 
@@ -519,7 +534,8 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
     @Override
     public List<String> getChildDirNameList(Directory directory) {
         List<String> childDirNameList = new ArrayList<>();
-        List<Directory> childDirList = directoryRepository.findAllById(directory.getChildDirIdList());
+        List<Directory> childDirList = directoryRepository.findAllById(
+            directory.getChildDirIdList());
         for (Directory childDir : childDirList) {
             childDirNameList.add(childDir.getDirName());
         }
@@ -530,7 +546,7 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
     @Override
     public List<String> getPhotoUrlList(Directory directory) {
         List<String> photoUrlList = new ArrayList<>();
-        List<File> FileList =  fileRepository.findAllById(directory.getFileIdList());
+        List<File> FileList = fileRepository.findAllById(directory.getFileIdList());
         for (File file : FileList) {
             photoUrlList.add(file.getPhotoDto().getThumbUrl1());
         }
@@ -540,10 +556,10 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
     @Override
     public String getRootDirId(Directory dir) {
         int cnt = 0;
-        while(!dir.getParentDirId().equals("")) {
+        while (!dir.getParentDirId().equals("")) {
             dir = findById(dir.getParentDirId());
             cnt++;
-            if(cnt > 100){
+            if (cnt > 100) {
                 throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
             }
         }
@@ -556,11 +572,11 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
         dequeDirId.addFirst(dirId);
         Directory dir = findById(dirId);
         int cnt = 0;
-        while(!dir.getParentDirId().equals("")) {
+        while (!dir.getParentDirId().equals("")) {
             dir = findById(dir.getParentDirId());
             dequeDirId.addFirst(dir.getId());
             cnt++;
-            if(cnt > 100){
+            if (cnt > 100) {
                 throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
             }
         }
@@ -574,11 +590,11 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
         Directory dir = findById(dirId);
         dequeName.addFirst(dir.getDirName());
         int cnt = 0;
-        while(!dir.getParentDirId().equals("")) {
+        while (!dir.getParentDirId().equals("")) {
             dir = findById(dir.getParentDirId());
             dequeName.addFirst(dir.getDirName());
             cnt++;
-            if(cnt > 100){
+            if (cnt > 100) {
                 throw new BusinessLogicException(ErrorCode.ROOTDIR_NOT_FOUND);
             }
         }
@@ -616,7 +632,7 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         // 파티Id가 곧 TrashBin의 Id
         Long partyId = party.getId();
-        return  partyId;
+        return partyId;
     }
 
     @Override
@@ -642,10 +658,10 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
         List<GetDirThumbUrl2> response = new ArrayList<>();
         List<String> fileIdList = dir.getFileIdList();
         log.info("fileIdList = {}", fileIdList);
-        if(fileIdList.isEmpty()) {
+        if (fileIdList.isEmpty()) {
             throw new BusinessLogicException(ErrorCode.FILE_NOT_FOUND);
         }
-        for(File file : fileRepository.findAllById(fileIdList)) {
+        for (File file : fileRepository.findAllById(fileIdList)) {
             response.add(
                 GetDirThumbUrl2.builder()
                     .pk(file.getId())
@@ -663,18 +679,18 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
         visitedSet.add(directory.getId());
 
         int fileNum = 0;
-        while(!deque.isEmpty()) {
+        while (!deque.isEmpty()) {
             // pop + 해당 폴더의 파일 수 카운트
             Directory curDirectory = deque.pop();
             fileNum += curDirectory.getFileIdList().size();
             // 탐색
             List<String> childDirIdList = curDirectory.getChildDirIdList();
-            if(childDirIdList.isEmpty()) {
+            if (childDirIdList.isEmpty()) {
                 continue;
             }
-            for(Directory childDirectory : directoryRepository.findAllById(childDirIdList)){
+            for (Directory childDirectory : directoryRepository.findAllById(childDirIdList)) {
                 // 유효성 검사
-                if(visitedSet.contains(childDirectory.getId())) {
+                if (visitedSet.contains(childDirectory.getId())) {
                     continue;
                 }
                 // 인큐
@@ -685,5 +701,35 @@ public void deleteDir(String dirId, String sseKey) { // photo의 경우도 고�
         }
         visitedSet.clear();
         return fileNum;
+    }
+
+    private Member getMemberByNone() {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
+        Long userId = userDetails.getId();
+        return memberRepository.findById(userId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    private Party getPartyByDirId(String dirId) {
+        Directory dir = directoryRepository.findById(dirId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.DIRECTORY_NOE_FOUND));
+        String rootDirId = getRootDirId(dir);
+        return partyRepository.findPartyByRootDirId(rootDirId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+    }
+
+    public Boolean isValidRole(String dirId, MemberRole ... memberRoles) {
+        MemberParty memberParty = memberpartyRepository.findByMemberAndParty(getMemberByNone(),
+                getPartyByDirId(dirId))
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_PARTY_NOT_FOUND));
+
+        // 여기서 MemberRole로 복수로 들어왔을때 or로 내가 넣어준 매개변수에 해당하는 memberParty.getMemberRole();이있ㄷ으면 true 아니면 false
+        for (MemberRole role : memberRoles) {
+            if(memberParty.getMemberRole().equals(role)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

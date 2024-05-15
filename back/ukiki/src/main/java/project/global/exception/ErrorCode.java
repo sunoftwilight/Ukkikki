@@ -26,6 +26,7 @@ public enum ErrorCode {
     USER_PASSWORD_INVALID(400, "잘못된 비밀번호입니다."),
     KEY_GROUP_NOT_FOUND(400, "키그룹에 대한 잘못된 접근입니다."),
     MEMBER_NOT_MATCH(404,"회원 정보가 일치하지 않습니다."),
+    INVALID_MEMBER_ROLE(401, "해당 요청 권한이 없는 유저입니다."),
 
     // 파티 관련
     PARTY_NAME_INVALID(400, "그룹명 입력이 유효하지 않습니다."),
@@ -41,6 +42,7 @@ public enum ErrorCode {
     MEMBER_NOT_PROFILE(400, "프로필을 찾을 수 없습니다."),
     NOT_ROLE_GUEST(400, "게스트에게 없는 권한입니다."),
     PARTY_KEY_NOT_FOUND(400, "파티키를 찾을 수 없습니다."),
+    MEMBER_PARTY_NOT_FOUND(404, "멤버 파티 중개 엔티티를 찾을 수 없습니다."),
 
     // 사진 업로드, 다운로드 관련
     META_CODE_NOT_FOUND(404, "해당 메타코드 분류가 존재하지 않습니다."),

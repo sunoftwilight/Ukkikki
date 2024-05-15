@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.directory.collection.DataType;
@@ -28,6 +29,11 @@ import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
+import project.domain.member.dto.request.CustomUserDetails;
+import project.domain.member.entity.MemberRole;
+import project.domain.member.repository.MemberRepository;
+import project.domain.party.entity.MemberParty;
+import project.domain.party.repository.MemberpartyRepository;
 import project.domain.photo.entity.Face;
 import project.domain.photo.entity.FaceGroup;
 import project.domain.photo.entity.Photo;
@@ -55,6 +61,8 @@ public class TrashServiceImpl implements TrashService{
     private final PhotoRepository photoRepository;
     private final FaceRepository faceRepository;
     private final FaceGroupRepository faceGroupRepository;
+    private final MemberpartyRepository memberpartyRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public void getTrash() {
@@ -129,6 +137,10 @@ public class TrashServiceImpl implements TrashService{
     @Override
     @Transactional
     public void restoreTrashList(List<String> trashIdList, Long trashBinId, String sseKey) {
+        if (!isValidRole(trashBinId, MemberRole.EDITOR, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
         log.info("come in restoreTrashList service");
         for (String trashId : trashIdList) {
             restoreOneTrash(trashId, trashBinId, sseKey);
@@ -330,6 +342,10 @@ public class TrashServiceImpl implements TrashService{
     @Override
     @Transactional
     public void deleteTrashList(Long trashBinId, List<String> trashIdList) {
+        if (!isValidRole(trashBinId, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
         log.info("come in deleteTrashList service");
         for (String trashId : trashIdList) {
             deleteOneTrash(trashId, trashBinId);
@@ -581,4 +597,24 @@ public class TrashServiceImpl implements TrashService{
         }
         directoryRepository.save(directory);
     }
+
+    public Boolean isValidRole(Long trashBinId, MemberRole... memberRoles) {
+        MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(getMemberIdByNone(), trashBinId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_PARTY_NOT_FOUND));
+
+        // 여기서 MemberRole로 복수로 들어왔을때 or로 내가 넣어준 매개변수에 해당하는 memberParty.getMemberRole();이있ㄷ으면 true 아니면 false
+        for (MemberRole role : memberRoles) {
+            if(memberParty.getMemberRole().equals(role)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Long getMemberIdByNone() {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
+        return userDetails.getId();
+    }
+
 }

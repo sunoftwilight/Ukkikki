@@ -5,17 +5,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.article.dto.response.ArticleDirDto;
-import project.domain.article.entity.Article;
-import project.domain.article.entity.ArticlePhoto;
 import project.domain.article.mapper.ArticleMapper;
 import project.domain.article.repository.ArticlePhotoRepository;
 import project.domain.directory.collection.DataType;
@@ -25,14 +20,15 @@ import project.domain.directory.collection.Trash;
 import project.domain.directory.dto.PhotoDto;
 import project.domain.directory.dto.TrashFileDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
-import project.domain.directory.dto.response.GetDirDto;
 import project.domain.directory.repository.DirectoryRepository;
 import project.domain.directory.repository.FileRepository;
 import project.domain.directory.repository.TrashRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
+import project.domain.member.entity.MemberRole;
 import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.Party;
+import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Face;
 import project.domain.photo.entity.Photo;
@@ -66,6 +62,7 @@ public class FileServiceImpl implements FileService{
     private final MemberRepository memberRepository;
     private final FaceRepository faceRepository;
     private final ArticlePhotoRepository articlePhotoRepository;
+    private final MemberpartyRepository memberpartyRepository;
 
     private final ArticleMapper articleMapper;
 
@@ -111,6 +108,11 @@ public class FileServiceImpl implements FileService{
     @Override
     @Transactional
     public void copyFileList(List<String> fileIdList, String fromDirId,  String toDirId) {
+        if (!directoryService.isValidRole(fromDirId, MemberRole.EDITOR, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
+
         if(fileIdList.isEmpty()) {
             throw new BusinessLogicException(ErrorCode.EMPTY_FILE_ID_LIST);
         }
@@ -128,6 +130,10 @@ public class FileServiceImpl implements FileService{
     @Override
     @Transactional
     public void moveFileList(List<String> fileIdList, String fromDirId, String toDirId) {
+        if (!directoryService.isValidRole(fromDirId, MemberRole.EDITOR, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
         if(fileIdList.isEmpty()) {
             throw new BusinessLogicException(ErrorCode.EMPTY_FILE_ID_LIST);
         }
@@ -176,6 +182,10 @@ public class FileServiceImpl implements FileService{
     @Override
     @Transactional
     public void deleteFileList(List<String> fileIdList, String dirId, String sseKey) {
+        if (!directoryService.isValidRole(dirId, MemberRole.EDITOR, MemberRole.MASTER)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+        }
+
         if(fileIdList.isEmpty()) {
             throw new BusinessLogicException(ErrorCode.EMPTY_FILE_ID_LIST);
         }
