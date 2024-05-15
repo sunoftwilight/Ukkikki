@@ -46,7 +46,7 @@ export interface EditDirInfoType {
 
 export interface getDetailImgDataType {
   isDownload : boolean;
-  isLikes: false;
+  isLikes: boolean;
   url: string;
 }
 

@@ -38,9 +38,25 @@ export const deleteMemo = async (
     memoId: number,
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-      console.log(memoId);
         await privateApi.delete(`${url}/memo/delete/${memoId}`)
         .then(Response)
         .catch(Error)
 }
 
+export const createLike = async (
+  fileId : string,
+  Response : (Response : AxiosResponse<ResponseData>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.post(`${url}/likes/${fileId}`)
+    .then(Response)
+    .catch(Error)
+}
+
+export const deleteLike = async (
+  fileId : string,
+  Response : (Response : AxiosResponse<ResponseData>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+    await privateApi.delete(`${url}/likes/${fileId}`)
+    .then(Response)
+    .catch(Error)
+}

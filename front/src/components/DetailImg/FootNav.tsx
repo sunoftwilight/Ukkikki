@@ -17,11 +17,14 @@ import { getDetailImgDataType } from "../../types/AlbumType";
 import { useParams } from "react-router-dom";
 import { userStore } from "../../stores/UserStore";
 
+import * as P from "../../api/detailImg"
+
 interface NavPropsType {
-  info: getDetailImgDataType
+  info: getDetailImgDataType,
+  // 부모 함수 호출하여 좋아요 값 업데이트
+  updateLikes : (isLike : boolean) => void
 }
-const FootNav: React.FC<NavPropsType> = ({ info }) => {
-  const [isHeart, setIsHeart] = useState<boolean>(false)
+const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
   const [isArticle, setIsArticle] = useState<boolean>(false)
   const [isMemo, setIsMemo] = useState<boolean>(false)
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
@@ -33,6 +36,9 @@ const FootNav: React.FC<NavPropsType> = ({ info }) => {
 
   const { groupKey } = useStore(userStore);
   const { groupPk } = useParams();
+
+  // 사진 정보 가져오기
+  const detail = useStore(DetailImgStore)
 
   const prefixHandler = async () => {
     setIsPrefixOpen(false)
@@ -66,6 +72,42 @@ const FootNav: React.FC<NavPropsType> = ({ info }) => {
   const doneHandler = () => {
     setIsIng(false)
     setIsDownDone(true)
+  }
+
+  // 좋아요 클릭
+  const likeClick = () => {
+    // 좋아요 여부 체크
+    if(info.isLikes){
+      likeDelete();
+    }else{
+      likeCreate();
+    }
+  }
+
+  const likeCreate = async () => {
+    await P.createLike(
+      detail.currentImg,
+      () => {
+        // 좋아요 값 업데이트
+        updateLikes(true);
+      },
+      (err) => {
+        console.log(err);
+      }
+    )
+  }
+
+  const likeDelete = async () => {
+    await P.deleteLike(
+      detail.currentImg,
+      () => {
+        // 좋아요 값 업데이트
+        updateLikes(false);
+      },
+      (err) => {
+        console.log(err);
+      }
+    )
   }
 
   return (
@@ -123,8 +165,8 @@ const FootNav: React.FC<NavPropsType> = ({ info }) => {
         <img src={trash} className="w-6" />
     
         { info.isLikes ? 
-          <img src={heart} onClick={() => setIsHeart(!isHeart)} className="w-6" /> 
-          : <img src={noHeart} onClick={() => setIsHeart(!isHeart)} className="w-6" />
+          <img src={heart} onClick={likeClick} className="w-6" /> 
+          : <img src={noHeart} onClick={likeClick} className="w-6" />
         }
 
         <img src={memo} onClick={() => setIsMemo(!isMemo)} className="w-6" />

@@ -31,10 +31,18 @@ const DetailImg: React.FC = () => {
     )
   }, [])
   
+  // 좋아요 값 업데이트
+  const updateLikes = (isLike : boolean) => {
+    setDetailInfo(prevInfo => ({
+      ...prevInfo, // 현재 상태의 나머지 부분을 복사합니다.
+      isLikes: isLike // isLikes 값을 업데이트합니다.
+    }))
+  }
+
   return (
     <div className="w-full h-full">
       <Img url={highQualityUrl} />
-      <FootNav info={detailInfo} />
+      <FootNav info={detailInfo} updateLikes={updateLikes} />
       <ThumbnailNav />
     </div>
   )
