@@ -24,6 +24,7 @@ import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
 import project.domain.chat.entity.Chat;
 import project.domain.chat.repository.ChatRepository;
+import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.service.DirectoryService;
 import project.domain.directory.service.TrashBinService;
 import project.domain.member.dto.request.CustomOAuth2User;
@@ -79,6 +80,7 @@ public class PartyServiceImpl implements PartyService {
     private final ChatRepository chatRepository;
     private final KeyGroupRepository keyGroupRepository;
     private final FaceRepository faceRepository;
+    private final TrashBinRepository trashBinRepository;
 
     private final PartyLinkMapper partyLinkMapper;
     private final ProfileMapper profileMapper;
