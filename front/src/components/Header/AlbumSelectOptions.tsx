@@ -79,11 +79,13 @@ const AlbumSelectOptions: React.FC = () => {
   const delFileHandler = async () => {
     await delFiles(
       currentDirId,
-      {data:{
-        sseKey: groupKey[Number(groupPk)],
-        // sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
-        fileIdList: selectListForPk
-      }},
+      { 
+        data: {
+          // sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+          sseKey: groupKey[Number(groupPk)],
+          fileIdList: selectListForPk
+        }
+      },
       (res) => {
         console.log(res)
         doneHandler('del')

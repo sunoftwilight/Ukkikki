@@ -4,7 +4,7 @@ import newFolder from "@/assets/Album/newFolder.png"
 import { folderStore } from "../../stores/ModalStore";
 import ModalBackground from "../@commons/ModalBackground";
 import { useStore } from "zustand";
-import { copyFiles, getDirStructure, moveFiles } from "../../api/directory";
+import { copyFiles, getDirStructure, moveDirectory, moveFiles } from "../../api/directory";
 import { childDirItem } from "../../types/AlbumType";
 import { currentDirStore, selectModeStore, selectStore, updateAlbumStore } from "../../stores/AlbumStore";
 import { albumDoneStore } from "../../stores/HeaderStateStore";
@@ -63,6 +63,21 @@ const FolderModal: React.FC = () => {
       }
     )
   }
+  
+  const moveDirHandler = () => {
+    moveDirectory(
+      currentDirId,
+      { toDirId: selectDir },
+      () => {
+        setFolderOpen('')
+        setIsDone()
+      },
+      (err) => {
+        console.error(err)
+        alert('오류가 발생했습니다. 다시 시도하십시오.')
+      }
+    )
+  }
 
   const doneHandler = () => {
     setFolderOpen('')
@@ -91,7 +106,7 @@ const FolderModal: React.FC = () => {
           <div className="w-full h-full z-20 flex items-center justify-center">
             <div className="relative z-20 w-[320px] h-[540px] p-4 bg-white rounded-[15px] flex flex-col">
               <div className="mb-4 flex justify-between items-center font-pre-B text-black text-2xl">
-                폴더선택
+                폴더 선택
                 <img src={newFolder} className="w-[27px]" />
               </div>
               <div className="h-[calc(100%-112px)] w-full top-[64px] bottom-[82px] flex flex-col overflow-scroll scrollbar-hide">
@@ -113,7 +128,7 @@ const FolderModal: React.FC = () => {
               
               <div className="flex gap-3 absolute bottom-4 w-[calc(100%-32px)] h-[50px]">
                 <div onClick={() => doneHandler()} className={`${btnStyle} bg-disabled-gray`}>취소</div>
-                <div onClick={() => {folderMode === 'move' ? moveHandler() : copyHandler()}} className={`${btnStyle} bg-main-blue`}>{folderMode === 'move' ? '이동' : '복사'}</div>
+                <div onClick={() => {folderMode === 'move' ? moveHandler() : folderMode === 'copy' ? copyHandler() : moveDirHandler()}} className={`${btnStyle} bg-main-blue`}>{folderMode === 'copy' ? '복사' : '이동'}</div>
               </div>
             </div>
           </div>

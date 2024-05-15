@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { AlbumResponse, DirInfoType, delFilesDtoType, getChildDirResponseType, getDetailImgType, handleInfoType, sseKeyDtoType, thumbNailResponseType } from '../types/AlbumType';
+import { AlbumResponse, DirInfoType, delFilesDtoType, getChildDirResponseType, getDetailImgType, handleInfoType, patchMoveDirDtoType, sseKeyDtoType, thumbNailResponseType } from '../types/AlbumType';
 
 const url = 'directories';
 
@@ -97,6 +97,17 @@ export const copyFiles = async (
   Response : (Response : AxiosResponse<getChildDirResponseType>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.patch(`/${url}/${dirId}/files/copy`, copyInfo)
+  .then(Response)
+  .catch(Error)
+}
+
+
+export const moveDirectory = async (
+  dirId: string,
+  patchMoveDirDto : patchMoveDirDtoType,
+  Response : (Response : AxiosResponse<AlbumResponse>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.patch(`/${url}/${dirId}`, patchMoveDirDto)
   .then(Response)
   .catch(Error)
 }

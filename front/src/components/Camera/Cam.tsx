@@ -141,9 +141,9 @@ const Cam: React.FC = () => {
             formData.append('files', file);
 
             upLoadPhoto(formData,
-               (response) => {
+              (response) => {
                 console.log(response)
-               }, (error)=> {
+              }, (error)=> {
                 console.log(error)
             })
           }

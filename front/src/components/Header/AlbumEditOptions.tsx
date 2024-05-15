@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import upload from "@/assets/Header/AlbumEditOptions/upload.png";
 import addFolder from "@/assets/Header/AlbumEditOptions/addFolder.png";
 import edit from "@/assets/Header/AlbumEditOptions/edit.png";
 import trash from "@/assets/Header/AlbumEditOptions/trash.png";
+import moveFolder from "@/assets/Header/AlbumEditOptions/moveFolder.png";
 import { albumEditStore } from "../../stores/HeaderStateStore";
 import { AnimatePresence } from "framer-motion";
 import Modal from "../@commons/Modal";
@@ -11,6 +12,7 @@ import { currentDirStore, prefixStore, updateAlbumStore } from "../../stores/Alb
 import { createDirectory, delDirectory, editDirectory } from "../../api/directory";
 import { userStore } from "../../stores/UserStore";
 import { useParams } from "react-router-dom";
+import { folderStore } from "../../stores/ModalStore";
 
 const AlbumEditOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
@@ -23,6 +25,9 @@ const AlbumEditOptions: React.FC = () => {
   const [isEditNameOpen, setIsEditNameOpen] = useState(false)
   const { groupKey } = useStore(userStore);
   const { groupPk } = useParams();
+  const { setFolderOpen } = useStore(folderStore)
+  // const [uploadFiles, setUploadFiles] = useState([])
+	const refInputRef = useRef(null)
 
   // 요청에 맞는 모달창 열기
   const openHandler = (mode: string) => {
@@ -32,6 +37,8 @@ const AlbumEditOptions: React.FC = () => {
       setIsNamingOpen(true)
     } else if (mode === 'edit Name') {
       setIsEditNameOpen(true)
+    } else if (mode === 'move dir') {
+      setFolderOpen('move dir')
     }
   }
 
@@ -85,6 +92,10 @@ const AlbumEditOptions: React.FC = () => {
     )
   }
 
+  const uploadHandler = (e: any) => {
+    console.log(e)
+  }
+
   // 모달 요청 완료 후 로직
   const doneHandler = () => {
     setNeedUpdate()
@@ -120,11 +131,17 @@ const AlbumEditOptions: React.FC = () => {
         onCancelBtnClick={() => setIsEditNameOpen(false)}
         />
       }
-      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[160px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
-        <div className={`${optionStyle}`} onClick={() => setIsEdit()}>
+      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[200px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
+        <label className={`${optionStyle}`} htmlFor='files'>
           <img src={upload} className="w-4" />
           업로드
-        </div>
+        </label>
+        <input 
+          type="file" name='file' id='files' 
+          style={{display: "none"}}
+          ref={refInputRef}
+          onChange={(e) => uploadHandler(e)}
+        />
 
         <div className={`${optionStyle}`} onClick={() => openHandler('add Folder')}>
           <img src={addFolder} className="w-4" />
@@ -134,6 +151,11 @@ const AlbumEditOptions: React.FC = () => {
         <div className={`${optionStyle}`} onClick={() => openHandler('edit Name')}>
           <img src={edit} className="w-4" />
           현재 폴더명 수정
+        </div>
+
+        <div className={`${optionStyle}`} onClick={() => openHandler('move dir')}>
+          <img src={moveFolder} className="w-4" />
+          현재 폴더 이동
         </div>
 
         <div className={`${optionStyle}`} onClick={() => openHandler('delete')}>

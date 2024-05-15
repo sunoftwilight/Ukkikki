@@ -5,13 +5,13 @@ import { Link, useParams } from "react-router-dom";
 import { useStore } from "zustand";
 import { DetailImgStore } from "../../stores/DetailImgStore";
 import { currentDirStore, selectModeStore, updateAlbumStore } from "../../stores/AlbumStore";
-import SelectModeImg from "./SelectModeImg";
+import SelectModeImg from "../Album/SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
-import SecureImg from "./SecureImg";
+import SecureImg from "../Album/SecureImg";
 import { getPartyDetail } from "../../api/party";
 
-const AlbumMain: React.FC = () => {
+const TrashMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
   const { needUpdate } = useStore(updateAlbumStore)
@@ -93,4 +93,4 @@ const AlbumMain: React.FC = () => {
   )
 };
 
-export default AlbumMain;
+export default TrashMain;

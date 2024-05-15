@@ -94,3 +94,7 @@ export interface handleInfoType {
   toDirId: string;
   fileIdList: string[];
 }
+
+export interface patchMoveDirDtoType {
+  toDirId: string
+}
