@@ -1,11 +1,14 @@
 import axios, { AxiosInstance } from "axios";
 // import { tokenRefresh } from "../api/user";
 // import { httpStatusCode } from "./http-status";
+// import { useStore } from "zustand";
+// import { userStore } from "../stores/UserStore";
 
 axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
 // const baseURL: string = "http://localhost:5000/api";
+// const user = useStore(userStore);
 
 // S3 조회 API 
 export const imgApi: AxiosInstance = axios.create({
@@ -82,16 +85,14 @@ privateApi.interceptors.request.use(
     // if (status === 401) {
     //   if (error.response.data.message === 'access token expired') {
     //     const originRequest = config;
-
     //     // 토큰 재발급.
     //     await tokenRefresh(
     //       (res) => {
     //         // 성공 시
     //         if (res.status === httpStatusCode.OK && res.headers.access) {
-    //           localStorage.setItem('accessToken', res.headers.access);
+    //           user.setAccessToken(res.headers.access);
     //           axios.defaults.headers.access = `${res.headers.access}`;
     //           originRequest.headers.access = `${res.headers.access}`;
-
     //           // 토큰 교환 후 재 시도.
     //           return axios(originRequest);
     //         }
@@ -123,22 +124,20 @@ formDataApi.interceptors.request.use(
     // if (status === 401) {
     //   if (error.response.data.message === 'access token expired') {
     //     const originRequest = config;
-
     //     // 토큰 재발급.
-    //     await TokenRefresh(
+    //     await tokenRefresh(
     //       (res) => {
     //         // 성공 시
     //         if (res.status === httpStatusCode.OK && res.headers.access) {
-    //           localStorage.setItem('accessToken', res.headers.access);
+    //           user.setAccessToken(res.headers.access);
     //           axios.defaults.headers.access = `${res.headers.access}`;
     //           originRequest.headers.access = `${res.headers.access}`;
-
     //           // 토큰 교환 후 재 시도.
     //           return axios(originRequest);
     //         }
     //       },
     //       () => {
-    //         localStorage.clear();
+            
     //       }
     //     )
     //   }

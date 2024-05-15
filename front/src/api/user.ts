@@ -45,4 +45,13 @@ export const simpleCheck = async(
       await privateApi.post(`/${url}/logout`)
       .then(Response)
       .catch(Error)
+  }
+
+  export const changeUploadGroup = async (
+    partyId: number,
+    Response : (Response: AxiosResponse<ResponseData>) => void,
+    Error : (Error: AxiosResponse<ResponseData>) => void) => {
+      await privateApi.patch(`/${url}/directory/${partyId}`)
+      .then(Response)
+      .catch(Error)
     }

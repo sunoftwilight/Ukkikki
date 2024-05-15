@@ -15,6 +15,7 @@ const GroupAttend:React.FC = () => {
   const inputsRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
 
   useEffect(() => {
+    console.log(guest.isGuest, user.isLogin)
     if(!guest.isGuest && !user.isLogin) navi(`/group/${groupPk}/attend/login`)
   }, [])
 
@@ -50,7 +51,7 @@ const GroupAttend:React.FC = () => {
   const attentMember = async () => {
     await enterPartyMember(Number(groupPk),
       () => {
-        navi(`/group/${groupPk}`)
+        navi(`/group/${groupPk}/main`)
       },
       (err) => {
         console.error(err)
@@ -62,7 +63,7 @@ const GroupAttend:React.FC = () => {
     await enterPartyGuest(Number(groupPk),
       (res) => {
         user.setAccessToken('Bearer ' + res.data.data.token);
-        navi(`/group/${groupPk}`)
+        navi(`/group/${groupPk}/main`)
       },
       (err) => {
         console.error(err)

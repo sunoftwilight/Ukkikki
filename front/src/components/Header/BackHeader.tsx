@@ -19,6 +19,10 @@ const BackHeader: React.FC = () => {
       navigate(`/album/${currentGroup}`)
       return
     }
+		if (location.pathname.startsWith('/group') && location.pathname.includes('/main')) {
+      navigate(`/group/list`)
+      return
+    }
 		navigate(-1);
 	};
 

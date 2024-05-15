@@ -25,7 +25,7 @@ const CreateDone: React.FC<CreateDoneProps> = ({ partyPk, partyName, inviteCode 
 			<div className="font-pre-B text-white text-xl flex flex-col gap-4">
 				<button
 					className={btnStyle + " bg-main-blue"}
-					onClick={() => navi(`/group/${pk}`)}
+					onClick={() => navi(`/group/${pk}/main`)}
 				>
 					<p>바로가기</p>
 				</button>

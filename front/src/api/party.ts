@@ -1,7 +1,13 @@
 import { AxiosResponse } from 'axios';
 import { formDataApi, privateApi, imgApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { CreateDoenResponesData, PartyListResponesData, PartyLinkResponse, EnterGuestRespones, PartyCheckPassRespones, PartyUserListRespones } from '../types/GroupType';
+import { CreateDoenResponesData,
+	PartyListResponesData,
+	PartyLinkResponse,
+	EnterGuestRespones,
+	PartyCheckPassRespones,
+	PartyUserListRespones,
+	PartyPassChangeResponse } from '../types/GroupType';
 import { PartyDetailResponse } from '../types/GroupType';
 
 const url = 'party'
@@ -130,14 +136,12 @@ export const getPartyThumb = async (
 	export const changePartyPass = async (
 		partyId : number,
 		passInfo : Record<string, string>,
-		Response : (Response : AxiosResponse<ResponseData>) => void, 
+		Response : (Response : AxiosResponse<PartyPassChangeResponse>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
     await privateApi.patch(`/${url}/change/password/${partyId}`, passInfo)
     .then(Response)
     .catch(Error)
 	}
-
-
 
 	// 1
 	export const getPartyUserList = async (

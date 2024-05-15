@@ -68,7 +68,6 @@ const Header: React.FC = () => {
 		return <BackHeader />;
 	else if (
 		basicPath.includes(location.pathname)
-		
 	)
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;
