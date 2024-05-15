@@ -74,7 +74,7 @@ export default function Router() {
         <Route path="/feed/img/:pk" element={<ArticleImg />} />
         <Route path="/write" element={<Write />} />
         <Route path="/chat" element={<Chatting />} />
-        <Route path="/trash" element={<Trash />} />
+        <Route path="/trash/:groupPk" element={<Trash />} />
       </Route>
 
       {/* 헤더 & 네브가 필요 없는 페이지 */}

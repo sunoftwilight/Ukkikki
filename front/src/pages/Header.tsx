@@ -71,7 +71,7 @@ const Header: React.FC = () => {
 	)
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;
-	else if (albumPath.includes(location.pathname) || location.pathname.startsWith("/album")) return <AlbumHeader />;
+	else if (albumPath.includes(location.pathname) || location.pathname.startsWith("/album")  || location.pathname.startsWith("/trash")) return <AlbumHeader />;
 	else if (location.pathname === "/write") return <WriteHeader />;
 };
 

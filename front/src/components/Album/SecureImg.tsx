@@ -23,6 +23,7 @@ const SecureImg: React.FC<ImgProps> = ({ url }) => {
     opt,
     () => {},
     (err) => { console.error(err) },
+    // () => {},
   );
 
   return (

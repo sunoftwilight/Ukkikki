@@ -12,6 +12,7 @@ import { albumDoneStore, albumEditStore } from "../../stores/HeaderStateStore";
 import TrashOptions from "./TrashOptions";
 import { useStore } from "zustand";
 import { currentGroupStore } from "../../stores/GroupStore";
+import { selectTrashStore } from "../../stores/TrashStore";
 
 const AlbumHeader: React.FC = () => {
 	const btnStyle = "w-14 h-8 rounded-[10px] font-pre-SB text-white flex justify-center items-center";
@@ -28,7 +29,8 @@ const AlbumHeader: React.FC = () => {
 	const { selectMode, setSelectMode } = selectModeStore();
 	const { isEdit, setIsEdit } = albumEditStore();
 	const { isDone, setIsDone } = albumDoneStore();
-	const { setSelectList } = useStore(selectStore)
+	const { setSelectList, setSelectListForPk } = useStore(selectStore)
+  const { setSelectTrash } = useStore(selectTrashStore)
   const { currentGroup } = useStore(currentGroupStore);
 
 	const navigate = useNavigate();
@@ -38,6 +40,8 @@ const AlbumHeader: React.FC = () => {
 
 	const cancelHandler = () => {
 		setSelectList(-1, false)
+    setSelectListForPk('-1', false)
+    setSelectTrash('-1', false)
 		setSelectMode()
 	}
 

@@ -1,10 +1,10 @@
 import React from "react";
-import AlbumMain from "../components/Album/AlbumMain";
+import TrashMain from "../components/Trash/TrashMain";
 
 const Trash: React.FC = () => {
   return (
     <div>
-      <AlbumMain />
+      <TrashMain />
     </div>
   )
 };

@@ -26,7 +26,7 @@ const GroupMenu: React.FC = () => {
       <Link to='/feed' className={`${btnStyle}  bg-soft-blue`}>피드</Link>
       <Link to='/chat' className={`${btnStyle}  bg-soft-blue`}>채팅</Link>
       <div className={`${btnStyle}  bg-soft-blue`} onClick={() => handleInviteBtn()}>초대</div>
-      <Link to='/trash' className={`${btnStyle} bg-disabled-gray`}>휴지통</Link>
+      <Link to={`/trash/${groupPk}`} className={`${btnStyle} bg-disabled-gray`}>휴지통</Link>
     </div>
   )
 };
