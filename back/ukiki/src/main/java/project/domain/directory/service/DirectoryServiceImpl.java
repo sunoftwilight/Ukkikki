@@ -261,11 +261,15 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     @Transactional
     public void moveDir(String dirId, String toDirId) {
+        log.info("come in moveDir service");
         if (!isValidRole(dirId, MemberRole.EDITOR, MemberRole.MASTER)) {
             throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
         }
+        log.info("pass validation");
 
+        log.info("dirId = {}", dirId);
         Directory dir = findById(dirId);
+        log.info("parentDirId = {}", dir.getParentDirId());
         Directory fromDir = findById(dir.getParentDirId());
         Directory toDir = findById(toDirId);
         // fromDirId : 자식 리스트에서 dirId 제거
@@ -274,8 +278,8 @@ public class DirectoryServiceImpl implements DirectoryService {
         toDir.getChildDirIdList().add(dirId);
         // dirId : 부로를 toDirId로 수정
         dir.setParentDirId(toDirId);
-
         directoryRepository.saveAll(toList(dir, fromDir, toDir));
+        log.info("response moveDir service = void");
     }
 
     //    @Override
