@@ -7,15 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.DeleteFileListDto;
 import project.domain.directory.dto.request.GetRenameDto;
@@ -29,9 +26,7 @@ import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirFullStructureDto;
-import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
-import project.domain.member.dto.request.CustomUserDetails;
 import project.global.result.ResultResponse;
 
 @Tag(name ="공유 앨범 폴더및 사진 조작 관련(휴지통 아님) Controller", description = "폴더 조작 및 사진 파일 조작 API ")
@@ -69,7 +64,7 @@ public interface DirectoryDocs {
     @PatchMapping("/{dirId}")
     public ResponseEntity<ResultResponse> moveDir(
         @PathVariable String dirId,
-        @RequestParam PatchMoveDirDto patchMoveDirDto
+        @RequestBody PatchMoveDirDto patchMoveDirDto
     );
 
     @Operation(summary = "폴더 삭제 요청", description = "PathVariable로 dirId(삭제 대상 폴더 Id), Body로 sseKey를 받아 해당 폴더 삭제")
