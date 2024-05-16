@@ -13,4 +13,6 @@ public class FileUploadDto {
     private long partyId;
     private Double latitude;
     private Double longitude;
+    private String rootDirId;
+    private String targetDirId;
 }

@@ -101,9 +101,8 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
             photo.setMember(member);
             photoRepository.save(photo);
-            //GPT API
 
-
+            //인물분류 API
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             try {
@@ -135,7 +134,86 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             log.info("MongoDB 업데이트 시작");
             //MongoDB 업데이트
             fileService.createFile(fileUploadDto.getPartyId(), photo);
+            //GPT API
+            gptService.processGptApiAsync(photo, file);
+        }
+    }
 
+    @Override
+    public void uploadToDirectory(List<MultipartFile> files, FileUploadDto fileUploadDto) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        String key = fileUploadDto.getKey();
+
+        if (key == null || key.isEmpty()){
+            throw new BusinessLogicException(ErrorCode.SSE_KEY_MISSED);
+        }
+
+        for(MultipartFile file : files){
+            Photo photo = new Photo();
+            photo.setPhotoType(PhotoType.APP);
+            PhotoUrl urls = new PhotoUrl();
+
+            //S3 파일 업로드 후 저장
+            urls.setPhotoUrl(s3Util.fileUpload(file, key));
+            photo.setFileName(urls.getPhotoUrl().split("/")[3]);
+
+            BufferedImage firstThumbnail = imageUtil.resizeImage(file, 1);
+            String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, key, file);
+            urls.setThumb_url1(firstThumbnailUrl);
+
+            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 1);
+            String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, key, file);
+            urls.setThumb_url2(secondThumbnailUrl);
+
+            log.info("urls : " + urls.getPhotoUrl() + ", " + urls.getThumb_url1() + ", " + urls.getThumb_url2()
+                    + ", " + photo.getFileName());
+
+            photo.setPhotoUrl(urls);
+
+            Party party = partyRepository.findById(fileUploadDto.getPartyId())
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+            photo.setParty(party);
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+            photo.setMember(member);
+            photoRepository.save(photo);
+
+            //인물분류 API
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            try {
+                ImageIO.write(secondThumbnail, "jpg", outputStream);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            byte[] imageBytes = outputStream.toByteArray();
+
+            MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+            bodyBuilder.part("file", imageBytes)
+                    .filename(urls.getPhotoUrl())
+                    .contentType(MediaType.IMAGE_JPEG);
+            bodyBuilder.part("partyId", fileUploadDto.getPartyId());
+            bodyBuilder.part("key", key);
+            bodyBuilder.part("photoId", photo.getId());
+
+            webClient
+                    .post()
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .subscribe(response -> {
+                        // Handle response from server
+                        log.info(response);
+                    });
+            log.info("MongoDB 업데이트 시작");
+            //MongoDB 업데이트
+            String fileId = fileService.createFile(fileUploadDto.getPartyId(), photo);
+            fileService.moveFile(fileId, fileUploadDto.getRootDirId(), fileUploadDto.getTargetDirId());
+            //GPT API
             gptService.processGptApiAsync(photo, file);
         }
     }
