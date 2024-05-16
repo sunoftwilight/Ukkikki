@@ -339,6 +339,78 @@ public class TrashServiceImpl implements TrashService{
         }
     }
 
+    public void deleteOneTrashDaily(String trashId, Long trashBinId) {
+        log.info("come in deleteOneTrash");
+        log.info("trashId = {}", trashId);
+        log.info("trashBinId = {}", trashBinId);
+        Trash trash = findById(trashId);
+        TrashBin trashBin = trashBinRepository.findById(trashBinId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.TRASHBIN_NOT_FOUND));
+
+        if (trash.getDataType() == DataType.FILE) {
+            TrashFileDto trashFileDto = modelMapper.map(trash.getContent(), TrashFileDto.class);
+            Long photoId = trashFileDto.getPhotoDto().getId();
+
+            // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
+            setPhotoAndS3(photoId, trashBinId);
+
+            // 쓰레기에서 trash 지우기
+            trashRepository.deleteById(trash.getId());
+            // 쓰레기통에서 trashId 지우기
+            trashBin.getFileTrashIdList().remove(trash.getId());
+            trashBinRepository.save(trashBin);
+        } else if (trash.getDataType() == DataType.DIRECTORY) {
+            // 쓰레기가 폴더인 경우
+            // trashBin에서 trashId 제거
+            trashBin.getDirTrashIdList().remove(trashId);
+            trashBinRepository.save(trashBin);
+            // 해당 쓰레기 디렉토리 하위 모든 쓰레기 검색(본인 포함)
+//            List<Trash> allTrash = getAllTrash(trashId);
+            List<Trash> allTrash = getAllTrashV2(trashId);
+            for (Trash oneTrash : allTrash) {
+                log.info("oneTrashId = {}", oneTrash.getId());
+                if (oneTrash.getDataType() == DataType.DIRECTORY) {
+                    trashRepository.delete(oneTrash);
+                } else if (oneTrash.getDataType() == DataType.FILE) {
+                    TrashFileDto oneTrashFileDto = modelMapper.map(oneTrash.getContent(), TrashFileDto.class);
+                    log.info("trashFileDto = {}", oneTrashFileDto);
+                    log.info("photoDto = {}", oneTrashFileDto.getPhotoDto());
+                    log.info("photoId = {}", oneTrashFileDto.getPhotoDto().getId());
+
+                    Long photoId = oneTrashFileDto.getPhotoDto().getId();
+
+                    // 포토 관련 설정과 S3에서 지우기 설정은 여기에서
+                    setPhotoDaily(photoId, trashBinId);
+
+                    // 쓰레기에서 trash 지우기
+                    trashRepository.deleteById(oneTrash.getId());
+                }
+            }
+        }
+    }
+
+    public void setPhotoDaily(Long photoId, Long trashBinId) {
+        // 포토 수 - 1감소
+        Photo photo = photoRepository.findById(photoId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
+
+        int photoNum = photo.getPhotoNum();
+        photoNum = photoNum - 1;
+        log.info("갱신된 photoNum = {}", photoNum);
+
+        if (photoNum != 0) {
+            log.info("photoNum 갱신 로직 실행");
+            // 그냥 photoNum 갱신하고 return
+            photo.setPhotoNum(photoNum);
+            photoRepository.save(photo);
+            return;
+        }
+        log.info("photo, s3 삭제 로직 실행");
+
+        // photo 처리 부분
+        photoRepository.delete(photo);
+    }
+
     @Override
     @Transactional
     public void deleteTrashList(Long trashBinId, List<String> trashIdList) {
@@ -618,7 +690,6 @@ public class TrashServiceImpl implements TrashService{
         return userDetails.getId();
     }
 
-    @Scheduled(cron = "0 0 3 * * ?")
     public void dailyTrashCleanUp() {
         List<TrashBin> allTrashBinList = trashBinRepository.findAll();
         for (TrashBin oneTrashBin : allTrashBinList) {
@@ -632,7 +703,7 @@ public class TrashServiceImpl implements TrashService{
                 if (!isOutOfRecoveryPeriod(oneTrash)) {continue;}
 
                 // 지워야할 쓰래기 처리
-                deleteOneTrash(oneTrash.getId(), oneTrashBin.getId());
+                deleteOneTrashDaily(oneTrash.getId(), oneTrashBin.getId());
             }
         }
     }

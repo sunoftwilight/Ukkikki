@@ -44,4 +44,6 @@ public interface TrashService {
     void setConnection(Trash trash);
 
     void setEndPoint(Trash trash, List<String> fullRoutList, int sizeOfFullRoutList);
+
+    void dailyTrashCleanUp();
 }
