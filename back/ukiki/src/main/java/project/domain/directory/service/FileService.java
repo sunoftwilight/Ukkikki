@@ -37,9 +37,9 @@ public interface FileService {
     // dir, file의 관계 삭제 메서드
     void deleteDirFileRelation(String dirId, String fileId);
 
-    public String generateId();
+    String generateId();
 
-    public File findById(String fileId);
+    File findById(String fileId);
 
     GetDetailFileDto getFile(String fileId);
 }
