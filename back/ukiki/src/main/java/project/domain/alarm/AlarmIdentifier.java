@@ -9,7 +9,7 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("album/detail/%s/%d", contentsId, partyId));
+                add(String.format("/album/detail/%s/%d", contentsId, partyId));
             }};
         }
     },
