@@ -68,7 +68,7 @@ public class FileServiceImpl implements FileService{
 
     @Override
     @Transactional
-    public void createFile(Long partyId, Photo photo) {
+    public String createFile(Long partyId, Photo photo) {
         // 파티에서 rootDirId 찾기
         Party findParty = partyRepository.findById(partyId).orElseThrow(() -> new BusinessLogicException(
             ErrorCode.PARTY_NOT_FOUND));
@@ -92,6 +92,8 @@ public class FileServiceImpl implements FileService{
         String newFileId = newFile.getId();
         fileRepository.save(newFile);
         setDirFileRelation(rootDirId, newFileId);
+
+        return newFile.getId();
     }
     @Override
     @Transactional

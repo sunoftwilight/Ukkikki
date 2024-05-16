@@ -74,7 +74,10 @@ public class TrashBinControllerImpl implements TrashBinController {
     public ResponseEntity<ResultResponse> deleteTrashList(
         @PathVariable Long trashBinId,
         @RequestBody TrashIdListDto trashIdListDto) {
+        log.info("come in deleteTrashList controller");
+        log.info("trashBindId = {}, sseKey {}, trashIdList = {}", trashBinId, trashIdListDto.getSseKey(), trashIdListDto.getTrashIdList());
         trashService.deleteTrashList(trashBinId, trashIdListDto.getTrashIdList());
+        log.info("response controller = void");
         return ResponseEntity.ok(new ResultResponse(ResultCode.DELETE_TRASH_SUCCESS));
     }
 

@@ -16,11 +16,15 @@ import java.util.List;
 @ToString
 public class SimpleAlarm {
 
+    String alarmId;
     Long partyId;
     Long contentsId;
     Long targetId;
+    String writerNick;
     AlarmType alarmType;
     String content;
+    String partyName;
+    String partyUrl;
     LocalDateTime createDate;
     List<String> identifier;     // LIST 형태안에 API를 넣어주자
     boolean read;

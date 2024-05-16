@@ -14,6 +14,7 @@ public class ArticleUpdateDto {
 
     String title;
     String content;
+    String password;
 
     List<Object> articlePhotoList;
     boolean addPhoto;

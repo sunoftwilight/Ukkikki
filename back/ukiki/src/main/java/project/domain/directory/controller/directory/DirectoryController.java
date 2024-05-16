@@ -73,7 +73,9 @@ public class DirectoryController implements DirectoryDocs {
         @PathVariable(name = "dirId") String dirId,
         @RequestBody PatchMoveDirDto patchMoveDirDto
     ) {
+        log.info("come in moveDir controller");
         directoryService.moveDir(dirId, patchMoveDirDto.getToDirId());
+        log.info("result moveDir controller = void");
         return ResponseEntity.ok(new ResultResponse(ResultCode.MOVE_DIRECTORY_SUCCESS));
     }
 

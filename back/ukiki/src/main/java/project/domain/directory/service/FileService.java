@@ -10,7 +10,7 @@ import project.domain.photo.entity.Photo;
 public interface FileService {
 
     // file생성
-    void createFile(Long partyId, Photo photo);
+    String createFile(Long partyId, Photo photo);
 
     // 사진 복사
     void copyFile(String fileId, String fromDirId, String toDirId);
@@ -37,9 +37,9 @@ public interface FileService {
     // dir, file의 관계 삭제 메서드
     void deleteDirFileRelation(String dirId, String fileId);
 
-    public String generateId();
+    String generateId();
 
-    public File findById(String fileId);
+    File findById(String fileId);
 
     GetDetailFileDto getFile(String fileId);
 }

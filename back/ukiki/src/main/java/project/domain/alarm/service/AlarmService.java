@@ -18,10 +18,11 @@ public interface AlarmService {
 
     AlarmPageDto getAlarmList(AlarmPageableDto alarmPageableDto);
 
-    void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long articleId, Long targetId, Long writerId);
+    void groupSendAlarm(Alarm alarm, Long senderId);
 
-    Alarm createAlarm(AlarmType type, Long partyId, Long articleId, Long targetId, Long writerId, String data);
+    Alarm createAlarm(AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId, String data);
 
     SseEmitter findEmitterByUserId(Long memberId);
 
+    void checkAlarm(String alarmId);
 }

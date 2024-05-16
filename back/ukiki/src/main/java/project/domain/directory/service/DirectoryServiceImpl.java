@@ -261,21 +261,29 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     @Transactional
     public void moveDir(String dirId, String toDirId) {
+        log.info("come in moveDir service");
         if (!isValidRole(dirId, MemberRole.EDITOR, MemberRole.MASTER)) {
             throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
         }
+        log.info("pass validation");
 
+        log.info("dirId = {}", dirId);
         Directory dir = findById(dirId);
+        log.info("parentDirId = {}", dir.getParentDirId());
         Directory fromDir = findById(dir.getParentDirId());
+        log.info("toDirId = {}", toDirId);
         Directory toDir = findById(toDirId);
         // fromDirId : 자식 리스트에서 dirId 제거
         fromDir.getChildDirIdList().remove(dirId);
+        log.info("자식 리스트에서 dirId 제거 완료");
         // toDirId : 자식 리스트에 dirId 추가
         toDir.getChildDirIdList().add(dirId);
+        log.info("자식 리스트에서 dirId 추가 완료");
         // dirId : 부로를 toDirId로 수정
         dir.setParentDirId(toDirId);
-
+        log.info("부모를 toDirId로 수정 완료");
         directoryRepository.saveAll(toList(dir, fromDir, toDir));
+        log.info("response moveDir service = void");
     }
 
     //    @Override

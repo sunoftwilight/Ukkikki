@@ -7,15 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import project.domain.directory.dto.request.CreateDirDto;
 import project.domain.directory.dto.request.DeleteFileListDto;
 import project.domain.directory.dto.request.GetRenameDto;
@@ -29,9 +26,7 @@ import project.domain.directory.dto.response.GetChildDirDto;
 import project.domain.directory.dto.response.GetDetailFileDto;
 import project.domain.directory.dto.response.GetDirDtov2;
 import project.domain.directory.dto.response.GetDirFullStructureDto;
-import project.domain.directory.dto.response.GetDirListDto;
 import project.domain.directory.dto.response.GetDirThumbUrl2;
-import project.domain.member.dto.request.CustomUserDetails;
 import project.global.result.ResultResponse;
 
 @Tag(name ="공유 앨범 폴더및 사진 조작 관련(휴지통 아님) Controller", description = "폴더 조작 및 사진 파일 조작 API ")
@@ -40,7 +35,7 @@ public interface DirectoryDocs {
     @Operation(summary = "특정 파티에 공유 앨범 폴더 생성 요청(초기 공유 앨범 생성용도)", description = "PathVariable로 파티id를 받아 생성된 폴더 정보를 반환")
     @ApiResponse(responseCode = "201", description = "그룹 생성에 성공하였습니다.")
     @PostMapping("/init/{partyId}")
-    public ResponseEntity<ResultResponse> initDirPartyTest(@PathVariable Long partyId);
+    ResponseEntity<ResultResponse> initDirPartyTest(@PathVariable Long partyId);
 
     @Operation(summary = "폴더 조회 요청", description = "PathVariable로 dirId를 받아 해당 폴더 정보를 반환")
     @ApiResponses(value = {
@@ -57,31 +52,31 @@ public interface DirectoryDocs {
             ))
     })
     @GetMapping("/{dirId}")
-    public ResponseEntity<ResultResponse> getDir(@PathVariable String dirId);
+    ResponseEntity<ResultResponse> getDir(@PathVariable String dirId);
 
     @Operation(summary = "자식폴더 생성 요청(선결 조건으로 부모 폴더가 필요합니다./party/create를 통해 파티를 먼저 생성하세요)", description = "Body로 parentDirId(부모폴더 ID), dirName(생성 할 폴더명)을 받아 부모폴더의 정보를 반환")
     @ApiResponse(responseCode = "201", description = "폴더 생성에 성공하였습니다.")
     @PostMapping("")
-    public ResponseEntity<ResultResponse> createDir(@RequestBody CreateDirDto request);
+    ResponseEntity<ResultResponse> createDir(@RequestBody CreateDirDto request);
 
     @Operation(summary = "폴더 위치 변경 요청", description = "PathVariable로 dirId(이동 대상이 되는 폴더Id), body toDirId(목적지가 되는 폴더 Id)를 받아 폴더 위치 변경 ")
     @ApiResponse(responseCode = "200", description = "폴더 이동에 성공하였습니다.")
     @PatchMapping("/{dirId}")
-    public ResponseEntity<ResultResponse> moveDir(
+    ResponseEntity<ResultResponse> moveDir(
         @PathVariable String dirId,
-        @RequestParam PatchMoveDirDto patchMoveDirDto
+        @RequestBody PatchMoveDirDto patchMoveDirDto
     );
 
     @Operation(summary = "폴더 삭제 요청", description = "PathVariable로 dirId(삭제 대상 폴더 Id), Body로 sseKey를 받아 해당 폴더 삭제")
     @ApiResponse(responseCode = "204", description = "폴더 삭제에 성공하였습니다.")
     @DeleteMapping("/{dirId}")
-    public ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId, @RequestBody
+    ResponseEntity<ResultResponse> deleteDir(@PathVariable String dirId, @RequestBody
         GetSseKeyDto getSseKeyDto);
 
     @Operation(summary = "폴더명 수정 요청", description = "PathVariable로 dirId(이름 수정 대상 폴더 Id), RequestBody로 newName을 받아 이름을 수정")
     @ApiResponse(responseCode = "200", description = "폴더 이름 수정에 성공하였습니다.")
     @PatchMapping("/{dirId}/rename")
-    public ResponseEntity<ResultResponse> renameDir(
+    ResponseEntity<ResultResponse> renameDir(
         @PathVariable String dirId,
         @RequestBody GetRenameDto getRenameDto
     );
@@ -113,7 +108,7 @@ public interface DirectoryDocs {
     @Operation(summary = "(실 서비스 API)사진 복사 요청", description = "Body로 fileIdList와 dirId(fromDirId), toDirId를 받아 사진을 복제합니다")
     @ApiResponse(responseCode = "200", description = "사진 복사에 성공하였습니다.")
     @PatchMapping("/{dirId}/files/copy")
-    public ResponseEntity<ResultResponse> copyFileList(
+    ResponseEntity<ResultResponse> copyFileList(
         @PathVariable(name = "dirId") String fromDirId,
         @RequestBody PatchCopyFileListDto patchCopyFileListDto
     );
@@ -141,7 +136,7 @@ public interface DirectoryDocs {
     @Operation(summary = "(실 서비스 API)복수 사진 삭제 요청", description = "Body로 sseKey, fileIdList를 PathVarialbe로 dirId를 받아 사진을 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "사진 삭제에 성공하였습니다.")
     @DeleteMapping("/{dirId}/files")
-    public ResponseEntity<ResultResponse> deleteFileList(
+    ResponseEntity<ResultResponse> deleteFileList(
         @PathVariable(name = "dirId") String dirId,
         @RequestBody DeleteFileListDto deleteFileListDto
     );

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import project.domain.article.collection.CommentCollection;
 import project.domain.article.dto.request.ArticleCreateDto;
 import project.domain.article.dto.request.ArticleUpdateDto;
@@ -20,6 +21,7 @@ import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,12 +35,9 @@ public class ArticleController implements ArticleDocs{
 
 
     @Override
-    @PostMapping("/create/{partyId}")
-    public ResponseEntity<ResultResponse> create(@PathVariable(name = "partyId") Long partyId, @RequestBody ArticleCreateDto articleCreateDto) {
-        ArticleCreateResDto res = articleService.createArticle(partyId, articleCreateDto);
-
-        // 댓글 mongoDB create
-        commentService.createComment(res);
+    @PostMapping(value = "/create/{partyId}", consumes = {"application/json", "multipart/form-data"})
+    public ResponseEntity<ResultResponse> create(@PathVariable(name = "partyId") Long partyId, @RequestPart(name = "articleCreateDto") ArticleCreateDto articleCreateDto, @RequestPart(name = "multipartFiles", required = false) List<MultipartFile> multipartFiles) {
+        ArticleCreateResDto res = articleService.createArticle(partyId, articleCreateDto, multipartFiles);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_ARTICLE_SUCCESS, res));
     }
 
@@ -50,9 +49,16 @@ public class ArticleController implements ArticleDocs{
     }
     @Override
     @PatchMapping("/update/{partyId}/{articleId}")
-    public ResponseEntity<SimpleArticleDto> updateArticle(@PathVariable(name = "partyId")Long partyId, @PathVariable(name = "articleId") Long articleId, @RequestBody ArticleUpdateDto articleUpdateDto) {
-        SimpleArticleDto res = articleService.updateArticle(partyId, articleId, articleUpdateDto);
+    public ResponseEntity<SimpleArticleDto> updateArticle(@PathVariable(name = "partyId")Long partyId, @PathVariable(name = "articleId") Long articleId, @RequestPart ArticleUpdateDto articleUpdateDto, @RequestPart List<MultipartFile> multipartFiles) {
+        SimpleArticleDto res = articleService.updateArticle(partyId, articleId, articleUpdateDto, multipartFiles);
         return ResponseEntity.ok(res);
+    }
+
+    @Override
+    @DeleteMapping("/delete/{partyId}/{articleId}")
+    public ResponseEntity<ResultResponse> deleteArticle(@PathVariable(name = "partyId") Long partyId, @PathVariable(name = "articleId") Long articleId) {
+        articleService.deleteArticle(partyId, articleId);
+        return null;
     }
 
     @Override

@@ -45,13 +45,15 @@ public class Alarm {
     Long targetId;
     @Indexed
     Long memberId;
+    String writerNick;
+    String partyName;
+    String partyUrl;
     AlarmType alarmType;
     String content;
-    @CreatedDate
-    LocalDateTime createDate;
+    String createDate;
     List<String> identifier;
     @Builder.Default
-    Boolean isRead = true;
+    Boolean isRead = false;
 
     @TimeToLive
     @Builder.Default
@@ -59,10 +61,13 @@ public class Alarm {
 
     public Alarm(Alarm alarm, Long memberId) {
         this.partyId = alarm.getPartyId();
+        this.contentsId = alarm.getContentsId();
         this.targetId = alarm.getTargetId();
         this.memberId = memberId;
+        this.writerNick = alarm.getWriterNick();
         this.alarmType = alarm.getAlarmType();
         this.content = alarm.getContent();
         this.identifier = alarm.getIdentifier();
     }
+
 }

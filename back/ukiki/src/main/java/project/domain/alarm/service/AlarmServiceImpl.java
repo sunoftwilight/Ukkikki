@@ -27,14 +27,18 @@ import project.domain.member.entity.Profile;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
 import project.domain.party.entity.MemberParty;
+import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
+import project.domain.party.repository.PartyRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component
@@ -47,6 +51,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final AlarmRedisRepository alarmRedisRepository;
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
+    private final PartyRepository partyRepository;
     private final AlarmMapper alarmMapper;
 
 
@@ -55,38 +60,47 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public Alarm createAlarm(AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId, String data){
 
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
         Profile profile = profileRepository.findByMemberIdAndPartyId(writerId, partyId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
 
         List<String> identifier = new ArrayList<>();
-        String message = null;
+
         switch (type){
-            case MEMO -> { // DONE
-                message = String.format("%s님께서 사진에 메모를 작성하였습니다.\n%s", profile.getNickname(), data);
+            case MEMO -> {
                 identifier = AlarmIdentifier.MEMO.identifier(partyId, contentsId, targetId);
             }
             case REPLY -> {
-                message = String.format("%s님께서 회원님에게 답글을 작성하였습니다.\n%s", profile.getNickname(), data);
                 identifier = AlarmIdentifier.REPLY.identifier(partyId, contentsId, targetId);
             }
             case COMMENT -> {
-                message = String.format("%s님께서 댓글을 작성하였습니다.\n%s", profile.getNickname(), data);
                 identifier = AlarmIdentifier.COMMENT.identifier(partyId, contentsId, targetId);
             }
             case CHECK -> {
-                message = "체크 알람";
+                identifier = AlarmIdentifier.CHECK.identifier(partyId, contentsId, targetId);
             }
-            case PASSWORD -> { // DONE
-                message = String.format("%s 그룹의 비밀번호가 변경되었습니다.", data);
+            case PASSWORD -> {
+                identifier = AlarmIdentifier.PASSWORD.identifier(partyId, contentsId, targetId);
+            }
+            case CHAT -> {
+                identifier = AlarmIdentifier.CHAT.identifier(partyId, contentsId, targetId);
+            }
+            case MENTION -> {
+                identifier = AlarmIdentifier.MENTION.identifier(partyId, contentsId, targetId);
             }
         }
         return Alarm.builder()
-            .alarmType(type)
             .partyId(partyId)
-            .memberId(targetId)
             .contentsId(contentsId)
             .targetId(targetId)
-            .content(message)
+            .writerNick(profile.getNickname())
+            .alarmType(type)
+            .content(data)
+            .partyUrl(party.getThumbnail())
+            .partyName(party.getPartyName())
+            .createDate(LocalDateTime.now().toString())
             .identifier(identifier)
             .build();
     }
@@ -125,6 +139,12 @@ public class AlarmServiceImpl implements AlarmService {
         return emitterRepository.getByUserId(userId);
     }
 
+    @Override
+    public void checkAlarm(String alarmId) {
+        alarmRedisRepository.findById(alarmId)
+            .ifPresent(alarm -> alarm.setIsRead(true));
+    }
+
     /**
      * @param emitter   유저와 연결되있는 SSE : findEmitterByUserId() 함수에서 얻을 수 있다.
      * @param userId        Member id
@@ -133,41 +153,35 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public void sendAlarm(SseEmitter emitter, Long userId, Alarm alarm){
-        System.out.println("toSimpleAlarm = " + alarmMapper.toSimpleAlarm(alarm).toString());
         try{
             emitter.send(
                 SseEmitter.event()
                 .id(alarm.getAlarmType().toString())
                 .name(String.valueOf(alarm.getAlarmType()))
                 .data(alarmMapper.toSimpleAlarm(alarm))
-
-                
             );
         }catch (IOException e){
-            alarm.setIsRead(false);
             String emitterKey = emitterRepository.getEmitterKeyByUserId(userId);
             emitterRepository.deleteById(emitterKey);
         }
     }
     @Transactional
     @Override
-    public void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId) {
-        List<MemberParty> memberPartyList = memberpartyRepository.findMemberList(partyId);
-        Alarm data = createAlarm(type, partyId, contentsId, targetId, 0L,"");
+    public void groupSendAlarm(Alarm alarm, Long senderId) {
+        List<MemberParty> memberPartyList = memberpartyRepository.findMemberList(alarm.getPartyId());
+//        Alarm data = createAlarm(type, partyId, contentsId, targetId, writerId,content);
         for (MemberParty memberParty : memberPartyList) {
             Long sendMemberId = memberParty.getMember().getId();
-            if(sendMemberId.equals(memberId)){
+            if(sendMemberId.equals(senderId)){
                 continue;
             }
 
-            Alarm alarm = new Alarm(data, sendMemberId);
-            alarmRedisRepository.save(alarm);
+            Alarm saveAlarm = new Alarm(alarm, sendMemberId);
+            alarmRedisRepository.save(saveAlarm);
             SseEmitter memberEmitter = emitterRepository.getByUserId(sendMemberId);
             if(memberEmitter != null){
-                sendAlarm(memberEmitter, sendMemberId, alarm);
+                sendAlarm(memberEmitter, sendMemberId, saveAlarm);
             }
-
-
         }
     }
     // 모든 SseEmitter의 생존 여부를 판단해주는 함수
@@ -188,12 +202,14 @@ public class AlarmServiceImpl implements AlarmService {
         memberRepository.findById(memberId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        PageRequest pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.by(Sort.Direction.DESC, "createDate"));
+        PageRequest pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.by(Sort.Direction.ASC, "createDate"));
 
         Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(memberId, pageable);
         List<SimpleAlarm> simpleAlarmList = alarmPage.stream()
-            .map(alarmMapper::toSimpleAlarm)
-            .toList();
+            .map(alarm -> {
+                return alarmMapper.toSimpleAlarm(alarm);
+            })
+            .collect(Collectors.toList());
         List<SimpleAlarm> alarmList = new ArrayList<>(simpleAlarmList);
         AlarmPageDto res = AlarmPageDto.builder()
             .pageNo(alarmPageableDto.getPageNo())

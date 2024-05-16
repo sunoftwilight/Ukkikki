@@ -342,11 +342,12 @@ public class TrashServiceImpl implements TrashService{
     @Override
     @Transactional
     public void deleteTrashList(Long trashBinId, List<String> trashIdList) {
+        log.info("come in deleteTrashList service");
         if (!isValidRole(trashBinId, MemberRole.MASTER)) {
             throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
         }
+        log.info("pass validation");
 
-        log.info("come in deleteTrashList service");
         for (String trashId : trashIdList) {
             deleteOneTrash(trashId, trashBinId);
         }

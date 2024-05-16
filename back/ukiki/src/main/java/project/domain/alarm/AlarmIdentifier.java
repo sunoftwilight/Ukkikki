@@ -35,6 +35,25 @@ public enum AlarmIdentifier {
             }};
         }
     },
+    PASSWORD{
+        @Override
+        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+            return null;
+        }
+    },
+    CHAT{
+        @Override
+        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+            return null;
+        }
+    },
+    MENTION{
+        @Override
+        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+            return null;
+        }
+    },
+
     ;
 
 
