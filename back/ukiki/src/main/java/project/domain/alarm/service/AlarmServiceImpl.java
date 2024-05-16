@@ -160,7 +160,6 @@ public class AlarmServiceImpl implements AlarmService {
                 .data(alarmMapper.toSimpleAlarm(alarm))
             );
         }catch (IOException e){
-            alarm.setIsRead(false);
             String emitterKey = emitterRepository.getEmitterKeyByUserId(userId);
             emitterRepository.deleteById(emitterKey);
         }

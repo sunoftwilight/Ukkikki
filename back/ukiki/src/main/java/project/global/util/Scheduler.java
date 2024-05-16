@@ -21,7 +21,7 @@ public class Scheduler {
         partyService.linkDelete();
     }
 
-    @Scheduled(fixedRate = 1000 * 60 * 10) // 10M
+    @Scheduled(fixedRate = 1000 * 30) // 30S
     public void checkEmitter(){
         alarmService.checkEmitterLive();
     }
