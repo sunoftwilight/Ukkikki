@@ -69,10 +69,9 @@ export default function Router() {
         <Route path="/setting" element={<Setting />} />
         <Route path="/album/:groupPk" element={<Album />} />
         <Route path={`album/detail/${currentImg}/:groupPk`} element={<DetailImg />} />
-        <Route path="/feed" element={<Feed />} />
-        <Route path="/feed/:pk" element={<ArticleDetail />} />
-        <Route path="/feed/img/:pk" element={<ArticleImg />} />
-        <Route path="/write" element={<Write />} />
+        <Route path="/feed/:groupPk" element={<Feed />} />
+        <Route path="/feed/:groupPk/:feedPk" element={<ArticleDetail />} />
+        <Route path="/feed/:groupPk/:feedPk/:imgPk" element={<ArticleImg />} />
         <Route path="/chat" element={<Chatting />} />
         <Route path="/trash/:groupPk" element={<Trash />} />
       </Route>
@@ -83,6 +82,7 @@ export default function Router() {
       <Route path="/camera" element={<Camera />} />
       <Route path='/simpleinsert' element={<SimplePass type='insert'/>}/>
       <Route path='/simplecheck' element={<SimplePass type='check'/>}/>
+      <Route path="/write/:groupPk" element={<Write />} />
       <Route path='/error' element={<ErrorRedirect />}/>
     </Routes>
   );

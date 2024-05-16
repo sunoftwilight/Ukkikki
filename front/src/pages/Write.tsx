@@ -1,12 +1,12 @@
 import React from "react";
-import TextInput from "../components/Write/TextInput";
-import AddMediaBtn from "../components/Write/AddMediaBtn";
+import CreateWrite from "../components/Write/CreateWrite";
+
 
 const Write: React.FC = () => {
+
   return (
-    <div className="w-full h-full">
-      <TextInput />
-      <AddMediaBtn />
+    <div className="w-screen h-[calc(100vh-60px)]">
+      <CreateWrite />
     </div>
   )
 };
