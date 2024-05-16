@@ -2,19 +2,10 @@ package project.domain.directory.dto.request;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class TrashIdListDto {
     private String sseKey;
-    @Builder.Default
     private List<String> trashIdList = new ArrayList<>();
 }
