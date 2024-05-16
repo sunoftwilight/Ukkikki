@@ -17,15 +17,15 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/chat");
+                add(String.format("/feed/%s/%s", partyId, contentsId));
             }};
         }
     },
-    REPLY{ // 이건 만들어 봐야할듯
+    REPLY{
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/chat");
+                add(String.format("/feed/%s/%s", partyId, contentsId));
             }};
         }
     },
@@ -58,7 +58,7 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/chat");
+                add(String.format("/feed/%s/%s", partyId, contentsId));
             }};
         }
     },

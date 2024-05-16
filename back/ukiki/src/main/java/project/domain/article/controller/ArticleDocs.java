@@ -36,10 +36,10 @@ public interface ArticleDocs {
     ResponseEntity<ResultResponse> deleteArticle(Long partyId, Long articleId);
 
     @Operation(summary = "포토 이동")
-    void movePhoto(HttpServletResponse response, String fileId) throws IOException;
+    String movePhoto(HttpServletResponse response, String fileId) throws IOException;
 
     @Operation(summary = "게시판 이동")
-    void moveArticle(HttpServletResponse response, Long articleId) throws IOException;
+    String moveArticle(HttpServletResponse response, Long articleId) throws IOException;
 
 
     @Operation(summary = "댓글 조회")

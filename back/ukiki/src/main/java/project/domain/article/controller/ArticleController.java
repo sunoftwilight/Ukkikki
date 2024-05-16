@@ -63,17 +63,23 @@ public class ArticleController implements ArticleDocs{
 
     @Override
     @GetMapping("/move-photo/{fileId}")
-    public void movePhoto(HttpServletResponse response, @PathVariable(name = "fileId")String fileId) throws IOException {
-        response.sendRedirect(String.format("https://k10d202.p.ssafy.io/album/detail/%s", fileId));
+    public String movePhoto(HttpServletResponse response, @PathVariable(name = "fileId")String fileId) throws IOException {
+//        response.sendRedirect(String.format("https://k10d202.p.ssafy.io/album/detail/%s", fileId));
 //        response.sendRedirect(String.format("http://localhost:5173/album/detail/%s", fileId));
+
+        return String.format("https://k10d202.p.ssafy.io/album/detail/%s", fileId);
+//        return String.format("http://localhost:5173/album/detail/%s", fileId);
     }
 
     @Override
     @GetMapping("/move-article/{partyId}/{articleId}")
-    public void moveArticle(HttpServletResponse response, Long articleId) throws IOException {
+    public String moveArticle(HttpServletResponse response, Long articleId) throws IOException {
 
-        response.sendRedirect(String.format("https://k10d202.p.ssafy.io/feed/%d", articleId));
+//        response.sendRedirect(String.format("https://k10d202.p.ssafy.io/feed/%d", articleId));
 //        response.sendRedirect(String.format("http://localhost:5173/feed/%d", articleId));
+
+        return String.format("https://k10d202.p.ssafy.io/feed/%d", articleId);
+//        return String.format("http://localhost:5173/feed/%d", articleId);
     }
 
     @Override

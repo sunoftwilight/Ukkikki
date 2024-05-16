@@ -24,6 +24,6 @@ public interface AlarmDocs {
     @Operation(summary = "내 알람 가지고오기")
     ResponseEntity<ResultResponse> getAlarmList(AlarmPageableDto alarmPageDto);
 
-    @Operation(summary = "redirect 하기")
-    void redirectUser(HttpServletResponse response, RedirectDto redirectDto) throws IOException;
+    @Operation(summary = "알람 읽음 처리")
+    ResponseEntity<Object> redirectUser(String alarmId) throws IOException;
 }
