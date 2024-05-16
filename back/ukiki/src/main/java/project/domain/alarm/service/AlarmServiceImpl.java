@@ -95,6 +95,7 @@ public class AlarmServiceImpl implements AlarmService {
             .alarmType(type)
             .content(message)
             .partyUrl(party.getThumbnail())
+            .partyName(party.getPartyName())
             .createDate(LocalDateTime.now().toString())
             .identifier(identifier)
             .build();

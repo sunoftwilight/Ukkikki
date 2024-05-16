@@ -46,6 +46,7 @@ public class Alarm {
     @Indexed
     Long memberId;
     String writerNick;
+    String partyName;
     String partyUrl;
     AlarmType alarmType;
     String content;
