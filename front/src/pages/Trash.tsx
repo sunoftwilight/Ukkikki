@@ -3,9 +3,7 @@ import TrashMain from "../components/Trash/TrashMain";
 
 const Trash: React.FC = () => {
   return (
-    <div>
-      <TrashMain />
-    </div>
+    <TrashMain />
   )
 };
 

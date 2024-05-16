@@ -21,28 +21,40 @@ const TrashMain: React.FC = () => {
       Number(groupPk),
       (res) => {
         setTrashList(res.data.data)
+        console.log(res.data.data)
       },
       (err) => { console.error(err) }
     )
   }, [groupPk, needUpdate])
 
+  const dateHandler = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    return `${year.slice(2)}.${month}.${day}`;
+  };
+  
+
   return (
     <div>
       <div className="px-4 mt-2 mb-4 rounded-xl py-2 font-pre-R text-red text-base mx-4 bg-soft-gray ">폴더는 단일 선택만 가능합니다</div>
-      <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
+      <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 gap-y-5 overflow-scroll scrollbar-hide ">
         {trashList!.map((item, idx) => (
-          selectMode ? 
-            <TrashSelectModeImg key={idx} item={item} />
-          :
-            item.type === 'DIRECTORY' ?
+          <div>
+            {
+              selectMode ? 
+              <TrashSelectModeImg key={idx} item={item} />
+              :
+              item.type === 'DIRECTORY' ?
               <div key={idx} className="flex flex-col justify-center items-center gap-1">
-                <img src={folder} className="w-[82px] h-[65px]" />
-                <div className="font-pre-R text-center text-xs">{item.name}</div>
-              </div>
-            :
-              <div key={idx} className="flex justify-center items-center">
-                <SecureImg url={item.url} />
-              </div>
+                    <img src={folder} className="w-[82px] h-[65px]" />
+                    <div className="font-pre-R text-center text-xs">{item.name}</div>
+                  </div>
+                :
+                <div key={idx} className="flex justify-center items-center">
+                    <SecureImg url={item.url} />
+                  </div>
+            }
+            <div className="font-pre-L text-sm text-black">만료일 <span className="text-red">{dateHandler(item.deadLine)}</span></div>
+          </div>
         ))}
       </div>
     </div>
