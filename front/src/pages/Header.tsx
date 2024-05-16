@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import AlbumHeader from "../components/Header/AlbumHeader";
 import BackHeader from "../components/Header/BackHeader";
 import LogoHeader from "../components/Header/LogoHeader";
-import WriteHeader from "../components/Header/WriteHeader";
 import SaveHeader from "../components/Header/SaveHeader";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { useStore } from "zustand";
@@ -137,7 +136,6 @@ const Header: React.FC = () => {
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;
 	else if (albumPath.includes(location.pathname) || location.pathname.startsWith("/album")  || location.pathname.startsWith("/trash")) return <AlbumHeader />;
-	else if (location.pathname === "/write") return <WriteHeader />;
 
 	return(
 		<Toaster
