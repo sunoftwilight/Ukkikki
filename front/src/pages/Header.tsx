@@ -63,11 +63,12 @@ const Header: React.FC = () => {
 		backPath.includes(location.pathname) ||
 		location.pathname.startsWith("/album/detail") ||
 		location.pathname.startsWith("/feed/") ||
-		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend'))
+		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend') && !location.pathname.includes('list'))
 	)
 		return <BackHeader />;
 	else if (
-		basicPath.includes(location.pathname)
+		basicPath.includes(location.pathname) ||
+		(location.pathname.startsWith("/group/") && location.pathname.includes('list'))
 	)
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;

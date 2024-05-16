@@ -40,6 +40,7 @@ export interface PartyListData{
   id: number;
   partyName: string;
   partyProfile: string;
+  expired: boolean;
 }
 
 export interface MemberData {

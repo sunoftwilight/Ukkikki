@@ -20,26 +20,15 @@ const ListComponent: React.FC = () => {
 	const getList = async () => {
 		await getPartyList(
 			(res) => {
-				setPartList(res.data.data);
 				res.data.data.forEach((item) => {
-					getImg(item.partyProfile, keys[item.id]);
+					checkStateAndImg(item)
 				});
+				setPartList(res.data.data);
+				console.log(res.data.data)
 			},
 			(err) => {
 				console.log(err);
 			},
-		);
-	};
-
-	const getImg = async (url: string, key: string) => {
-		const opt = {
-			"x-amz-server-side-encryption-customer-key": key,
-		};
-		await getPartyThumb(
-			url,
-			opt,
-			() => {},
-			(err) => { console.log(err); },
 		);
 	};
 
@@ -57,26 +46,64 @@ const ListComponent: React.FC = () => {
 		)
 	}
 
+	const checkStateAndImg = async (data: PartyListData) => {
+		const key = keys[data.id]
+		if (key === "expired") {
+			data.partyProfile = ''
+			data.expired = true;
+		}
+		else {
+			data.expired = false
+			const opt = {
+				"x-amz-server-side-encryption-customer-key": key,
+			};
+			await getPartyThumb(
+				data.partyProfile,
+				opt,
+				() => {},
+				(err) => { console.log(err); },
+			);
+		}
+	}
+
+	const clickHandler = (id: number, state: boolean) => {
+		if (state) {
+			navi(`/group/${id}/attend`);
+		}
+		else {
+			navi(`/group/${id}/main`);
+		}
+	}
+
 	return (
 		<div className="flex flex-col gap-2">
 			{partyList.map((item) => (
 				<div
 					key={item.id}
 					className="relative w-100 h-20 rounded-2xl flex items-center border border-disabled-gray">
-					<div className="h-full w-5/6 flex items-center" onClick={() => navi(`/group/${item.id}/main`)}>
+					<div className="h-full w-4/5 flex items-center" onClick={() => clickHandler(item.id, item.expired)}>
 						<img
 							src={item.partyProfile}
 							className="w-14 h-14 rounded-full ms-4 me-5"
 						/>
 						<p className="text-xl font-pre-R">{item.partyName}</p>
 					</div>
-					<img
-						src={item.id === user.uploadGroupId ? favorStar : unFavorStar}
-						className="absolute w-6 h-6 right-5"
-						onClick={() => {
-							changeUpload(item.id)
-						}}
-					/>					
+					<div className="h-full w-1/5 flex items-center justify-center">
+						{!item.expired && (
+							<img
+								src={item.id === user.uploadGroupId ? favorStar : unFavorStar}
+								className="w-6 h-6 right-5"
+								onClick={() => {
+									changeUpload(item.id)
+								}}
+							/>
+						)}
+						{item.expired && (
+							<div className="w-4/5 h-4/5 flex flex-col justify-center items-center font-gtr-B text-white bg-disabled-gray rounded-xl">
+								<p>재입장</p>
+							</div>
+						)}
+					</div>
 				</div>
 			))}
 		</div>
