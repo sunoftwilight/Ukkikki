@@ -32,6 +32,7 @@ import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -81,12 +82,13 @@ public class AlarmServiceImpl implements AlarmService {
             }
         }
         return Alarm.builder()
-            .alarmType(type)
             .partyId(partyId)
-            .memberId(targetId)
             .contentsId(contentsId)
             .targetId(targetId)
+            .writerNick(profile.getNickname())
+            .alarmType(type)
             .content(message)
+            .createDate(LocalDateTime.now().toString())
             .identifier(identifier)
             .build();
     }
@@ -133,15 +135,12 @@ public class AlarmServiceImpl implements AlarmService {
     @Transactional
     @Override
     public void sendAlarm(SseEmitter emitter, Long userId, Alarm alarm){
-        System.out.println("toSimpleAlarm = " + alarmMapper.toSimpleAlarm(alarm).toString());
         try{
             emitter.send(
                 SseEmitter.event()
                 .id(alarm.getAlarmType().toString())
                 .name(String.valueOf(alarm.getAlarmType()))
                 .data(alarmMapper.toSimpleAlarm(alarm))
-
-                
             );
         }catch (IOException e){
             alarm.setIsRead(false);
@@ -151,23 +150,21 @@ public class AlarmServiceImpl implements AlarmService {
     }
     @Transactional
     @Override
-    public void groupSendAlarm(Long memberId, AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId) {
-        List<MemberParty> memberPartyList = memberpartyRepository.findMemberList(partyId);
-        Alarm data = createAlarm(type, partyId, contentsId, targetId, 0L,"");
+    public void groupSendAlarm(Alarm alarm, Long senderId) {
+        List<MemberParty> memberPartyList = memberpartyRepository.findMemberList(alarm.getPartyId());
+//        Alarm data = createAlarm(type, partyId, contentsId, targetId, writerId,content);
         for (MemberParty memberParty : memberPartyList) {
             Long sendMemberId = memberParty.getMember().getId();
-            if(sendMemberId.equals(memberId)){
+            if(sendMemberId.equals(senderId)){
                 continue;
             }
 
-            Alarm alarm = new Alarm(data, sendMemberId);
-            alarmRedisRepository.save(alarm);
+            Alarm saveAlarm = new Alarm(alarm, sendMemberId);
+            alarmRedisRepository.save(saveAlarm);
             SseEmitter memberEmitter = emitterRepository.getByUserId(sendMemberId);
             if(memberEmitter != null){
-                sendAlarm(memberEmitter, sendMemberId, alarm);
+                sendAlarm(memberEmitter, sendMemberId, saveAlarm);
             }
-
-
         }
     }
     // 모든 SseEmitter의 생존 여부를 판단해주는 함수
