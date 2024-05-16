@@ -46,6 +46,13 @@ public class FileUploadDownloadController implements FileUploadDownloadDocs{
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
     }
 
+    @PostMapping(value = "/upload/dir", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResultResponse> fileUploadToDir(@RequestPart("files") List<MultipartFile> files,
+                                                          @RequestPart("key") @Valid FileUploadDto fileUploadDto) throws Exception {
+        fileUploadDownloadService.uploadToDirectory(files, fileUploadDto);
+        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
+    }
+
     @GetMapping("/download")
     public void fileDownload(FileDownloadDto fileDownloadDto,
                              HttpServletResponse response,

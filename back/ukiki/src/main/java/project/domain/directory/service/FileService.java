@@ -10,7 +10,7 @@ import project.domain.photo.entity.Photo;
 public interface FileService {
 
     // file생성
-    void createFile(Long partyId, Photo photo);
+    String createFile(Long partyId, Photo photo);
 
     // 사진 복사
     void copyFile(String fileId, String fromDirId, String toDirId);
