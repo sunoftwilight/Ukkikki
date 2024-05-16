@@ -47,7 +47,7 @@ public class AlarmController implements AlarmDocs {
     }
 
     @Override
-    @GetMapping("redirect-user")
+    @GetMapping("/redirect-user")
     public void redirectUser(HttpServletResponse response, @RequestParam RedirectDto redirectDto) throws IOException {
         alarmService.checkAlarm(redirectDto.getAlarmId());
         response.sendRedirect("https://k10d202.p.ssafy.io"+redirectDto.getRedirectUrl());
@@ -75,8 +75,8 @@ public class AlarmController implements AlarmDocs {
             "테스트 알람 보내기 입니다."
         );
         dsa.setMemberId(2L);
-//        alarmRedisRepository.save(dsa);
-//        alarmService.sendAlarm(asd,userId,dsa);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
 
         dsa = alarmService.createAlarm(
             AlarmType.CHAT,
@@ -87,8 +87,8 @@ public class AlarmController implements AlarmDocs {
             "채팅 일까 아닐까 "
         );
         dsa.setMemberId(2L);
-//        alarmRedisRepository.save(dsa);
-//        alarmService.sendAlarm(asd,userId,dsa);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
 
         dsa = alarmService.createAlarm(
             AlarmType.COMMENT,
@@ -102,55 +102,55 @@ public class AlarmController implements AlarmDocs {
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 
-//        dsa = alarmService.createAlarm(
-//            AlarmType.REPLY,
-//            78L,
-//            1L,
-//            1L,
-//            6L,
-//            "테스트 알람 보내기 입니다."
-//        );
-//        dsa.setMemberId(2L);
-//        alarmRedisRepository.save(dsa);
-//        alarmService.sendAlarm(asd,userId,dsa);
+        dsa = alarmService.createAlarm(
+            AlarmType.REPLY,
+            78L,
+            1L,
+            1L,
+            6L,
+            "테스트 알람 보내기 입니다."
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
 //
 //
-//        dsa = alarmService.createAlarm(
-//            AlarmType.PASSWORD,
-//            78L,
-//            1L,
-//            1L,
-//            6L,
-//            "비밀번호 바뀜 ㅅㄱㄹ"
-//        );
-//        dsa.setMemberId(2L);
-//        alarmRedisRepository.save(dsa);
-//        alarmService.sendAlarm(asd,userId,dsa);
+        dsa = alarmService.createAlarm(
+            AlarmType.PASSWORD,
+            78L,
+            1L,
+            1L,
+            6L,
+            "비밀번호 바뀜 ㅅㄱㄹ"
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
 //
 //
-//        dsa = alarmService.createAlarm(
-//            AlarmType.MENTION,
-//            78L,
-//            1L,
-//            1L,
-//            6L,
-//            "@Sun.L 너 짱 잘 나 옴"
-//        );
-//        dsa.setMemberId(2L);
-//        alarmRedisRepository.save(dsa);
-//        alarmService.sendAlarm(asd,userId,dsa);
-//
-//        dsa = alarmService.createAlarm(
-//            AlarmType.MEMO,
-//            78L,
-//            1L,
-//            1L,
-//            6L,
-//            "우와 짱 잘 나왔다"
-//        );
-//        dsa.setMemberId(2L);
-//        alarmRedisRepository.save(dsa);
-//        alarmService.sendAlarm(asd,userId,dsa);
+        dsa = alarmService.createAlarm(
+            AlarmType.MENTION,
+            78L,
+            1L,
+            1L,
+            6L,
+            "@Sun.L 너 짱 잘 나 옴"
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
+        dsa = alarmService.createAlarm(
+            AlarmType.MEMO,
+            78L,
+            1L,
+            1L,
+            6L,
+            "우와 짱 잘 나왔다"
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
 
         }
 }
