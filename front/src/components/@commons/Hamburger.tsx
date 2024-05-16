@@ -6,21 +6,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "zustand";
 import { headerStore } from "../../stores/HeaderStateStore";
 import { getAlarm } from "../../api/alarm";
-import { AlarmItemType } from "../../types/AlarmType";
 import AlarmItem from "./AlarmItem";
 import LoadingGif from "./LoadingGif";
+import { AlarmListStore, AlarmOccuredStore } from "../../stores/AlarmStore";
 
 const Hamburger: React.FC = () => {
+  const { alarmList, setAlarmList } = useStore(AlarmListStore)
+  const { setIsAlarmOccured } = useStore(AlarmOccuredStore)
+  
+  const { menuOpen, setMenuOpen } = useStore(headerStore)
+  const { alarmOpen, setAlarmOpen } = useStore(headerStore)
+
 	const menuList = [
 		{ name: "카메라", router: "/camera" },
 		{ name: "마이 앨범", router: "/mypage" },
 		{ name: "참여 중인 그룹", router: "/grouplist" },
 		{ name: "설정", router: "/setting" },
 	];
-
-  const { menuOpen, setMenuOpen } = useStore(headerStore)
-	const { alarmOpen, setAlarmOpen } = useStore(headerStore)
-  const [alarmList, setAlarmList] = useState<AlarmItemType[]>([])
 
 	const closeHandler = () => {
 		if (alarmOpen) {
@@ -70,7 +72,8 @@ const Hamburger: React.FC = () => {
   }, [isLoading])
 
   useEffect(() => {
-    setAlarmList([])
+    setIsAlarmOccured(false)
+    setAlarmList('')
     setPage(1)
     setIsLoading(true)
     setIsLast(false)
@@ -81,7 +84,7 @@ const Hamburger: React.FC = () => {
     await getAlarm(
       { pageNo: page, pageSize: 20 },
       (res) => {
-        setAlarmList(prevList => prevList.concat(res.data.data.alarmList))
+        setAlarmList(res.data.data.alarmList)
         if (res.data.data.last === true) {
           setIsLast(true)
         }
@@ -135,7 +138,7 @@ const Hamburger: React.FC = () => {
 
               {/* 알림함 */}
               {alarmOpen && 
-                <div className="flex flex-col gap-y-7">
+                <div className="flex flex-col gap-y-5">
                   {alarmList.map((alarmItem, idx) => (
                     <AlarmItem key={idx} alarmItem={alarmItem} />
                   ))}

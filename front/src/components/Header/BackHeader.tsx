@@ -8,11 +8,14 @@ import { headerStore } from "../../stores/HeaderStateStore";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useStore } from "zustand";
 import { currentGroupStore } from "../../stores/GroupStore";
+import { AlarmOccuredStore } from "../../stores/AlarmStore";
 
 const BackHeader: React.FC = () => {
 	const navigate = useNavigate();
   const location = useLocation();
   const { currentGroup } = useStore(currentGroupStore);
+  const { isAlarmOccured } = useStore(AlarmOccuredStore)
+	
 
 	const goBackHandler = () => {
     if (location.pathname.startsWith('/album/detail/')) {
@@ -27,7 +30,6 @@ const BackHeader: React.FC = () => {
 	};
 
 	const isGuest = false;
-	const isAlaram = false;
 
 	const { setAlarmOpen } = useStore(headerStore);
 	const { setMenuOpen } = useStore(headerStore);
@@ -42,7 +44,7 @@ const BackHeader: React.FC = () => {
 						<img src={timeOut} />
 						<div className="font-pre-R text-black">13 : 28</div>
 					</div>
-				) : isAlaram ? (
+				) : isAlarmOccured ? (
 					<img src={alarm} onClick={() => setAlarmOpen()} />
 				) : (
 					<img src={noAlarm} onClick={() => setAlarmOpen()} />

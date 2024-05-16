@@ -23,6 +23,8 @@ export interface AlarmItemType {
   partyUrl: string;
   read: boolean;
   targetId: number;
+  writerNick: string;
+  alarmId: string;
 }
 
 export interface AlarmResponseType {

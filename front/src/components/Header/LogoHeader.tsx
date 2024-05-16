@@ -7,13 +7,14 @@ import hamburger from "@/assets/Header/hamburger.png";
 import { headerStore } from "../../stores/HeaderStateStore";
 import { Link } from "react-router-dom";
 import { useStore } from "zustand";
+import { AlarmOccuredStore } from "../../stores/AlarmStore";
 
 const LogoHeader: React.FC = () => {
 	const isGuest = false;
-	const isAlaram = false;
 
 	const { setAlarmOpen } = useStore(headerStore);
 	const { setMenuOpen } = useStore(headerStore);
+  const { isAlarmOccured } = useStore(AlarmOccuredStore)
 
 	return (
 		<div className="flex justify-between items-center px-4 w-full h-14 bg-white">
@@ -27,7 +28,7 @@ const LogoHeader: React.FC = () => {
 						<img src={timeOut} />
 						<div className="font-pre-R text-black">13 : 28</div>
 					</div>
-				) : isAlaram ? (
+				) : isAlarmOccured ? (
 					<img src={alarm} onClick={() => setAlarmOpen()} />
 				) : (
 					<img src={noAlarm} onClick={() => setAlarmOpen()} />
