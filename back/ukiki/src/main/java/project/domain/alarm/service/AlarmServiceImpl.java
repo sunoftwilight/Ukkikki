@@ -66,7 +66,7 @@ public class AlarmServiceImpl implements AlarmService {
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
 
         List<String> identifier = new ArrayList<>();
-        String message = null;
+
         switch (type){
             case MEMO -> {
                 identifier = AlarmIdentifier.MEMO.identifier(partyId, contentsId, targetId);
@@ -96,7 +96,7 @@ public class AlarmServiceImpl implements AlarmService {
             .targetId(targetId)
             .writerNick(profile.getNickname())
             .alarmType(type)
-            .content(message)
+            .content(data)
             .partyUrl(party.getThumbnail())
             .partyName(party.getPartyName())
             .createDate(LocalDateTime.now().toString())
