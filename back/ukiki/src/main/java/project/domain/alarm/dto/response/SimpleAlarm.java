@@ -16,9 +16,11 @@ import java.util.List;
 @ToString
 public class SimpleAlarm {
 
+    String alarmId;
     Long partyId;
     Long contentsId;
     Long targetId;
+    String writerNick;
     AlarmType alarmType;
     String content;
     String partyName;
