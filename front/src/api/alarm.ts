@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { privateApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { AlarmRequestType, AlarmResponseType } from '../types/AlarmType';
+import { AlarmRequestType, AlarmResponseType, redirectDtoType } from '../types/AlarmType';
 
 const url = 'alarm';
 
@@ -18,6 +18,15 @@ export const getAlarm = async(
   Response : (Response : AxiosResponse<AlarmResponseType>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.get(`/${url}/list`, { params: alarmPageDto })
+  .then(Response)
+  .catch(Error)
+}
+
+export const redirectAlarm = async (
+  redirectDto: redirectDtoType,
+  Response : (Response : AxiosResponse<ResponseData>) => void, 
+  Error : (Error : AxiosResponse<ResponseData>) => void) => {
+  await privateApi.get(`/${url}/redirect-user`, { params: redirectDto })
   .then(Response)
   .catch(Error)
 }

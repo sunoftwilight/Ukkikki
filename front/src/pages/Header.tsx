@@ -32,6 +32,14 @@ const Header: React.FC = () => {
 	const backPath = ["/setting", "/feed", "/chat", ...groupBackPath];
 	const albumPath = ["/album", "/trash"];
 
+	// const toastHandler = (e: MessageEvent) => {
+	// 	const alarmObject = JSON.parse(e.data);
+	// 	const partyName = alarmObject.partyName;
+	// 	const writerNick = alarmObject.writerNick;
+	// 	const alarmId = alarmObject.alarmId;
+	// 	const redirectUrl = alarmObject.identifier[0];
+	// }
+
 	useEffect(() => {
 		const stored = localStorage.getItem('USER_STORE');
 
@@ -132,12 +140,10 @@ const Header: React.FC = () => {
 	else if (location.pathname === "/write") return <WriteHeader />;
 
 	return(
-		<div>
-			<Toaster
-				position="top-center"
-				reverseOrder={false}
-			/>
-		</div>
+		<Toaster
+			position="top-center"
+			reverseOrder={false}
+		/>
 	)
 };
 

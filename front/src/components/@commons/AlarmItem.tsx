@@ -3,13 +3,12 @@ import { AlarmItemProps } from "../../types/AlarmType";
 import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
 import { getPartyThumb } from "../../api/party";
+import { redirectAlarm } from "../../api/alarm";
 
 const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
 	const { groupKey } = useStore(userStore);
 
-  // if (!alarmItem) return;
   useEffect(() => {
-
     const opt = {
 			"x-amz-server-side-encryption-customer-key": groupKey[Number(alarmItem.partyId)],
 		};
@@ -44,11 +43,23 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
       case "MENTION":
         return "댓글에서 회원님을 언급했습니다"
     }
+  }
 
+  const clickHandler = () => {
+    redirectAlarm(
+      {
+        alarmId: alarmItem.alarmId,
+        redirectUrl: alarmItem.identifier[0]
+      },
+      (res) => {
+        console.log(res.data)
+      },
+      (err) => { console.error(err) }
+    )
   }
 
 	return (
-    <div className={`flex gap-2 w-full ${alarmItem.read ? 'bg-gray' : 'bg-white'}`}>
+    <div onClick={() => clickHandler()} className={`flex gap-2 w-full ${alarmItem.read ? 'bg-gray' : 'bg-white'}`}>
       <img src={alarmItem.partyUrl} className="rounded-full w-12 h-12 border-[0.1px] border-point-gray object-cover" />
       <div className="flex w-[calc(100%-56px)] flex-col gap-2">
         <div className="font-gtr-B text-xs">

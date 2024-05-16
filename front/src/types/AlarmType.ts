@@ -36,3 +36,8 @@ export interface AlarmResponseType {
   };
   resultCode: string;
 }
+
+export interface redirectDtoType {
+  alarmId: string;
+  redirectUrl: string;
+}
