@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class) // Security 기능 제외  나중에 지워야함!!!
 @EnableJpaAuditing
 @EnableAsync
-@EnableScheduling
 public class UkikiApplication {
 
     public static void main(String[] args) {
