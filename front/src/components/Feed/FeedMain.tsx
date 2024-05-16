@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import write from "@/assets/DetailImg/write.png"
 import { Link, useParams } from "react-router-dom";
 import { ArticleProps } from "../../types/ArticleType";
-import { getArticleList } from "../../api/article";
+import { getArticleList, getArticleImg } from "../../api/article";
+import { useStore } from "zustand";
+import { userStore } from "../../stores/UserStore";
 
 const FeedMain: React.FC = () => {
   const { groupPk }= useParams();
   const [articleList, setArticleList] = useState<ArticleProps[]>([])
+  const keys = useStore(userStore).groupKey
 
   useEffect(() => {
     getList()
@@ -18,12 +21,30 @@ const FeedMain: React.FC = () => {
       (res) => {
         console.log(res)
         setArticleList(res.data.articleDtoList)
+        res.data.articleDtoList.forEach(item => checkStateAndImg(item))
       },
       (err) => {
         console.log(err)
       }
     )
   }
+
+  const checkStateAndImg = async (data:ArticleProps) => {
+		const key = keys[data.partyId]
+    const opt = {
+      "x-amz-server-side-encryption-customer-key": key,
+    };
+    console.log(opt)
+    if (data.photoList.length > 0) {
+      await getArticleImg(
+        data.photoList[0].photoUrl,
+        opt,
+        () => {},
+        (err) => { console.log(err); },
+      );
+    }
+	}
+
   return (
     <div className="flex flex-col w-full h-full overflow-scroll scrollbar-hide">
       <div className="px-4 justify-end flex">

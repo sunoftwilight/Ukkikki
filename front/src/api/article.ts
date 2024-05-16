@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
-import { privateApi, formDataApi } from '../utils/http-commons';
+import { privateApi, formDataApi, imgApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
-import { ArticleListRespones } from '../types/ArticleType';
+import { ArticleListRespones, ArticleDetailRespones } from '../types/ArticleType';
 
 export const getArticleList = async(
   groupPk: number,
@@ -15,7 +15,7 @@ export const getArticleList = async(
 export const getArticleDetail = async(
   groupPk: number,
   articlePk: number,
-  Response : (Response : AxiosResponse<ResponseData>) => void, 
+  Response : (Response : AxiosResponse<ArticleDetailRespones>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
   await privateApi.get(`/article/detail/${groupPk}/${articlePk}`)
   .then(Response)
@@ -52,3 +52,15 @@ export const deleteAritcle = async(
   .then(Response)
   .catch(Error)
   }
+
+
+export const getArticleImg = async (
+  thumbUrl: string,
+  headerOpt: Record<string,string>,
+  Response: (Response: AxiosResponse<ResponseData>) => void,
+  Error: (Error: AxiosResponse<ResponseData>) => void) => {
+    await imgApi.get(`${thumbUrl}`,{headers: {...headerOpt}})
+    .then(Response)
+    .catch(Error)
+  }
+  
