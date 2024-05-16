@@ -1,11 +1,14 @@
 package project.domain.article.service;
 
+import com.amazonaws.services.s3.model.SSECustomerKey;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import project.domain.article.collection.CommentCollection;
 import project.domain.article.dto.request.ArticleCreateDto;
 import project.domain.article.dto.request.ArticleUpdateDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
@@ -19,6 +22,7 @@ import project.domain.article.mapper.ArticleMapper;
 import project.domain.article.mapper.ArticlePhotoMapper;
 import project.domain.article.repository.ArticlePhotoRepository;
 import project.domain.article.repository.ArticleRepository;
+import project.domain.article.repository.CommentRepository;
 import project.domain.directory.collection.File;
 import project.domain.directory.mapper.GetFileMapper;
 import project.domain.directory.repository.FileRepository;
@@ -34,10 +38,12 @@ import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.party.repository.PartyRepository;
 import project.domain.photo.entity.Photo;
+import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.mapper.PhotoMapper;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
+import project.global.util.S3Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,14 +62,16 @@ public class ArticleServiceImpl implements ArticleService{
     private final ArticlePhotoRepository articlePhotoRepository;
     private final FileRepository fileRepository;
     private final ProfileRepository profileRepository;
+    private final CommentRepository commentRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticlePhotoMapper articlePhotoMapper;
     private final GetFileMapper fileMapper;
     private final PhotoMapper photoMapper;
 
+    private final S3Util s3Util;
     @Override
-    public ArticleCreateResDto createArticle(Long partyId, ArticleCreateDto articleCreateDto) {
+    public ArticleCreateResDto createArticle(Long partyId, ArticleCreateDto articleCreateDto, List<MultipartFile> multipartFiles) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
@@ -101,6 +109,20 @@ public class ArticleServiceImpl implements ArticleService{
                 .party(party)
                 .build());
 
+        // Device 사진 추가하기
+        for (MultipartFile file : multipartFiles) {
+            String url = s3Util.fileUpload(file, articleCreateDto.getPassword());
+            PhotoUrl photoUrl = PhotoUrl.builder()
+                .photoUrl(url).build();
+            Photo photo = Photo.builder()
+                .photoUrl(photoUrl)
+                .photoType(PhotoType.DEVICE)
+                .build();
+            photoRepository.save(photo);
+            ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
+            articlePhotoRepository.save(articlePhoto);
+        }
+
         // 게시판 사진 리스트
         List<ArticlePhoto> articlePhotoList = new ArrayList<>();
 
@@ -113,10 +135,9 @@ public class ArticleServiceImpl implements ArticleService{
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
             // ArticlePhoto 생성
             ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
-            // 리스트에 넣고 저장
-            articlePhotoList.add(articlePhotoRepository.save(articlePhoto));
+            // 저장
+            articlePhotoRepository.save(articlePhoto);
         }
-
 
         articleRepository.save(article);
         article.setArticlePhotoList(articlePhotoList);
@@ -214,9 +235,8 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
-    public SimpleArticleDto updateArticle(Long partyId, Long articleId, ArticleUpdateDto articleUpdateDto) {
+    public SimpleArticleDto updateArticle(Long partyId, Long articleId, ArticleUpdateDto articleUpdateDto, List<MultipartFile> multipartFiles) {
 
-        System.out.println(articleUpdateDto.toString());
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
 
@@ -237,17 +257,35 @@ public class ArticleServiceImpl implements ArticleService{
         Article article = articleRepository.findById(articleId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.ARTICLE_NOT_FOUND));
 
+        // 글쓴이가 다르다면 리턴
         if (!memberId.equals(article.getMember().getId())){
             throw new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR);
         }
-
+        // 제목 변화 여부
         if (articleUpdateDto.getTitle() != null){
             article.setTitle(articleUpdateDto.getTitle());
         }
-
+        // 본문 변화 여부
         if (articleUpdateDto.getContent() != null){
             article.setContent(articleUpdateDto.getContent());
         }
+
+        // Device 사진 추가
+        for (MultipartFile file : multipartFiles) {
+            String url = s3Util.fileUpload(file, articleUpdateDto.getPassword());
+            PhotoUrl photoUrl = PhotoUrl.builder()
+                .photoUrl(url).build();
+            Photo photo = Photo.builder()
+                .photoUrl(photoUrl)
+                .photoType(PhotoType.DEVICE)
+                .build();
+            photoRepository.save(photo);
+            ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
+            articlePhotoRepository.save(articlePhoto);
+        }
+
+
+        // 폴더 사진 추가 여부
         if (articleUpdateDto.getArticlePhotoList() != null){
             if (articleUpdateDto.isAddPhoto()){
                 // 포토 추가
@@ -280,6 +318,56 @@ public class ArticleServiceImpl implements ArticleService{
         res.setPhotoList(articlePhotoMapper.toSimpleArticlePhotoDtoList(articlePhotoList));
         
         return res;
+
+    }
+
+    @Override
+    public void deleteArticle(Long partyId, Long articleId) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getId();
+
+        memberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        partyRepository.findById(partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(()-> new BusinessLogicException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        // 멤버 권한 조회
+        memberpartyRepository.findByMemberIdAndPartyId(memberId,partyId)
+            .ifPresentOrElse(memberParty -> {
+                // BLOCK 유저거나 글쓴이가 아니라면
+                if (memberParty.getMemberRole().equals(MemberRole.BLOCK) || !memberId.equals(article.getMember().getId())) {
+                    // 마스터 권한이 아니라면 리턴
+                    if (!memberParty.getMemberRole().equals(MemberRole.MASTER)){
+                        throw new BusinessLogicException(ErrorCode.NOT_ROLE_EDIT);
+                    }
+                }
+            }, ()-> {
+                    // 멤버 권한을 못찾았을 때 리턴
+                    throw new BusinessLogicException(ErrorCode.MEMBER_NOT_MATCH);
+                }
+            );
+
+        // 댓글 삭제
+        commentRepository.findById(articleId)
+            .ifPresent(commentRepository::delete);
+
+        // 게시판 Device 사진 삭제
+        List<ArticlePhoto> articlePhotoList = article.getArticlePhotoList();
+        for (ArticlePhoto articlePhoto : articlePhotoList) {
+            if (articlePhoto.getPhoto().getPhotoType().equals(PhotoType.DEVICE)){
+                Photo photo = articlePhoto.getPhoto();
+                String myProfileFileName = photo.getPhotoUrl().getPhotoUrl().split("/")[3];
+                s3Util.fileDelete(myProfileFileName);
+            }
+        }
+
+        // 게시판 삭제
+        articleRepository.delete(article);
+
 
     }
 

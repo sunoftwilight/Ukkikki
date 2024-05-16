@@ -4,6 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import project.domain.alarm.redis.Alarm;
+import project.domain.alarm.redis.AlarmType;
+import project.domain.alarm.repository.AlarmRedisRepository;
+import project.domain.alarm.service.AlarmService;
 import project.domain.article.collection.CommentCollection;
 import project.domain.article.dto.response.ArticleCreateResDto;
 import project.domain.article.entity.Article;
@@ -31,8 +36,8 @@ public class CommentServiceImpl implements CommentService{
     private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
     private final ArticleRepository articleRepository;
-
-
+    private final AlarmService alarmService;
+    private final AlarmRedisRepository alarmRedisRepository;
     @Override
     @Transactional
     public void createComment(ArticleCreateResDto articleCreateResDto) {
@@ -117,7 +122,16 @@ public class CommentServiceImpl implements CommentService{
 
         cc.getComment().add(newComment);
 
+
         commentRepository.save(cc);
+
+        // 알림 보내기
+        Long receiverId = article.getMember().getId();
+        Integer commentSize = cc.getComment().size() - 1;
+        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.CHAT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, content), receiverId);
+        alarmRedisRepository.save(alarm);
+        SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
+        alarmService.sendAlarm(emitter, receiverId, alarm);
     }
 
     @Override
@@ -136,7 +150,6 @@ public class CommentServiceImpl implements CommentService{
         if(memberId == 0){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
         }
-
 
         CommentCollection cc = commentRepository.findById(articleId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.COMMENT_NOT_FOUND));
@@ -234,6 +247,12 @@ public class CommentServiceImpl implements CommentService{
         cc.getComment().get(commentIdx).getReply().add(newReply);
 
         commentRepository.save(cc);
+
+        Long receiverId = cc.getComment().get(commentIdx).getUserId();
+        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.REPLY, article.getParty().getId(), articleId, Long.valueOf(commentIdx), memberId, content), receiverId);
+        alarmRedisRepository.save(alarm);
+        SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
+        alarmService.sendAlarm(emitter, receiverId, alarm);
     }
 
     @Override

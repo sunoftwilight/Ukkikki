@@ -11,5 +11,6 @@ public class ArticleCreateDto {
 
     String title;
     String content;
+    String password;
     List<String> photoIdList;
 }
