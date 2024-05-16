@@ -8,6 +8,7 @@ import SaveHeader from "../components/Header/SaveHeader";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { useStore } from "zustand";
 import { AlarmOccuredStore } from "../stores/AlarmStore";
+import toast, { Toaster } from "react-hot-toast";
 
 const Header: React.FC = () => {
 	const location = useLocation();
@@ -49,12 +50,65 @@ const Header: React.FC = () => {
 				);
 
 				// 알람 이벤트 발생 시 Alarm 발생 이미지 변경해주기
-				sse.addEventListener("PASSWORD", () => setIsAlarmOccured(true));
-				sse.addEventListener("COMMENT", () => setIsAlarmOccured(true));
-				sse.addEventListener("REPLY", () => setIsAlarmOccured(true));
-				sse.addEventListener("CHAT", () => setIsAlarmOccured(true));
-				sse.addEventListener("MEMO", () => setIsAlarmOccured(true));
-				sse.addEventListener("MENTION", () => setIsAlarmOccured(true));
+				sse.addEventListener("PASSWORD", (event: any) => {
+					const e = event as MessageEvent; // 이벤트 타입을 MessageEvent로 캐스팅
+
+					const alarmObject = JSON.parse(e.data);
+					const partyName = alarmObject.partyName;
+
+					toast.success(`${partyName} 그룹의 비밀번호가 변경되었습니다`,{icon: '🔐'})
+					setIsAlarmOccured(true)
+				});
+
+				sse.addEventListener("COMMENT", (event: any) => {
+					const e = event as MessageEvent; 
+
+					const alarmObject = JSON.parse(e.data);
+					const writerNick = alarmObject.writerNick;
+
+					toast.success(`${writerNick}님께서 댓글을 작성했습니다`,{icon: '💬'})
+					setIsAlarmOccured(true)
+				});
+
+				sse.addEventListener("REPLY", (event: any) => {
+					const e = event as MessageEvent; 
+
+					const alarmObject = JSON.parse(e.data);
+					const writerNick = alarmObject.writerNick;
+
+					toast.success(`${writerNick}님께서 대댓글을 작성했습니다`,{icon: '💬'})
+					setIsAlarmOccured(true)
+				});
+
+				sse.addEventListener("CHAT", (event: any) => {
+					const e = event as MessageEvent; 
+
+					const alarmObject = JSON.parse(e.data);
+					const writerNick = alarmObject.writerNick;
+
+					toast.success(`${writerNick}님께서 회원님을 언급했습니다`,{icon: '💌'})
+					setIsAlarmOccured(true)
+				});
+
+				sse.addEventListener("MEMO", (event: any) => {
+					const e = event as MessageEvent; 
+
+					const alarmObject = JSON.parse(e.data);
+					const writerNick = alarmObject.writerNick;
+
+					toast.success(`${writerNick}님께서 회원님을 언급했습니다`,{icon: '🖼'})
+					setIsAlarmOccured(true)
+				});
+
+				sse.addEventListener("MENTION", (event: any) => {
+					const e = event as MessageEvent; 
+
+					const alarmObject = JSON.parse(e.data);
+					const writerNick = alarmObject.writerNick;
+
+					toast.success(`${writerNick}님께서 회원님을 언급했습니다`,{icon: '💬'})
+					setIsAlarmOccured(true)
+				});
 		
 				return () => sse.close(); // 컴포넌트 언마운트 시 EventSource 연결을 닫습니다.
     }
@@ -76,6 +130,15 @@ const Header: React.FC = () => {
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;
 	else if (albumPath.includes(location.pathname) || location.pathname.startsWith("/album")  || location.pathname.startsWith("/trash")) return <AlbumHeader />;
 	else if (location.pathname === "/write") return <WriteHeader />;
+
+	return(
+		<div>
+			<Toaster
+				position="top-center"
+				reverseOrder={false}
+			/>
+		</div>
+	)
 };
 
 export default Header;
