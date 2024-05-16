@@ -509,8 +509,9 @@ public class PartyServiceImpl implements PartyService {
         keyGroup.setSseKey(encryptorPassword);
         keyGroupRepository.save(keyGroup);
 
-        // 알람 보내기
-        alarmService.groupSendAlarm(memberId, AlarmType.PASSWORD, partyId,0L,0L, 0L);
+        // 알람 생성 & 보내기
+        Alarm alarm = alarmService.createAlarm(AlarmType.PASSWORD, partyId, 0L, 0L, memberId, "");
+        alarmService.groupSendAlarm(alarm, memberId);
 
         // S3 이미지 비밀번호 바꾸기
         List<Photo> photos = party.getPhotoList();
@@ -592,7 +593,7 @@ public class PartyServiceImpl implements PartyService {
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_GUEST);
         }
 
-        // 유저확인 TODO 유저 아이디를 토큰에서 받아야 함
+        // 유저확인
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 파티확인
