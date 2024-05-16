@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { downloadApi } from '../utils/http-commons';
+import { downloadApi, formDataApi } from '../utils/http-commons';
 import { ResponseData } from '../types/ApiResponseType';
 import { FileDownloadDto, MultiFileDownloadDto } from '../types/AlbumType';
 import qs from 'qs';
@@ -32,3 +32,12 @@ export const multiDownloadFile = async(
   .then(Response)
   .catch(Error)
   }
+
+export const uploadFile = async (
+  params: FormData,
+  Response: (Response: AxiosResponse<ResponseData>) => void,
+  Error: (Error: AxiosResponse<ResponseData>) => void,) => {
+  await formDataApi.post(`/${url}/upload/dir`, params)
+  .then(Response)
+  .catch(Error);
+};

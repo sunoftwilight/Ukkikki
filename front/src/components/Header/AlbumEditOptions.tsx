@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import upload from "@/assets/Header/AlbumEditOptions/upload.png";
 import addFolder from "@/assets/Header/AlbumEditOptions/addFolder.png";
 import edit from "@/assets/Header/AlbumEditOptions/edit.png";
@@ -13,6 +13,8 @@ import { createDirectory, delDirectory, editDirectory } from "../../api/director
 import { userStore } from "../../stores/UserStore";
 import { useParams } from "react-router-dom";
 import { folderStore } from "../../stores/ModalStore";
+import { getPartyDetail } from "../../api/party";
+import { uploadFile } from "../../api/file";
 
 const AlbumEditOptions: React.FC = () => {
   const optionStyle = "flex rounded-[10px] w-full h-[30px] items-center px-3 gap-3 font-pre-R text-black text-sm bg-white/70"
@@ -26,7 +28,6 @@ const AlbumEditOptions: React.FC = () => {
   const { groupKey } = useStore(userStore);
   const { groupPk } = useParams();
   const { setFolderOpen } = useStore(folderStore)
-  // const [uploadFiles, setUploadFiles] = useState([])
 	const refInputRef = useRef(null)
 
   // 요청에 맞는 모달창 열기
@@ -91,9 +92,59 @@ const AlbumEditOptions: React.FC = () => {
       }
     )
   }
+  
+  const [rootDir, setRootDir] = useState<string>('')
 
+  useEffect(() => {
+    getPartyDetail(
+      Number(groupPk),
+      (res) => {
+        setRootDir(res.data.data.rootDirId)
+      },
+      (err) => { console.error(err) }
+    )
+  }, [groupPk])
+
+  const key = new Blob(
+    [JSON.stringify({
+      'key': groupKey[Number(groupPk)],
+      'partyId': groupPk,
+      'rootDirId': rootDir,
+      'targetDirId': currentDirId
+    })],
+    {type: 'application/json'}
+  ) 
+  
   const uploadHandler = (e: any) => {
-    console.log(e)
+    const formData = new FormData();
+    const filesArray = Array.from(e.target.files); // FileList 객체를 배열로 변환
+
+    // 원하는 파일 형식만 필터링
+    const filteredFiles = filesArray.filter((file: any) => 
+      file.type === "image/jpg" || file.type === "image/jpeg" || file.type === "image/png"
+    );
+
+    // 필터링 후에 남은 파일이 없으면 형식 경고
+    if (filteredFiles.length === 0) {
+      alert('jpg, jpeg, png 파일만 업로드할 수 있습니다.')
+      return
+    }
+
+    // 필터링된 파일들을 FormData에 추가
+    filteredFiles.forEach((file: any) => {
+      formData.append('files', file);
+    });
+
+    formData.append('key', key)
+
+    uploadFile(
+      formData,
+      () => { doneHandler() },
+      (err) => { 
+        console.error(err) 
+        alert('오류가 발생했습니다. 다시 시도해주세요.')
+      }
+    )
   }
 
   // 모달 요청 완료 후 로직
@@ -104,6 +155,7 @@ const AlbumEditOptions: React.FC = () => {
     setIsEditNameOpen(false)
     setIsEdit()
   }
+
 
   return (
     <AnimatePresence>
@@ -137,6 +189,7 @@ const AlbumEditOptions: React.FC = () => {
           업로드
         </label>
         <input 
+          multiple
           type="file" name='file' id='files' 
           style={{display: "none"}}
           ref={refInputRef}

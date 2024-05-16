@@ -19,18 +19,20 @@ const AlbumMain: React.FC = () => {
   const { needUpdate } = useStore(updateAlbumStore)
   const { currentDirId, setCurrentDirId, setCurrentDirName, parentDirId, setParentDirId, parentDirName } = useStore(currentDirStore)
   const [albumList, setAlbumList] = useState<contentListData[]>([])
-  
   const { groupPk } = useParams();
 
   useEffect(() => {
+    console.log('groupPk', groupPk)
     getPartyDetail(
       Number(groupPk),
       (res) => {
         setCurrentDirId(res.data.data.rootDirId)
+        console.log('partyDetail', res.data)
 
         getDirectory(
           res.data.data.rootDirId,
           (res) => {
+            console.log('List', res.data)
             setParentDirId(res.data.data.parentId)
             setAlbumList(res.data.data.contentList)
           },
@@ -47,7 +49,7 @@ const AlbumMain: React.FC = () => {
       (res) => {
         setParentDirId(res.data.data.parentId)
         setAlbumList(res.data.data.contentList)
-        console.log(res.data.data)
+        console.log('data', res.data.data)
       },
       (err) => { console.error(err) }
     )

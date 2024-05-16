@@ -25,6 +25,7 @@ const DetailImg: React.FC = () => {
       currentImg,
       (res) => {
         setHighQualityUrl(res.data.data.url)
+        console.log('high', res.data.data.url)
         setDetailInfo(res.data.data)
       },
       (err) => { console.error(err) }

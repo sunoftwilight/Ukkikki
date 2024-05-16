@@ -22,11 +22,10 @@ const SecureImg: React.FC<ImgProps> = ({ url }) => {
     getPartyThumb(
       url,
       opt,
-      () => {},
+      () => { console.log('성공')},
       (err) => { console.error(err) },
-      // () => {},
     );
-  }, [])
+  }, [url])
 
   return (
     location.pathname.startsWith('/album/detail') ?
