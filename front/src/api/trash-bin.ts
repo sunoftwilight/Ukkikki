@@ -19,7 +19,7 @@ export const delTrashBin = async(
   trashInfo: trashInfoType,
   Response : (Response : AxiosResponse<ResponseData>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await privateApi.patch(`/${url}/${trashBinId}/trashes`, trashInfo)
+  await privateApi.delete(`/${url}/${trashBinId}/trashes`, { data: trashInfo })
   .then(Response)
   .catch(Error)
 }
