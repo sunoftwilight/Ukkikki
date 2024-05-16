@@ -18,8 +18,8 @@ public class SimpleAlarm {
 
     String alarmId;
     Long partyId;
-    Long contentsId;
-    Long targetId;
+    String contentsId;
+    String targetId;
     String writerNick;
     AlarmType alarmType;
     String content;

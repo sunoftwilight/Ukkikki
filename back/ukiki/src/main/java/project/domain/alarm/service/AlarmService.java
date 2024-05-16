@@ -20,7 +20,7 @@ public interface AlarmService {
 
     void groupSendAlarm(Alarm alarm, Long senderId);
 
-    Alarm createAlarm(AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId, String data);
+    Alarm createAlarm(AlarmType type, Long partyId, Object contentsId, Object targetId, Long writerId, String data);
 
     SseEmitter findEmitterByUserId(Long memberId);
 

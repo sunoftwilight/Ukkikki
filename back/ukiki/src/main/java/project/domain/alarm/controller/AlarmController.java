@@ -143,7 +143,7 @@ public class AlarmController implements AlarmDocs {
         dsa = alarmService.createAlarm(
             AlarmType.MEMO,
             78L,
-            1L,
+            "38ca74c4-7797-42b1-a431-38e639a34f532024-05-16T16:08:21.790233970",
             1L,
             6L,
             "우와 짱 잘 나왔다"

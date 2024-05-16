@@ -6,43 +6,49 @@ import java.util.List;
 
 public enum AlarmIdentifier {
     MEMO{
-        public List<String> identifier(Long partyId, Long detailId, Long targetId){
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("/api/photo/memo/%d/%d", partyId, detailId));
+                add(String.format("album/detail/%s/%d", contentsId, partyId));
             }};
         }
     },
     COMMENT{
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("/api/article/comment/%d/%d/", partyId, detailId));
+                add("/chat");
             }};
         }
     },
     REPLY{ // 이건 만들어 봐야할듯
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("REPLY URL");
+                add("/chat");
             }};
         }
     },
 
     CHECK{ // SSE 연결 체크용
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/CHECK/URL");
+                add("/chat");
             }};
         }
     },
     PASSWORD{
         @Override
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
-            return null;
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
+            return new ArrayList<>(){{
+                add("/chat");
+            }};
         }
     },
     CHAT{
         @Override
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
                 add("/chat");
             }};
@@ -50,14 +56,16 @@ public enum AlarmIdentifier {
     },
     MENTION{
         @Override
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
-            return null;
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
+            return new ArrayList<>(){{
+                add("/chat");
+            }};
         }
     },
 
     ;
 
 
-    public abstract List<String> identifier(Long partyId, Long detailId, Long targetId);
+    public abstract List<String> identifier(Long partyId, Object contentsId, Object targetId);
 //    public abstract List<String> identifier2 (Long partyId, Long detailId);
 }
