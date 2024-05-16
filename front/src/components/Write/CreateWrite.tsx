@@ -12,7 +12,7 @@ const WriteMain: React.FC = () => {
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [addMediaList, setAddMediaList] = useState<{src:string}[]>([]);
+  const [addMediaList, setAddMediaList] = useState<File[]>([]);
 
   const user = useStore(userStore);
   const {groupPk} = useParams();
@@ -24,12 +24,8 @@ const WriteMain: React.FC = () => {
     const files = e.target.files;
     if (!files) return;
   
-    const newMediaList = Array.from(files).map(file => ({
-      src: URL.createObjectURL(file)
-    }));
-  
-    console.log(newMediaList); // 새로 추가된 이미지 확인
-  
+    const newMediaList = Array.from(files);
+
     setAddMediaList(prevMediaList => [...prevMediaList, ...newMediaList]);
 	};
 
@@ -51,9 +47,8 @@ const WriteMain: React.FC = () => {
 
 		formData.append("articleCreateDto", JSON.stringify(data));
     console.log(addMediaList)
-    addMediaList.forEach((item, index) => {
-      const file = new File([item.src], `image_${index}.jpeg`, {type: "image/jpeg"});
-      formData.append("multipartFiles", file)
+    addMediaList.forEach((file) => { // 변경 3: URL 대신 실제 파일을 FormData에 추가
+      formData.append(`multipartFiles`, file, file.name);
     });
     console.log(formData.getAll('multipartFiles'))
 
@@ -90,7 +85,7 @@ const WriteMain: React.FC = () => {
           />
           <div className="pl-4 flex overflow-x-scroll scrollbar-hide gap-2 h-48">
             { addMediaList.map((item, idx) => (
-              <img key={idx} src={item.src}
+              <img key={idx} src={URL.createObjectURL(item)}
                 className="w-36 h-36 object-cover"
               />
             ))}

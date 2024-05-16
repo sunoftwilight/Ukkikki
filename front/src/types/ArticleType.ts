@@ -45,3 +45,8 @@ export interface ArticleListRespones {
   size: number;
   next: boolean;
 }
+
+export interface ArticleDetailRespones {
+  resultCode: string;
+  data: ArticleProps;
+}

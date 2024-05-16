@@ -113,12 +113,13 @@ const Cam: React.FC = () => {
 
           canvas.toBlob(async blob => {
             if (blob && user.uploadGroupId) {
+
               const formData = new FormData();
   
               const key = new Blob([JSON.stringify({key: user.groupKey[user.uploadGroupId], partyId:user.uploadGroupId})], {type: 'application/json',});
   
               const file = new File([blob], 'image.jpeg', {type: 'image/jpeg'});
-  
+              console.log(blob.size / (1024 * 1024))
               formData.append('key', key);
               formData.append('files', file);
   
@@ -129,7 +130,7 @@ const Cam: React.FC = () => {
                   console.log(error)
               })
             }
-          })
+          }, 'image/jpeg', 0.8)
         }, selectedTimer)
       }
     }
