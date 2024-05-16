@@ -5,7 +5,7 @@ import java.util.List;
 
 
 public enum AlarmIdentifier {
-    MEMO{ // 사진 메모 URL
+    MEMO{
         public List<String> identifier(Long partyId, Long detailId, Long targetId){
             return new ArrayList<>(){{
                 add(String.format("/api/photo/memo/%d/%d", partyId, detailId));
@@ -30,8 +30,7 @@ public enum AlarmIdentifier {
     CHECK{ // SSE 연결 체크용
         public List<String> identifier(Long partyId, Long detailId, Long targetId) {
             return new ArrayList<>(){{
-                add("CHECK URL1");
-                add("CHECK URL2");
+                add("/CHECK/URL");
             }};
         }
     },
@@ -44,7 +43,9 @@ public enum AlarmIdentifier {
     CHAT{
         @Override
         public List<String> identifier(Long partyId, Long detailId, Long targetId) {
-            return null;
+            return new ArrayList<>(){{
+                add("/chat");
+            }};
         }
     },
     MENTION{
