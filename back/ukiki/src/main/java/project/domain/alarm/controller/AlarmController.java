@@ -48,7 +48,7 @@ public class AlarmController implements AlarmDocs {
 
     @Override
     @GetMapping("/redirect-user")
-    public void redirectUser(HttpServletResponse response, @RequestParam RedirectDto redirectDto) throws IOException {
+    public void redirectUser(HttpServletResponse response, @ModelAttribute RedirectDto redirectDto) throws IOException {
         alarmService.checkAlarm(redirectDto.getAlarmId());
         response.sendRedirect("https://k10d202.p.ssafy.io"+redirectDto.getRedirectUrl());
     }
