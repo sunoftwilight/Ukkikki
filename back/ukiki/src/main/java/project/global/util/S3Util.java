@@ -65,7 +65,7 @@ public class S3Util {
     public String fileUpload(MultipartFile file, String key) {
         SSECustomerKey sseKey = new SSECustomerKey(key);
         // 허용할 MIME 타입들 설정 (이미지, 동영상 파일만 허용하는 경우)
-        List<String> allowedMimeTypes = List.of("image/jpeg", "image/png", "image/gif", "video/mp4", "video/webm", "video/ogg", "video/3gpp", "video/x-msvideo", "video/quicktime");
+        List<String> allowedMimeTypes = List.of("image/jpg", "image/jpeg", "image/png", "image/gif", "video/mp4", "video/webm", "video/ogg", "video/3gpp", "video/x-msvideo", "video/quicktime");
 
         // 허용되지 않는 MIME 타입의 파일은 처리하지 않음
         String fileContentType = file.getContentType();
