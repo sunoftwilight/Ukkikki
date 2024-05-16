@@ -19,6 +19,8 @@ export interface AlarmItemType {
   createDate?: string;
   identifier: string[];
   partyId: number;
+  partyName: string;
+  partyUrl: string;
   read: boolean;
   targetId: number;
 }

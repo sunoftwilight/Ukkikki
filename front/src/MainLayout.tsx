@@ -4,9 +4,15 @@ import Hamburger from "./components/@commons/Hamburger";
 import InviteModal from "./components/@commons/InviteModal";
 import GroupMemberModal from "./components/GroupMain/GroupMemberModal";
 import FolderModal from "./components/Album/FolderModal";
+import { headerStore } from "./stores/HeaderStateStore";
+import { useStore } from "zustand";
+import { folderStore } from "./stores/ModalStore";
 
 // 헤더가 필요한 곳에 대한 설정
 function App() {
+	const { alarmOpen, menuOpen } = useStore(headerStore);
+  const { folderOpen } = useStore(folderStore)
+
 	return (
     <div className="w-screen h-screen">
       <Header />
@@ -15,10 +21,10 @@ function App() {
         <Outlet />
       </div>
 
-      <Hamburger />
+      { (alarmOpen || menuOpen)  && <Hamburger /> }
       <InviteModal />
       <GroupMemberModal />
-      <FolderModal />
+      { folderOpen && <FolderModal /> }
     </div>
 	);
 }

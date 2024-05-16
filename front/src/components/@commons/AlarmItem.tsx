@@ -1,46 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { AlarmItemProps } from "../../types/AlarmType";
-import { getPartyDetail } from "../../api/party";
-// import { downloadFile } from "../../api/file";
+import { useStore } from "zustand";
+import { userStore } from "../../stores/UserStore";
+import { getPartyThumb } from "../../api/party";
 
 const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
-  const [partyName, setPartyName] = useState('')
-  // const [partyThumb, setPartyThumb] = useState('')
-  const [partyThumb, ] = useState('')
+	const { groupKey } = useStore(userStore);
 
   useEffect(() => {
-    getPartyDetail(
-      alarmItem.partyId,
-      (res) => {
-        // console.log(res.data)
-        setPartyName(res.data.data.partyName)
-
-        // downloadFile(
-        //   'jA4k9zv1/nk9xF5fkLWpaCwMs0X1JN3vd6soWbk1LVI=',
-        //   {
-        //     fileId : res.data.data.thumbnail,
-        //     prefix: ''
-        //   },
-        //   (res) => { 
-        //     const url = window.URL.createObjectURL(new Blob([res.data]))
-        //     setPartyThumb(url)
-        //   },
-        //   (err) => { console.error(err) },
-        // )
-      },
-      (err) => {
-        console.error(err)
-      }
-    )
+    const opt = {
+			"x-amz-server-side-encryption-customer-key": groupKey[Number(alarmItem.partyId)],
+		};
+		getPartyThumb(
+			alarmItem.partyUrl,
+			opt,
+			() => {},
+			(err) => { console.log(err); },
+		);
   }, [])
-
 
 	return (
     <div className={`flex gap-2 w-full ${alarmItem.read ? 'bg-gray' : 'bg-white'}`}>
-      <img src={partyThumb} className="rounded-full w-12 h-12" />
+      <img src={alarmItem.partyUrl} className="rounded-full w-12 h-12 border-[0.1px] border-point-gray object-cover" />
       <div className="flex w-[calc(100%-56px)] flex-col gap-2">
         <div className="font-gtr-B text-xs">
-          {partyName}
+          {alarmItem.partyName}
         </div>
         <div>
           <div className="text-xs font-pre-R text-black">
