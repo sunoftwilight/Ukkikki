@@ -1,10 +1,8 @@
 package project.domain.directory.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class CreateDirDto {
     private String parentDirId;
     private String dirName;
