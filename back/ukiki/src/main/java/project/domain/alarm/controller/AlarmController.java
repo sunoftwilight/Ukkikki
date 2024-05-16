@@ -65,6 +65,7 @@ public class AlarmController implements AlarmDocs {
         }
 
         // 2번 유저  78파티
+
         Alarm dsa = alarmService.createAlarm(
             AlarmType.CHECK,
             78L,
@@ -73,10 +74,83 @@ public class AlarmController implements AlarmDocs {
             6L,
             "테스트 알람 보내기 입니다."
         );
-            dsa.setMemberId(2L);
-            alarmRedisRepository.save(dsa);
-            alarmService.sendAlarm(asd,userId,dsa);
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
+        dsa = alarmService.createAlarm(
+            AlarmType.CHAT,
+            78L,
+            1L,
+            1L,
+            6L,
+            "채팅 일까 아닐까 "
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
+        dsa = alarmService.createAlarm(
+            AlarmType.COMMENT,
+            78L,
+            1L,
+            1L,
+            6L,
+            "답글 일껄? ??? "
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
+        dsa = alarmService.createAlarm(
+            AlarmType.REPLY,
+            78L,
+            1L,
+            1L,
+            6L,
+            "테스트 알람 보내기 입니다."
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
+
+        dsa = alarmService.createAlarm(
+            AlarmType.PASSWORD,
+            78L,
+            1L,
+            1L,
+            6L,
+            "비밀번호 바뀜 ㅅㄱㄹ"
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
+
+        dsa = alarmService.createAlarm(
+            AlarmType.MENTION,
+            78L,
+            1L,
+            1L,
+            6L,
+            "@Sun.L 너 짱 잘 나 옴"
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
+        dsa = alarmService.createAlarm(
+            AlarmType.MEMO,
+            78L,
+            1L,
+            1L,
+            6L,
+            "우와 짱 잘 나왔다"
+        );
+        dsa.setMemberId(2L);
+        alarmRedisRepository.save(dsa);
+        alarmService.sendAlarm(asd,userId,dsa);
+
         }
-
-
 }

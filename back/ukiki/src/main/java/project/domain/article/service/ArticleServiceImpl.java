@@ -64,13 +64,17 @@ public class ArticleServiceImpl implements ArticleService{
     private final ProfileRepository profileRepository;
     private final CommentRepository commentRepository;
 
+
     private final ArticleMapper articleMapper;
     private final ArticlePhotoMapper articlePhotoMapper;
     private final GetFileMapper fileMapper;
     private final PhotoMapper photoMapper;
 
     private final S3Util s3Util;
+
+    private final CommentServiceImpl commentService;
     @Override
+    @Transactional
     public ArticleCreateResDto createArticle(Long partyId, ArticleCreateDto articleCreateDto, List<MultipartFile> multipartFiles) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -92,8 +96,7 @@ public class ArticleServiceImpl implements ArticleService{
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // BLOCK or Viewr 차단
-        if (memberParty.getMemberRole().equals(MemberRole.BLOCK) ||
-            memberParty.getMemberRole().equals(MemberRole.VIEWER)){
+        if (memberParty.getMemberRole().equals(MemberRole.BLOCK)){
             throw new BusinessLogicException(ErrorCode.NOT_ROLE_EDIT);
         }
 
@@ -110,17 +113,20 @@ public class ArticleServiceImpl implements ArticleService{
                 .build());
 
         // Device 사진 추가하기
-        for (MultipartFile file : multipartFiles) {
-            String url = s3Util.fileUpload(file, articleCreateDto.getPassword());
-            PhotoUrl photoUrl = PhotoUrl.builder()
-                .photoUrl(url).build();
-            Photo photo = Photo.builder()
-                .photoUrl(photoUrl)
-                .photoType(PhotoType.DEVICE)
-                .build();
-            photoRepository.save(photo);
-            ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
-            articlePhotoRepository.save(articlePhoto);
+        if(multipartFiles!= null){
+            for (MultipartFile file : multipartFiles) {
+                String url = s3Util.fileUpload(file, articleCreateDto.getPassword());
+                PhotoUrl photoUrl = PhotoUrl.builder()
+                    .photoUrl(url).build();
+                Photo photo = Photo.builder()
+                    .photoUrl(photoUrl)
+                    .photoType(PhotoType.DEVICE)
+                    .build();
+                photoRepository.save(photo);
+                ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
+                articlePhotoRepository.save(articlePhoto);
+            }
+
         }
 
         // 게시판 사진 리스트
@@ -142,11 +148,13 @@ public class ArticleServiceImpl implements ArticleService{
         articleRepository.save(article);
         article.setArticlePhotoList(articlePhotoList);
 
-        // 게시판 PK 반환
-        return ArticleCreateResDto
+        ArticleCreateResDto res = ArticleCreateResDto
             .builder()
             .articleId(article.getId())
             .build();
+        commentService.createComment(res);
+        // 게시판 PK 반환
+        return res;
     }
 
     @Override

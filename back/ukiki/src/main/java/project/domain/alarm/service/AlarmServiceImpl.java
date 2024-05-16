@@ -68,23 +68,26 @@ public class AlarmServiceImpl implements AlarmService {
         List<String> identifier = new ArrayList<>();
         String message = null;
         switch (type){
-            case MEMO -> { // DONE
-                message = String.format("%s님께서 사진에 메모를 작성하였습니다.\n%s", profile.getNickname(), data);
+            case MEMO -> {
                 identifier = AlarmIdentifier.MEMO.identifier(partyId, contentsId, targetId);
             }
             case REPLY -> {
-                message = String.format("%s님께서 회원님에게 답글을 작성하였습니다.\n%s", profile.getNickname(), data);
                 identifier = AlarmIdentifier.REPLY.identifier(partyId, contentsId, targetId);
             }
             case COMMENT -> {
-                message = String.format("%s님께서 댓글을 작성하였습니다.\n%s", profile.getNickname(), data);
                 identifier = AlarmIdentifier.COMMENT.identifier(partyId, contentsId, targetId);
             }
             case CHECK -> {
-                message = "체크 알람";
+                identifier = AlarmIdentifier.CHECK.identifier(partyId, contentsId, targetId);
             }
-            case PASSWORD -> { // DONE
-                message = String.format("%s 그룹의 비밀번호가 변경되었습니다.", data);
+            case PASSWORD -> {
+                identifier = AlarmIdentifier.PASSWORD.identifier(partyId, contentsId, targetId);
+            }
+            case CHAT -> {
+                identifier = AlarmIdentifier.CHAT.identifier(partyId, contentsId, targetId);
+            }
+            case MENTION -> {
+                identifier = AlarmIdentifier.MENTION.identifier(partyId, contentsId, targetId);
             }
         }
         return Alarm.builder()

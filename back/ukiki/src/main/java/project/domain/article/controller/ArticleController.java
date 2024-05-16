@@ -36,11 +36,8 @@ public class ArticleController implements ArticleDocs{
 
     @Override
     @PostMapping(value = "/create/{partyId}", consumes = {"application/json", "multipart/form-data"})
-    public ResponseEntity<ResultResponse> create(@PathVariable(name = "partyId") Long partyId, @RequestPart ArticleCreateDto articleCreateDto, @RequestPart List<MultipartFile> multipartFiles) {
+    public ResponseEntity<ResultResponse> create(@PathVariable(name = "partyId") Long partyId, @RequestPart(name = "articleCreateDto") ArticleCreateDto articleCreateDto, @RequestPart(name = "multipartFiles", required = false) List<MultipartFile> multipartFiles) {
         ArticleCreateResDto res = articleService.createArticle(partyId, articleCreateDto, multipartFiles);
-
-        // 댓글 mongoDB create
-        commentService.createComment(res);
         return ResponseEntity.ok(new ResultResponse(ResultCode.CREATE_ARTICLE_SUCCESS, res));
     }
 
