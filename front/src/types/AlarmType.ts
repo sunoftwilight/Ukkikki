@@ -15,14 +15,14 @@ export interface AlarmItemProps {
 export interface AlarmItemType {
   alarmType: string;
   content: string;
-  contentsId: number;
-  createDate?: string;
+  contentsId: string;
+  createDate: string;
   identifier: string[];
   partyId: number;
   partyName: string;
   partyUrl: string;
   read: boolean;
-  targetId: number;
+  targetId: string;
   writerNick: string;
   alarmId: string;
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { getPartyThumb } from '../../api/party';
 import { useStore } from 'zustand';
@@ -18,13 +18,15 @@ const SecureImg: React.FC<ImgProps> = ({ url }) => {
     // "x-amz-server-side-encryption-customer-key": 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
   };
   
-  getPartyThumb(
-    url,
-    opt,
-    () => {},
-    (err) => { console.error(err) },
-    // () => {},
-  );
+  useEffect(() => {
+    getPartyThumb(
+      url,
+      opt,
+      () => {},
+      (err) => { console.error(err) },
+      // () => {},
+    );
+  }, [])
 
   return (
     location.pathname.startsWith('/album/detail') ?

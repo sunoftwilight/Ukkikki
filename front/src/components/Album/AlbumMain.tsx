@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import folder from "@/assets/Album/folder.png"
+import heart from "@/assets/Album/heart.png"
+import downloaded from "@/assets/Album/downloaded.png"
 import backFolder from "@/assets/Album/backFolder.png"
 import { Link, useParams } from "react-router-dom";
 import { useStore } from "zustand";
@@ -45,6 +47,7 @@ const AlbumMain: React.FC = () => {
       (res) => {
         setParentDirId(res.data.data.parentId)
         setAlbumList(res.data.data.contentList)
+        console.log(res.data.data)
       },
       (err) => { console.error(err) }
     )
@@ -82,12 +85,20 @@ const AlbumMain: React.FC = () => {
               <Link 
                 to={`/album/detail/${item.pk}/${groupPk}`} state={{url: item.url}}
                 key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.url)}
-                className="flex justify-center items-center"
+                className="flex justify-center items-center relative"
               >
+                {item.isDownload ? 
+                  <img src={downloaded} className="absolute bottom-0 left-0 w-6" />
+                  : <></>
+                }
+                {item.isLikes ? 
+                  <div className="absolute bottom-1 right-1">
+                    <img className="w-4" src={heart} />
+                  </div>
+                  : <></>
+                }
                 <SecureImg url={item.url} />
               </Link>
-            
-          // </div>
         ))))}
     </div>
   )
