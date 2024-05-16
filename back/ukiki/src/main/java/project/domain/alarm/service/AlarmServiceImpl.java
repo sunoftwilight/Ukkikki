@@ -27,7 +27,9 @@ import project.domain.member.entity.Profile;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
 import project.domain.party.entity.MemberParty;
+import project.domain.party.entity.Party;
 import project.domain.party.repository.MemberpartyRepository;
+import project.domain.party.repository.PartyRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -48,6 +50,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final AlarmRedisRepository alarmRedisRepository;
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
+    private final PartyRepository partyRepository;
     private final AlarmMapper alarmMapper;
 
 
@@ -55,6 +58,9 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public Alarm createAlarm(AlarmType type, Long partyId, Long contentsId, Long targetId, Long writerId, String data){
+
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
         Profile profile = profileRepository.findByMemberIdAndPartyId(writerId, partyId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
@@ -88,6 +94,7 @@ public class AlarmServiceImpl implements AlarmService {
             .writerNick(profile.getNickname())
             .alarmType(type)
             .content(message)
+            .partyUrl(party.getThumbnail())
             .createDate(LocalDateTime.now().toString())
             .identifier(identifier)
             .build();
