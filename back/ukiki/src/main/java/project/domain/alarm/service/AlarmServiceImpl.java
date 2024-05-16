@@ -135,6 +135,12 @@ public class AlarmServiceImpl implements AlarmService {
         return emitterRepository.getByUserId(userId);
     }
 
+    @Override
+    public void checkAlarm(String alarmId) {
+        alarmRedisRepository.findById(alarmId)
+            .ifPresent(alarm -> alarm.setIsRead(true));
+    }
+
     /**
      * @param emitter   유저와 연결되있는 SSE : findEmitterByUserId() 함수에서 얻을 수 있다.
      * @param userId        Member id
@@ -193,7 +199,7 @@ public class AlarmServiceImpl implements AlarmService {
         memberRepository.findById(memberId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
 
-        PageRequest pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.by(Sort.Direction.DESC, "createDate"));
+        PageRequest pageable = PageRequest.of(alarmPageableDto.getPageNo()-1, alarmPageableDto.getPageSize()+1, Sort.by(Sort.Direction.ASC, "createDate"));
 
         Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(memberId, pageable);
         List<SimpleAlarm> simpleAlarmList = alarmPage.stream()

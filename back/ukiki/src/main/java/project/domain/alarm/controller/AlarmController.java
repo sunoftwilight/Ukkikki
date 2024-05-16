@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import project.domain.alarm.dto.request.AlarmPageableDto;
+import project.domain.alarm.dto.request.RedirectDto;
 import project.domain.alarm.dto.response.AlarmPageDto;
 import project.domain.alarm.redis.Alarm;
 import project.domain.alarm.redis.AlarmType;
@@ -19,6 +20,8 @@ import project.domain.member.dto.request.CustomOAuth2User;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/alarm")
@@ -41,6 +44,13 @@ public class AlarmController implements AlarmDocs {
     public ResponseEntity<ResultResponse> getAlarmList(AlarmPageableDto alarmPageDto) {
         AlarmPageDto res = alarmService.getAlarmList(alarmPageDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.GET_ALARM_SUCCESS, res));
+    }
+
+    @Override
+    @GetMapping("redirect-user")
+    public void redirectUser(HttpServletResponse response, @RequestParam RedirectDto redirectDto) throws IOException {
+        alarmService.checkAlarm(redirectDto.getAlarmId());
+        response.sendRedirect("https://k10d202.p.ssafy.io"+redirectDto.getRedirectUrl());
     }
 
     @GetMapping("/test-alarm")

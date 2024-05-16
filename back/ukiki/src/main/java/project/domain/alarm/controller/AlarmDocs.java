@@ -8,15 +8,22 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import project.domain.alarm.dto.request.AlarmPageableDto;
+import project.domain.alarm.dto.request.RedirectDto;
 import project.global.result.ResultResponse;
+
+import java.io.IOException;
+
 @Tag(name = "AlarmController", description = "알람 api")
 public interface AlarmDocs {
 
     
     @Operation(summary = "alarm 구독하기")
-    public SseEmitter subScribe(HttpServletResponse response);
+    SseEmitter subScribe(HttpServletResponse response);
     
     
     @Operation(summary = "내 알람 가지고오기")
-    public ResponseEntity<ResultResponse> getAlarmList(AlarmPageableDto alarmPageDto);
+    ResponseEntity<ResultResponse> getAlarmList(AlarmPageableDto alarmPageDto);
+
+    @Operation(summary = "redirect 하기")
+    void redirectUser(HttpServletResponse response, RedirectDto redirectDto) throws IOException;
 }

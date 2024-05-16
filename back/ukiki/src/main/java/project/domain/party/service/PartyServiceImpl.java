@@ -242,11 +242,8 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.FORBIDDEN_ERROR));
 
         // 기존 경로는 삭제
-        Optional<PartyLink> existLink = partyLinkRedisRepository.findByParty(party.getId());
-        existLink.ifPresent(link ->
-        {
-            partyLinkRedisRepository.delete(link);
-        });
+        partyLinkRedisRepository.findByParty(party.getId())
+        .ifPresent(partyLinkRedisRepository::delete);
 
         String link = makeLink(); // 고유한 link가 나오도록 반복
         while (partyLinkRedisRepository.findById(link).isPresent()){

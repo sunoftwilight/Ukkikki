@@ -24,4 +24,5 @@ public interface AlarmService {
 
     SseEmitter findEmitterByUserId(Long memberId);
 
+    void checkAlarm(String alarmId);
 }
