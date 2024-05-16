@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,6 @@ import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.repository.TrashRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.MemberRole;
-import project.domain.member.repository.MemberRepository;
 import project.domain.party.entity.MemberParty;
 import project.domain.party.repository.MemberpartyRepository;
 import project.domain.photo.entity.Face;
@@ -62,7 +62,7 @@ public class TrashServiceImpl implements TrashService{
     private final FaceRepository faceRepository;
     private final FaceGroupRepository faceGroupRepository;
     private final MemberpartyRepository memberpartyRepository;
-    private final MemberRepository memberRepository;
+
 
     @Override
     public void getTrash() {
@@ -618,4 +618,22 @@ public class TrashServiceImpl implements TrashService{
         return userDetails.getId();
     }
 
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void dailyTrashCleanUp() {
+        List<TrashBin> allTrashBinList = trashBinRepository.findAll();
+        for (TrashBin oneTrashBin : allTrashBinList) {
+            // 디렉토리와 파일 쓰래기 리스트를 합침
+            List<String> combinedTrashIdList = new ArrayList<>();
+            combinedTrashIdList.addAll(oneTrashBin.getDirTrashIdList());
+            combinedTrashIdList.addAll(oneTrashBin.getFileTrashIdList());
+
+            for (Trash oneTrash : trashRepository.findAllById(combinedTrashIdList)) {
+                // 해당 쓰래기 유효성 검사
+                if (!isOutOfRecoveryPeriod(oneTrash)) {continue;}
+
+                // 지워야할 쓰래기 처리
+                deleteOneTrash(oneTrash.getId(), oneTrashBin.getId());
+            }
+        }
+    }
 }
