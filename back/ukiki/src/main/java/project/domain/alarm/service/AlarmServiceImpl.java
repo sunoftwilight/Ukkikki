@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component
@@ -205,8 +206,10 @@ public class AlarmServiceImpl implements AlarmService {
 
         Page<Alarm> alarmPage = alarmRedisRepository.findAllByMemberId(memberId, pageable);
         List<SimpleAlarm> simpleAlarmList = alarmPage.stream()
-            .map(alarmMapper::toSimpleAlarm)
-            .toList();
+            .map(alarm -> {
+                return alarmMapper.toSimpleAlarm(alarm);
+            })
+            .collect(Collectors.toList());
         List<SimpleAlarm> alarmList = new ArrayList<>(simpleAlarmList);
         AlarmPageDto res = AlarmPageDto.builder()
             .pageNo(alarmPageableDto.getPageNo())

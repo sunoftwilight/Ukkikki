@@ -41,6 +41,9 @@ public class Article extends BaseEntity {
     @Column(name= "writer")
     private String writer;
 
+    @Column(name = "writer_url")
+    private String writerUrl;
+
     @Column(name = "content")
     private String content;
 

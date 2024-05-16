@@ -15,6 +15,7 @@ public class SimpleArticleDto {
     private Long id;
     private String title;
     private String writer;
+    private String writerUrl;
     private String content;
     private LocalDateTime createDate;
     private boolean modify;

@@ -108,6 +108,7 @@ public class ArticleServiceImpl implements ArticleService{
                 .title(articleCreateDto.getTitle())
                 .content(articleCreateDto.getContent())
                 .writer(profile.getNickname())
+                .writerUrl(profile.getProfileUrl())
                 .member(member)
                 .party(party)
                 .build());
