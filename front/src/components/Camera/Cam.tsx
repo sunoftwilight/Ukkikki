@@ -13,13 +13,14 @@ import changeView from "@/assets/Camera/changeCamera.png";
 import singleShot from "@/assets/Camera/singleShot.png";
 import multiShot from "@/assets/Camera/multiShot.png";
 import photo from "@/assets/Camera/photo.png";
-import video from "@/assets/Camera/video.png"
+// import video from "@/assets/Camera/video.png"
 import { useStore } from 'zustand';
 import { userStore } from '../../stores/UserStore';
 
 
 const Cam: React.FC = () => {
-  const [selectedTimer, setSelectedTimer] = useState<string>(timerNone);
+  const [selectedTimerImg, setselectedTimerImg] = useState<string>(timerNone);
+  const [selectedTimer, setSelectedTimer] = useState<number>(0);
   const [selectedScale, setSelectedScale] = useState<string>('3:4');
   const [openTimerList, setOpenTimerList] = useState<boolean>(false);
   const [openScaleList, setOpenScaleList] = useState<boolean>(false);
@@ -28,13 +29,9 @@ const Cam: React.FC = () => {
   const [selectedPV, setSelectedPV] = useState<boolean>(true);
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
   const [cameras, setCameras] = useState<string[]>([]);
-  // const [isRecording, setIsRecording] = useState<boolean>(false);
   const user = useStore(userStore);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  // const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const chunksRef = useRef<Blob[]>([]);
-  // const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const qualities: Record<string, {width:number, height:number}> = {
     '3:4': { width: 3600, height: 2700 },
@@ -43,10 +40,22 @@ const Cam: React.FC = () => {
   }
 
   const changeTimer = (type : string) => {
-    if (type === 'None') setSelectedTimer(timerNone);
-    else if (type === '3sec') setSelectedTimer(timer3s);
-    else if (type === '5sec') setSelectedTimer(timer5s);
-    else if (type === '10sec') setSelectedTimer(timer10s);
+    if (type === 'None') {
+      setselectedTimerImg(timerNone);
+      setSelectedTimer(0);
+    }
+    else if (type === '3sec') {
+      setselectedTimerImg(timer3s);
+      setSelectedTimer(3000);
+    }
+    else if (type === '5sec') {
+      setselectedTimerImg(timer5s);
+      setSelectedTimer(5000);
+    }
+    else if (type === '10sec') {
+      setselectedTimerImg(timer10s);
+      setSelectedTimer(10000);
+    }
     
     setOpenTimerList(false);
     setOpenOptList(true);
@@ -89,28 +98,6 @@ const Cam: React.FC = () => {
     capturePhoto();
   }
 
-  // const startRecording = (stream: MediaStream) => {
-  //   mediaRecorderRef.current = new MediaRecorder(stream);
-
-  //   mediaRecorderRef.current.ondataavailable = (event) => {
-  //     chunksRef.current.push(event.data);
-  //   };
-
-  //   mediaRecorderRef.current.onstop = () => {
-  //     const videoBlob = new Blob(chunksRef.current, { type: 'video/mp4' });
-  //     // 녹화된 비디오를 다운로드하거나 서버에 업로드하는 등의 작업을 수행할 수 있습니다.
-  //     // 예시: window.URL.createObjectURL(videoBlob)
-  //   };
-
-  //   mediaRecorderRef.current.start();
-  // };
-
-  // const stopRecording = () => {
-  //   if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-  //     mediaRecorderRef.current.stop();
-  //   }
-  // };
-
   const capturePhoto = () => {
     // Check if video stream is available
     if (videoRef.current && videoRef.current.srcObject) {
@@ -121,33 +108,29 @@ const Cam: React.FC = () => {
 
       const context = canvas.getContext('2d');
       if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        setTimeout(() => {
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        canvas.toBlob(async blob => {
-          if (blob && user.uploadGroupId) {
-            const formData = new FormData();
-
-            const key = new Blob([JSON.stringify({key: user.groupKey[user.uploadGroupId], partyId:user.uploadGroupId})], {type: 'application/json',});
-
-            const file = new File([blob], 'image.jpeg', {type: 'image/jpeg'});
-            // 바이트 단위로 파일 크기 가져오기
-            const fileSizeInBytes = file.size;
-            // 바이트를 메가바이트로 변환
-            const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
-
-            console.log(fileSizeInMegabytes + " MB"); // 파일 크기 (메가바이트 단위)
-
-            formData.append('key', key);
-            formData.append('files', file);
-
-            upLoadPhoto(formData,
-              (response) => {
-                console.log(response)
-              }, (error)=> {
-                console.log(error)
-            })
-          }
-        })
+          canvas.toBlob(async blob => {
+            if (blob && user.uploadGroupId) {
+              const formData = new FormData();
+  
+              const key = new Blob([JSON.stringify({key: user.groupKey[user.uploadGroupId], partyId:user.uploadGroupId})], {type: 'application/json',});
+  
+              const file = new File([blob], 'image.jpeg', {type: 'image/jpeg'});
+  
+              formData.append('key', key);
+              formData.append('files', file);
+  
+              upLoadPhoto(formData,
+                (response) => {
+                  console.log(response)
+                }, (error)=> {
+                  console.log(error)
+              })
+            }
+          })
+        }, selectedTimer)
       }
     }
   };
@@ -165,9 +148,6 @@ const Cam: React.FC = () => {
 
   async function switchCamera(deviceId: string, scale: string) {
     setSelectedCamera(deviceId);
-
-    console.log("device", deviceId);
-    console.log("scale", scale);
 
     try {
 
@@ -203,40 +183,12 @@ const Cam: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    switchCamera(cameras[0], selectedScale);
+    switchCamera(cameras[3], selectedScale);
   }, [cameras])
 
   useEffect(() => {
     if(selectedCamera && selectedScale) switchCamera(selectedCamera, selectedScale);
   }, [selectedCamera, selectedScale])
-
-  // async function getMaxVideoResolution(): Promise<{ maxWidth: number; maxHeight: number }> {
-  //   try {
-  //     // 미디어 장치 권한을 요청하고 비디오 트랙에 접근합니다.
-  //     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-  //     const track = stream.getVideoTracks()[0];
-  
-  //     // 비디오 트랙의 기능과 제약 조건을 가져옵니다.
-  //     const capabilities = track.getCapabilities();
-  
-  //     // 최대 너비와 높이를 가져옵니다.
-  //     const maxWidth = capabilities.width?.max || 0;
-  //     const maxHeight = capabilities.height?.max || 0;
-  
-  //     // 스트림을 해제합니다.
-  //     stream.getTracks().forEach(track => track.stop());
-  
-  //     return { maxWidth, maxHeight };
-  //   } catch (error) {
-  //     console.error('Error getting max video resolution:', error);
-  //     return { maxWidth: 0, maxHeight: 0 };
-  //   }
-  // }
-  
-  // // 최대 해상도를 가져와서 출력합니다.
-  // getMaxVideoResolution().then(({ maxWidth, maxHeight }) => {
-  //   console.log(`Max video resolution: ${maxWidth}x${maxHeight}`);
-  // });
 
   return (
     <div className='min-h-screen max-h-screen min-w-full max-w-full bg-black relative'>
@@ -244,7 +196,7 @@ const Cam: React.FC = () => {
         {openOptList && (
           <div className='w-full h-full flex justify-evenly items-center'>
             <div className='w-6 h-6'>
-              <img src={selectedTimer} className='object-cover w-6 h-6'  onClick={() => openList('timer')}/>
+              <img src={selectedTimerImg} className='object-cover w-6 h-6'  onClick={() => openList('timer')}/>
             </div>
             <div className='w-6 h-6 font-pre-B text-white'>
               <p onClick={() => openList('scale')}>{selectedScale}</p>
@@ -257,10 +209,10 @@ const Cam: React.FC = () => {
         
         {openTimerList && (
           <div className='w-full h-full flex justify-evenly items-center'>
-            <img src={selectedTimer !== timerNone ? timerNone : selectedTimerNone} className='object-cover w-6 h-6' onClick={() => changeTimer("None") }/>
-            <img src={selectedTimer !== timer3s ? timer3s : selectedTimer3s} className='object-cover w-6 h-6' onClick={() => changeTimer("3sec") }/>
-            <img src={selectedTimer !== timer5s ? timer5s : selectedTimer5s} className='object-cover w-6 h-6' onClick={() => changeTimer("5sec") }/>
-            <img src={selectedTimer !== timer10s ? timer10s : selectedTimer10s} className='object-cover w-6 h-6' onClick={() => changeTimer("10sec") }/>
+            <img src={selectedTimerImg !== timerNone ? timerNone : selectedTimerNone} className='object-cover w-6 h-6' onClick={() => changeTimer("None") }/>
+            <img src={selectedTimerImg !== timer3s ? timer3s : selectedTimer3s} className='object-cover w-6 h-6' onClick={() => changeTimer("3sec") }/>
+            <img src={selectedTimerImg !== timer5s ? timer5s : selectedTimer5s} className='object-cover w-6 h-6' onClick={() => changeTimer("5sec") }/>
+            <img src={selectedTimerImg !== timer10s ? timer10s : selectedTimer10s} className='object-cover w-6 h-6' onClick={() => changeTimer("10sec") }/>
           </div>
         )}
 
@@ -279,11 +231,9 @@ const Cam: React.FC = () => {
 
       <div className='min-h-40 max-h-40 min-w-full max-w-full fixed bottom-0 flex justify-evenly items-center bg-black/50'>
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
-          <img src={!selectedPV ? photo : video} className='object-cover w-6 h-6' onClick={changePV}/>
+          <img src={!selectedPV ? photo : photo} className='object-cover w-6 h-6' onClick={changePV}/>
         </div>
         <div className='w-20 h-20 bg-white rounded-full flex items-center justify-center' onClick={testLogic}>
-          {/* <div className={!selectedPV ? !isRecording ? 'w-10 h-10 bg-red rounded-full' : 'w-8 h-8 bg-red rounded-sm' : ''}>
-          </div> */}
         </div>
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
           <img src={changeView} className='object-cover w-6 h-6' onClick={changeCamera}/>
