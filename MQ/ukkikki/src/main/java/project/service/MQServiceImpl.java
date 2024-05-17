@@ -17,6 +17,7 @@ import project.dto.MQDto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -58,8 +59,8 @@ public class MQServiceImpl implements MQService {
         }
 
         // 지정된 디렉토리에 파일 저장
-        String fileName = mqDto.getFile().getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "");
-        log.info(fileName);
+        String fileName = getFileName(mqDto.getFile().getOriginalFilename());
+
         try {
             mqDto.getFile().transferTo(new File(uploadDir + fileName));
         } catch (IOException e) {
@@ -104,17 +105,43 @@ public class MQServiceImpl implements MQService {
 
         MultipartFile multipartFile = mqDto.getFile(); // mqDto에서 MultipartFile을 가져옴
 
+        // 기본 경로 및 파일 이름
+        String uploadDir = "/home/ubuntu/mq/file/" + mqDto.getPartyId() + "/";
+        String fileName = getFileName(mqDto.getFile().getOriginalFilename());
+        String fullPath = uploadDir + fileName; // 전체 파일 경로
 
-        log.info("파일 정보 : " + multipartFile.getOriginalFilename());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        FileInputStream fis = null;
         try {
-            multipartFile.getInputStream().transferTo(baos); // MultipartFile의 내용을 바이트 배열로 변환
+            fis = new FileInputStream(fullPath); // 저장된 파일로부터 FileInputStream 생성
+            byte[] buffer = new byte[1024]; // 1KB 버퍼
+            int length;
+            while ((length = fis.read(buffer)) != -1) { // 파일 끝까지 읽기
+                baos.write(buffer, 0, length); // ByteArrayOutputStream에 쓰기
+            }
+
+            // 바이트 배열 사용
         } catch (IOException e) {
-                log.error("Error occurred during file conversion. File path: " + multipartFile.getOriginalFilename(), e);
+            log.error("Error occurred during file reading. File path: " + fullPath, e);
         }
 
+        byte[] fileBytes = baos.toByteArray(); // 바이트 배열로 변환
+
+        try {
+            if (fis != null) fis.close(); // FileInputStream 닫기
+            baos.close(); // ByteArrayOutputStream 닫기
+        } catch (IOException e) {
+            log.error("Error occurred during stream closing.", e);
+        }
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        try {
+//            multipartFile.getInputStream().transferTo(baos); // MultipartFile의 내용을 바이트 배열로 변환
+//        } catch (IOException e) {
+//                log.error("Error occurred during file conversion. File path: " + multipartFile.getOriginalFilename(), e);
+//        }
+
         // 바이트 배열 저장
-        byte[] fileBytes = baos.toByteArray();
+//        byte[] fileBytes = baos.toByteArray();
 
         // 바이트 배열을 이용해 MultipartBodyBuilder 생성
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
@@ -182,6 +209,9 @@ public class MQServiceImpl implements MQService {
 
     }
 
+    public String getFileName(String name) {
+        return Objects.requireNonNull(name).replaceAll("[^a-zA-Z0-9.]", "");
+    }
 
 //    @Override
 //    public void queSize() {
