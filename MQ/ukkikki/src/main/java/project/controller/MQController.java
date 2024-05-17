@@ -14,6 +14,8 @@ import project.result.ResultCode;
 import project.result.ResultResponse;
 import project.service.MQService;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 public class MQController {
@@ -32,7 +34,10 @@ public class MQController {
             @RequestPart("partyId") Long partyId,
             @RequestPart("key") String key,
             @RequestPart("photoId") Long photoId
-            ){
+            ) throws IOException {
+
+
+        System.out.println(multipartFile.getBytes().length);
 
 
         MQDto mqDto = new MQDto();
