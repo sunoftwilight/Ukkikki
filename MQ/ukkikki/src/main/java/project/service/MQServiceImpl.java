@@ -17,6 +17,7 @@ import project.dto.MQDto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -102,6 +103,7 @@ public class MQServiceImpl implements MQService {
         bodyBuilder.part("photoId", mqDto.getPhotoId());
         bodyBuilder.part("index", index);
 
+        log.info("file byte : " + Arrays.toString(fileBytes));
 
         // ai 서버로 보내기.
         webClient
