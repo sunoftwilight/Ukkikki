@@ -112,23 +112,27 @@ public class MQServiceImpl implements MQService {
                 .bodyToMono(String.class)
                 .subscribe(
                         (response) -> {
-                            try {
-                                // Jackson ObjectMapper를 사용하여 JSON 문자열 파싱
-                                ObjectMapper objectMapper = new ObjectMapper();
-                                JsonNode rootNode = objectMapper.readTree(response);
-
-                                // "index" 필드 값 추출
-                                String responseIndex = rootNode.path("index").asText();
-
-                                // 추출한 index 값을 사용하여 원하는 작업 수행
-                                finish(Integer.parseInt(responseIndex));
-
-                            } catch (Exception e) {
-                                finish(index);
-                            }
+                            log.info("index : " + index + "의 작업이 완료되었습니다");
+//                            try {
+//                                // Jackson ObjectMapper를 사용하여 JSON 문자열 파싱
+//                                ObjectMapper objectMapper = new ObjectMapper();
+//                                JsonNode rootNode = objectMapper.readTree(response);
+//
+//                                // "index" 필드 값 추출
+//                                String responseIndex = rootNode.path("index").asText();
+//
+//                                // 추출한 index 값을 사용하여 원하는 작업 수행
+//                                finish(Integer.parseInt(responseIndex));
+//
+//                            } catch (Exception e) {
+//                                finish(index);
+//                            }
                         },
                         error -> finish(index),
-                        () -> log.info("index : " + index + "의 작업이 완료되었습니다.")
+                        () -> {
+                            log.info("index : " + index + "의 작업이 완료되었습니다.");dex :
+                            finish(index);
+                        }
                 );
     }
 
