@@ -30,15 +30,11 @@ public class PhotoUrl {
     @Column(name = "thumb_url2")
     private String thumb_url2;
 
-    @Column(name = "thumb_url3")
-    private String thumb_url3;
-
     public List<String> photoUrls(){
         List<String> urls = new ArrayList<>(){{
             add(photoUrl);
             add(thumb_url1);
             add(thumb_url2);
-            add(thumb_url3);
         }};
         return urls;
     }
