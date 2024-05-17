@@ -2,83 +2,59 @@ package project.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.dto.MQDto;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MQServiceImpl implements MQService {
 
-    private final ConcurrentLinkedDeque<MQDto> waitLinkedDeque;
-    private final ConcurrentLinkedDeque<MQDto>[] workLinkedDeque;
+    private final ConcurrentLinkedDeque<MQDto> evenLinkedDeque;
+    private final ConcurrentLinkedDeque<MQDto> oddLinkedDeque;
 
     private final WebClient webClient;
-
-    public MQServiceImpl(ConcurrentLinkedDeque<MQDto> waitLinkedDeque, WebClient webClient) {
-        this.waitLinkedDeque = waitLinkedDeque;
-        // 배열의 크기를 4로 초기화
-        this.workLinkedDeque = new ConcurrentLinkedDeque[2];
-        // 배열의 각 요소를 새 ConcurrentLinkedDeque 인스턴스로 초기화
-        Arrays.setAll(workLinkedDeque, i -> new ConcurrentLinkedDeque<>());
-        this.webClient = webClient;
-    }
 
     @Override
     @Async
     public void fileUpload(MQDto mqDto) {
 
-        String partyId = mqDto.getPartyId();
+        Long partyId = mqDto.getPartyId();
 
         /*
-        비어있는 큐 전에
-        같은 그룹이 있는지 체크해야 중복이 일어나지 않는다.
+        홀수 짝수 구분 후 큐에 넣어준다.
+        만약 큐가 비어있었다면
+        바로 실행할 수 있게 해준다.
          */
-        for (ConcurrentLinkedDeque<MQDto> mqDtos : workLinkedDeque) {
-
-            if (!mqDtos.isEmpty()) {
-                String peekPartyId = mqDtos.peek().getPartyId();
-
-                if (partyId.equals(peekPartyId)) {
-                    mqDtos.add(mqDto);
-                    return;
+        switch ((int) (partyId%2)){
+            case 0:
+                evenLinkedDeque.offerLast(mqDto);
+                if(evenLinkedDeque.size() == 1){
+                    fileAiUpload(0);
                 }
-            }
-
+                break;
+            case 1:
+                oddLinkedDeque.offerLast(mqDto);
+                if(oddLinkedDeque.size() == 1){
+                    fileAiUpload(1);
+                }
+                break;
         }
 
-        /*
-        작업 중인 같은 그룹이 없다면
-        비어 있는 큐를 찾아야한다.
-         */
-        for(int i=0;i< workLinkedDeque.length;i++){
-
-            if (workLinkedDeque[i].isEmpty()){
-
-                workLinkedDeque[i].add(mqDto);
-
-                fileAiUpload(i);
-                return;
-            }
-        }
-
-        // 비어 있는 큐가 없으면 대기 큐에 넣어준다.
-        waitLinkedDeque.add(mqDto);
 
     }
 
@@ -88,21 +64,28 @@ public class MQServiceImpl implements MQService {
 
         log.info("index : " + index + "의 작업이 시작됩니다.");
 
-        MQDto mqDto = workLinkedDeque[index].peek();
+        MQDto mqDto = index == 0 ? evenLinkedDeque.peekFirst() : oddLinkedDeque.peekFirst();
         if(mqDto == null)
             return;
 
         MultipartFile multipartFile = mqDto.getFile(); // mqDto에서 MultipartFile을 가져옴
 
+        byte[] fileBytes;
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             multipartFile.getInputStream().transferTo(baos); // MultipartFile의 내용을 바이트 배열로 변환
+            fileBytes = baos.toByteArray(); // 바이트 배열 저장
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        byte[] fileBytes = baos.toByteArray(); // 바이트 배열 저장
+            try {
+                fileBytes = FileCopyUtils.copyToByteArray(multipartFile.getInputStream());
+            } catch (IOException ee) {
+                throw new RuntimeException(ee);
+            }
 
-    // 바이트 배열을 이용해 MultipartBodyBuilder 생성
+        }
+
+        // 바이트 배열을 이용해 MultipartBodyBuilder 생성
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
         bodyBuilder.part("file", fileBytes)
                 .filename(Objects.requireNonNull(multipartFile.getOriginalFilename()))
@@ -120,11 +103,6 @@ public class MQServiceImpl implements MQService {
                 .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .timeout(Duration.ofSeconds(5))
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2)))
-                .onErrorResume(e -> {
-                    return Mono.fromRunnable(() -> finish(index));
-                })
                 .subscribe(
                         (response) -> {
                             try {
@@ -149,22 +127,25 @@ public class MQServiceImpl implements MQService {
 
     @Override
     public void finish(int index) {
-        workLinkedDeque[index].poll();
 
-        if(!workLinkedDeque[index].isEmpty()){
-            fileAiUpload(index);
-        }else{
+        // 인덱스에 따라 값을 제거해준다.
+        if (index == 0) {
+            evenLinkedDeque.pollFirst();
 
-            if(!waitLinkedDeque.isEmpty()){
+            // 큐에 값이 남아있다면 반복한다.
+            if(!evenLinkedDeque.isEmpty()){
+                fileAiUpload(index);
+            }
 
-                MQDto mqDto = waitLinkedDeque.poll();
+        } else {
+            oddLinkedDeque.pollFirst();
 
-                if(mqDto != null){
-                    fileUpload(mqDto);
-                }
+            if(!oddLinkedDeque.isEmpty()){
+                fileAiUpload(index);
             }
 
         }
+
     }
 
 

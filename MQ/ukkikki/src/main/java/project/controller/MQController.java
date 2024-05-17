@@ -23,13 +23,13 @@ public class MQController {
     /*
     백 서버에서 요청이 들어오면 메모리 큐에 넣어서 관리해줄 예정.
     @params MultipartFile file;
-    @params String partyId;
+    @params Long partyId;
     @params String key;
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResultResponse> fileUpload(
             @RequestPart("file")MultipartFile multipartFile,
-            @RequestPart("partyId") String partyId,
+            @RequestPart("partyId") Long partyId,
             @RequestPart("key") String key,
             @RequestPart("photoId") Long photoId
             ){

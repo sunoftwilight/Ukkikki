@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @ToString
 public class MQDto {
     private MultipartFile file;
-    private String partyId;
+    private Long partyId;
     private String key;
     private Long photoId;
 }

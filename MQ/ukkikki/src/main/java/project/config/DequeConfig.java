@@ -10,7 +10,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class DequeConfig {
 
     @Bean
-    public ConcurrentLinkedDeque<MQDto> waitLinkedDeque() {
+    public ConcurrentLinkedDeque<MQDto> evenLinkedDeque() {
+        return new ConcurrentLinkedDeque<>();
+    }
+    @Bean
+    public ConcurrentLinkedDeque<MQDto> oddLinkedDeque() {
         return new ConcurrentLinkedDeque<>();
     }
 
