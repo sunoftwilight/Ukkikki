@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.domain.article.collection.CommentCollection;
 import project.domain.article.dto.request.ArticleCreateDto;
 import project.domain.article.dto.request.ArticleUpdateDto;
+import project.domain.article.dto.request.CommentDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
 import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
@@ -90,18 +91,18 @@ public class ArticleController implements ArticleDocs{
 
     @Override
     @PostMapping("/comment/enter/{articleId}")
-    public ResponseEntity<ResultResponse> enterComment(@PathVariable(name = "articleId")Long articleId, String content) {
+    public ResponseEntity<ResultResponse> enterComment(@PathVariable(name = "articleId")Long articleId, @RequestBody CommentDto commentDto) {
 
-        commentService.enterComment(articleId, content);
+        commentService.enterComment(articleId, commentDto);
 
         return ResponseEntity.ok(new ResultResponse(ResultCode.ENTER_COMMENT_SUCCESS));
     }
 
     @Override
-    @PostMapping("/comment/modify/{articleId}/{commentIdx}")
-    public ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, String content) {
+    @PatchMapping("/comment/modify/{articleId}/{commentIdx}")
+    public ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @RequestBody CommentDto commentDto) {
 
-        commentService.modifyComment(articleId,commentIdx,content);
+        commentService.modifyComment(articleId,commentIdx,commentDto);
 
         return ResponseEntity.ok(new ResultResponse(ResultCode.MODIFY_MEMO_SUCCESS));
     }
@@ -117,16 +118,16 @@ public class ArticleController implements ArticleDocs{
 
     @Override
     @PostMapping("/reply/enter/{articleId}/{commentIdx}")
-    public ResponseEntity<ResultResponse> enterReply(@PathVariable(name = "articleId") Long articleId,@PathVariable(name = "commentIdx") Integer commentIdx, String content) {
-        commentService.enterReply(articleId,commentIdx,content);
+    public ResponseEntity<ResultResponse> enterReply(@PathVariable(name = "articleId") Long articleId,@PathVariable(name = "commentIdx") Integer commentIdx, @RequestBody CommentDto commentDto) {
+        commentService.enterReply(articleId,commentIdx,commentDto);
 
         return ResponseEntity.ok(new ResultResponse(ResultCode.ENTER_COMMENT_SUCCESS));
     }
 
     @Override
-    @PostMapping("/reply/modify/{articleId}/{commentIdx}/{replyIdx}")
-    public ResponseEntity<ResultResponse> modifyReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx, String content) {
-        commentService.modifyReply(articleId,commentIdx,replyIdx,content);
+    @PatchMapping("/reply/modify/{articleId}/{commentIdx}/{replyIdx}")
+    public ResponseEntity<ResultResponse> modifyReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx, @RequestBody CommentDto commentDto) {
+        commentService.modifyReply(articleId,commentIdx,replyIdx,commentDto);
         return ResponseEntity.ok(new ResultResponse(ResultCode.MODIFY_MEMO_SUCCESS));
     }
 

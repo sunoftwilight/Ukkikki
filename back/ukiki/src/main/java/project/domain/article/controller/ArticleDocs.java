@@ -5,13 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.article.dto.request.ArticleCreateDto;
 import project.domain.article.dto.request.ArticleUpdateDto;
+import project.domain.article.dto.request.CommentDto;
 import project.domain.article.dto.response.ArticlePageDto;
 import project.domain.article.dto.response.SimpleArticleDto;
 import project.global.result.ResultResponse;
@@ -48,11 +46,11 @@ public interface ArticleDocs {
 
     @Operation(summary = "댓글 입력")
     @PostMapping("/comment/enter/{articleId}")
-    ResponseEntity<ResultResponse> enterComment(@PathVariable(name = "articleId") Long articleId, String content);
+    ResponseEntity<ResultResponse> enterComment(@PathVariable(name = "articleId") Long articleId, @RequestBody CommentDto commentDto);
 
     @Operation(summary = "댓글 수정")
-    @PostMapping("/comment/modify/{articleId}/{commentIdx}")
-    ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, String content);
+    @PatchMapping("/comment/modify/{articleId}/{commentIdx}")
+    ResponseEntity<ResultResponse> modifyComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @RequestBody CommentDto commentDto);
 
     @Operation(summary = "댓글 삭제")
     @DeleteMapping("/comment/{articleId}/{commentIdx}")
@@ -60,11 +58,11 @@ public interface ArticleDocs {
 
     @Operation(summary = "대댓글 입력")
     @PostMapping("/reply/enter/{articleId}/{commentIdx}")
-    ResponseEntity<ResultResponse> enterReply(@PathVariable(name = "articleId") Long articleId,@PathVariable(name = "commentIdx") Integer commentIdx, String content);
+    ResponseEntity<ResultResponse> enterReply(@PathVariable(name = "articleId") Long articleId,@PathVariable(name = "commentIdx") Integer commentIdx, @RequestBody CommentDto commentDto);
 
     @Operation(summary = "대댓글 수정")
-    @PostMapping("/reply/modify/{articleId}/{commentIdx}/{replyIdx}")
-    ResponseEntity<ResultResponse> modifyReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx, String content);
+    @PatchMapping("/reply/modify/{articleId}/{commentIdx}/{replyIdx}")
+    ResponseEntity<ResultResponse> modifyReply(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentIdx") Integer commentIdx, @PathVariable(name = "replyIdx") Integer replyIdx, @RequestBody CommentDto commentDto);
 
     @Operation(summary = "대댓글 삭제")
     @DeleteMapping("/reply/{articleId}/{commentIdx}/{replyIdx}")

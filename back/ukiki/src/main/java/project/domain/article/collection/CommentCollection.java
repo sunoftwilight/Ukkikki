@@ -37,6 +37,8 @@ public class CommentCollection {
         private Boolean isDelete = false;
         @Builder.Default
         private List<Reply> reply = new ArrayList<>();
+        @Builder.Default
+        private List<tag> tag = new ArrayList<>();
     }
 
     @Getter
@@ -52,5 +54,17 @@ public class CommentCollection {
         private String createdDate;
         @Builder.Default
         private Boolean isDelete = false;
+        @Builder.Default
+        private List<tag> tag = new ArrayList<>();
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class tag {
+        Long userId;
+        String userName;
     }
 }
