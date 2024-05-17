@@ -134,7 +134,7 @@ public class MQServiceImpl implements MQService {
 
     @Override
     public void finish(int index) {
-
+        log.info("index의 작업을 제거합니다");
         // 인덱스에 따라 값을 제거해준다.
         if (index == 0) {
             evenLinkedDeque.pollFirst();
