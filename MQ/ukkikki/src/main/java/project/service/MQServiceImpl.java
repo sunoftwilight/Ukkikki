@@ -58,7 +58,7 @@ public class MQServiceImpl implements MQService {
         }
 
         // 지정된 디렉토리에 파일 저장
-        String fileName = mqDto.getFile().getOriginalFilename();
+        String fileName = Objects.requireNonNull(mqDto.getFile().getOriginalFilename()).replace("https:/", "");
         try {
             mqDto.getFile().transferTo(new File(uploadDir + fileName));
         } catch (IOException e) {
