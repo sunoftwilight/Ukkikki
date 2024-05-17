@@ -70,21 +70,18 @@ public class MQServiceImpl implements MQService {
 
         MultipartFile multipartFile = mqDto.getFile(); // mqDto에서 MultipartFile을 가져옴
 
-        byte[] fileBytes;
+        
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             multipartFile.getInputStream().transferTo(baos); // MultipartFile의 내용을 바이트 배열로 변환
-            fileBytes = baos.toByteArray(); // 바이트 배열 저장
         } catch (IOException e) {
-            try {
-                fileBytes = FileCopyUtils.copyToByteArray(multipartFile.getInputStream());
-            } catch (IOException ee) {
-                throw new RuntimeException(ee);
-            }
-
+                log.error("Error occurred during file conversion. File path: " + multipartFile.getOriginalFilename(), e);
         }
-
+        
+        // 바이트 배열 저장
+        byte[] fileBytes = baos.toByteArray();
+        
         // 바이트 배열을 이용해 MultipartBodyBuilder 생성
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
         bodyBuilder.part("file", fileBytes)
