@@ -458,7 +458,9 @@ public class TrashServiceImpl implements TrashService{
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.FACE_GROUP_NOT_FOUND));
             List<Integer> faces = stringToListFormatter(faceGroup.getFaceList());
             //FaceGroup Entity faceList 에서 해당 faceId 삭제
-            faces.remove((Long)face.getFaceId());
+            log.info("faces : {}", faces);
+            faces.remove(faces.indexOf(face.getFaceId().intValue()));
+            log.info("faces : {}", faces);
             //Entity update
             faceGroup.setFaceList(faces.toString());
             //리스트가 비었다면 group 삭제

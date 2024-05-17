@@ -63,11 +63,12 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     private final FileUtil fileUtil;
     private final WebClient webClient;
 
-    public void uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) {
+    public List<String> uploadProcess(List<MultipartFile> files, FileUploadDto fileUploadDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = userDetails.getId();
         log.info("유저 Id = {}", memberId);
 
+        List<String> res = new ArrayList<>();
         String key = fileUploadDto.getKey();
 
         if (key == null || key.isEmpty()){
@@ -87,7 +88,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, key, file);
             urls.setThumb_url1(firstThumbnailUrl);
 
-            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 1);
+            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 2);
             String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, key, file);
             urls.setThumb_url2(secondThumbnailUrl);
 
@@ -135,10 +136,12 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
                     });
             log.info("MongoDB 업데이트 시작");
             //MongoDB 업데이트
-            fileService.createFile(fileUploadDto.getPartyId(), photo);
+            res.add(fileService.createFile(fileUploadDto.getPartyId(), photo));
             //GPT API
             gptService.processGptApiAsync(photo, file);
         }
+
+        return res;
     }
 
     @Override
@@ -165,7 +168,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, key, file);
             urls.setThumb_url1(firstThumbnailUrl);
 
-            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 1);
+            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 2);
             String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, key, file);
             urls.setThumb_url2(secondThumbnailUrl);
 
