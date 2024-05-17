@@ -17,6 +17,7 @@ const Chatting: React.FC = () => {
   const [messages, setMessages] = useState<ChatItemType[]>([]);
 
   const [client, setClient] = useState<Client | null>(null)
+  const [isConnected, setIsConnected] = useState(false);  // 연결 상태를 추적
 
   const { groupPk } = useParams();
   const { groupKey } = useStore(userStore)
@@ -24,12 +25,14 @@ const Chatting: React.FC = () => {
   useEffect(() => {
     getMsg(
       Number(groupPk),
+      {password: groupKey[Number(groupPk)]},
       {
-        page: 1,
+        page: 0,
         size: 30
       },
       (res) => {
         console.log(res.data)
+        setMessages(res.data.simpleChatDtos)
       },
       (err) => { console.error(err) }
     )
@@ -45,12 +48,22 @@ const Chatting: React.FC = () => {
         const token = obj.state.accessToken
         
         // 웹소켓 연결
-        const newClient = new Client();
-        newClient.configure({
-          brokerURL: import.meta.env.VITE_CHAT_URL,
+        const newClient = new Client({
+          // brokerURL: 'wss://k10d202.p.ssafy.io/api/ws',
+          brokerURL: 'ws://localhost:5000/api/ws',
+          // reconnectDelay: 5000,
+          // heartbeatIncoming: 4000,
+          // heartbeatOutgoing: 4000,
+        // });
+
+        // newClient.configure({
+          // brokerURL: 'wss://k10d202.p.ssafy.io/api/ws',
+
           onConnect: () => {
+            setIsConnected(true);
+
             const headers: StompHeaders = {
-              authorization: 'Bearer ' + token,
+              authorization: 'Bearer ' + token
             };
 
             newClient.subscribe(
@@ -64,8 +77,15 @@ const Chatting: React.FC = () => {
           },
     
           onDisconnect: () => {
+            setIsConnected(false);
+
             console.log('웹소켓 연결 종료');
           },
+
+          onStompError: (frame) => {
+            console.error('Broker reported error: ' + frame.headers['message']);
+            console.error('Additional details: ' + frame.body);
+          }
         });
     
         // 웹소켓 세션 활성화
@@ -77,18 +97,24 @@ const Chatting: React.FC = () => {
         };
       }
     }
-  }, []);
+  }, [groupPk]);
 
   const sendMessage = (message: string) => {
+
     if (client !== null) {
       const newMessage = {
         content: message,
         password: groupKey[Number(groupPk)]
       };
+
       const jsonMessage = JSON.stringify(newMessage);
+
       client.publish({ destination: `/pub/message/${groupPk}`, body: jsonMessage });
+
+      console.log('메세지보내기')
     } else {
-      console.error('웹소켓 연결 노활성화.');
+      console.error('웹소켓 연결 비활성화');
+      console.error(client);
     }
   };
   
@@ -100,9 +126,10 @@ const Chatting: React.FC = () => {
     }
 
     sendMessage(chat)
+    setChat('')
   }
 
-  const enterHandler = (e: any) => {
+  const enterHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       messageHandler();
     }
@@ -114,7 +141,7 @@ const Chatting: React.FC = () => {
         <div className="fixed w-[calc(100%-32px)] h-full flex justify-center items-center">
           <img src={logo} className="w-48" />
         </div>
-        <ChattingRoom list={messages} />
+        <ChattingRoom msgList={messages} />
       </div>
 
       {/* <div className="w-full bg-white "> */}

@@ -9,10 +9,17 @@ export interface ChatItemType {
 }
 
 export interface ChattingRoomProps {
-  list: ChatItemType[]
+  msgList: ChatItemType[]
 }
 
 export interface pageableType {
   page: number;
   size: number;
+}
+
+export interface getMsgResponseType {
+  size: number;
+  pageable: number;
+  next: boolean;
+  simpleChatDtos: ChatItemType[]
 }
