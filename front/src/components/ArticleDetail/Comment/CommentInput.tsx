@@ -5,8 +5,12 @@ import { getPartyUserList } from "../../../api/party";
 import { currentGroupStore } from "../../../stores/GroupStore";
 import { useStore } from "zustand";
 
+import ReplyImg from "@/assets/ArticleDetail/lucide_reply.png"
+
 const CommentInput: React.FC<CommentInputInterface> = ({
-	comment,
+	userId,
+	content,
+	tag,
 	commentModify,
 	switchIsModify,
 }) => {
@@ -15,7 +19,7 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 	// 그룹 유저 정보 가져오기.
 	const [userList, setUserList] = useState<UserGrantData[]>([]);
 	// 입력 값
-	const [inputValue, setInputValue] = useState(comment.content);
+	const [inputValue, setInputValue] = useState(content);
 	// 태그 인덱스
 	const [tagIndex, setTagIndex] = useState(0);
 	// 태그 이후 값
@@ -27,7 +31,7 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 	// 태그된 유저 목록
 	const [tagUserList, setTagUserList] = useState<
 		{ userId: number; userName: string }[]
-	>(comment.tag);
+	>(tag);
 
 	// 처음 한번 유저 리스트를 불러온다.
 	useEffect(() => {
@@ -125,11 +129,12 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 
 	// 취소시 초기화
 	const inputCancel = () => {
-		setInputValue(comment.content);
-		setTagUserList(comment.tag);
+		setInputValue(content);
+		setTagUserList(tag);
 		setTagIndex(0);
 		setIsShowUserList(false);
 		setTagValue("");
+
 		switchIsModify();
 	};
 
@@ -170,7 +175,8 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 						))}
 				</ul>
 			)}
-			<div className="flex">
+			<div className="flex items-center">
+				{userId === -1 && (<img src={ReplyImg} alt="reply" className="w-4 h-4 mr-3" />)}
 				{tagUserList.map((tag, index) => (
 					<div className="flex items-center justify-center mr-1 rounded-lg px-1 text-xs bg-blue-200 w-auto text-nowrap">
 						{tag.userName}
@@ -183,8 +189,8 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 					</div>
 				))}
 				<input
-					placeholder={comment.content}
-					className="py-2 px-3 w-[calc(100%-66px)] text-base rounded-xl text-black h-5 outline-none"
+					placeholder={content}
+					className="py-3 px-3 w-[calc(100%-66px)] text-base text-black h-5 outline-none border-b border-gray-300 mr-4"
 					value={inputValue}
 					onChange={changeValue}
 					onKeyUp={checkValue}
@@ -201,7 +207,7 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 					className="ml-2 bg-main-blue text-white font-pre-M text-base w-12 rounded-xl"
 					onClick={inputModify}
 				>
-					수정
+					{userId === -1 ? <>등록</> : <>수정</>}
 				</button>
 			</div>
 		</div>

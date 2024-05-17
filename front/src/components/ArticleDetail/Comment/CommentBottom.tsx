@@ -25,7 +25,7 @@ const CommentBottom: React.FC<CommentBottomInterface> = ({
 				    <div className="font-pre-L text-black text-sm">{comment.content}</div>
                 </div>
 			) : (
-                <CommentInput key={idx} comment={comment} commentModify={commentModify} switchIsModify={switchIsModify}/>
+                <CommentInput key={idx} userId={comment.userId} content={comment.content} tag={comment.tag} commentModify={commentModify} switchIsModify={switchIsModify}/>
 			)}
 		</>
 	);

@@ -32,7 +32,7 @@ const ArticleDetail: React.FC = () => {
     <>
       <div className="flex flex-col w-full h-[calc(100%-48px)] overflow-scroll scrollbar-hide gap-7">
         <Content />
-        <Comment getCommentList={getCommentList} commentList={commentList}/>
+        <Comment key={feedPk} getCommentList={getCommentList} commentList={commentList}/>
       </div>
       <InputNav getCommentList={getCommentList}/>
     </>

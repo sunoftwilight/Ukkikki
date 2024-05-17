@@ -53,9 +53,10 @@ export const deleteComment = async(
 export const createReply = async(
     articleId: number,
     commentId: number,
+    params : CommentInputType,
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.post(`/${url}/reply/enter/${articleId}/${commentId}`)
+    await privateApi.post(`/${url}/reply/enter/${articleId}/${commentId}`,params)
     .then(Response)
     .catch(Error)
   }
@@ -65,9 +66,10 @@ export const modifyReply = async(
     articleId: number,
     commentId: number,
     replyId: number,
+    params : CommentInputType,
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.patch(`/${url}/reply/modify/${articleId}/${commentId}/${replyId}`)
+    await privateApi.patch(`/${url}/reply/modify/${articleId}/${commentId}/${replyId}`, params)
     .then(Response)
     .catch(Error)
   }
@@ -79,7 +81,7 @@ export const deleteReply = async(
     replyId: number,
     Response : (Response : AxiosResponse<ResponseData>) => void, 
     Error : (Error : AxiosResponse<ResponseData>) => void) => {
-    await privateApi.get(`/${url}/reply/${articleId}/${commentId}/${replyId}`)
+    await privateApi.delete(`/${url}/reply/${articleId}/${commentId}/${replyId}`)
     .then(Response)
     .catch(Error)
   }

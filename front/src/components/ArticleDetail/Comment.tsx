@@ -23,7 +23,7 @@ const Comment: React.FC<CommentProps> = ({getCommentList, commentList}) => {
       
       <div className="flex flex-col gap-4">
         { commentList?.comment.map((item, idx) => (
-          <CommentItem idx={idx} comment={item} getCommentList={getCommentList} />
+          <CommentItem key={idx} idx={idx} comment={item} getCommentList={getCommentList} />
         ))}
       </div>
     </div>

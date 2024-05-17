@@ -35,7 +35,7 @@ export interface CommentListInterface {
     content : string;
     userName : string;
     profileUrl : string;
-    createDate : string;
+    createdDate : string;
     isDelete : boolean;
     tag : TagInterface[]
   }
@@ -51,11 +51,11 @@ export interface CommentListInterface {
 
   // CommentTop
   export interface CommentTopInterface {
-    idx : number;
     comment : CommentInterface;
     isModify : boolean;
     commentDelete : () => void;
     switchIsModify : () => void;
+    createReply : () => void;
   }
   
   // CommentBottom
@@ -69,7 +69,35 @@ export interface CommentListInterface {
   
   // CommentInput
   export interface CommentInputInterface {
-    comment : CommentInterface;
+    userId : number;
+    content : string;
+    tag : TagInterface[];
     commentModify : (inputValue : string, tagList : TagInterface[]) => void;
+    switchIsModify : () => void;
+  }
+
+  // replyItem
+  export interface ReplyItemInterface {
+    commentIdx : number;
+    replyIdx : number;
+    reply : ReplyInterface;
+    createReplyCancel : () => void;
+    getCommentList : () => void;
+  }
+
+  // ReplyTop
+  export interface ReplyTopInterface {
+    reply : ReplyInterface;
+    isModify : boolean;
+    commentDelete : () => void;
+    switchIsModify : () => void;
+  }
+
+  // ReplyBottom
+  export interface ReplyBottomInterface {
+    idx : number;
+    reply : ReplyInterface;
+    isModify : boolean;
+    replyModify : (inputValue : string, tagList : TagInterface[]) => void;
     switchIsModify : () => void;
   }
