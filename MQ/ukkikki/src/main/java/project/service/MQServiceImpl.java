@@ -64,7 +64,11 @@ public class MQServiceImpl implements MQService {
 
         log.info("index : " + index + "의 작업이 시작됩니다.");
 
+        log.info("짝수 큐 : " + evenLinkedDeque.size());
+        log.info("홀수 큐 : " + oddLinkedDeque.size());
+
         MQDto mqDto = index == 0 ? evenLinkedDeque.peekFirst() : oddLinkedDeque.peekFirst();
+
         if(mqDto == null)
             return;
 
