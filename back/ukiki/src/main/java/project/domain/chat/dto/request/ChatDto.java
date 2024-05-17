@@ -9,7 +9,6 @@ import project.domain.chat.entity.ChatType;
 @Setter
 public class ChatDto {
 
-    private ChatType chatType;
     private String content;
     private String password;
 }

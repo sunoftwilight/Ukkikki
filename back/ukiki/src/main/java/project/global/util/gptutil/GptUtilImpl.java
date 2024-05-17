@@ -231,7 +231,7 @@ public class GptUtilImpl implements GptUtil {
             throw new BusinessLogicException(ErrorCode.JSON_PARSE_EXCEPTION);
         }
         // 로깅
-//        System.out.println(jsonBody);
+        System.out.println(jsonBody);
 
         // 요청 헤더 설정
         HttpEntity<String> request = new HttpEntity<>(jsonBody, this.baseHttpHeader());
@@ -245,7 +245,7 @@ public class GptUtilImpl implements GptUtil {
         );
 
         // 응답 로깅 및 반환
-//        System.out.println(response);
+        System.out.println(response);
         return getMeta(response);
     }
 

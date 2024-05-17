@@ -21,5 +21,6 @@ public interface GetFileMapper {
     @Mapping(source = "id", target = "fileId")
     @Mapping(source = "photoDto.id", target = "photoId")
     @Mapping(source = "photoDto.photoUrl", target = "photoUrl")
+    @Mapping(target = "id", ignore = true) // 매핑 제외
     SimpleArticlePhotoDto toSimpleArticlePhotoDto(File file);
 }
