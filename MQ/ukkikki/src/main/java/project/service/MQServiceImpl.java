@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import project.dto.MQDto;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -43,6 +44,21 @@ public class MQServiceImpl implements MQService {
 
         log.info("업로드 짝수 큐 : " + evenLinkedDeque.size());
         log.info("업로드 홀수 큐 : " + oddLinkedDeque.size());
+
+        /*
+            파일 업로드
+         */
+        //기본 경로
+        String uploadDir = "/home/ubuntu/mq/file/" + partyId + "/";
+
+        // 지정된 디렉토리에 파일 저장
+        String fileName = mqDto.getFile().getOriginalFilename();
+        try {
+            mqDto.getFile().transferTo(new File(uploadDir + fileName));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         /*
         홀수 짝수 구분 후 큐에 넣어준다.
         만약 큐가 비어있었다면
