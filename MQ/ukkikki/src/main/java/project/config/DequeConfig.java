@@ -10,12 +10,22 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class DequeConfig {
 
     @Bean
-    public ConcurrentLinkedDeque<MQDto> evenLinkedDeque() {
+    public ConcurrentLinkedDeque<MQDto> oneLinkedDeque() {
         return new ConcurrentLinkedDeque<>();
     }
     @Bean
-    public ConcurrentLinkedDeque<MQDto> oddLinkedDeque() {
+    public ConcurrentLinkedDeque<MQDto> twoLinkedDeque() {
         return new ConcurrentLinkedDeque<>();
     }
+    @Bean
+    public ConcurrentLinkedDeque<MQDto> threeLinkedDeque() {
+        return new ConcurrentLinkedDeque<>();
+    }
+
+    @Bean
+    public ConcurrentLinkedDeque<MQDto> fourLinkedDeque() {
+        return new ConcurrentLinkedDeque<>();
+    }
+
 
 }

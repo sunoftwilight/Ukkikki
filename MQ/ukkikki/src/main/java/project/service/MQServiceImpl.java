@@ -1,5 +1,6 @@
 package project.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,18 +20,15 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MQServiceImpl implements MQService {
 
-    private final ConcurrentLinkedDeque<MQDto> evenLinkedDeque;
-    private final ConcurrentLinkedDeque<MQDto> oddLinkedDeque;
+    private final ConcurrentLinkedDeque<MQDto> oneLinkedDeque;
+    private final ConcurrentLinkedDeque<MQDto> twoLinkedDeque;
+    private final ConcurrentLinkedDeque<MQDto> threeLinkedDeque;
+    private final ConcurrentLinkedDeque<MQDto> fourLinkedDeque;
 
     private final WebClient webClient;
-    @Autowired
-    public MQServiceImpl(ConcurrentLinkedDeque<MQDto> evenLinkedDeque, ConcurrentLinkedDeque<MQDto> oddLinkedDeque,WebClient webClient) {
-        this.evenLinkedDeque = evenLinkedDeque;
-        this.oddLinkedDeque = oddLinkedDeque;
-        this.webClient = webClient;
-    }
 
     @Override
     public void fileUpload(MQDto mqDto) {
@@ -63,17 +61,29 @@ public class MQServiceImpl implements MQService {
         만약 큐가 비어있었다면
         바로 실행할 수 있게 해준다.
          */
-        switch ((int) (partyId%2)){
+        switch ((int) (partyId%4)){
             case 0:
-                evenLinkedDeque.offerLast(mqDto);
-                if(evenLinkedDeque.size() == 1){
+                oneLinkedDeque.offerLast(mqDto);
+                if(oneLinkedDeque.size() == 1){
                     fileAiUpload(0);
                 }
                 break;
             case 1:
-                oddLinkedDeque.offerLast(mqDto);
-                if(oddLinkedDeque.size() == 1){
+                twoLinkedDeque.offerLast(mqDto);
+                if(twoLinkedDeque.size() == 1){
                     fileAiUpload(1);
+                }
+                break;
+            case 2:
+                threeLinkedDeque.offerLast(mqDto);
+                if(threeLinkedDeque.size() == 1){
+                    fileAiUpload(2);
+                }
+                break;
+            case 3:
+                fourLinkedDeque.offerLast(mqDto);
+                if(fourLinkedDeque.size() == 1){
+                    fileAiUpload(3);
                 }
                 break;
         }
@@ -86,7 +96,13 @@ public class MQServiceImpl implements MQService {
 
         log.info("index : " + index + "의 작업이 시작됩니다.");
 
-        MQDto mqDto = index == 0 ? evenLinkedDeque.peekFirst() : oddLinkedDeque.peekFirst();
+        MQDto mqDto = switch ((index)) {
+            case 0 -> oneLinkedDeque.peek();
+            case 1 -> twoLinkedDeque.peek();
+            case 2 -> threeLinkedDeque.peek();
+            case 3 -> fourLinkedDeque.peek();
+            default -> null;
+        };
 
         if(mqDto == null)
             return;
@@ -165,11 +181,22 @@ public class MQServiceImpl implements MQService {
 
     @Override
     public void finish(int index) {
-        log.info("index의 작업을 제거합니다");
+        log.info("index : " + index + "의 작업을 제거합니다");
 
         // 인덱스에 따라 값을 제거해준다.
-        MQDto mqDto = index == 0 ? evenLinkedDeque.poll() : oddLinkedDeque.poll();
-        
+
+        MQDto mqDto = switch ((index)) {
+            case 0 -> oneLinkedDeque.poll();
+            case 1 -> twoLinkedDeque.poll();
+            case 2 -> threeLinkedDeque.poll();
+            case 3 -> fourLinkedDeque.poll();
+            default -> null;
+        };
+
+        if(mqDto == null){
+            return;
+        }
+
         // 파일 경로
         String uploadDir = "/home/ubuntu/mq/file/" + mqDto.getPartyId() + "/";
         String fileName = getFileName(mqDto.getFile().getOriginalFilename());
@@ -180,20 +207,33 @@ public class MQServiceImpl implements MQService {
         file.delete();
 
         // 다음 작업 고
-        if (index == 0) {
-
-            // 큐에 값이 남아있다면 반복한다.
-            if(!evenLinkedDeque.isEmpty()){
-                fileAiUpload(index);
+        switch ((index)) {
+            case 0 -> {
+                if (!oneLinkedDeque.isEmpty()){
+                    fileAiUpload(0);
+                }
+                break;
             }
-
-        } else {
-
-            if(!oddLinkedDeque.isEmpty()){
-                fileAiUpload(index);
+            case 1 -> {
+                if (!twoLinkedDeque.isEmpty()){
+                    fileAiUpload(1);
+                }
+                break;
             }
+            case 2 -> {
+                if (!threeLinkedDeque.isEmpty()){
+                    fileAiUpload(2);
+                }
+                break;
+            }
+            case 3 -> {
+                if (!fourLinkedDeque.isEmpty()){
+                    fileAiUpload(3);
+                }
+                break;
+            }
+        };
 
-        }
 
     }
 

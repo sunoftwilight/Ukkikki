@@ -32,10 +32,7 @@ public class MQController {
             @RequestPart("partyId") Long partyId,
             @RequestPart("key") String key,
             @RequestPart("photoId") Long photoId
-            ) throws IOException {
-
-
-        System.out.println(multipartFile.getBytes().length);
+            ) {
 
 
         MQDto mqDto = new MQDto();
