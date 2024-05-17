@@ -126,6 +126,7 @@ const Header: React.FC = () => {
 		backPath.includes(location.pathname) ||
 		location.pathname.startsWith("/album/detail") ||
 		location.pathname.startsWith("/feed/") ||
+		location.pathname.startsWith("/chat/") ||
 		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend') && !location.pathname.includes('list'))
 	)
 		return <BackHeader />;

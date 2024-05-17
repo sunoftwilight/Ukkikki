@@ -123,9 +123,9 @@ const AlbumHeader: React.FC = () => {
 								</motion.div>
 							)}
 						</AnimatePresence>
-						<button className={`${btnStyle} text-sm bg-main-blue`}>
+						{/* <button className={`${btnStyle} text-sm bg-main-blue`}>
 							전체선택
-						</button>
+						</button> */}
 					</div>
 				</>
 			)}

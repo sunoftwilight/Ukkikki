@@ -11,3 +11,8 @@ export interface ChatItemType {
 export interface ChattingRoomProps {
   list: ChatItemType[]
 }
+
+export interface pageableType {
+  page: number;
+  size: number;
+}
