@@ -44,7 +44,7 @@ export default function Router() {
   const navi = useNavigate();
 
   useEffect(() => {
-    if(!user.isLogin && !guest.isGuest && !guest.isInvite) {
+    if(!user.isLogin && !guest.isGuest && !guest.isInvite && !location.pathname.includes('/attend')) {
       navi('/login');
     }
   }, [location.pathname, navi])

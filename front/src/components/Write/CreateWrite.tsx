@@ -60,6 +60,7 @@ const WriteMain: React.FC = () => {
     await createArticle(Number(groupPk), formData,
     (res) => {
       console.log(res)
+      navigate(`/feed/${groupPk}`);
     },
     (err) => {
       console.error(err)
