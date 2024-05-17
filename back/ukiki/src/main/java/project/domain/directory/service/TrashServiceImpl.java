@@ -459,7 +459,7 @@ public class TrashServiceImpl implements TrashService{
             List<Integer> faces = stringToListFormatter(faceGroup.getFaceList());
             //FaceGroup Entity faceList 에서 해당 faceId 삭제
             log.info("faces : {}", faces);
-            faces.remove(face.getFaceId().intValue());
+            faces.remove(faces.indexOf(face.getFaceId().intValue()));
             log.info("faces : {}", faces);
             //Entity update
             faceGroup.setFaceList(faces.toString());
