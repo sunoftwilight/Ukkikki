@@ -81,7 +81,7 @@ public class MQServiceImpl implements MQService {
         MultipartFile multipartFile = mqDto.getFile(); // mqDto에서 MultipartFile을 가져옴
 
         
-
+        log.info("파일 정보 : " + multipartFile.getOriginalFilename());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             multipartFile.getInputStream().transferTo(baos); // MultipartFile의 내용을 바이트 배열로 변환
