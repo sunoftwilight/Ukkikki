@@ -1,15 +1,10 @@
 package project.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -19,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -42,9 +36,6 @@ public class MQServiceImpl implements MQService {
     public void fileUpload(MQDto mqDto) {
 
         Long partyId = mqDto.getPartyId();
-
-        log.info("업로드 짝수 큐 : " + evenLinkedDeque.size());
-        log.info("업로드 홀수 큐 : " + oddLinkedDeque.size());
 
         /*
             파일 업로드
@@ -95,9 +86,6 @@ public class MQServiceImpl implements MQService {
 
         log.info("index : " + index + "의 작업이 시작됩니다.");
 
-        log.info("짝수 큐 : " + evenLinkedDeque.size());
-        log.info("홀수 큐 : " + oddLinkedDeque.size());
-
         MQDto mqDto = index == 0 ? evenLinkedDeque.peekFirst() : oddLinkedDeque.peekFirst();
 
         if(mqDto == null)
@@ -112,7 +100,11 @@ public class MQServiceImpl implements MQService {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         FileInputStream fis = null;
+        byte[] fileBytes = null;
+
+
         try {
+
             fis = new FileInputStream(fullPath); // 저장된 파일로부터 FileInputStream 생성
             byte[] buffer = new byte[1024]; // 1KB 버퍼
             int length;
@@ -120,28 +112,27 @@ public class MQServiceImpl implements MQService {
                 baos.write(buffer, 0, length); // ByteArrayOutputStream에 쓰기
             }
 
-            // 바이트 배열 사용
+            // 바이트 배열로 변환
+            fileBytes = baos.toByteArray();
+
         } catch (IOException e) {
+
             log.error("Error occurred during file reading. File path: " + fullPath, e);
+            // 실패 시 다음 작업으로 넘어간다.
+            finish(index);
+            return;
+
+        } finally {
+
+            try {
+                if (fis != null) fis.close(); // FileInputStream 닫기
+                baos.close(); // ByteArrayOutputStream 닫기
+            } catch (IOException e) {
+                log.error("Error occurred during stream closing.", e);
+            }
+
         }
 
-        byte[] fileBytes = baos.toByteArray(); // 바이트 배열로 변환
-
-        try {
-            if (fis != null) fis.close(); // FileInputStream 닫기
-            baos.close(); // ByteArrayOutputStream 닫기
-        } catch (IOException e) {
-            log.error("Error occurred during stream closing.", e);
-        }
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        try {
-//            multipartFile.getInputStream().transferTo(baos); // MultipartFile의 내용을 바이트 배열로 변환
-//        } catch (IOException e) {
-//                log.error("Error occurred during file conversion. File path: " + multipartFile.getOriginalFilename(), e);
-//        }
-
-        // 바이트 배열 저장
-//        byte[] fileBytes = baos.toByteArray();
 
         // 바이트 배열을 이용해 MultipartBodyBuilder 생성
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
@@ -161,26 +152,12 @@ public class MQServiceImpl implements MQService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(
-                        (response) -> {
-                            log.info("index : " + index + "의 작업이 완료되었습니다");
-//                            try {
-//                                // Jackson ObjectMapper를 사용하여 JSON 문자열 파싱
-//                                ObjectMapper objectMapper = new ObjectMapper();
-//                                JsonNode rootNode = objectMapper.readTree(response);
-//
-//                                // "index" 필드 값 추출
-//                                String responseIndex = rootNode.path("index").asText();
-//
-//                                // 추출한 index 값을 사용하여 원하는 작업 수행
-//                                finish(Integer.parseInt(responseIndex));
-//
-//                            } catch (Exception e) {
-//                                finish(index);
-//                            }
+                        (res) -> {
+                            log.info("index : " + index + "의 작업이 완료되었습니다.");
+                            finish(index);
                         },
-                        error -> finish(index),
-                        () -> {
-                            log.info("index : " + index + "의 작업이 완료되었습니다.");dex :
+                        (err) -> {
+                            log.info("index : " + index + "의 작업이 완료되었습니다.");
                             finish(index);
                         }
                 );
@@ -189,9 +166,21 @@ public class MQServiceImpl implements MQService {
     @Override
     public void finish(int index) {
         log.info("index의 작업을 제거합니다");
+
         // 인덱스에 따라 값을 제거해준다.
+        MQDto mqDto = index == 0 ? evenLinkedDeque.poll() : oddLinkedDeque.poll();
+        
+        // 파일 경로
+        String uploadDir = "/home/ubuntu/mq/file/" + mqDto.getPartyId() + "/";
+        String fileName = getFileName(mqDto.getFile().getOriginalFilename());
+        String fullPath = uploadDir + fileName; // 전체 파일 경로
+        
+        // 저장했던 파일 삭제
+        File file = new File(fullPath);
+        file.delete();
+
+        // 다음 작업 고
         if (index == 0) {
-            evenLinkedDeque.pollFirst();
 
             // 큐에 값이 남아있다면 반복한다.
             if(!evenLinkedDeque.isEmpty()){
@@ -199,7 +188,6 @@ public class MQServiceImpl implements MQService {
             }
 
         } else {
-            oddLinkedDeque.pollFirst();
 
             if(!oddLinkedDeque.isEmpty()){
                 fileAiUpload(index);
@@ -212,14 +200,5 @@ public class MQServiceImpl implements MQService {
     public String getFileName(String name) {
         return Objects.requireNonNull(name).replaceAll("[^a-zA-Z0-9.]", "");
     }
-
-//    @Override
-//    public void queSize() {
-//        System.out.println(waitLinkedDeque.size());
-//        for(int i=0;i<workLinkedDeque.length;i++){
-//            System.out.println("workLinkedDeque" + i + " = " + workLinkedDeque[i].size());
-//        }
-//    }
-
 
 }

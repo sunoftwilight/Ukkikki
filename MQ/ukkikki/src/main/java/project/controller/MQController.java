@@ -1,10 +1,8 @@
 package project.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,20 +48,5 @@ public class MQController {
         return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
     }
 
-//    @PostMapping("/finish")
-//    public ResponseEntity<ResultResponse> finish(int index){
-//
-//        mqService.finish(index);
-//
-//        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
-//    }
-//
-//    @PostMapping("/size")
-//    public ResponseEntity<ResultResponse> size(){
-//
-//        mqService.queSize();
-//
-//        return ResponseEntity.ok().body(new ResultResponse(ResultCode.FILE_UPLOAD_SUCCESS));
-//    }
 
 }
