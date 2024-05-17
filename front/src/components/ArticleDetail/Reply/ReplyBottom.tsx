@@ -11,6 +11,7 @@ const ReplyBottom: React.FC<ReplyBottomInterface> = ({
 	replyModify,
 	switchIsModify,
 }) => {
+	idx;
 	return (
 		<>
 			{!isModify ? (
