@@ -17,7 +17,8 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("/feed/%s/%s", partyId, contentsId));
+                add(String.format("http://localhost:5173/feed/%s/%s", partyId, contentsId));
+                add(String.format("https://k10d202.p.ssafy.io/feed/%s/%s", partyId, contentsId));
             }};
         }
     },
@@ -25,7 +26,8 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("/feed/%s/%s", partyId, contentsId));
+                add(String.format("http://localhost:5173/feed/%s/%s", partyId, contentsId));
+                add(String.format("https://k10d202.p.ssafy.io/feed/%s/%s", partyId, contentsId));
             }};
         }
     },
@@ -34,7 +36,8 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/chat");
+                add("http://localhost:5173/chat");
+                add("https://k10d202.p.ssafy.io/chat");
             }};
         }
     },
@@ -42,7 +45,8 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/chat");
+                add("http://localhost:5173/chat");
+                add("https://k10d202.p.ssafy.io/chat");
             }};
         }
     },
@@ -50,7 +54,8 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/chat");
+                add("http://localhost:5173/chat");
+                add("https://k10d202.p.ssafy.io/chat");
             }};
         }
     },
@@ -58,7 +63,8 @@ public enum AlarmIdentifier {
         @Override
         public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("/feed/%s/%s", partyId, contentsId));
+                add(String.format("http://localhost:5173/feed/%s/%s", partyId, contentsId));
+                add(String.format("https://k10d202.p.ssafy.io/feed/%s/%s", partyId, contentsId));
             }};
         }
     },
