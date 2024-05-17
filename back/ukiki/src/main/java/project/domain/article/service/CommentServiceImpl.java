@@ -10,6 +10,7 @@ import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
 import project.domain.article.collection.CommentCollection;
+import project.domain.article.dto.request.CommentDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
 import project.domain.article.entity.Article;
 import project.domain.article.repository.ArticleRepository;
@@ -80,7 +81,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void enterComment(Long articleId, String content) {
+    public void enterComment(Long articleId, CommentDto commentDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -115,10 +116,15 @@ public class CommentServiceImpl implements CommentService{
         CommentCollection.Comment newComment = CommentCollection.Comment.builder()
                 .userId(memberId)
                 .userName(member.getUserName())
-                .content(content)
+                .content(commentDto.getContent())
                 .createdDate(myDate())
                 .profileUrl(profile.getProfileUrl())
                 .build();
+
+        commentDto.getTagList()
+                .forEach(collectionTag -> newComment.getTag()
+                        .add(new CommentCollection.tag(collectionTag.getUserId(),collectionTag.getUserName())));
+
 
         cc.getComment().add(newComment);
 
@@ -126,17 +132,17 @@ public class CommentServiceImpl implements CommentService{
         commentRepository.save(cc);
 
         // 알림 보내기
-        Long receiverId = article.getMember().getId();
-        Integer commentSize = cc.getComment().size() - 1;
-        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.CHAT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, content), receiverId);
-        alarmRedisRepository.save(alarm);
-        SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
-        alarmService.sendAlarm(emitter, receiverId, alarm);
+//        Long receiverId = article.getMember().getId();
+//        Integer commentSize = cc.getComment().size() - 1;
+//        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.CHAT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, commentDto.getContent()), receiverId);
+//        alarmRedisRepository.save(alarm);
+//        SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
+//        alarmService.sendAlarm(emitter, receiverId, alarm);
     }
 
     @Override
     @Transactional
-    public void modifyComment(Long articleId, Integer commentIdx, String content) {
+    public void modifyComment(Long articleId, Integer commentIdx, CommentDto commentDto) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -165,7 +171,7 @@ public class CommentServiceImpl implements CommentService{
         }
 
         // 내용 수정
-        cc.getComment().get(commentIdx).setContent(content);
+        cc.getComment().get(commentIdx).setContent(commentDto.getContent());
         cc.getComment().get(commentIdx).setCreatedDate(myDate());
 
         commentRepository.save(cc);
@@ -205,7 +211,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void enterReply(Long articleId, Integer commentIdx, String content) {
+    public void enterReply(Long articleId, Integer commentIdx, CommentDto commentDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -240,16 +246,21 @@ public class CommentServiceImpl implements CommentService{
                 .userId(memberId)
                 .userName(member.getUserName())
                 .createdDate(myDate())
-                .content(content)
+                .content(commentDto.getContent())
                 .profileUrl(profile.getProfileUrl())
                 .build();
+
+        // 태그 객체 추가
+        commentDto.getTagList()
+                .forEach(collectionTag -> newReply.getTag()
+                        .add(new CommentCollection.tag(collectionTag.getUserId(),collectionTag.getUserName())));
 
         cc.getComment().get(commentIdx).getReply().add(newReply);
 
         commentRepository.save(cc);
 
         Long receiverId = cc.getComment().get(commentIdx).getUserId();
-        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.REPLY, article.getParty().getId(), articleId, Long.valueOf(commentIdx), memberId, content), receiverId);
+        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.REPLY, article.getParty().getId(), articleId, Long.valueOf(commentIdx), memberId, commentDto.getContent()), receiverId);
         alarmRedisRepository.save(alarm);
         SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
         alarmService.sendAlarm(emitter, receiverId, alarm);
@@ -257,7 +268,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void modifyReply(Long articleId, Integer commentIdx, Integer replyIdx, String content) {
+    public void modifyReply(Long articleId, Integer commentIdx, Integer replyIdx, CommentDto commentDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -287,7 +298,7 @@ public class CommentServiceImpl implements CommentService{
         }
 
         // 내용 수정
-        cc.getComment().get(commentIdx).getReply().get(replyIdx).setContent(content);
+        cc.getComment().get(commentIdx).getReply().get(replyIdx).setContent(commentDto.getContent());
 
         cc.getComment().get(commentIdx).getReply().get(replyIdx).setCreatedDate(myDate());
 
