@@ -58,6 +58,7 @@ public enum ResultCode {
 
     // alarm
     GET_ALARM_SUCCESS(200, "알람 조회에 성공하였습니다."),
+    ALARM_CHECK_SUCCESS(200, "알람 체크에 성공하였습니다"),
 
     // Chat
     CHAT_SEND_SUCCESS(200, "채팅 전송에 성공하였습니다."),

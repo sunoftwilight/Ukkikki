@@ -47,10 +47,10 @@ public class AlarmController implements AlarmDocs {
     }
 
     @Override
-    @GetMapping("/redirect-user")
-    public void redirectUser(HttpServletResponse response, @RequestParam RedirectDto redirectDto) throws IOException {
-        alarmService.checkAlarm(redirectDto.getAlarmId());
-        response.sendRedirect("https://k10d202.p.ssafy.io"+redirectDto.getRedirectUrl());
+    @GetMapping("/check-read")
+    public ResponseEntity<Object> redirectUser(@RequestParam(name = "alarmId") String alarmId){
+        alarmService.checkAlarm(alarmId);
+        return ResponseEntity.ok(ResultCode.ALARM_CHECK_SUCCESS);
     }
 
     @GetMapping("/test-alarm")
@@ -74,7 +74,7 @@ public class AlarmController implements AlarmDocs {
             6L,
             "테스트 알람 보내기 입니다."
         );
-        dsa.setMemberId(2L);
+        dsa.setMemberId(userId);
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 
@@ -86,7 +86,7 @@ public class AlarmController implements AlarmDocs {
             6L,
             "채팅 일까 아닐까 "
         );
-        dsa.setMemberId(2L);
+        dsa.setMemberId(userId);
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 
@@ -98,7 +98,7 @@ public class AlarmController implements AlarmDocs {
             6L,
             "답글 일껄? ??? "
         );
-        dsa.setMemberId(2L);
+        dsa.setMemberId(userId);
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 
@@ -110,7 +110,7 @@ public class AlarmController implements AlarmDocs {
             6L,
             "테스트 알람 보내기 입니다."
         );
-        dsa.setMemberId(2L);
+        dsa.setMemberId(userId);
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 //
@@ -123,7 +123,7 @@ public class AlarmController implements AlarmDocs {
             6L,
             "비밀번호 바뀜 ㅅㄱㄹ"
         );
-        dsa.setMemberId(2L);
+        dsa.setMemberId(userId);
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 //
@@ -136,19 +136,19 @@ public class AlarmController implements AlarmDocs {
             6L,
             "@Sun.L 너 짱 잘 나 옴"
         );
-        dsa.setMemberId(2L);
+        dsa.setMemberId(userId);
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 
         dsa = alarmService.createAlarm(
             AlarmType.MEMO,
             78L,
-            1L,
+            "38ca74c4-7797-42b1-a431-38e639a34f532024-05-16T16:08:21.790233970",
             1L,
             6L,
             "우와 짱 잘 나왔다"
         );
-        dsa.setMemberId(2L);
+        dsa.setMemberId(userId);
         alarmRedisRepository.save(dsa);
         alarmService.sendAlarm(asd,userId,dsa);
 

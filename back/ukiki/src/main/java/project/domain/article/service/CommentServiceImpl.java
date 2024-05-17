@@ -10,15 +10,18 @@ import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
 import project.domain.article.collection.CommentCollection;
+import project.domain.article.dto.request.CommentDto;
 import project.domain.article.dto.response.ArticleCreateResDto;
 import project.domain.article.entity.Article;
 import project.domain.article.repository.ArticleRepository;
 import project.domain.article.repository.CommentRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
+import project.domain.member.entity.MemberRole;
 import project.domain.member.entity.Profile;
 import project.domain.member.repository.MemberRepository;
 import project.domain.member.repository.ProfileRepository;
+import project.domain.party.repository.MemberpartyRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
@@ -38,6 +41,7 @@ public class CommentServiceImpl implements CommentService{
     private final ArticleRepository articleRepository;
     private final AlarmService alarmService;
     private final AlarmRedisRepository alarmRedisRepository;
+    private final MemberpartyRepository memberpartyRepository;
     @Override
     @Transactional
     public void createComment(ArticleCreateResDto articleCreateResDto) {
@@ -80,7 +84,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void enterComment(Long articleId, String content) {
+    public void enterComment(Long articleId, CommentDto commentDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -115,10 +119,15 @@ public class CommentServiceImpl implements CommentService{
         CommentCollection.Comment newComment = CommentCollection.Comment.builder()
                 .userId(memberId)
                 .userName(member.getUserName())
-                .content(content)
+                .content(commentDto.getContent())
                 .createdDate(myDate())
                 .profileUrl(profile.getProfileUrl())
                 .build();
+
+        commentDto.getTagList()
+                .forEach(collectionTag -> newComment.getTag()
+                        .add(new CommentCollection.tag(collectionTag.getUserId(),collectionTag.getUserName())));
+
 
         cc.getComment().add(newComment);
 
@@ -128,15 +137,39 @@ public class CommentServiceImpl implements CommentService{
         // 알림 보내기
         Long receiverId = article.getMember().getId();
         Integer commentSize = cc.getComment().size() - 1;
-        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.CHAT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, content), receiverId);
+        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.CHAT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, commentDto.getContent()), receiverId);
         alarmRedisRepository.save(alarm);
         SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
         alarmService.sendAlarm(emitter, receiverId, alarm);
+
+        // 태그가 있을 때
+        if(!newComment.getTag().isEmpty()){
+            for (CommentCollection.tag tag : newComment.getTag()) {
+                Long receiverPk = tag.getUserId();
+                String tagNick = tag.getUserName();
+                memberRepository.findById(receiverPk)
+                     .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+                memberpartyRepository.findByMemberIdAndPartyId(receiverPk, alarm.getPartyId())
+                    .ifPresentOrElse(memberParty -> {
+                        if(MemberRole.BLOCK.equals(memberParty.getMemberRole())){
+                            throw new BusinessLogicException(ErrorCode.MEMBER_PARTY_NOT_FOUND);
+                        }
+                    }, ()-> {
+                        throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+                    });
+                Alarm tagAlarm = new Alarm(alarm, receiverPk);
+                tagAlarm.setWriterNick(tagNick);
+                alarmRedisRepository.save(tagAlarm);
+                SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverId);
+                alarmService.sendAlarm(tagEmitter, receiverPk, tagAlarm);
+            }
+        }
+
     }
 
     @Override
     @Transactional
-    public void modifyComment(Long articleId, Integer commentIdx, String content) {
+    public void modifyComment(Long articleId, Integer commentIdx, CommentDto commentDto) {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -165,7 +198,7 @@ public class CommentServiceImpl implements CommentService{
         }
 
         // 내용 수정
-        cc.getComment().get(commentIdx).setContent(content);
+        cc.getComment().get(commentIdx).setContent(commentDto.getContent());
         cc.getComment().get(commentIdx).setCreatedDate(myDate());
 
         commentRepository.save(cc);
@@ -205,7 +238,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void enterReply(Long articleId, Integer commentIdx, String content) {
+    public void enterReply(Long articleId, Integer commentIdx, CommentDto commentDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -240,24 +273,53 @@ public class CommentServiceImpl implements CommentService{
                 .userId(memberId)
                 .userName(member.getUserName())
                 .createdDate(myDate())
-                .content(content)
+                .content(commentDto.getContent())
                 .profileUrl(profile.getProfileUrl())
                 .build();
+
+        // 태그 객체 추가
+        commentDto.getTagList()
+                .forEach(collectionTag -> newReply.getTag()
+                        .add(new CommentCollection.tag(collectionTag.getUserId(),collectionTag.getUserName())));
 
         cc.getComment().get(commentIdx).getReply().add(newReply);
 
         commentRepository.save(cc);
 
         Long receiverId = cc.getComment().get(commentIdx).getUserId();
-        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.REPLY, article.getParty().getId(), articleId, Long.valueOf(commentIdx), memberId, content), receiverId);
+        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.REPLY, article.getParty().getId(), articleId, Long.valueOf(commentIdx), memberId, commentDto.getContent()), receiverId);
         alarmRedisRepository.save(alarm);
         SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
         alarmService.sendAlarm(emitter, receiverId, alarm);
+
+        // 태그가 있을 때
+        if(!newReply.getTag().isEmpty()){
+            for (CommentCollection.tag tag : newReply.getTag()) {
+                Long receiverPk = tag.getUserId();
+                String tagNick = tag.getUserName();
+                memberRepository.findById(receiverPk)
+                    .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+                memberpartyRepository.findByMemberIdAndPartyId(receiverPk, alarm.getPartyId())
+                    .ifPresentOrElse(memberParty -> {
+                        if(MemberRole.BLOCK.equals(memberParty.getMemberRole())){
+                            throw new BusinessLogicException(ErrorCode.MEMBER_PARTY_NOT_FOUND);
+                        }
+                    }, ()-> {
+                        throw new BusinessLogicException(ErrorCode.INVALID_MEMBER_ROLE);
+                    });
+                Alarm tagAlarm = new Alarm(alarm, receiverPk);
+                tagAlarm.setWriterNick(tagNick);
+                alarmRedisRepository.save(tagAlarm);
+                SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverId);
+                alarmService.sendAlarm(tagEmitter, receiverPk, tagAlarm);
+            }
+        }
+
     }
 
     @Override
     @Transactional
-    public void modifyReply(Long articleId, Integer commentIdx, Integer replyIdx, String content) {
+    public void modifyReply(Long articleId, Integer commentIdx, Integer replyIdx, CommentDto commentDto) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 유저 확인
@@ -287,7 +349,7 @@ public class CommentServiceImpl implements CommentService{
         }
 
         // 내용 수정
-        cc.getComment().get(commentIdx).getReply().get(replyIdx).setContent(content);
+        cc.getComment().get(commentIdx).getReply().get(replyIdx).setContent(commentDto.getContent());
 
         cc.getComment().get(commentIdx).getReply().get(replyIdx).setCreatedDate(myDate());
 

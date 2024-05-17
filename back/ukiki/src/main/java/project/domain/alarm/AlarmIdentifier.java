@@ -6,58 +6,72 @@ import java.util.List;
 
 public enum AlarmIdentifier {
     MEMO{
-        public List<String> identifier(Long partyId, Long detailId, Long targetId){
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("/api/photo/memo/%d/%d", partyId, detailId));
+                add(String.format("/album/detail/%s/%d", contentsId, partyId));
             }};
         }
     },
     COMMENT{
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add(String.format("/api/article/comment/%d/%d/", partyId, detailId));
+                add(String.format("http://localhost:5173/feed/%s/%s", partyId, contentsId));
+                add(String.format("https://k10d202.p.ssafy.io/feed/%s/%s", partyId, contentsId));
             }};
         }
     },
-    REPLY{ // 이건 만들어 봐야할듯
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+    REPLY{
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("REPLY URL");
+                add(String.format("http://localhost:5173/feed/%s/%s", partyId, contentsId));
+                add(String.format("https://k10d202.p.ssafy.io/feed/%s/%s", partyId, contentsId));
             }};
         }
     },
 
     CHECK{ // SSE 연결 체크용
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+        @Override
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/CHECK/URL");
+                add("http://localhost:5173/chat");
+                add("https://k10d202.p.ssafy.io/chat");
             }};
         }
     },
     PASSWORD{
         @Override
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
-            return null;
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
+            return new ArrayList<>(){{
+                add("http://localhost:5173/chat");
+                add("https://k10d202.p.ssafy.io/chat");
+            }};
         }
     },
     CHAT{
         @Override
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
             return new ArrayList<>(){{
-                add("/chat");
+                add("http://localhost:5173/chat");
+                add("https://k10d202.p.ssafy.io/chat");
             }};
         }
     },
     MENTION{
         @Override
-        public List<String> identifier(Long partyId, Long detailId, Long targetId) {
-            return null;
+        public List<String> identifier(Long partyId, Object contentsId, Object targetId) {
+            return new ArrayList<>(){{
+                add(String.format("http://localhost:5173/feed/%s/%s", partyId, contentsId));
+                add(String.format("https://k10d202.p.ssafy.io/feed/%s/%s", partyId, contentsId));
+            }};
         }
     },
 
     ;
 
 
-    public abstract List<String> identifier(Long partyId, Long detailId, Long targetId);
+    public abstract List<String> identifier(Long partyId, Object contentsId, Object targetId);
 //    public abstract List<String> identifier2 (Long partyId, Long detailId);
 }
