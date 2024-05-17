@@ -15,7 +15,7 @@ const GroupAttend:React.FC = () => {
   const inputsRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
 
   useEffect(() => {
-    console.log(guest.isGuest, user.isLogin)
+    guest.setIsInvite(true);
     if(!guest.isGuest && !user.isLogin) navi(`/group/${groupPk}/attend/login`)
   }, [])
 

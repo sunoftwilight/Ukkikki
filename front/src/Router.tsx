@@ -35,15 +35,20 @@ import SimplePass from './pages/SimplePass';
 import ErrorRedirect from './pages/ErrorRedirect';
 import { userStore } from './stores/UserStore';
 import { guestStore } from './stores/GuestStore';
+import { useEffect } from 'react';
 
 export default function Router() {
   const { currentImg } = useStore(DetailImgStore)
   const user = useStore(userStore);
   const guest = useStore(guestStore)
   const navi = useNavigate();
-  if(!user.isLogin && !guest.isGuest) {
-    navi('/login');
-  }
+
+  useEffect(() => {
+    if(!user.isLogin && !guest.isGuest && !guest.isInvite) {
+      navi('/login');
+    }
+  }, [location.pathname, navi])
+
 
 
   return (

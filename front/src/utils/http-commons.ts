@@ -1,15 +1,22 @@
 import axios, { AxiosInstance } from "axios";
 import { tokenRefresh } from "../api/user";
 import { httpStatusCode } from "./http-status";
-import { useStore } from "zustand";
-import { userStore } from "../stores/UserStore";
 
 axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
 // const baseURL: string = "http://localhost:5000/api";
 
-const user = useStore(userStore);
+// 새 토큰 저장
+const newAccess = (header:string) => {
+  const stored = localStorage.getItem('USER_STORE');
+  if (stored) {
+    const obj = JSON.parse(stored)
+    obj.state.access = header;
+    localStorage.setItem('USER_STORE', JSON.stringify(obj));
+  }
+}
+
 
 // S3 조회 API 
 export const imgApi: AxiosInstance = axios.create({
@@ -89,7 +96,7 @@ privateApi.interceptors.request.use(
           (res) => {
             // 성공 시
             if (res.status === httpStatusCode.OK && res.headers.access) {
-              user.setAccessToken(res.headers.access);
+              newAccess(res.headers.access)
               axios.defaults.headers.access = `${res.headers.access}`;
               originRequest.headers.access = `${res.headers.access}`;
               // 토큰 교환 후 재 시도.
@@ -127,7 +134,7 @@ formDataApi.interceptors.request.use(
           (res) => {
             // 성공 시
             if (res.status === httpStatusCode.OK && res.headers.access) {
-              user.setAccessToken(res.headers.access);
+              newAccess(res.headers.access)
               axios.defaults.headers.access = `${res.headers.access}`;
               originRequest.headers.access = `${res.headers.access}`;
               // 토큰 교환 후 재 시도.

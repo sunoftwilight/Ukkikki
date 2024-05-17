@@ -13,7 +13,6 @@ const GroupAttendLogin:React.FC = () => {
 
   useEffect(() => {
     guest.setPartyPk(Number(groupPk));
-    guest.setIsInvite(true);
   }, [])
 
   const login = () => {
@@ -23,6 +22,7 @@ const GroupAttendLogin:React.FC = () => {
 
   const guestBtn = () => {
     guest.setIsGuest(true);
+    guest.setIsInvite(false);
     navi(`/group/${guest.viewPartyPk}/attend`)
   }
 
