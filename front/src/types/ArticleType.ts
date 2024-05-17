@@ -37,6 +37,21 @@ export interface ArticleCreateProps{
   photoIdList: string[];
 }
 
+export interface ImgModalProps {
+  onChoiceDoneBtn: (data: {photoId: string, src: string}[]) => void;
+  onCancelBtn: () => void;
+}
+
+export interface ImgListProps {
+  pk: string;
+  type: string;
+  name: string;
+  url: string;
+  photoId: number;
+  isSelect:boolean;
+}
+
+
 // API type
 
 export interface ArticleListRespones {

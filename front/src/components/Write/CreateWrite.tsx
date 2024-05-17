@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createArticle } from "../../api/article";
 import { ArticleCreateProps } from "../../types/ArticleType";
 import { useStore } from "zustand";
@@ -6,14 +6,17 @@ import { userStore } from "../../stores/UserStore";
 import { useNavigate, useParams } from "react-router-dom";
 import back from "@/assets/Header/back.png"
 import { motion, AnimatePresence } from "framer-motion"
+import ImgModal from "./ImgModal";
 
 const WriteMain: React.FC = () => {
 
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [addMediaList, setAddMediaList] = useState<File[]>([]);
-
+  const [addMediaList, setAddMediaList] = useState<{src:string}[]>([]);
+  const [addDeviceList, setAddDeviceList] = useState<File[]>([]);
+  const [addAlbumList, setAddAlbumList] = useState<{photoId: string, src: string}[]>([])
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const user = useStore(userStore);
   const {groupPk} = useParams();
   const navigate = useNavigate();
@@ -26,7 +29,7 @@ const WriteMain: React.FC = () => {
   
     const newMediaList = Array.from(files);
 
-    setAddMediaList(prevMediaList => [...prevMediaList, ...newMediaList]);
+    setAddDeviceList(prevMediaList => [...prevMediaList, ...newMediaList]);
 	};
 
   // 버튼 이벤트
@@ -41,16 +44,18 @@ const WriteMain: React.FC = () => {
       title: titleRef.current.value,
       content: contentRef.current.value,
       password: user.groupKey[Number(groupPk)],
-      photoIdList: []
+      photoIdList: addAlbumList.map((item) => String(item.photoId))
     }
+    console.log(data)
+
     const formData = new FormData();
 
 		formData.append("articleCreateDto", JSON.stringify(data));
-    console.log(addMediaList)
-    addMediaList.forEach((file) => { // 변경 3: URL 대신 실제 파일을 FormData에 추가
+
+    addDeviceList.forEach((file) => { // 변경 3: URL 대신 실제 파일을 FormData에 추가
       formData.append(`multipartFiles`, file, file.name);
     });
-    console.log(formData.getAll('multipartFiles'))
+
 
     await createArticle(Number(groupPk), formData,
     (res) => {
@@ -61,10 +66,29 @@ const WriteMain: React.FC = () => {
     })
   }
 
+  useEffect(() => {
+    const device = addDeviceList.map((item) => ({src: URL.createObjectURL(item)}))
+    const album = addAlbumList.map(item => ({src: item.src}))
+    const combined = [...device, ...album]
+    setAddMediaList((prevAddMediaList) => {
+
+      const updatedList = prevAddMediaList.filter(item => combined.includes(item));
+      combined.forEach(item => {
+        if (!updatedList.includes(item)) {
+          updatedList.push(item);
+        }
+      });
+      return updatedList;
+    });
+    console.log(addMediaList)
+  }, [addDeviceList, addAlbumList])
+
 
   return (
     <div className="flex flex-col w-screen h-screen relative">
-
+      {isModalOpen && (
+        <ImgModal onChoiceDoneBtn={(data) => {setAddAlbumList(data)}} onCancelBtn={() => {setIsModalOpen(false)}}/>
+      )}
       <div className="flex justify-between items-center p-4 w-full h-14 bg-white">
         <img src={back} onClick={() => goBackHandler()} />
         <button onClick={() => clickCreateBtn()} className="rounded-[10px] font-pre-SB text-white text-lg justify-center flex items-center bg-main-blue w-14 h-8">작성</button>
@@ -85,7 +109,7 @@ const WriteMain: React.FC = () => {
           />
           <div className="pl-4 flex overflow-x-scroll scrollbar-hide gap-2 h-48">
             { addMediaList.map((item, idx) => (
-              <img key={idx} src={URL.createObjectURL(item)}
+              <img key={idx} src={item.src}
                 className="w-36 h-36 object-cover"
               />
             ))}
@@ -103,7 +127,7 @@ const WriteMain: React.FC = () => {
               exit={{ opacity: 0, translateY: "44px" }}
             >
               <div className="flex flex-col items-center">
-                <div className={`${optionStyle} pt-4 pb-3 rounded-t-[15px]`} onClick={() => {}}>
+                <div className={`${optionStyle} pt-4 pb-3 rounded-t-[15px]`} onClick={() => {setIsModalOpen(true)}}>
                   <p>공유 앨범에서 첨부하기</p>
                 </div>
                 <div className={`${optionStyle} pt-3 pb-4`}>
@@ -121,6 +145,8 @@ const WriteMain: React.FC = () => {
           미디어 첨부
         </div>
       </div>
+
+      
     </div>
   )
 };
