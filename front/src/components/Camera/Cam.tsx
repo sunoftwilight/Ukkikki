@@ -130,7 +130,7 @@ const Cam: React.FC = () => {
                   console.log(error)
               })
             }
-          }, 'image/jpeg', 0.8)
+          }, 'image/jpeg', 1)
         }, selectedTimer)
       }
     }

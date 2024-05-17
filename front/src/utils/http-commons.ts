@@ -1,15 +1,15 @@
 import axios, { AxiosInstance } from "axios";
-// import { tokenRefresh } from "../api/user";
-// import { httpStatusCode } from "./http-status";
-// import { useStore } from "zustand";
-// import { userStore } from "../stores/UserStore";
+import { tokenRefresh } from "../api/user";
+import { httpStatusCode } from "./http-status";
+import { useStore } from "zustand";
+import { userStore } from "../stores/UserStore";
 
 axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
 // const baseURL: string = "http://localhost:5000/api";
 
-// const user = useStore(userStore);
+const user = useStore(userStore);
 
 // S3 조회 API 
 export const imgApi: AxiosInstance = axios.create({
@@ -52,7 +52,6 @@ export const downloadApi = (sseKey: string) => {
       const obj = JSON.parse(stored);
       if (obj.state.accessToken !== '') {
         config.headers['authorization'] = obj.state.accessToken;
-        // config.headers['authorization'] = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk"
       }
     }
     return config;
@@ -75,35 +74,34 @@ privateApi.interceptors.request.use(
 			const obj = JSON.parse(stored)
 			if (obj.state.accessToken !== ''){
 				config.headers['authorization'] = obj.state.accessToken;
-				// config.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk';
 			}
 		}
     return config;
   },
-  async () => {
-    // const { config, response: { status }, } = error;
-    // // 토큰 만료일 경우.
-    // if (status === 401) {
-    //   if (error.response.data.message === 'access token expired') {
-    //     const originRequest = config;
-    //     // 토큰 재발급.
-    //     await tokenRefresh(
-    //       (res) => {
-    //         // 성공 시
-    //         if (res.status === httpStatusCode.OK && res.headers.access) {
-    //           user.setAccessToken(res.headers.access);
-    //           axios.defaults.headers.access = `${res.headers.access}`;
-    //           originRequest.headers.access = `${res.headers.access}`;
-    //           // 토큰 교환 후 재 시도.
-    //           return axios(originRequest);
-    //         }
-    //       },
-    //       () => {
+  async (error) => {
+    const { config, response: { status }, } = error;
+    // 토큰 만료일 경우.
+    if (status === 401) {
+      if (error.response.data.message === 'access token expired') {
+        const originRequest = config;
+        // 토큰 재발급.
+        await tokenRefresh(
+          (res) => {
+            // 성공 시
+            if (res.status === httpStatusCode.OK && res.headers.access) {
+              user.setAccessToken(res.headers.access);
+              axios.defaults.headers.access = `${res.headers.access}`;
+              originRequest.headers.access = `${res.headers.access}`;
+              // 토큰 교환 후 재 시도.
+              return axios(originRequest);
+            }
+          },
+          () => {
             
-    //       }
-    //     )
-    //   }
-    // }
+          }
+        )
+      }
+    }
   }
 );
 
@@ -114,34 +112,33 @@ formDataApi.interceptors.request.use(
 			const obj = JSON.parse(stored)
 			if (obj.state.accessToken !== ''){
 				config.headers['authorization'] = obj.state.accessToken;
-				// config.headers['authorization'] = 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk';
 			}
 		}
     return config;
   },
-  async () => {
-    // const { config, response: { status }, } = error;
-    // // 토큰 만료일 경우.
-    // if (status === 401) {
-    //   if (error.response.data.message === 'access token expired') {
-    //     const originRequest = config;
-    //     // 토큰 재발급.
-    //     await tokenRefresh(
-    //       (res) => {
-    //         // 성공 시
-    //         if (res.status === httpStatusCode.OK && res.headers.access) {
-    //           user.setAccessToken(res.headers.access);
-    //           axios.defaults.headers.access = `${res.headers.access}`;
-    //           originRequest.headers.access = `${res.headers.access}`;
-    //           // 토큰 교환 후 재 시도.
-    //           return axios(originRequest);
-    //         }
-    //       },
-    //       () => {
+  async (error) => {
+    const { config, response: { status }, } = error;
+    // 토큰 만료일 경우.
+    if (status === 401) {
+      if (error.response.data.message === 'access token expired') {
+        const originRequest = config;
+        // 토큰 재발급.
+        await tokenRefresh(
+          (res) => {
+            // 성공 시
+            if (res.status === httpStatusCode.OK && res.headers.access) {
+              user.setAccessToken(res.headers.access);
+              axios.defaults.headers.access = `${res.headers.access}`;
+              originRequest.headers.access = `${res.headers.access}`;
+              // 토큰 교환 후 재 시도.
+              return axios(originRequest);
+            }
+          },
+          () => {
             
-    //       }
-    //     )
-    //   }
-    // }
+          }
+        )
+      }
+    }
   }
 );

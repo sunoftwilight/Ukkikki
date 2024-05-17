@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useStore } from 'zustand';
 import { DetailImgStore } from './stores/DetailImgStore';
 import MainLayout from './MainLayout'
@@ -20,7 +20,6 @@ import GroupUser from './pages/GroupConfig/GroupUser';
 import GroupUserDetail from './pages/GroupConfig/GroupUserDetail';
 import GroupPass from './pages/GroupConfig/GroupPass';
 
-import MyPage from './pages/MyPage';
 import Setting from './pages/Setting';
 import Album from './pages/Album';
 import Feed from './pages/Feed';
@@ -34,9 +33,18 @@ import Trash from './pages/Trash';
 import LoginRedirect from './components/User/LoginRedirect';
 import SimplePass from './pages/SimplePass';
 import ErrorRedirect from './pages/ErrorRedirect';
+import { userStore } from './stores/UserStore';
+import { guestStore } from './stores/GuestStore';
 
 export default function Router() {
   const { currentImg } = useStore(DetailImgStore)
+  const user = useStore(userStore);
+  const guest = useStore(guestStore)
+  const navi = useNavigate();
+  if(!user.isLogin && !guest.isGuest) {
+    navi('/login');
+  }
+
 
   return (
     <Routes location={location} key={location.pathname}>
@@ -65,7 +73,6 @@ export default function Router() {
         <Route path="/group/:groupPk/userdetail" element={<GroupUserDetail />} />
         <Route path="/group/:groupPk/pass" element={<GroupPass />} />
 
-        <Route path="/mypage" element={<MyPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/album/:groupPk" element={<Album />} />
         <Route path={`album/detail/${currentImg}/:groupPk`} element={<DetailImg />} />
