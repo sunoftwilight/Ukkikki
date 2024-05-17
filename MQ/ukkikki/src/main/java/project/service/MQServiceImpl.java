@@ -51,6 +51,12 @@ public class MQServiceImpl implements MQService {
         //기본 경로
         String uploadDir = "/home/ubuntu/mq/file/" + partyId + "/";
 
+        //폴더가 없으면 생성
+        File directory = new File(uploadDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
         // 지정된 디렉토리에 파일 저장
         String fileName = mqDto.getFile().getOriginalFilename();
         try {
