@@ -30,7 +30,6 @@ public class MQServiceImpl implements MQService {
     private final WebClient webClient;
 
     @Override
-    @Async
     public void fileUpload(MQDto mqDto) {
 
         Long partyId = mqDto.getPartyId();
@@ -61,7 +60,6 @@ public class MQServiceImpl implements MQService {
     }
 
     @Override
-    @Async
     public void fileAiUpload(int index) {
 
         log.info("index : " + index + "의 작업이 시작됩니다.");
