@@ -45,6 +45,8 @@ import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 import project.global.util.S3Util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -184,7 +186,11 @@ public class ArticleServiceImpl implements ArticleService{
 
         SimpleArticleDto res = articleMapper.toSimpleArticleDto(article);
 
-        res.setModify(!article.getCreateDate().isEqual(article.getLastModifiedDate()));
+        String createDate = article.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String modifiedDate = article.getLastModifiedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        res.setModify(!createDate.equals(modifiedDate));
+
+
 
         List<SimpleArticlePhotoDto> fileList = article.getArticlePhotoList()
             .stream()
@@ -321,7 +327,7 @@ public class ArticleServiceImpl implements ArticleService{
         articleRepository.save(article);
         SimpleArticleDto res = articleMapper.toSimpleArticleDto(article);
 
-        res.setModify(!article.getCreateDate().isEqual(article.getLastModifiedDate()));
+        res.setModify(true);
 
         List<ArticlePhoto> articlePhotoList = article.getArticlePhotoList();
         res.setPhotoList(articlePhotoMapper.toSimpleArticlePhotoDtoList(articlePhotoList));
