@@ -88,7 +88,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, key, file);
             urls.setThumb_url1(firstThumbnailUrl);
 
-            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 1);
+            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 2);
             String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, key, file);
             urls.setThumb_url2(secondThumbnailUrl);
 
@@ -168,7 +168,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             String firstThumbnailUrl = s3Util.bufferedImageUpload(firstThumbnail, key, file);
             urls.setThumb_url1(firstThumbnailUrl);
 
-            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 1);
+            BufferedImage secondThumbnail = imageUtil.resizeImage(file, 2);
             String secondThumbnailUrl = s3Util.bufferedImageUpload(secondThumbnail, key, file);
             urls.setThumb_url2(secondThumbnailUrl);
 
