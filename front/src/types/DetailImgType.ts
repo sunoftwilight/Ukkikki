@@ -10,6 +10,7 @@ export interface DownloadDataType {
   type: string;
 }
 
+
 // memo List
 export type MemoListType = MemoListInterface[];
 
