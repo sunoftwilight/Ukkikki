@@ -23,6 +23,7 @@ import project.domain.chat.dto.request.ChatPagealbeDto;
 import project.domain.chat.dto.response.ChatPageDto;
 import project.domain.chat.dto.response.SimpleChatDto;
 import project.domain.chat.entity.Chat;
+import project.domain.chat.entity.ChatType;
 import project.domain.chat.mapper.ChatMapper;
 import project.domain.chat.redis.ChatMember;
 import project.domain.chat.repository.ChatRepository;
@@ -98,7 +99,7 @@ public class ChatServiceImpl implements ChatService{
 
         // 채팅 만들기
         Chat chat = Chat.customBuilder()
-            .chatType(chatDto.getChatType())
+            .chatType(ChatType.CHAT)
             .content(jasyptUtil.keyEncrypt(encryptor, chatDto.getContent()))
             .member(member)
             .party(party)

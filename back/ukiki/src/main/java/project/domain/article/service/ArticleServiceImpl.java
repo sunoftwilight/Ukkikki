@@ -51,6 +51,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -120,7 +121,7 @@ public class ArticleServiceImpl implements ArticleService{
                 .build());
 
         // Device 사진 추가하기
-        if(multipartFiles!= null){
+        if(multipartFiles != null){
             fileUploadDownloadService.uploadProcess(multipartFiles, FileUploadDto.builder()
                 .partyId(partyId).key(articleCreateDto.getPassword()).build());
         }
@@ -189,20 +190,16 @@ public class ArticleServiceImpl implements ArticleService{
             .stream()
             .map(ArticlePhoto::getPhoto)
             .map(photo -> {
-                SimpleArticlePhotoDto addList;
-                if (photo.getPhotoType().equals(PhotoType.APP)){
-                    Optional<File> asd  = fileRepository.findByPhotoDtoId(photo.getId());
-                    if(asd.isEmpty()){
-                        return null;
-                    }
-                    addList = fileMapper.toSimpleArticlePhotoDto(asd.get());
-                }else{
-                    addList = photoMapper.toSimpleArticlePhotoDto(photo);
+                Optional<File> opfile = fileRepository.findByPhotoDtoId(photo.getId());
+                if(opfile.isPresent()){
+                    SimpleArticlePhotoDto addList = fileMapper.toSimpleArticlePhotoDto(opfile.get());
+                    addList.setId(articleId);
+                    return addList;
                 }
-                addList.setId(articleId);
-                return addList;
+                return null;
             })
-            .toList();
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 
 
         res.setPhotoList(fileList);

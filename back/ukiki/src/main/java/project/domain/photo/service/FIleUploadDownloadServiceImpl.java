@@ -109,7 +109,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             try {
-                ImageIO.write(secondThumbnail, "jpg", outputStream);
+                ImageIO.write(firstThumbnail, "jpg", outputStream);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -189,7 +189,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             try {
-                ImageIO.write(secondThumbnail, "jpg", outputStream);
+                ImageIO.write(firstThumbnail, "jpg", outputStream);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
