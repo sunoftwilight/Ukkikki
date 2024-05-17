@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.scheduling.annotation.Async;
@@ -21,13 +22,18 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class MQServiceImpl implements MQService {
 
     private final ConcurrentLinkedDeque<MQDto> evenLinkedDeque;
     private final ConcurrentLinkedDeque<MQDto> oddLinkedDeque;
 
     private final WebClient webClient;
+    @Autowired
+    public MQServiceImpl(ConcurrentLinkedDeque<MQDto> evenLinkedDeque, ConcurrentLinkedDeque<MQDto> oddLinkedDeque,WebClient webClient) {
+        this.evenLinkedDeque = evenLinkedDeque;
+        this.oddLinkedDeque = oddLinkedDeque;
+        this.webClient = webClient;
+    }
 
     @Override
     public void fileUpload(MQDto mqDto) {
