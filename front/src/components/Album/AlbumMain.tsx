@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import folder from "@/assets/Album/folder.png"
 import heart from "@/assets/Album/heart.png"
 import downloaded from "@/assets/Album/downloaded.png"
@@ -21,18 +21,24 @@ const AlbumMain: React.FC = () => {
   const [albumList, setAlbumList] = useState<contentListData[]>([])
   const { groupPk } = useParams();
 
+  const isInitialRender = useRef(true);
+
   useEffect(() => {
-    console.log('groupPk', groupPk)
-    getPartyDetail(
+    getFirstDirectoryHandler()
+    return () => {
+      isInitialRender.current = true;
+    };
+  }, [])
+
+  const getFirstDirectoryHandler = async () => {
+    await getPartyDetail(
       Number(groupPk),
       (res) => {
         setCurrentDirId(res.data.data.rootDirId)
-        console.log('partyDetail', res.data)
 
         getDirectory(
           res.data.data.rootDirId,
           (res) => {
-            console.log('List', res.data)
             setParentDirId(res.data.data.parentId)
             setAlbumList(res.data.data.contentList)
           },
@@ -41,19 +47,26 @@ const AlbumMain: React.FC = () => {
       },
       (err) => { console.error(err) }
     )
-  }, [groupPk])
+  }
 
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+    } else {
+      getDirectoryHandler()
+    }
+  }, [needUpdate, currentDirId])
+
+  const getDirectoryHandler = () => {
     getDirectory(
       currentDirId,
       (res) => {
         setParentDirId(res.data.data.parentId)
         setAlbumList(res.data.data.contentList)
-        console.log('data', res.data.data)
       },
       (err) => { console.error(err) }
     )
-  }, [needUpdate, currentDirId])
+  }
 
   const dirHandler = (id: string, name: string) => {
     setCurrentDirId(id)
@@ -87,19 +100,21 @@ const AlbumMain: React.FC = () => {
               <Link 
                 to={`/album/detail/${item.pk}/${groupPk}`} state={{url: item.url}}
                 key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.url)}
-                className="flex justify-center items-center relative"
+                className="flex justify-center items-center"
               >
-                {item.isDownload ? 
-                  <img src={downloaded} className="absolute bottom-0 left-0 w-6" />
-                  : <></>
-                }
-                {item.isLikes ? 
-                  <div className="absolute bottom-1 right-1">
-                    <img className="w-4" src={heart} />
-                  </div>
-                  : <></>
-                }
-                <SecureImg url={item.url} />
+                <div className="relative">
+                  {item.isDownload ? 
+                    <img src={downloaded} className="absolute bottom-0 left-0 w-6" />
+                    : <></>
+                  }
+                  {item.isLikes ? 
+                    <div className="absolute bottom-1 right-1">
+                      <img className="w-4" src={heart} />
+                    </div>
+                    : <></>
+                  }
+                  <SecureImg url={item.url} />
+                </div>
               </Link>
         ))))}
     </div>

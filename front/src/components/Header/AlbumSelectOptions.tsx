@@ -65,6 +65,7 @@ const AlbumSelectOptions: React.FC = () => {
         document.body.appendChild(link)
         link.click()
         doneHandler('down')
+        setNeedUpdate()
       },
       (err) => { 
         setIsPrefixOpen(true)

@@ -72,7 +72,7 @@ export default function Router() {
         <Route path="/feed/:groupPk" element={<Feed />} />
         <Route path="/feed/:groupPk/:feedPk" element={<ArticleDetail />} />
         <Route path="/feed/:groupPk/:feedPk/:imgPk" element={<ArticleImg />} />
-        <Route path="/chat" element={<Chatting />} />
+        <Route path="/chat/:groupPk" element={<Chatting />} />
         <Route path="/trash/:groupPk" element={<Trash />} />
       </Route>
 

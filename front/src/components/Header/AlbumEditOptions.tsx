@@ -44,8 +44,8 @@ const AlbumEditOptions: React.FC = () => {
   }
 
   // 현재 폴더 삭제 로직
-  const deleteFolderHandler = () => {
-    delDirectory(
+  const deleteFolderHandler = async () => {
+    await delDirectory(
       currentDirId,
       {data: {sseKey: groupKey[Number(groupPk)]}},
       // {data: {sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE='}},
@@ -62,8 +62,8 @@ const AlbumEditOptions: React.FC = () => {
   }
 
   // 폴더 생성 로직
-  const createFolderHandler = () => {
-    createDirectory(
+  const createFolderHandler = async () => {
+    await createDirectory(
       { parentDirId: currentDirId, dirName: prefix },
       () => {
         setCurrentDirId(currentDirId)
@@ -77,8 +77,8 @@ const AlbumEditOptions: React.FC = () => {
     )
   }
 
-  const editFolderNameHandler = () => {
-    editDirectory(
+  const editFolderNameHandler = async () => {
+    await editDirectory(
       currentDirId,
       prefix,
       () => {
@@ -96,14 +96,18 @@ const AlbumEditOptions: React.FC = () => {
   const [rootDir, setRootDir] = useState<string>('')
 
   useEffect(() => {
-    getPartyDetail(
+    getPartyDetailHandler()
+  }, [groupPk])
+
+  const getPartyDetailHandler = async () => {
+    await getPartyDetail(
       Number(groupPk),
       (res) => {
         setRootDir(res.data.data.rootDirId)
       },
       (err) => { console.error(err) }
     )
-  }, [groupPk])
+  }
 
   const key = new Blob(
     [JSON.stringify({

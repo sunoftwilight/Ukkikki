@@ -68,10 +68,10 @@ const GroupProfile: React.FC = () => {
         <img src={groupInfo.thumbnail} className="w-[84px] h-[84px] rounded-full" />
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div className="text-black text-xl font-gtr-B">{groupInfo.partyName}</div>
         <Link to={`/group/${groupPk}/config`}>
-          <img src={settings} className="w-3 h-3" />
+          <img src={settings} className="w-5 top-[1px]" />
         </Link>
       </div>
 

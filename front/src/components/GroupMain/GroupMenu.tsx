@@ -24,7 +24,7 @@ const GroupMenu: React.FC = () => {
     <div className="flex flex-col gap-[10px]">
       <Link to={`/album/${groupPk}`} className={`${btnStyle}  bg-soft-blue`}>앨범</Link>
       <Link to={`/feed/${groupPk}`} className={`${btnStyle}  bg-soft-blue`}>피드</Link>
-      <Link to='/chat' className={`${btnStyle}  bg-soft-blue`}>채팅</Link>
+      <Link to={`/chat/${groupPk}`} className={`${btnStyle}  bg-soft-blue`}>채팅</Link>
       <div className={`${btnStyle}  bg-soft-blue`} onClick={() => handleInviteBtn()}>초대</div>
       <Link to={`/trash/${groupPk}`} className={`${btnStyle} bg-disabled-gray`}>휴지통</Link>
     </div>

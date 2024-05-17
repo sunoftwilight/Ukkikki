@@ -17,7 +17,11 @@ const TrashMain: React.FC = () => {
   const { groupPk } = useParams();
 
   useEffect(() => {
-    getTrashBin(
+    getTrashBinHandler()
+  }, [groupPk, needUpdate])
+
+  const getTrashBinHandler = async () => {
+    await getTrashBin(
       Number(groupPk),
       (res) => {
         setTrashList(res.data.data)
@@ -25,14 +29,13 @@ const TrashMain: React.FC = () => {
       },
       (err) => { console.error(err) }
     )
-  }, [groupPk, needUpdate])
+  }
 
   const dateHandler = (dateString: string) => {
     const [year, month, day] = dateString.split('-');
     return `${year.slice(2)}.${month}.${day}`;
   };
   
-
   return (
     <div>
       <div className="px-4 mt-2 mb-4 rounded-xl py-2 font-pre-R text-red text-base mx-4 bg-soft-gray ">폴더는 단일 선택만 가능합니다</div>
@@ -41,19 +44,19 @@ const TrashMain: React.FC = () => {
           <div>
             {
               selectMode ? 
-              <TrashSelectModeImg key={idx} item={item} />
+                <TrashSelectModeImg key={idx} item={item} />
               :
-              item.type === 'DIRECTORY' ?
-              <div key={idx} className="flex flex-col justify-center items-center gap-1">
+                item.type === 'DIRECTORY' ?
+                  <div key={idx} className="flex flex-col justify-center items-center gap-1">
                     <img src={folder} className="w-[82px] h-[65px]" />
                     <div className="font-pre-R text-center text-xs">{item.name}</div>
                   </div>
                 :
-                <div key={idx} className="flex justify-center items-center">
+                  <div key={idx} className="flex flex-col justify-center items-center">
                     <SecureImg url={item.url} />
+                    <div className="font-pre-L text-sm text-black">만료일 <span className="text-red">{dateHandler(item.deadLine)}</span></div>
                   </div>
             }
-            <div className="font-pre-L text-sm text-black">만료일 <span className="text-red">{dateHandler(item.deadLine)}</span></div>
           </div>
         ))}
       </div>

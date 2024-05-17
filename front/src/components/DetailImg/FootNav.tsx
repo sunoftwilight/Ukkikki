@@ -10,14 +10,15 @@ import ArticleList from "./ArticleList";
 import Memo from "./Memo";
 import { downloadFile } from "../../api/file";
 import { useStore } from "zustand";
-import { prefixStore } from "../../stores/AlbumStore";
+import { currentDirStore, prefixStore, updateAlbumStore } from "../../stores/AlbumStore";
 import Modal from "../@commons/Modal";
 import { DetailImgStore } from "../../stores/DetailImgStore";
 import { getDetailImgDataType } from "../../types/AlbumType";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { userStore } from "../../stores/UserStore";
 
 import * as P from "../../api/detailImg"
+import { delFiles } from "../../api/directory";
 
 interface NavPropsType {
   info: getDetailImgDataType,
@@ -30,6 +31,7 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
   const [isIng, setIsIng] = useState(false)
   const [isDownDone, setIsDownDone] = useState(false)
+  const [isDelete, setIsDelete] = useState(false)
 
   const { prefix } = useStore(prefixStore)
   const { currentId } = useStore(DetailImgStore)
@@ -72,6 +74,7 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
   const doneHandler = () => {
     setIsIng(false)
     setIsDownDone(true)
+    setNeedUpdate()
   }
 
   // 좋아요 클릭
@@ -106,6 +109,33 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
       },
       (err) => {
         console.log(err);
+      }
+    )
+  }
+
+  const { currentDirId } = useStore(currentDirStore)
+  const { setNeedUpdate } = useStore(updateAlbumStore)
+  const { currentImg } = useStore(DetailImgStore)
+  const navigate = useNavigate()
+
+  const delHandler = async () => {
+    await delFiles(
+      currentDirId,
+      { 
+        data: {
+          sseKey: groupKey[Number(groupPk)],
+          fileIdList: [currentImg]
+        }
+      },
+      (res) => {
+        console.log(res)
+        doneHandler()
+        setNeedUpdate()
+        navigate(`/album/${groupPk}`)
+      },
+      (err) => { 
+        console.error(err)
+        alert('오류가 발생했습니다. 다시 시도하십시오.')
       }
     )
   }
@@ -159,10 +189,19 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
             onSubmitBtnClick={() => setIsDownDone(false)}
           />
         )}
+
+        { isDelete && (
+          <Modal
+            key='isDelete'
+            modalItems={{ title: '사진을 삭제합니다', content: '삭제된 사진은 휴지통에 2주간 보관되며 기간 내 복구 가능합니다', modalType: 'warn', btn: 2 }}
+            onSubmitBtnClick={() => delHandler()}
+            onCancelBtnClick={() => setIsDelete(false)}
+          />
+        )}
       </AnimatePresence>
 
       <div className="bg-white w-full h-11 flex items-center justify-between px-4 fixed bottom-11">
-        <img src={trash} className="w-6" />
+        <img src={trash} onClick={() => setIsDelete(true)} className="w-6" />
     
         { info.isLikes ? 
           <img src={heart} onClick={likeClick} className="w-6" /> 

@@ -2,84 +2,95 @@ import React, { useState, useEffect, useRef } from "react";
 import ChattingRoom from "../components/Chatting/ChattingRoom";
 import logo from '../../icons/512.png'
 import { ChatItemType } from "../types/ChatType";
-// import SockJS from 'sockjs-client';
-// import StompJs from '@stomp/stompjs';
+import { Client, StompHeaders } from '@stomp/stompjs';
+import { useParams } from "react-router-dom";
+import { getMsg } from "../api/chat";
+import { userStore } from "../stores/UserStore";
+import { useStore } from "zustand";
 
 // 웹소켓 참고자료
 // https://velog.io/@caecus/Project-Hobbyt-WebSocket-%EA%B3%BC-stomp-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-%EC%95%8C%EB%A6%BC-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%B1%84%ED%8C%85-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0
 
 const Chatting: React.FC = () => {
-  const [chat, setChat] = useState('')
   const chatInput = useRef<HTMLInputElement>(null)
-  // const [messages, setMessages] = useState<ChatItemType[]>([]);
-  const [messages, ] = useState<ChatItemType[]>([]);
-  const webSocket = useRef<WebSocket | null>(null);
+  const [chat, setChat] = useState('')
+  const [messages, setMessages] = useState<ChatItemType[]>([]);
 
+  const [client, setClient] = useState<Client | null>(null)
+
+  const { groupPk } = useParams();
+  const { groupKey } = useStore(userStore)
+
+  useEffect(() => {
+    getMsg(
+      Number(groupPk),
+      {
+        page: 1,
+        size: 30
+      },
+      (res) => {
+        console.log(res.data)
+      },
+      (err) => { console.error(err) }
+    )
+  }, [])
   
   useEffect(() => {
-    // 웹 소켓 연결
-    webSocket.current = new WebSocket("wss://k10d202.p.ssafy.io/api/ws");
-    // webSocket.current = new WebSocket('ws://localhost:5000/api/ws');
-    webSocket.current.onopen = function () {
-      console.log("웹소켓 연결 성공");
-    };
+    const stored = localStorage.getItem('USER_STORE');
 
-    // webSocket.current.onclose = (error) => {
-    //   console.log(error);
-    // }
+    if (stored) {
+      const obj = JSON.parse(stored);
 
-    // webSocket.current.onerror = (error) => {
-    //   console.log(error);
-    // }
+      if (obj.state.accessToken !== '') {
+        const token = obj.state.accessToken
+        
+        // 웹소켓 연결
+        const newClient = new Client();
+        newClient.configure({
+          brokerURL: import.meta.env.VITE_CHAT_URL,
+          onConnect: () => {
+            const headers: StompHeaders = {
+              authorization: 'Bearer ' + token,
+            };
 
-    // webSocket.current.onmessage = (event: MessageEvent) => {   
-    //   console.log(event)
-    //   setMessages((prev) => [...prev, event.data]);
-    // };
-  
-    return () => {
-      webSocket.current?.close();
+            newClient.subscribe(
+              `/sub/chats/party/${groupPk}`,
+              message => {
+                const parsedMessage = JSON.parse(message.body);
+                setMessages(prevChatLogs => [...prevChatLogs, parsedMessage.body.data]);
+              },
+              headers,
+            );
+          },
+    
+          onDisconnect: () => {
+            console.log('웹소켓 연결 종료');
+          },
+        });
+    
+        // 웹소켓 세션 활성화
+        newClient.activate();
+        setClient(newClient);
+    
+        return () => {
+          newClient.deactivate();
+        };
+      }
     }
-    // const client = new StompJs.Client({
-    //   // brokerURL: 'wss://k10d202.p.ssafy.io/api/ws',
-    //   brokerURL: 'ws://localhost:5000/api/ws',
-    //   beforeConnect: () => {
-    //     console.log('before Connect')
-    //   },
-    //   connectHeaders: {
-    //     authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImlkIjoxLCJ1c2VybmFtZSI6IuyEseq3nCIsInByb3ZpZGVySWQiOiJrYWthbyAzNDU4Njg5NDM3IiwiaWF0IjoxNzE1MjM1ODk5LCJleHAiOjE3MTYwOTk4OTl9.mdm4F9ymRYeyAKJcds4sl1_j_g-5oRfSMkQZJBcNVHk"
-    //   },
-    //   debug(str) {
-    //     console.log('debug', str)
-    //   },
-    //   reconnectDelay: 5000,
-    //   heartbeatIncoming: 4000,
-    //   heartbeatOutgoing: 4000
-    // })
-  
-    // client.onConnect = function (frame) {
-    //   console.log('connect')
-    //   console.log(frame)
-    // }
-  
-    // client.onStompError = function (frame) {
-    //   console.log(`Broker reported error`, frame.headers.message);
-    //     console.log(`Additional details:${frame.body}`);
-    // }
-
-    // client.activate()
-
-    // return () => {
-    //   client.deactivate()
-    // } 
   }, []);
 
-  const sendMessage = (msg: string) => {
-    console.log(webSocket)
-    if (webSocket.current!.readyState === WebSocket.OPEN) {
-      webSocket.current!.send(msg);
+  const sendMessage = (message: string) => {
+    if (client !== null) {
+      const newMessage = {
+        content: message,
+        password: groupKey[Number(groupPk)]
+      };
+      const jsonMessage = JSON.stringify(newMessage);
+      client.publish({ destination: `/pub/message/${groupPk}`, body: jsonMessage });
+    } else {
+      console.error('웹소켓 연결 노활성화.');
     }
-  }
+  };
   
   const messageHandler = () => {
     // 작성 길이가 1 미만이라면 input 태그로 포커싱
