@@ -35,6 +35,8 @@ public class MQServiceImpl implements MQService {
 
         Long partyId = mqDto.getPartyId();
 
+        log.info("짝수 큐 : " + evenLinkedDeque.size());
+        log.info("홀수 큐 : " + oddLinkedDeque.size());
         /*
         홀수 짝수 구분 후 큐에 넣어준다.
         만약 큐가 비어있었다면
