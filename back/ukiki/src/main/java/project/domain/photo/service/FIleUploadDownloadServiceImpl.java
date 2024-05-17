@@ -37,6 +37,7 @@ import project.domain.photo.dto.request.MultiFileDownloadDto;
 import project.domain.photo.entity.Photo;
 import project.domain.photo.entity.PhotoUrl;
 import project.domain.photo.entity.mediatable.DownloadLog;
+import project.domain.photo.repository.DownloadLogRepository;
 import project.domain.photo.repository.PhotoRepository;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
@@ -55,6 +56,7 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
     private final PhotoRepository photoRepository;
     private final MemberRepository memberRepository;
     private final PartyRepository partyRepository;
+    private final DownloadLogRepository downloadLogRepository;
     // GptUtil
     private final S3Util s3Util;
     private final ImageUtil imageUtil;
@@ -242,10 +244,8 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
             throw new BusinessLogicException(ErrorCode.FILE_NOT_FOUND);
         }
 
-        DownloadLog.customBuilder()
-                .photo(photo)
-                .member(member)
-                .build();
+        DownloadLog downloadLog = DownloadLog.create(photo, member);
+        downloadLogRepository.save(downloadLog);
 
         return object;
     }
@@ -284,10 +284,9 @@ public class FIleUploadDownloadServiceImpl implements FileUploadDownloadService{
 
             objects.add(object);
 
-            DownloadLog.customBuilder()
-                    .photo(photo)
-                    .member(member)
-                    .build();
+            DownloadLog downloadLog = DownloadLog.create(photo, member);
+            downloadLogRepository.save(downloadLog);
+
         }
 
         int i = 0;
