@@ -18,12 +18,12 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 	// 수정 여부
 	const [isModify, setIsModify] = useState(false);
 	// 게시판 번호
-	const { pk } = useParams();
+	const { feedPk } = useParams();
 
 	// 댓글 삭제
 	const commentDelete = async () => {
 		await C.deleteComment(
-			Number(pk),
+			Number(feedPk),
 			idx,
 			() => {
 				getCommentList();
@@ -46,7 +46,7 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 		}
 
 		await C.modifyComment(
-			Number(pk),idx,params,
+			Number(feedPk),idx,params,
 			() => {
 				getCommentList();
 			},

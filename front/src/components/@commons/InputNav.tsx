@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 
 const InputNav: React.FC<{getCommentList : () => void;}> = ({getCommentList}) => {
 	// 게시판 번호
-	const {pk} = useParams();
+	const {feedPk} = useParams();
 	// 그룹 pk
 	const group = useStore(currentGroupStore);
 	// 그룹 유저 정보 가져오기.
@@ -66,7 +66,7 @@ const InputNav: React.FC<{getCommentList : () => void;}> = ({getCommentList}) =>
 		}
 
 		await createComment (
-			Number(pk),
+			Number(feedPk),
 			params,
 			() => {
 				setInputValue("");

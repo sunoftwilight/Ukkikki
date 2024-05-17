@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 
 const ArticleDetail: React.FC = () => {
 
-  const {pk} = useParams();
+  const {feedPk} = useParams();
 
   const [commentList, setCommentList] = useState<CommentListType>();
 
@@ -18,7 +18,7 @@ const ArticleDetail: React.FC = () => {
 
   const getCommentList = async () => {
     await getComment(
-      Number(pk),
+      Number(feedPk),
       (res) => {
         setCommentList(res.data.data);
       },

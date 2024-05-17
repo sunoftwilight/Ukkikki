@@ -6,7 +6,6 @@ import { currentGroupStore } from "../../../stores/GroupStore";
 import { useStore } from "zustand";
 
 const CommentInput: React.FC<CommentInputInterface> = ({
-	idx,
 	comment,
 	commentModify,
 	switchIsModify,

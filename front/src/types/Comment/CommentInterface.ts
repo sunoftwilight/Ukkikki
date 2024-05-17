@@ -69,7 +69,6 @@ export interface CommentListInterface {
   
   // CommentInput
   export interface CommentInputInterface {
-    idx : number;
     comment : CommentInterface;
     commentModify : (inputValue : string, tagList : TagInterface[]) => void;
     switchIsModify : () => void;
