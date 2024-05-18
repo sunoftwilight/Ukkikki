@@ -2,20 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import ChattingRoom from "../components/Chatting/ChattingRoom";
 import logo from '../../icons/512.png'
 import { ChatItemType } from "../types/ChatType";
-import { Client, StompHeaders } from '@stomp/stompjs';
+import { Client } from '@stomp/stompjs';
 import { useParams } from "react-router-dom";
 import { getMsg } from "../api/chat";
 import { userStore } from "../stores/UserStore";
 import { useStore } from "zustand";
 
-// 웹소켓 참고자료
-// https://velog.io/@caecus/Project-Hobbyt-WebSocket-%EA%B3%BC-stomp-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-%EC%95%8C%EB%A6%BC-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%B1%84%ED%8C%85-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0
-
 const Chatting: React.FC = () => {
   const chatInput = useRef<HTMLInputElement>(null)
   const [chat, setChat] = useState('')
   const [messages, setMessages] = useState<ChatItemType[]>([]);
-
   const [client, setClient] = useState<Client | null>(null)
 
   const { groupPk } = useParams();
@@ -24,12 +20,14 @@ const Chatting: React.FC = () => {
   useEffect(() => {
     getMsg(
       Number(groupPk),
+      {password: groupKey[Number(groupPk)]},
       {
-        page: 1,
+        page: 0,
         size: 30
       },
       (res) => {
         console.log(res.data)
+        setMessages(res.data.simpleChatDtos)
       },
       (err) => { console.error(err) }
     )
@@ -43,30 +41,32 @@ const Chatting: React.FC = () => {
 
       if (obj.state.accessToken !== '') {
         const token = obj.state.accessToken
-        
-        // 웹소켓 연결
-        const newClient = new Client();
-        newClient.configure({
-          brokerURL: import.meta.env.VITE_CHAT_URL,
-          onConnect: () => {
-            const headers: StompHeaders = {
-              authorization: 'Bearer ' + token,
-            };
 
+        // WebSocket 연결 설정
+        const connectionOptions = {
+          // brokerURL: 'wss://k10d202.p.ssafy.io/api/ws',
+          brokerURL: 'ws://localhost:5000/api/ws',
+          connectHeaders: {
+            Authorization: token
+          }, // 연결 시 헤더 설정
+
+          onConnect: () => {
             newClient.subscribe(
               `/sub/chats/party/${groupPk}`,
               message => {
                 const parsedMessage = JSON.parse(message.body);
-                setMessages(prevChatLogs => [...prevChatLogs, parsedMessage.body.data]);
+                setMessages(prev => [...prev, parsedMessage]);
               },
-              headers,
             );
           },
-    
-          onDisconnect: () => {
-            console.log('웹소켓 연결 종료');
-          },
-        });
+
+          onDisconnect: () => {}
+        };
+        
+        // 웹소켓 연결
+        const newClient = new Client();
+
+        newClient.configure(connectionOptions);
     
         // 웹소켓 세션 활성화
         newClient.activate();
@@ -77,7 +77,7 @@ const Chatting: React.FC = () => {
         };
       }
     }
-  }, []);
+  }, [groupPk]);
 
   const sendMessage = (message: string) => {
     if (client !== null) {
@@ -85,11 +85,21 @@ const Chatting: React.FC = () => {
         content: message,
         password: groupKey[Number(groupPk)]
       };
+      
+      const stored = localStorage.getItem('USER_STORE');
       const jsonMessage = JSON.stringify(newMessage);
-      client.publish({ destination: `/pub/message/${groupPk}`, body: jsonMessage });
-    } else {
-      console.error('웹소켓 연결 노활성화.');
-    }
+
+      if (stored) {
+        const obj = JSON.parse(stored);
+  
+        if (obj.state.accessToken !== '') {
+          const token = obj.state.accessToken
+
+          client.publish({ destination: `/pub/message/${groupPk}`, body: jsonMessage, headers: { Authorization: token} });
+        }} else {
+          console.error('웹소켓 연결 비활성화');
+        }
+      }
   };
   
   const messageHandler = () => {
@@ -100,9 +110,10 @@ const Chatting: React.FC = () => {
     }
 
     sendMessage(chat)
+    setChat('')
   }
 
-  const enterHandler = (e: any) => {
+  const enterHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       messageHandler();
     }
@@ -114,7 +125,7 @@ const Chatting: React.FC = () => {
         <div className="fixed w-[calc(100%-32px)] h-full flex justify-center items-center">
           <img src={logo} className="w-48" />
         </div>
-        <ChattingRoom list={messages} />
+        <ChattingRoom msgList={messages} />
       </div>
 
       {/* <div className="w-full bg-white "> */}
