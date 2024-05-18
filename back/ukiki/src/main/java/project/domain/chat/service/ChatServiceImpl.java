@@ -118,7 +118,7 @@ public class ChatServiceImpl implements ChatService{
 
         SimpleChatDto simpleChatDto = chatMapper.toSimpleChatDto(chat);
         simpleChatDto.setContent(chatDto.getContent());
-        simpleChatDto.setReadNum(memberPartyList.size() - chatMemberList.size());
+        simpleChatDto.setReadNum(chat.getReadMember().size());
 
         ResponseEntity<ResultResponse> res = ResponseEntity.ok(
             new ResultResponse(ResultCode.CHAT_SEND_SUCCESS, simpleChatDto));
@@ -166,7 +166,7 @@ public class ChatServiceImpl implements ChatService{
                 }
 
                 SimpleChatDto chatDto = chatMapper.toSimpleChatDto(chat);
-                chatDto.setReadNum(memberPartyList.size() - readMemberList.size() - 1);
+                chatDto.setReadNum(chat.getReadMember().size());
                 return chatDto;
             })
             .toList());
