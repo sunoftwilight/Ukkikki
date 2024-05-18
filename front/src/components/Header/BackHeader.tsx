@@ -26,6 +26,10 @@ const BackHeader: React.FC = () => {
       navigate(`/group/list`)
       return
     }
+		if (location.pathname.startsWith('/feed') && !location.pathname.includes('/detail')) {
+      navigate(`/group/${currentGroup}/main`)
+      return
+    }
 		navigate(-1);
 	};
 

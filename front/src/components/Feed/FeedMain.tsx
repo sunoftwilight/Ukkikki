@@ -53,7 +53,7 @@ const FeedMain: React.FC = () => {
         </Link>
       </div>
       { articleList.map((item, idx) => (        
-        <Link to={`/feed/${groupPk}/${item.id}`} key={idx} className="px-4 py-2 flex flex-col gap-2">
+        <Link to={`/feed/${groupPk}/detail/${item.id}`} key={idx} className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex gap-3 items-center">
             <img src={item.writerUrl} className="rounded-full w-12 h-12 object-cover" />
             <div className="flex flex-col gap-1">

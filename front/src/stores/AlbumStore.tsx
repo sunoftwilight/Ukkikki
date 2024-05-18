@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { selectModeStoreType, selectListStoreType, PrefixStoreType, CurrentDirType, UpdateAlbumStoreType } from '../types/StoreType/AlbumStoreType'
+import { selectModeStoreType, selectListStoreType, PrefixStoreType, CurrentDirType, UpdateAlbumStoreType, ImgGroupStoreType } from '../types/StoreType/AlbumStoreType'
 
 export const selectModeStore = create(
   persist<selectModeStoreType>((set) => ({
@@ -56,4 +56,14 @@ export const updateAlbumStore = create(
     setNeedUpdate: () => set((state) => ({needUpdate: !state.needUpdate})),
   }),
   { name: 'ALBUM_STORE' }
+))
+
+export const imgGroupStore = create(
+  persist<ImgGroupStoreType>((set) => ({
+    type: 0,
+    groupName: '',
+    setType: (newType:number) => (set(() => ({type: newType}))),
+    setGroupName : (newName:string) => (set(() => ({groupName: newName})))
+  }),
+  { name: 'IMGGROUP_STORE'}
 ))

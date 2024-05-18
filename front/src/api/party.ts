@@ -6,9 +6,11 @@ import { CreateDoenResponesData,
 	PartyLinkResponse,
 	EnterGuestRespones,
 	PartyCheckPassRespones,
+	PartyDetailResponse,
 	PartyUserListRespones,
-	PartyPassChangeResponse } from '../types/GroupType';
-import { PartyDetailResponse } from '../types/GroupType';
+	PartyPassChangeResponse,
+	ImgGroupListResponse,
+	ImgGroupResponse } from '../types/GroupType';
 
 const url = 'party'
 
@@ -191,3 +193,24 @@ export const getPartyThumb = async (
     .then(Response)
     .catch(Error)
 	}
+
+	export const getGroup = async (
+		partyId : number,
+		Response : (Response : AxiosResponse<ImgGroupListResponse>) => void, 
+    Error : (Error : AxiosResponse<ResponseData>) => void) => {
+			await privateApi.get(`/photo/group/${partyId}`)
+    .then(Response)
+    .catch(Error)
+		}
+
+	
+	export const getGroupDetail = async (
+		type:number,
+		groupName:string,
+		partyId : number,
+		Response : (Response : AxiosResponse<ImgGroupResponse>) => void, 
+		Error : (Error : AxiosResponse<ResponseData>) => void) => {
+		await privateApi.get(`/photo/group/detail/${partyId}?type=${type}&groupName=${groupName}`)
+		.then(Response)
+		.catch(Error)
+		}

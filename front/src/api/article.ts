@@ -38,7 +38,7 @@ export const updateArticle = async(
   data: FormData,
   Response : (Response : AxiosResponse<ResponseData>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await privateApi.patch(`/article/update/${groupPk}/${articlePk}`, data)
+  await formDataApi.patch(`/article/update/${groupPk}/${articlePk}`, data)
   .then(Response)
   .catch(Error)
   }
