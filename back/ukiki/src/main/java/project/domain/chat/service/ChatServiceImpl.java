@@ -48,6 +48,8 @@ import project.global.result.ResultCode;
 import project.global.result.ResultResponse;
 import project.global.util.JasyptUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -148,7 +150,7 @@ public class ChatServiceImpl implements ChatService{
 
         Page<Chat> chatPage = chatRepository.findAllByPartyId(partyId, pageable);
 
-        List<SimpleChatDto> chatDtoList = chatPage.stream()
+        List<SimpleChatDto> chatDtoList = new ArrayList<>(chatPage.stream()
             .map(chat -> {
                 String content = encryptor.decrypt(chat.getContent());
                 chat.setContent(content);
@@ -156,7 +158,7 @@ public class ChatServiceImpl implements ChatService{
                     .map(Member::getId)
                     .toList();
 
-                if (!readMemberList.contains(memberId)){
+                if (!readMemberList.contains(memberId)) {
                     List<Member> readmember = chat.getReadMember();
                     readmember.add(member);
                     chat.setReadMember(readmember);
@@ -167,7 +169,8 @@ public class ChatServiceImpl implements ChatService{
                 chatDto.setReadNum(memberPartyList.size() - readMemberList.size() - 1);
                 return chatDto;
             })
-            .toList();
+            .toList());
+        Collections.reverse(chatDtoList);
 
         ChatPageDto res = ChatPageDto.builder()
             .page(pageable.getPageNumber())
