@@ -14,13 +14,13 @@ public enum AlarmIdentifier {
     COMMENT{
         @Override
         public String identifier(Long partyId, Object contentsId, Object targetId) {
-            return String.format("feed/%s/%s", partyId, contentsId);
+            return String.format("feed/%d/%s", partyId, contentsId);
         }
     },
     REPLY{
         @Override
         public String identifier(Long partyId, Object contentsId, Object targetId) {
-            return String.format("feed/%s/%s", partyId, contentsId);
+            return String.format("feed/%d/%s", partyId, contentsId);
         }
     },
 
@@ -45,7 +45,7 @@ public enum AlarmIdentifier {
     MENTION{
         @Override
         public String identifier(Long partyId, Object contentsId, Object targetId) {
-            return String.format("chat/%d", partyId);
+            return String.format("feed/%d/%s", partyId, contentsId);
         }
     },
 
@@ -53,5 +53,4 @@ public enum AlarmIdentifier {
 
 
     public abstract String identifier(Long partyId, Object contentsId, Object targetId);
-//    public abstract List<String> identifier2 (Long partyId, Long detailId);
 }
