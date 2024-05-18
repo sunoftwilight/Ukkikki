@@ -157,11 +157,14 @@ public class ChatServiceImpl implements ChatService{
                     .toList();
 
                 if (!readMemberList.contains(memberId)){
-                    chat.getReadMember().add(member);
-                    readMemberList.add(memberId);
+                    List<Member> readmember = chat.getReadMember();
+                    readmember.add(member);
+                    chat.setReadMember(readmember);
+                    chatRepository.save(chat);
                 }
+
                 SimpleChatDto chatDto = chatMapper.toSimpleChatDto(chat);
-                chatDto.setReadNum(memberPartyList.size() - readMemberList.size());
+                chatDto.setReadNum(memberPartyList.size() - readMemberList.size() - 1);
                 return chatDto;
             })
             .toList();
