@@ -11,8 +11,8 @@ import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
 // import SecureImg from "./SecureImg";
-import { getPartyDetail, getPartyThumb } from "../../api/party";
-import { userStore } from "../../stores/UserStore";
+import { getPartyDetail } from "../../api/party";
+import SecureImg from "./SecureImg";
 
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
@@ -74,22 +74,22 @@ const AlbumMain: React.FC = () => {
     setCurrentDirName(name)
   }
 
-  const { groupKey } = useStore(userStore);
+  // const { groupKey } = useStore(userStore);
 
-  const opt = {
-    "x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
-  };
+  // const opt = {
+  //   "x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
+  // };
 
-  const getImgHandler = (url: string) => {
-      getPartyThumb(
-      url,
-      opt,
-      () => {},
-      (err) => { console.error(err) },
+  // const getImgHandler = (url: string) => {
+  //     getPartyThumb(
+  //     url,
+  //     opt,
+  //     () => {},
+  //     (err) => { console.error(err) },
 
-    );
-    return <img src={url} className="w-[106px] h-[90px] object-cover rounded-lg" />
-  }
+  //   );
+  //   return <img src={url} className="w-[106px] h-[90px] object-cover rounded-lg" />
+  // }
 
 
   return (
@@ -132,7 +132,8 @@ const AlbumMain: React.FC = () => {
                     </div>
                     : <></>
                   }
-                  {getImgHandler(item.url)}
+                  {/* {getImgHandler(item.url)} */}
+                  <SecureImg url={item.url} />
                 </div>
               </Link>
         ))))}
