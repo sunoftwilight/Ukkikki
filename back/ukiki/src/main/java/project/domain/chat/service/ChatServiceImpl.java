@@ -150,7 +150,8 @@ public class ChatServiceImpl implements ChatService{
 
         Page<Chat> chatPage = chatRepository.findAllByPartyId(partyId, pageable);
 
-        List<SimpleChatDto> chatDtoList = new ArrayList<>(chatPage.stream()
+
+        List<SimpleChatDto> chatDtoList = chatPage.stream()
             .map(chat -> {
                 String content = encryptor.decrypt(chat.getContent());
                 chat.setContent(content);
@@ -169,7 +170,8 @@ public class ChatServiceImpl implements ChatService{
                 chatDto.setReadNum(chat.getReadMember().size());
                 return chatDto;
             })
-            .toList());
+            .toList();
+
         Collections.reverse(chatDtoList);
 
         ChatPageDto res = ChatPageDto.builder()
