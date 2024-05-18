@@ -10,4 +10,6 @@ public interface DownloadLogRepository extends JpaRepository<DownloadLog, Long> 
 
     Optional<DownloadLog> findByMemberAndPhoto(Member member, Photo photo);
 
+    Boolean existsByMemberAndPhoto(Member member, Photo photo);
+
 }

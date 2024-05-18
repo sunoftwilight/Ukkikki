@@ -217,7 +217,7 @@ public class DirectoryServiceImpl implements DirectoryService {
                 Photo photo = photoRepository.findById(file.getPhotoDto().getId())
                     .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_NOT_FOUND));
 
-                Optional<DownloadLog> opDownloadLog = downloadLogRepository.findByMemberAndPhoto(
+                Boolean isExistDownloadLog = downloadLogRepository.existsByMemberAndPhoto(
                     member, photo);
                 Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
                     photo);
@@ -227,7 +227,7 @@ public class DirectoryServiceImpl implements DirectoryService {
                     .pk(file.getId())
                     .photoId(file.getPhotoDto().getId())
                     .url(file.getPhotoDto().getThumbUrl1())
-                    .isDownload(opDownloadLog.isPresent())
+                    .isDownload(isExistDownloadLog)
                     .isLikes(opLikes.isPresent())
                     .build();
                 contentList.add(fileType);
