@@ -10,8 +10,9 @@ import { currentDirStore, selectModeStore, updateAlbumStore } from "../../stores
 import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
-import SecureImg from "./SecureImg";
-import { getPartyDetail } from "../../api/party";
+// import SecureImg from "./SecureImg";
+import { getPartyDetail, getPartyThumb } from "../../api/party";
+import { userStore } from "../../stores/UserStore";
 
 const AlbumMain: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
@@ -73,11 +74,23 @@ const AlbumMain: React.FC = () => {
     setCurrentDirName(name)
   }
 
-  const renderHandler = (url: string) => {
-    if (url) {
-      return <SecureImg url={url} />
-    }
+  const { groupKey } = useStore(userStore);
+
+  const opt = {
+    "x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
+  };
+
+  const getImgHandler = (url: string) => {
+      getPartyThumb(
+      url,
+      opt,
+      () => {},
+      (err) => { console.error(err) },
+
+    );
+    return <img src={url} className="w-[106px] h-[90px] object-cover rounded-lg" />
   }
+
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
@@ -119,7 +132,7 @@ const AlbumMain: React.FC = () => {
                     </div>
                     : <></>
                   }
-                  {renderHandler(item.url)}
+                  {getImgHandler(item.url)}
                 </div>
               </Link>
         ))))}
