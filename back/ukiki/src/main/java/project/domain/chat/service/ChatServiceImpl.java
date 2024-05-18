@@ -2,6 +2,7 @@ package project.domain.chat.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,6 +54,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService{
@@ -97,12 +99,13 @@ public class ChatServiceImpl implements ChatService{
         List<ChatMember> chatMemberList = chatMemberRedisRepository.findAllByDestination("/sub/chats/party/"+ partyId);
 
         // 암호화 알고리즘
-        StringEncryptor encryptor = jasyptUtil.customEncryptor(chatDto.getPassword());
-
+//        StringEncryptor encryptor = jasyptUtil.customEncryptor(chatDto.getPassword());
+//        System.out.println("채팅 보내기 sseKey : " + chatDto.getPassword());
         // 채팅 만들기
         Chat chat = Chat.customBuilder()
             .chatType(ChatType.CHAT)
-            .content(jasyptUtil.keyEncrypt(encryptor, chatDto.getContent()))
+//            .content(jasyptUtil.keyEncrypt(encryptor, chatDto.getContent()))
+            .content(chatDto.getContent())
             .member(member)
             .party(party)
             .build();
@@ -147,30 +150,27 @@ public class ChatServiceImpl implements ChatService{
 
         // JasyptCustomEncryptor
         StringEncryptor encryptor = jasyptUtil.customEncryptor(sseKey);
-
+        System.out.println(sseKey);
         Page<Chat> chatPage = chatRepository.findAllByPartyId(partyId, pageable);
 
-
-        List<SimpleChatDto> chatDtoList = chatPage.stream()
+        List<SimpleChatDto> chatDtoList = new ArrayList<>(chatPage.stream()
             .map(chat -> {
-                String content = encryptor.decrypt(chat.getContent());
-                chat.setContent(content);
-                List<Long> readMemberList = chat.getReadMember().stream()
+//                String contnet = jasyptUtil.keyDecrypt(encryptor, chat.getContent());
+//                chat.setContent(contnet);
+                List<Long> readMembers = chat.getReadMember().stream()
                     .map(Member::getId)
                     .toList();
-
-                if (!readMemberList.contains(memberId)) {
-                    List<Member> readmember = chat.getReadMember();
-                    readmember.add(member);
-                    chat.setReadMember(readmember);
+                if (!readMembers.contains(memberId)) {
+                    List<Member> readMemberList = chat.getReadMember();
+                    readMemberList.add(member);
+                    chat.setReadMember(readMemberList);
                     chatRepository.save(chat);
                 }
-
                 SimpleChatDto chatDto = chatMapper.toSimpleChatDto(chat);
-                chatDto.setReadNum(chat.getReadMember().size());
+                chatDto.setReadNum(memberPartyList.size() - chat.getReadMember().size());
                 return chatDto;
             })
-            .toList();
+            .toList());
 
         Collections.reverse(chatDtoList);
 
