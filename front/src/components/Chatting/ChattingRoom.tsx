@@ -4,11 +4,15 @@ import { useParams } from "react-router-dom";
 import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
 import { getPartyThumb } from "../../api/party";
+import { lastStore, loadingStore } from "../../stores/ChatStore";
+import LoadingGif from "../@commons/LoadingGif";
 
 const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
   const { groupPk } = useParams();
   const { groupKey } = useStore(userStore)
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { isLoading } = useStore(loadingStore)
+  const { isLast } = useStore(lastStore)
+
 
   const dateHandler = (dateInfo: string) => {
     const date = new Date(dateInfo)
@@ -54,6 +58,8 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
     )
   }
 
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
   // 채팅의 가장 마지막 메시지를 가장 처음 볼 수 있도록 구현
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -63,6 +69,9 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
 
   return (
     <div ref={chatContainerRef} className="flex flex-col w-full h-full overflow-scroll scrollbar-hide z-10">
+      <div id='observer' className="h-[30px] mb-2 w-full flex justify-center">
+        {(isLoading && !isLast) && <LoadingGif /> }
+      </div>
       { msgList.map((item, idx) => (
         item.chatType === 'ENTER' 
         ? 

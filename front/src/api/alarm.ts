@@ -26,7 +26,7 @@ export const redirectAlarm = async (
   redirectDto: redirectDtoType,
   Response : (Response : AxiosResponse<ResponseData>) => void, 
   Error : (Error : AxiosResponse<ResponseData>) => void) => {
-  await privateApi.get(`/${url}/redirect-user`, { params: redirectDto })
+  await privateApi.get(`/${url}/check-read`, { params: redirectDto })
   .then(Response)
   .catch(Error)
 }

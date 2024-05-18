@@ -4,9 +4,13 @@ import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
 import { getPartyThumb } from "../../api/party";
 import { redirectAlarm } from "../../api/alarm";
+import { useNavigate } from "react-router-dom";
+import { headerStore } from "../../stores/HeaderStateStore";
 
 const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
 	const { groupKey } = useStore(userStore);
+  const { setAlarmOpen } = useStore(headerStore)
+
 
   useEffect(() => {
     const opt = {
@@ -45,17 +49,18 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
     }
   }
 
+  const navigate = useNavigate()
+
   const clickHandler = () => {
     redirectAlarm(
       {
         alarmId: alarmItem.alarmId,
-        redirectUrl: alarmItem.identifier[0]
       },
-      (res) => {
-        console.log(res.data)
-      },
+      () => {},
       (err) => { console.error(err) }
     )
+    navigate(alarmItem.identifier)
+    setAlarmOpen()
   }
 
   const timeTransHandler = (registDateTime: string | null) => {

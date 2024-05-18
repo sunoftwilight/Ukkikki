@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-// import ChattingRoom from "../components/Chatting/ChattingRoom";
+import ChattingRoom from "../components/Chatting/ChattingRoom";
 import logo from '../../icons/512.png'
 import { ChatItemType } from "../types/ChatType";
 import { Client } from '@stomp/stompjs';
@@ -8,7 +8,7 @@ import { getMsg } from "../api/chat";
 import { userStore } from "../stores/UserStore";
 import { useStore } from "zustand";
 import { getPartyThumb } from "../api/party";
-import LoadingGif from "../components/@commons/LoadingGif";
+import { lastStore, loadingStore } from "../stores/ChatStore";
 
 const Chatting: React.FC = () => {
   const chatInput = useRef<HTMLInputElement>(null)
@@ -19,21 +19,6 @@ const Chatting: React.FC = () => {
   const { groupPk } = useParams();
   const { groupKey } = useStore(userStore)
 
-  // useEffect(() => {
-    // getMsg(
-    //   Number(groupPk),
-    //   {password: groupKey[Number(groupPk)]},
-    //   {
-    //     page: 0,
-    //     size: 15
-    //   },
-    //   (res) => {
-    //     setMessages(res.data.simpleChatDtos)
-    //   },
-    //   (err) => { console.error(err) }
-    // )
-  // }, [])
-  
   useEffect(() => {
     const stored = localStorage.getItem('USER_STORE');
 
@@ -95,8 +80,8 @@ const Chatting: React.FC = () => {
   
         if (obj.state.accessToken !== '') {
           const token = obj.state.accessToken
-
           client.publish({ destination: `/pub/message/${groupPk}`, body: jsonMessage, headers: { Authorization: token} });
+          // setIsFocus()
         }} else {
           console.error('웹소켓 연결 비활성화');
         }
@@ -119,27 +104,6 @@ const Chatting: React.FC = () => {
       messageHandler();
     }
   }
-
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  const dateHandler = (dateInfo: string) => {
-    const date = new Date(dateInfo)
-    
-    return date.toLocaleDateString('ko-KR', {
-      year: '2-digit',
-      month: '2-digit',
-      day: '2-digit',
-    }).replace(/\. /g, '.').replace(/\.$/, '');
-  } 
-
-  const timeHandler = (dateInfo: string) => {
-    const date = new Date(dateInfo)
-    
-    return date.toLocaleTimeString('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } 
 
   useEffect(() => {
     getImgHandler()
@@ -166,23 +130,14 @@ const Chatting: React.FC = () => {
     )
   }
 
-  // 채팅의 가장 마지막 메시지를 가장 처음 볼 수 있도록 구현
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-
   // 무한 스크롤
-  const [page, setPage] = useState<number>(1)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [isLast, setIsLast] = useState<boolean>(false)
+  const [page, setPage] = useState<number>(0)
+  const { isLoading, setIsLoading } = useStore(loadingStore)
+  const { isLast, setIsLast } = useStore(lastStore)
 
   // observer 컴포넌트 만나면 발생하는 콜백 함수 -> loading중 표시
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
     const target = entries[0];
-
     if (target.isIntersecting && !isLoading && !isLast) {
       setIsLoading(true)
     }
@@ -192,7 +147,7 @@ const Chatting: React.FC = () => {
   const observer = new IntersectionObserver(handleObserver, { threshold: 0 });
 
   useEffect(() => {
-    // 최하단 요소를 관찰 대상으로 지정함
+    // 최상단 요소를 관찰 대상으로 지정함
     const observerTarget = document.getElementById("observer");
     // 관찰 시작
     if (observerTarget) {
@@ -224,15 +179,16 @@ const Chatting: React.FC = () => {
     await getMsg(
       Number(groupPk),
       { password: groupKey[Number(groupPk)] },
-      { page: page, size: 15 },
+      { page: page, size: 100 },
       (res) => {
-        setMessages(res.data.simpleChatDtos)
+        setMessages([...res.data.simpleChatDtos, ...messages])
         if (res.data.next === false) {
           setIsLast(true)
         }
       },
       (err) => { console.error(err) }
     )
+    setIsLoading(false)
   }
 
   return (
@@ -241,38 +197,8 @@ const Chatting: React.FC = () => {
         <div className="fixed w-[calc(100%-32px)] h-full flex justify-center items-center">
           <img src={logo} className="w-48" />
         </div>
-        {/* <ChattingRoom msgList={messages} /> */}
-        <div ref={chatContainerRef} className="flex flex-col w-full h-full overflow-scroll scrollbar-hide z-10">
-          <div id='observer' className="h-[30px] mb-2 w-full flex justify-center">
-            {(isLoading && !isLast) && <LoadingGif /> }
-          </div>
-          { messages.map((item, idx) => (
-            item.chatType === 'ENTER' 
-            ? 
-            <div key={idx} className="w-full mb-[10px] rounded-[15px] py-2 bg-disabled-gray opacity-80 font-pre-R text-white text-sm flex justify-center items-center">
-              {item.memberName} 님이 참여했습니다.
-            </div>
-            : item.chatType === 'EXIT' ?
-            <div key={idx} className="w-full mb-[10px] rounded-[15px] py-2 bg-disabled-gray opacity-80 font-pre-R text-white text-sm flex justify-center items-center">
-              {item.memberName} 님이 퇴장했습니다.
-            </div>
-            :
-            <div key={idx} className="w-full mb-[10px] rounded-[15px] bg-soft-gray opacity-80 flex py-2 px-[10px] gap-[10px]">
-              <img src={item.profileUrl} className="rounded-full w-[50px] h-[50px]" />
-
-              <div className="flex flex-col w-[calc(100%-60px)] gap-2">
-                <div className="flex w-full justify-between items-center">
-                  <div className="flex gap-2 items-center mt-[2px]">
-                    <div className="font-pre-SB text-black text-xs">{item.memberName}</div>
-                    <div className="font-pre-L text-point-gray text-[10px]">{dateHandler(item.createDate)} &nbsp; {timeHandler(item.createDate)}</div>
-                  </div>
-
-                  <div className="font-pre-L text-point-gray text-[10px]">{item.readNum}명 읽음</div>
-                </div>
-                <div className="font-pre-L text-black text-sm">{item.content}</div>
-              </div>
-            </div>
-          ))}
+        <div className="flex flex-col w-full h-full overflow-scroll scrollbar-hide z-10">
+          <ChattingRoom msgList={messages} />
         </div>
       </div>
 

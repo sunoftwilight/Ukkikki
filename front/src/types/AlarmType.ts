@@ -17,7 +17,7 @@ export interface AlarmItemType {
   content: string;
   contentsId: string;
   createDate: string | null;
-  identifier: string[];
+  identifier: string;
   partyId: number;
   partyName: string;
   partyUrl: string;
@@ -39,5 +39,4 @@ export interface AlarmResponseType {
 
 export interface redirectDtoType {
   alarmId: string;
-  redirectUrl: string;
 }
