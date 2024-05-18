@@ -23,6 +23,9 @@ import project.domain.alarm.redis.AlarmType;
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
 import project.domain.chat.entity.Chat;
+import project.domain.chat.entity.ChatType;
+import project.domain.chat.redis.ChatMember;
+import project.domain.chat.repository.ChatMemberRedisRepository;
 import project.domain.chat.repository.ChatRepository;
 import project.domain.directory.repository.TrashBinRepository;
 import project.domain.directory.service.DirectoryService;
@@ -81,6 +84,7 @@ public class PartyServiceImpl implements PartyService {
     private final KeyGroupRepository keyGroupRepository;
     private final FaceRepository faceRepository;
     private final TrashBinRepository trashBinRepository;
+    private final ChatMemberRedisRepository chatMemberRedisRepository;
 
     private final PartyLinkMapper partyLinkMapper;
     private final ProfileMapper profileMapper;
@@ -403,6 +407,25 @@ public class PartyServiceImpl implements PartyService {
                     .build();
                 profileRepository.save(profile);
 
+                // 입장 멤버 채팅 전송
+                Chat chat = Chat.builder()
+                    .chatType(ChatType.ENTER)
+                    .userName(profile.getNickname())
+                    .content(profile.getNickname() + " 님이 입장하셨습니다")
+                    .profile(profile)
+                    .party(party)
+                    .member(member)
+                    .build();
+                Chat saveChat = chatRepository.save(chat);
+
+                //TODO 채팅 입장 만드는중
+                // 현재 읽은 사람 목록 넣기 
+                List<ChatMember> chatMemberList = chatMemberRedisRepository.findAllByDestination("/sub/chats/party/"+ partyId);
+                for (ChatMember chatMember : chatMemberList) {
+                    memberRepository.findById(chatMember.getMemberId())
+                        .ifPresent(member1 -> {saveChat.getReadMember().add(member1);});
+                }
+                
                 return MemberParty.customBuilder()
                     .party(party)
                     .member(member)
