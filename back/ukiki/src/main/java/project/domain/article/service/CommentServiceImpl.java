@@ -164,7 +164,7 @@ public class CommentServiceImpl implements CommentService{
                 tagAlarm.setWriterNick(tagNick);
                 tagAlarm.setAlarmType(AlarmType.MENTION);
                 alarmRedisRepository.save(tagAlarm);
-                SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverId);
+                SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverPk);
                 alarmService.sendAlarm(tagEmitter, receiverPk, tagAlarm);
             }
         }
@@ -317,7 +317,7 @@ public class CommentServiceImpl implements CommentService{
                 tagAlarm.setWriterNick(tagNick);
                 tagAlarm.setAlarmType(AlarmType.MENTION);
                 alarmRedisRepository.save(tagAlarm);
-                SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverId);
+                SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverPk);
                 alarmService.sendAlarm(tagEmitter, receiverPk, tagAlarm);
             }
         }
