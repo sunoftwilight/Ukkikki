@@ -146,7 +146,7 @@ public class CommentServiceImpl implements CommentService{
         if(!newComment.getTag().isEmpty()){
             for (CommentCollection.tag tag : newComment.getTag()) {
                 Long receiverPk = tag.getUserId();
-                String tagNick = tag.getUserName();
+                String tagNick = profile.getNickname();
                 memberRepository.findById(receiverPk)
                      .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
                 memberpartyRepository.findByMemberIdAndPartyId(receiverPk, alarm.getPartyId())
@@ -159,6 +159,7 @@ public class CommentServiceImpl implements CommentService{
                     });
                 Alarm tagAlarm = new Alarm(alarm, receiverPk);
                 tagAlarm.setWriterNick(tagNick);
+                tagAlarm.setAlarmType(AlarmType.MENTION);
                 alarmRedisRepository.save(tagAlarm);
                 SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverId);
                 alarmService.sendAlarm(tagEmitter, receiverPk, tagAlarm);
@@ -296,7 +297,7 @@ public class CommentServiceImpl implements CommentService{
         if(!newReply.getTag().isEmpty()){
             for (CommentCollection.tag tag : newReply.getTag()) {
                 Long receiverPk = tag.getUserId();
-                String tagNick = tag.getUserName();
+                String tagNick = profile.getNickname();
                 memberRepository.findById(receiverPk)
                     .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
                 memberpartyRepository.findByMemberIdAndPartyId(receiverPk, alarm.getPartyId())
@@ -309,6 +310,7 @@ public class CommentServiceImpl implements CommentService{
                     });
                 Alarm tagAlarm = new Alarm(alarm, receiverPk);
                 tagAlarm.setWriterNick(tagNick);
+                tagAlarm.setAlarmType(AlarmType.REPLY);
                 alarmRedisRepository.save(tagAlarm);
                 SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverId);
                 alarmService.sendAlarm(tagEmitter, receiverPk, tagAlarm);
