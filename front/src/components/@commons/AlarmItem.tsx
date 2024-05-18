@@ -58,7 +58,11 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
     )
   }
 
-  const timeTransHandler = (registDateTime: string) => {
+  const timeTransHandler = (registDateTime: string | null) => {
+    if (!registDateTime) {
+      return "";
+    }
+    
     const commentDateTime = new Date(registDateTime);  // 댓글 작성 시간
     const currentTime = new Date();                    // 현재 시간
     const difference = currentTime.getTime() - commentDateTime.getTime();    // 두 시간의 차

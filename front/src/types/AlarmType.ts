@@ -16,7 +16,7 @@ export interface AlarmItemType {
   alarmType: string;
   content: string;
   contentsId: string;
-  createDate: string;
+  createDate: string | null;
   identifier: string[];
   partyId: number;
   partyName: string;
