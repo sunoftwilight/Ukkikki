@@ -104,7 +104,7 @@ public class ChatServiceImpl implements ChatService{
         // 채팅 만들기
         Chat chat = Chat.customBuilder()
             .chatType(ChatType.CHAT)
-            .content(jasyptUtil.keyEncrypt(encryptor, chatDto.getContent()))
+            .content(encryptor.decrypt(chatDto.getContent()))
 //            .content(chatDto.getContent())
             .member(member)
             .party(party)
