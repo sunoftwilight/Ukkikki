@@ -99,13 +99,13 @@ public class ChatServiceImpl implements ChatService{
         List<ChatMember> chatMemberList = chatMemberRedisRepository.findAllByDestination("/sub/chats/party/"+ partyId);
 
         // 암호화 알고리즘
-//        StringEncryptor encryptor = jasyptUtil.customEncryptor(chatDto.getPassword());
+        StringEncryptor encryptor = jasyptUtil.getPartyEncryptor(partyId, chatDto.getPassword());
 //        System.out.println("채팅 보내기 sseKey : " + chatDto.getPassword());
         // 채팅 만들기
         Chat chat = Chat.customBuilder()
             .chatType(ChatType.CHAT)
-//            .content(jasyptUtil.keyEncrypt(encryptor, chatDto.getContent()))
-            .content(chatDto.getContent())
+            .content(jasyptUtil.keyEncrypt(encryptor, chatDto.getContent()))
+//            .content(chatDto.getContent())
             .member(member)
             .party(party)
             .build();
@@ -121,7 +121,7 @@ public class ChatServiceImpl implements ChatService{
 
         SimpleChatDto simpleChatDto = chatMapper.toSimpleChatDto(chat);
         simpleChatDto.setContent(chatDto.getContent());
-        simpleChatDto.setReadNum(chat.getReadMember().size());
+        simpleChatDto.setReadNum(memberPartyList.size() - chat.getReadMember().size());
 
         ResponseEntity<ResultResponse> res = ResponseEntity.ok(
             new ResultResponse(ResultCode.CHAT_SEND_SUCCESS, simpleChatDto));
@@ -149,14 +149,14 @@ public class ChatServiceImpl implements ChatService{
 
 
         // JasyptCustomEncryptor
-        StringEncryptor encryptor = jasyptUtil.customEncryptor(sseKey);
-        System.out.println(sseKey);
+        StringEncryptor encryptor = jasyptUtil.getPartyEncryptor(partyId, sseKey);
+//        System.out.println(sseKey);
         Page<Chat> chatPage = chatRepository.findAllByPartyId(partyId, pageable);
 
         List<SimpleChatDto> chatDtoList = new ArrayList<>(chatPage.stream()
             .map(chat -> {
-//                String contnet = jasyptUtil.keyDecrypt(encryptor, chat.getContent());
-//                chat.setContent(contnet);
+                String contnet = jasyptUtil.keyDecrypt(encryptor, chat.getContent());
+                chat.setContent(contnet);
                 List<Long> readMembers = chat.getReadMember().stream()
                     .map(Member::getId)
                     .toList();

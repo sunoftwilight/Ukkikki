@@ -4,13 +4,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
+import org.jasypt.salt.FixedStringSaltGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import project.global.config.JasyptConfig;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 @Slf4j
 public class JasyptUtil {
+
+    private Map<Long, StringEncryptor> partyEncryptor = new HashMap<>();
 
     @Autowired
     private StringEncryptor jasyptStringEncryptor;
@@ -50,5 +56,15 @@ public class JasyptUtil {
     // 암호화 알고리즘을 같이 넣으면 복호화 시켜준다.
     public String keyDecrypt(StringEncryptor keyEncryptor, String text){
         return keyEncryptor.decrypt(text);
+    }
+
+    public StringEncryptor getPartyEncryptor(Long partyId, String partyKey){
+        StringEncryptor encryptor = partyEncryptor.getOrDefault(partyId, null);
+        if(encryptor == null){
+            StringEncryptor customEncryptor = customEncryptor(partyKey);
+            partyEncryptor.put(partyId, customEncryptor);
+            return customEncryptor;
+        }
+        return encryptor;
     }
 }
