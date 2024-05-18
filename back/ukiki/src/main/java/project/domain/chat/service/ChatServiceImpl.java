@@ -162,7 +162,7 @@ public class ChatServiceImpl implements ChatService{
         List<SimpleChatDto> chatDtoList = new ArrayList<>(chatPage.stream()
             .map(chat -> {
                 String contnet = jasyptUtil.keyDecrypt(encryptor, chat.getContent());
-                chat.setContent(contnet);
+
                 List<Long> readMembers = chat.getReadMember().stream()
                     .map(Member::getId)
                     .toList();
@@ -173,6 +173,7 @@ public class ChatServiceImpl implements ChatService{
                     chatRepository.save(chat);
                 }
                 SimpleChatDto chatDto = chatMapper.toSimpleChatDto(chat);
+                chatDto.setContent(contnet);
                 chatDto.setReadNum(memberPartyList.size() - chat.getReadMember().size());
                 return chatDto;
             })
