@@ -121,14 +121,27 @@ public class ArticleServiceImpl implements ArticleService{
                 .build());
 
         // Device 사진 추가하기
+        List<String> deviceFileList = new ArrayList<>();
         if(multipartFiles != null){
-            fileUploadDownloadService.uploadProcess(multipartFiles, FileUploadDto.builder()
+            deviceFileList = fileUploadDownloadService.uploadProcess(multipartFiles, FileUploadDto.builder()
                 .partyId(partyId).key(articleCreateDto.getPassword()).build());
         }
 
         // 게시판 사진 리스트
         List<ArticlePhoto> articlePhotoList = new ArrayList<>();
-
+        for (String filePk : deviceFileList) {
+            // 파일 찾기
+            File file = fileRepository.findById(filePk)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+            // 파일로 사진 찾기
+            Photo photo = photoRepository.findById(file.getPhotoDto().getId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
+            // ArticlePhoto 생성
+            ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
+            // 저장
+            ArticlePhoto saveArticlePhoto = articlePhotoRepository.save(articlePhoto);
+            articlePhotoList.add(saveArticlePhoto);
+        }
         for (String filePk : articleCreateDto.getPhotoIdList()) {
             // 파일 찾기
             File file = fileRepository.findById(filePk)
@@ -139,7 +152,8 @@ public class ArticleServiceImpl implements ArticleService{
             // ArticlePhoto 생성
             ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
             // 저장
-            articlePhotoRepository.save(articlePhoto);
+            ArticlePhoto saveArticlePhoto = articlePhotoRepository.save(articlePhoto);
+            articlePhotoList.add(saveArticlePhoto);
         }
 
         articleRepository.save(article);
