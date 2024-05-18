@@ -9,11 +9,10 @@ import { userStore } from "../../stores/UserStore";
 
 
 const GroupProfile: React.FC = () => { 
-  const { setMemberOpen } = memberStore()
+  const { setMembers, setMemberOpen } = memberStore()
   const { groupKey } = userStore();
   const { groupPk } = useParams();
   const [groupInfo, setGroupInfo] = useState<PartyDetailData>({partyMembers: [], partyName: '', rootDirId: '', thumbnail: ''})
-
   useEffect(() => {
     getDetail()
   }, [])
@@ -33,6 +32,7 @@ const GroupProfile: React.FC = () => {
         partyName: data.partyName,
         rootDirId: data.rootDirId,
         thumbnail: data.thumbnail})
+      setMembers(data.partyMembers)
     },
     (err) => {
       console.error(err)

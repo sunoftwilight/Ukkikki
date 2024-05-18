@@ -1,12 +1,12 @@
 import React from "react";
-import CreateWrite from "../components/Write/CreateWrite";
+import CreateArticle from "../components/Write/CreateArticle";
 
 
 const Write: React.FC = () => {
 
   return (
     <div className="w-screen h-[calc(100vh-60px)]">
-      <CreateWrite />
+      <CreateArticle />
     </div>
   )
 };

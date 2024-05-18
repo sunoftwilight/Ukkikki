@@ -1,3 +1,5 @@
+import { MemberData } from "../GroupType";
+
 export interface InviteStoreType {
   inviteOpen : boolean;
   inviteCode : string;
@@ -7,7 +9,9 @@ export interface InviteStoreType {
 
 export interface MemberStoreType {
   memberOpen : boolean;
+  members: MemberData[]
   setMemberOpen: () => void;
+  setMembers: (data: MemberData[]) => void;
 }
 
 export interface FolderStoreType {

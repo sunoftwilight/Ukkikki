@@ -11,8 +11,7 @@ const Content: React.FC = () => {
   const navigate = useNavigate()
   const { groupPk, feedPk } = useParams();
   const [articleInfo, setArticleInfo] = useState<ArticleProps>();
-  const keys = useStore(userStore).groupKey
-
+  const {groupKey, userName} = useStore(userStore)
   const goImgDetailHandler = (imgPk:number) => {
     navigate(`/feed/${groupPk}/${feedPk}/${imgPk}`)
   }
@@ -42,7 +41,7 @@ const Content: React.FC = () => {
   }
 
   const getImg = async (pk: number, url: string) => {
-		const key = keys[pk]
+		const key = groupKey[pk]
     const opt = {
       "x-amz-server-side-encryption-customer-key": key,
     };
@@ -66,7 +65,7 @@ const Content: React.FC = () => {
         console.log(err)
       }
     )
-  } 
+  }
 
   return (
     <div className="flex flex-col w-full bg-white gap-1">
@@ -78,8 +77,12 @@ const Content: React.FC = () => {
           <div className="w-full flex justify-between items-center">
             <div className="font-pre-SB text-black text-base">{articleInfo?.writer}</div>
             <div className="flex gap-2">
-              <img src={editBtn} className="w-[20px]" />
-              <img src={deleteBtn} className="w-[16px]" onClick={() => sendDeleteArticle()} />
+              {(articleInfo?.writer === userName) && (
+                <>
+                  <img src={editBtn} className="w-[20px]" onClick={() => {navigate(`/modify/${groupPk}/${feedPk}`)}}/>
+                  <img src={deleteBtn} className="w-[16px]" onClick={() => sendDeleteArticle()} />
+                </>
+              )}
             </div>
           </div>
 

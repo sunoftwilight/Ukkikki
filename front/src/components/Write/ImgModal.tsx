@@ -28,7 +28,6 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
     getPartyImg()
   }, [])
 
-
   const getPartyImg = async () => {
     const pk = Number(groupPk)
     await getPartyDetail(pk,
@@ -57,7 +56,6 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
             name: item.name
           }
         })
-
         data.forEach((item) => {
           getImg(item.url)
         })
@@ -83,6 +81,8 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
   }
 
   const itemClickHandler = (data: ImgListProps) => {
+    console.log(data)
+    console.log(albumList)
     data.isSelect = !data.isSelect
     setSelectImgList((prevList) => {
       const index = prevList.findIndex((item) => item.photoId === data.pk);
@@ -116,7 +116,6 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
           <>
             <ModalBackground/>
             <motion.div 
-              key='ImgModal'
               className="flex justify-center items-center w-full h-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -124,10 +123,10 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
             >
               <div className="z-20 w-11/12 h-4/6 bg-white rounded-[15px] p-1 py-5 flex flex-wrap content-between border border-disabled-gray drop-shadow-2xl">
                 
-                <div key='imgModal' className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide">
+                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide">
                   { parentDirId!= '' && 
                     <div
-                      key={'folder'}
+                      key={parentDirId}
                       onClick={() => dirHandler(parentDirId, parentDirName)}
                       className="flex flex-col justify-center items-center gap-1"
                     >

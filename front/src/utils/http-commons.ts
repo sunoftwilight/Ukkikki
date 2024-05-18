@@ -9,12 +9,14 @@ const baseURL: string = "https://k10d202.p.ssafy.io/api";
 
 // 새 토큰 저장
 const newAccess = (header:string) => {
+
   const stored = localStorage.getItem('USER_STORE');
   if (stored) {
     const obj = JSON.parse(stored)
-    obj.state.access = header;
+    obj.state.accessToken = header;
     localStorage.setItem('USER_STORE', JSON.stringify(obj));
   }
+  
 }
 
 
@@ -75,8 +77,10 @@ export const formDataApi: AxiosInstance = axios.create({
 });
 
 
+// privateInterceptors
 privateApi.interceptors.request.use(
   (config) => {
+    console.log('here')
 		const stored = localStorage.getItem('USER_STORE');
 		if (stored){
 			const obj = JSON.parse(stored)
@@ -86,35 +90,44 @@ privateApi.interceptors.request.use(
 		}
     return config;
   },
-  async (error) => {
-    const { config, response: { status }, } = error;
-    // 토큰 만료일 경우.
-    if (status === 401) {
-      if (error.response.data.message === 'access token expired') {
-        const originRequest = config;
-        // 토큰 재발급.
-        await tokenRefresh(
-          (res) => {
-            // 성공 시
-            if (res.status === httpStatusCode.OK && res.headers.access) {
-              newAccess(res.headers.access)
-              axios.defaults.headers.access = `${res.headers.access}`;
-              originRequest.headers.access = `${res.headers.access}`;
-              // 토큰 교환 후 재 시도.
-              return axios(originRequest);
-            }
-          },
-          () => {
+  (error) => {
+    return error
+  }
+);
+
+privateApi.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    const { config, response: { status, data }, } = error;
+    if(status === 401 && data === "access token expired") {
+      const originRequest = config;
+      tokenRefresh(
+        (res) => {
+          // 성공 시
+          if (res.status === httpStatusCode.OK && res.headers.authorization) {
             
+            newAccess(res.headers.authorization)
+            console.log('doit')
+            axios.defaults.headers.authorization = `${res.headers.authorization}`;
+            originRequest.headers.authorization = `${res.headers.authorization}`;
+
+            // 토큰 교환 후 재 시도.
+            return axios(originRequest);
           }
-        )
-      }
+        },
+        () => {
+        }
+      )
     }
   }
 );
 
+// formDataInterceptors
 formDataApi.interceptors.request.use(
   (config) => {
+    console.log('here')
 		const stored = localStorage.getItem('USER_STORE');
 		if (stored){
 			const obj = JSON.parse(stored)
@@ -124,29 +137,36 @@ formDataApi.interceptors.request.use(
 		}
     return config;
   },
-  async (error) => {
-    const { config, response: { status }, } = error;
-    // 토큰 만료일 경우.
-    if (status === 401) {
-      if (error.response.data.message === 'access token expired') {
-        const originRequest = config;
-        // 토큰 재발급.
-        await tokenRefresh(
-          (res) => {
-            // 성공 시
-            if (res.status === httpStatusCode.OK && res.headers.access) {
-              newAccess(res.headers.access)
-              axios.defaults.headers.access = `${res.headers.access}`;
-              originRequest.headers.access = `${res.headers.access}`;
-              // 토큰 교환 후 재 시도.
-              return axios(originRequest);
-            }
-          },
-          () => {
+  (error) => {
+    return error
+  }
+);
+
+formDataApi.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    const { config, response: { status, data }, } = error;
+    if(status === 401 && data === "access token expired") {
+      const originRequest = config;
+      tokenRefresh(
+        (res) => {
+          // 성공 시
+          if (res.status === httpStatusCode.OK && res.headers.authorization) {
             
+            newAccess(res.headers.authorization)
+            console.log('doit')
+            axios.defaults.headers.authorization = `${res.headers.authorization}`;
+            originRequest.headers.authorization = `${res.headers.authorization}`;
+
+            // 토큰 교환 후 재 시도.
+            return axios(originRequest);
           }
-        )
-      }
+        },
+        () => {
+        }
+      )
     }
   }
 );

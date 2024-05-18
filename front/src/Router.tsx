@@ -22,9 +22,11 @@ import GroupPass from './pages/GroupConfig/GroupPass';
 
 import Setting from './pages/Setting';
 import Album from './pages/Album';
+import ImgGroup from './pages/ImgGroup';
 import Feed from './pages/Feed';
 import DetailImg from './pages/DetailImg';
-import Write from './pages/Write';
+import ArticleCreate from './pages/ArticleCreate';
+import ArticleModify from './pages/ArticleModify';
 import Chatting from './pages/Chatting';
 import ArticleDetail from './pages/ArticleDetail';
 import ArticleImg from './pages/ArticleImg';
@@ -80,10 +82,11 @@ export default function Router() {
 
         <Route path="/setting" element={<Setting />} />
         <Route path="/album/:groupPk" element={<Album />} />
+        <Route path="/imagegroup/:groupPk" element={<ImgGroup />} />
         <Route path={`album/detail/${currentImg}/:groupPk`} element={<DetailImg />} />
         <Route path="/feed/:groupPk" element={<Feed />} />
-        <Route path="/feed/:groupPk/:feedPk" element={<ArticleDetail />} />
-        <Route path="/feed/:groupPk/:feedPk/:imgPk" element={<ArticleImg />} />
+        <Route path="/feed/:groupPk/detail/:feedPk" element={<ArticleDetail />} />
+        <Route path="/feed/:groupPk/detail/:feedPk/:imgPk" element={<ArticleImg />} />
         <Route path="/chat/:groupPk" element={<Chatting />} />
         <Route path="/trash/:groupPk" element={<Trash />} />
       </Route>
@@ -94,7 +97,8 @@ export default function Router() {
       <Route path="/camera" element={<Camera />} />
       <Route path='/simpleinsert' element={<SimplePass type='insert'/>}/>
       <Route path='/simplecheck' element={<SimplePass type='check'/>}/>
-      <Route path="/write/:groupPk" element={<Write />} />
+      <Route path="/write/:groupPk" element={<ArticleCreate />} />
+      <Route path="/modify/:groupPk/:feedPk" element={<ArticleModify />} />
       <Route path='/error' element={<ErrorRedirect />}/>
     </Routes>
   );

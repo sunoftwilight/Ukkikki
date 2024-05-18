@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { InviteStoreType, MemberStoreType, FolderStoreType } from '../types/StoreType/ModalStoreType'
+import { MemberData } from '../types/GroupType'
 
 export const inviteStore = create(
   persist<InviteStoreType>((set) => ({
@@ -16,8 +17,9 @@ export const inviteStore = create(
 export const memberStore = create(
   persist<MemberStoreType>((set) => ({
     memberOpen: false,
-
-    setMemberOpen: () => set((state) => ({memberOpen: !state.memberOpen}))
+    members: [],
+    setMemberOpen: () => set((state) => ({memberOpen: !state.memberOpen})),
+    setMembers: (newData: MemberData[]) => set(() => ({members: newData}))
   }),
   { name: 'MODAL_STORE'}
 ))

@@ -30,3 +30,10 @@ export interface UpdateAlbumStoreType {
   needUpdate: boolean;
   setNeedUpdate: () => void;
 }
+
+export interface ImgGroupStoreType {
+  type: number;
+  groupName: string;
+  setType: (newType: number) => void;
+  setGroupName: (newName: string) => void;
+}

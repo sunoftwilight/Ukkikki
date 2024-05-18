@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 const UserBtn: React.FC = () => {
 	const memberInfo = useStore(memberInfoStore)
 	const navi = useNavigate()
+	
 	const clickKickBtn = async () => {
 		if (!memberInfo.data) return;
 		await kickPartyUser(memberInfo.data?.partyId, memberInfo.data?.userId,

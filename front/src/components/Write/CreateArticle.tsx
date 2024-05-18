@@ -8,7 +8,7 @@ import back from "@/assets/Header/back.png"
 import { motion, AnimatePresence } from "framer-motion"
 import ImgModal from "./ImgModal";
 
-const WriteMain: React.FC = () => {
+const CreateArticle: React.FC = () => {
 
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -53,6 +53,7 @@ const WriteMain: React.FC = () => {
 
     addDeviceList.forEach((file) => { // 변경 3: URL 대신 실제 파일을 FormData에 추가
       formData.append(`multipartFiles`, file, file.name);
+      console.log(file)
     });
 
 
@@ -77,6 +78,7 @@ const WriteMain: React.FC = () => {
           updatedList.push(item);
         }
       });
+      console.log(updatedList)
       return updatedList;
     });
   }, [addDeviceList, addAlbumList])
@@ -149,4 +151,4 @@ const WriteMain: React.FC = () => {
   )
 };
 
-export default WriteMain;
+export default CreateArticle;

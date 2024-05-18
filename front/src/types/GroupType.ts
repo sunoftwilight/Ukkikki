@@ -66,6 +66,12 @@ export interface UserGrantData {
   memberRole: string;
 }
 
+export interface ImgGroupListData {
+  type: number;
+  groupName: string;
+  thumbnailUrl: string;
+}
+
 // API
 export interface CreateDoenResponesData{
   resultCode: string;
@@ -110,4 +116,14 @@ export interface PartyUserListRespones {
 export interface PartyPassChangeResponse {
   resultCode: string;
   data: GroupKey;
+}
+
+export interface ImgGroupListResponse {
+  resultCode: string;
+  data: ImgGroupListData[];
+}
+
+export interface ImgGroupResponse {
+  resultCode: string;
+  data: {photoId:number, photoUrl:string, thumbnailUrl:string}[];
 }
