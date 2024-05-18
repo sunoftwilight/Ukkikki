@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { ChattingRoomProps } from "../../types/ChatType";
 import { useParams } from "react-router-dom";
 import { useStore } from "zustand";
@@ -53,6 +53,12 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
     )
   }
   
+  const scrollRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    scrollRef.current!.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   return (
     <div className="flex flex-col w-full h-full overflow-scroll scrollbar-hide z-10">
       { msgList.map((item, idx) => (

@@ -2,22 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import ChattingRoom from "../components/Chatting/ChattingRoom";
 import logo from '../../icons/512.png'
 import { ChatItemType } from "../types/ChatType";
-import { Client, StompHeaders } from '@stomp/stompjs';
+import { Client } from '@stomp/stompjs';
 import { useParams } from "react-router-dom";
 import { getMsg } from "../api/chat";
 import { userStore } from "../stores/UserStore";
 import { useStore } from "zustand";
 
-// 웹소켓 참고자료
-// https://velog.io/@caecus/Project-Hobbyt-WebSocket-%EA%B3%BC-stomp-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-%EC%95%8C%EB%A6%BC-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%B1%84%ED%8C%85-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0
-
 const Chatting: React.FC = () => {
   const chatInput = useRef<HTMLInputElement>(null)
   const [chat, setChat] = useState('')
   const [messages, setMessages] = useState<ChatItemType[]>([]);
-
   const [client, setClient] = useState<Client | null>(null)
-  const [isConnected, setIsConnected] = useState(false);  // 연결 상태를 추적
 
   const { groupPk } = useParams();
   const { groupKey } = useStore(userStore)
@@ -46,47 +41,32 @@ const Chatting: React.FC = () => {
 
       if (obj.state.accessToken !== '') {
         const token = obj.state.accessToken
-        
-        // 웹소켓 연결
-        const newClient = new Client({
+
+        // WebSocket 연결 설정
+        const connectionOptions = {
           // brokerURL: 'wss://k10d202.p.ssafy.io/api/ws',
           brokerURL: 'ws://localhost:5000/api/ws',
-          // reconnectDelay: 5000,
-          // heartbeatIncoming: 4000,
-          // heartbeatOutgoing: 4000,
-        // });
-
-        // newClient.configure({
-          // brokerURL: 'wss://k10d202.p.ssafy.io/api/ws',
+          connectHeaders: {
+            Authorization: token
+          }, // 연결 시 헤더 설정
 
           onConnect: () => {
-            setIsConnected(true);
-
-            const headers: StompHeaders = {
-              authorization: 'Bearer ' + token
-            };
-
             newClient.subscribe(
               `/sub/chats/party/${groupPk}`,
               message => {
                 const parsedMessage = JSON.parse(message.body);
-                setMessages(prevChatLogs => [...prevChatLogs, parsedMessage.body.data]);
+                setMessages(prev => [...prev, parsedMessage]);
               },
-              headers,
             );
           },
-    
-          onDisconnect: () => {
-            setIsConnected(false);
 
-            console.log('웹소켓 연결 종료');
-          },
+          onDisconnect: () => {}
+        };
+        
+        // 웹소켓 연결
+        const newClient = new Client();
 
-          onStompError: (frame) => {
-            console.error('Broker reported error: ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
-          }
-        });
+        newClient.configure(connectionOptions);
     
         // 웹소켓 세션 활성화
         newClient.activate();
@@ -100,22 +80,26 @@ const Chatting: React.FC = () => {
   }, [groupPk]);
 
   const sendMessage = (message: string) => {
-
     if (client !== null) {
       const newMessage = {
         content: message,
         password: groupKey[Number(groupPk)]
       };
-
+      
+      const stored = localStorage.getItem('USER_STORE');
       const jsonMessage = JSON.stringify(newMessage);
 
-      client.publish({ destination: `/pub/message/${groupPk}`, body: jsonMessage });
+      if (stored) {
+        const obj = JSON.parse(stored);
+  
+        if (obj.state.accessToken !== '') {
+          const token = obj.state.accessToken
 
-      console.log('메세지보내기')
-    } else {
-      console.error('웹소켓 연결 비활성화');
-      console.error(client);
-    }
+          client.publish({ destination: `/pub/message/${groupPk}`, body: jsonMessage, headers: { Authorization: token} });
+        }} else {
+          console.error('웹소켓 연결 비활성화');
+        }
+      }
   };
   
   const messageHandler = () => {
