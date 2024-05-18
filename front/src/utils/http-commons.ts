@@ -24,7 +24,8 @@ export const imgApi: AxiosInstance = axios.create({
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
     'x-amz-server-side-encryption-customer-algorithm' : 'AES256'
-  }
+  },
+  responseType: 'blob'
 });
 
 // token이 필요 없는 api
