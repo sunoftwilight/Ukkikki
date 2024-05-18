@@ -19,7 +19,6 @@ const Hamburger: React.FC = () => {
 
 	const menuList = [
 		{ name: "카메라", router: "/camera" },
-		{ name: "마이 앨범", router: "/mypage" },
 		{ name: "참여 중인 그룹", router: "/grouplist" },
 		{ name: "설정", router: "/setting" },
 	];

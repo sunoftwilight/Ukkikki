@@ -12,21 +12,26 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
   const { setAlarmOpen } = useStore(headerStore)
 
   const [blobUrl, setBlobURl] = useState('')
-
-  useEffect(() => {
-    const opt = {
-			"x-amz-server-side-encryption-customer-key": groupKey[Number(alarmItem.partyId)],
-		};
-		getPartyThumb(
-			alarmItem.partyUrl,
-			opt,
-			(res) => {
+  
+  const opt = {
+    "x-amz-server-side-encryption-customer-key": groupKey[Number(alarmItem.partyId)],
+  };
+  const getImgHandler = async () => {
+    await getPartyThumb(
+      alarmItem.partyUrl,
+      opt,
+      (res) => {
+        console.log(alarmItem)
         const blob = new Blob([res.data], {type: 'image/png'})
         setBlobURl(URL.createObjectURL(blob))
+        console.log(blob)
       },
-			(err) => { console.log(err); },
-		);
-  }, [alarmItem])
+      (err) => { console.log(err); },
+    );
+  }
+  useEffect(() => {
+    getImgHandler()
+  }, [])
 
   const alarmTypeHandler = () => {
     switch (alarmItem.alarmType) {
