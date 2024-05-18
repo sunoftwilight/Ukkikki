@@ -32,7 +32,7 @@ export const getPartyList = async (
 export const getPartyThumb = async (
 	thumbUrl: string,
 	headerOpt: Record<string,string>,
-	Response: (Response: AxiosResponse<BlobPart>) => void,
+	Response: (Response: AxiosResponse<ResponseData>) => void,
 	Error: (Error: AxiosResponse<ResponseData>) => void) => {
 		await imgApi.get(`${thumbUrl}`,{headers: {...headerOpt}})
 		.then(Response)

@@ -10,7 +10,6 @@ import { currentDirStore, selectModeStore, updateAlbumStore } from "../../stores
 import SelectModeImg from "./SelectModeImg";
 import { getDirectory } from "../../api/directory";
 import { contentListData } from "../../types/AlbumType";
-// import SecureImg from "./SecureImg";
 import { getPartyDetail } from "../../api/party";
 import SecureImg from "./SecureImg";
 
@@ -74,23 +73,6 @@ const AlbumMain: React.FC = () => {
     setCurrentDirName(name)
   }
 
-  // const { groupKey } = useStore(userStore);
-
-  // const opt = {
-  //   "x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
-  // };
-
-  // const getImgHandler = (url: string) => {
-  //     getPartyThumb(
-  //     url,
-  //     opt,
-  //     () => {},
-  //     (err) => { console.error(err) },
-
-  //   );
-  //   return <img src={url} className="w-[106px] h-[90px] object-cover rounded-lg" />
-  // }
-
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
@@ -132,7 +114,6 @@ const AlbumMain: React.FC = () => {
                     </div>
                     : <></>
                   }
-                  {/* {getImgHandler(item.url)} */}
                   <SecureImg url={item.url} />
                 </div>
               </Link>
