@@ -31,15 +31,13 @@ const GroupProfile: React.FC = () => {
         partyMembers: data.partyMembers,
         partyName: data.partyName,
         rootDirId: data.rootDirId,
-        thumbnail: blobUrl})
+        thumbnail: data.thumbnail})
       setMembers(data.partyMembers)
     },
     (err) => {
       console.error(err)
     })
   }
-
-  const [blobUrl, setBlobURl] = useState('')
 
   const getImg = async (url: string, key: string) => {
 		const opt = {
@@ -48,10 +46,7 @@ const GroupProfile: React.FC = () => {
 		await getPartyThumb(
 			url,
 			opt,
-      (res) => {
-        const blob = new Blob([res.data], {type: 'image/png'})
-        setBlobURl(URL.createObjectURL(blob))
-      },
+      () => {},
 			(err) => { console.log(err); },
 		);
 	};
