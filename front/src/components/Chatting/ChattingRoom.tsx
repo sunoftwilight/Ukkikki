@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ChattingRoomProps } from "../../types/ChatType";
 import { useParams } from "react-router-dom";
 import { useStore } from "zustand";
@@ -45,6 +45,8 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
     })
   }
 
+  const [blobUrl, setBlobURl] = useState('')
+
   const toS3Handler = async (url: string) => {
     const opt = {
       "x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
@@ -53,7 +55,10 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
     await getPartyThumb(
       url,
       opt,
-      () => {},
+      (res) => {
+        const blob = new Blob([res.data], {type: 'image/png'})
+        setBlobURl(URL.createObjectURL(blob))
+      },
       (err) => { console.error(err) }
     )
   }
@@ -84,7 +89,7 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
         </div>
         :
         <div key={idx} className="w-full mb-[10px] rounded-[15px] bg-soft-gray opacity-80 flex py-2 px-[10px] gap-[10px]">
-          <img src={item.profileUrl} className="rounded-full w-[50px] h-[50px]" />
+          <img src={blobUrl} className="rounded-full w-[50px] h-[50px]" />
 
           <div className="flex flex-col w-[calc(100%-60px)] gap-2">
             <div className="flex w-full justify-between items-center">

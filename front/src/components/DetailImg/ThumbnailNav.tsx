@@ -29,6 +29,8 @@ const ThumbnailNav: React.FC = () => {
     )
   }, [])
 
+  const [blobUrl, setBlobURl] = useState('')
+
   const getImg = async (url: string, key: string) => {
 		const opt = {
 			"x-amz-server-side-encryption-customer-key": key,
@@ -36,7 +38,10 @@ const ThumbnailNav: React.FC = () => {
 		await getPartyThumb(
 			url,
 			opt,
-			() => {},
+      (res) => {
+        const blob = new Blob([res.data], {type: 'image/png'})
+        setBlobURl(URL.createObjectURL(blob))
+      },
 			(err) => { console.log(err) },
 		);
 	};
@@ -46,7 +51,7 @@ const ThumbnailNav: React.FC = () => {
       { thumbnailList.map((item, idx) => (
         <Link to={`/album/detail/${item.pk}/${groupPk}`} key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.thumbUrl2)}>
           <img 
-            src={item.thumbUrl2}
+            src={blobUrl}
             className="min-w-11 h-full border-r-[1px] border-white object-cover"
           />
         </Link>

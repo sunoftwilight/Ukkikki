@@ -44,6 +44,8 @@ const ListComponent: React.FC = () => {
 		)
 	}
 
+  const [blobUrl, setBlobURl] = useState('')
+
 	const checkStateAndImg = async (data: PartyListData) => {
 		const key = keys[data.id]
 		if (key === "expired") {
@@ -58,7 +60,10 @@ const ListComponent: React.FC = () => {
 			await getPartyThumb(
 				data.partyProfile,
 				opt,
-				() => {},
+        (res) => {
+          const blob = new Blob([res.data], {type: 'image/png'})
+          setBlobURl(URL.createObjectURL(blob))
+        },
 				(err) => { console.log(err); },
 			);
 		}
@@ -81,7 +86,7 @@ const ListComponent: React.FC = () => {
 					className="relative w-100 h-20 rounded-2xl flex items-center border border-disabled-gray">
 					<div className="h-full w-4/5 flex items-center" onClick={() => clickHandler(item.id, item.expired)}>
 						<img
-							src={item.partyProfile}
+							src={blobUrl}
 							className="w-14 h-14 rounded-full ms-4 me-5"
 						/>
 						<p className="text-xl font-pre-R">{item.partyName}</p>
