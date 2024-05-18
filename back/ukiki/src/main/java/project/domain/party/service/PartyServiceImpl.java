@@ -569,6 +569,17 @@ public class PartyServiceImpl implements PartyService {
         checkPasswordDto.setPartyId(party.getId());
         checkPasswordDto.setSseKey(afterSseKey);
 
+        // Chat 재 암호화
+        StringEncryptor firstEncryptor = jasyptUtil.customEncryptor(beforeSseKey);
+        StringEncryptor secondEncryptor = jasyptUtil.customEncryptor(afterSseKey);
+        List<Chat> allChatList = chatRepository.findAllByPartyId(partyId);
+        for (Chat chat : allChatList) {
+            String decodeContent = firstEncryptor.decrypt(chat.getContent());
+            chat.setContent(secondEncryptor.encrypt(decodeContent));
+            chatRepository.save(chat);
+        }
+
+
         return checkPasswordDto;
     }
 

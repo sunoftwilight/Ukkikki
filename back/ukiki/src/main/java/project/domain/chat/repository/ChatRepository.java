@@ -11,4 +11,5 @@ import java.util.List;
 public interface ChatRepository extends JpaRepository<Chat, Long>{
     Page<Chat> findAllByPartyId(Long partyId, Pageable pageable);
     void deleteAllByPartyId(Long partyId);
+    List<Chat> findAllByPartyId(Long partyId);
 }
