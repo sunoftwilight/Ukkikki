@@ -64,6 +64,9 @@ public class Alarm {
         this.contentsId = alarm.getContentsId();
         this.targetId = alarm.getTargetId();
         this.memberId = memberId;
+        this.partyUrl = alarm.getPartyUrl();
+        this.createDate = alarm.createDate;
+        this.partyName = alarm.getPartyName();
         this.writerNick = alarm.getWriterNick();
         this.alarmType = alarm.getAlarmType();
         this.content = alarm.getContent();

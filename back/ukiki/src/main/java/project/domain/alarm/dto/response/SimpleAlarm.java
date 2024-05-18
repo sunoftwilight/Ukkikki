@@ -25,7 +25,7 @@ public class SimpleAlarm {
     String content;
     String partyName;
     String partyUrl;
-    LocalDateTime createDate;
+    String createDate;
     String identifier;
     boolean read;
 
