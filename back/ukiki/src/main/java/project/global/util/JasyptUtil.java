@@ -41,10 +41,10 @@ public class JasyptUtil {
         config.setKeyObtentionIterations("1000");   //반복할 해싱 회수
         config.setPoolSize("1");    //pool 크기
         config.setProviderName("SunJCE");   //사용할 암호화 라이브러리
-//        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");    //salt 생성 클래스
-        FixedStringSaltGenerator saltGenerator = new FixedStringSaltGenerator();
-        saltGenerator.setSalt(clientKey); // 고정된 솔트 값 설정
-        config.setSaltGenerator(saltGenerator);
+        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");    //salt 생성 클래스
+//        FixedStringSaltGenerator saltGenerator = new FixedStringSaltGenerator();
+//        saltGenerator.setSalt(clientKey); // 고정된 솔트 값 설정
+//        config.setSaltGenerator(saltGenerator);
 
         config.setStringOutputType("base64");   //인코딩 방식
         encryptor.setConfig(config);    //설정 주입

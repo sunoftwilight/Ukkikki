@@ -99,8 +99,9 @@ public class ChatServiceImpl implements ChatService{
         List<ChatMember> chatMemberList = chatMemberRedisRepository.findAllByDestination("/sub/chats/party/"+ partyId);
 
         // 암호화 알고리즘
-        StringEncryptor encryptor = jasyptUtil.getPartyEncryptor(partyId, chatDto.getPassword());
-//        StringEncryptor encryptor = jasyptUtil.customEncryptor(chatDto.getPassword());
+//        StringEncryptor encryptor = jasyptUtil.getPartyEncryptor(partyId, chatDto.getPassword());
+        StringEncryptor encryptor = jasyptUtil.customEncryptor(chatDto.getPassword());
+        System.out.println(chatDto.getPassword());
 //        System.out.println("채팅 보내기 sseKey : " + chatDto.getPassword());
         // 채팅 만들기
         Chat chat = Chat.customBuilder()
@@ -150,8 +151,9 @@ public class ChatServiceImpl implements ChatService{
 
 
         // JasyptCustomEncryptor
-        StringEncryptor encryptor = jasyptUtil.getPartyEncryptor(partyId, sseKey);
-//        StringEncryptor encryptor = jasyptUtil.customEncryptor(sseKey);
+//        StringEncryptor encryptor = jasyptUtil.getPartyEncryptor(partyId, sseKey);
+        StringEncryptor encryptor = jasyptUtil.customEncryptor(sseKey);
+        System.out.println(sseKey);
 
         Page<Chat> chatPage = chatRepository.findAllByPartyId(partyId, pageable);
 
