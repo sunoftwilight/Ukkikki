@@ -138,6 +138,7 @@ public class CommentServiceImpl implements CommentService{
         Long receiverId = article.getMember().getId();
         Integer commentSize = cc.getComment().size() - 1;
         Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.COMMENT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, commentDto.getContent()), receiverId);
+        System.out.println(alarm.getIdentifier());
         if(!article.getMember().getId().equals(memberId)){
             alarmRedisRepository.save(alarm);
             SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
