@@ -46,7 +46,6 @@ const WriteMain: React.FC = () => {
       password: user.groupKey[Number(groupPk)],
       photoIdList: addAlbumList.map((item) => String(item.photoId))
     }
-    console.log(data)
 
     const formData = new FormData();
 
@@ -58,8 +57,7 @@ const WriteMain: React.FC = () => {
 
 
     await createArticle(Number(groupPk), formData,
-    (res) => {
-      console.log(res)
+    () => {
       navigate(`/feed/${groupPk}`);
     },
     (err) => {
@@ -81,7 +79,6 @@ const WriteMain: React.FC = () => {
       });
       return updatedList;
     });
-    console.log(addMediaList)
   }, [addDeviceList, addAlbumList])
 
 

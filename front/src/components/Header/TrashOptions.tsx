@@ -35,12 +35,10 @@ const TrashOptions: React.FC = () => {
     await delTrashBin(
       Number(groupPk),
       {
-        // sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
         sseKey: groupKey[Number(groupPk)],
         trashIdList: selectTrash
       },
-      (res) => {
-        console.log(res.data)
+      () => {
         setIsDelete(false)
         doneHandler()
       },
@@ -52,7 +50,6 @@ const TrashOptions: React.FC = () => {
     await restoreTrashBin(
       Number(groupPk),
       {
-        // sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
         sseKey: groupKey[Number(groupPk)],
         trashIdList: selectTrash
       },

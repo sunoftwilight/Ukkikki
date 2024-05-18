@@ -38,8 +38,7 @@ const UserBtn: React.FC = () => {
 			memberRole: 'MASTER'
 		}
 		await changePartyGrant(memberInfo.data?.partyId, memberInfo.data?.userId, param,
-			(res) => {
-				console.log(res)
+			() => {
 				navi(-1)
 			},
 			(err) => {

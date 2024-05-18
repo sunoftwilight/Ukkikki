@@ -119,16 +119,13 @@ const Cam: React.FC = () => {
               const key = new Blob([JSON.stringify({key: user.groupKey[user.uploadGroupId], partyId:user.uploadGroupId})], {type: 'application/json',});
   
               const file = new File([blob], 'image.jpeg', {type: 'image/jpeg'});
-              console.log(blob.size / (1024 * 1024))
               formData.append('key', key);
               formData.append('files', file);
   
               upLoadPhoto(formData,
-                (response) => {
-                  console.log(response)
-                }, (error)=> {
-                  console.log(error)
-              })
+                () => {}, 
+                ()=> {}
+              )
             }
           }, 'image/jpeg', 1)
         }, selectedTimer)
@@ -170,7 +167,6 @@ const Cam: React.FC = () => {
         audio: true
       }
       const stream = await navigator.mediaDevices.getUserMedia(constaints);
-      console.log()
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }

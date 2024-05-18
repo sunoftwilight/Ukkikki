@@ -84,7 +84,6 @@ const Hamburger: React.FC = () => {
     await getAlarm(
       { pageNo: page, pageSize: 20 },
       (res) => {
-        console.log(res.data.data)
         setAlarmList(res.data.data.alarmList)
         if (res.data.data.last === true) {
           setIsLast(true)

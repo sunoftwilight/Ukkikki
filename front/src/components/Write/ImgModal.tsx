@@ -46,7 +46,6 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
     await getDirectory(
       dirId, 
       (res) => {
-        console.log('List', res.data)
         setParentDirId(res.data.data.parentId)
         const data = res.data.data.contentList.map((item) => {
           return {
@@ -101,9 +100,7 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
       "x-amz-server-side-encryption-customer-key": key,
     };
     await getPartyThumb(url, opt,
-      (res) => {
-        console.log(res)
-      },
+      () => {},
       (err) => {
         console.log(err)
       }

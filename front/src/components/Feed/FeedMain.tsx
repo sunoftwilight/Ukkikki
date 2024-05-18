@@ -19,7 +19,6 @@ const FeedMain: React.FC = () => {
     const pk = Number(groupPk)
     await getArticleList(pk,
       (res) => {
-        console.log(res)
         setArticleList(res.data.articleDtoList)
         res.data.articleDtoList.forEach(item => checkStateAndImg(item))
       },
@@ -34,7 +33,6 @@ const FeedMain: React.FC = () => {
     const opt = {
       "x-amz-server-side-encryption-customer-key": key,
     };
-    console.log(opt)
     if (data.photoList.length > 0) {
       await getArticleImg(
         data.photoList[0].photoUrl,

@@ -61,7 +61,6 @@ const ChangePass: React.FC = () => {
       afterPassword : pass,
       simplePassword: user.simplePass,
     }
-    console.log(data)
     await changePartyPass(Number(groupPk), data, 
       (res) => {
 				dataSetUp(res.data.data);

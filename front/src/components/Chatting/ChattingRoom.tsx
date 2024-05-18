@@ -8,6 +8,7 @@ import { getPartyThumb } from "../../api/party";
 const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
   const { groupPk } = useParams();
   const { groupKey } = useStore(userStore)
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const dateHandler = (dateInfo: string) => {
     const date = new Date(dateInfo)
@@ -52,15 +53,16 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
       (err) => { console.error(err) }
     )
   }
-  
-  const scrollRef = useRef<HTMLInputElement>(null)
 
+  // 채팅의 가장 마지막 메시지를 가장 처음 볼 수 있도록 구현
   useEffect(() => {
-    scrollRef.current!.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [msgList]);
 
   return (
-    <div className="flex flex-col w-full h-full overflow-scroll scrollbar-hide z-10">
+    <div ref={chatContainerRef} className="flex flex-col w-full h-full overflow-scroll scrollbar-hide z-10">
       { msgList.map((item, idx) => (
         item.chatType === 'ENTER' 
         ? 

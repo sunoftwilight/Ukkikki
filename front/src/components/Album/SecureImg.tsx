@@ -17,7 +17,6 @@ const SecureImg: React.FC<ImgProps> = ({ url }) => {
 
   const opt = {
     "x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
-    // "x-amz-server-side-encryption-customer-key": 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
   };
   
   useEffect(() => {

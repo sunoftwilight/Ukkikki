@@ -25,13 +25,14 @@ const TrashMain: React.FC = () => {
       Number(groupPk),
       (res) => {
         setTrashList(res.data.data)
-        console.log(res.data.data)
       },
       (err) => { console.error(err) }
     )
   }
 
   const dateHandler = (dateString: string) => {
+    if (!dateString) return "";
+
     const [year, month, day] = dateString.split('-');
     return `${year.slice(2)}.${month}.${day}`;
   };

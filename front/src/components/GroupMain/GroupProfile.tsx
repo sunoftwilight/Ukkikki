@@ -22,7 +22,6 @@ const GroupProfile: React.FC = () => {
     await getPartyDetail(Number(groupPk),
     (res) => {
       const data = res.data.data;
-      console.log(data)
       res.data.data.partyMembers.forEach((item) => {
         if (item.type === 'S3') {
           const key = groupKey[Number(groupPk)];
@@ -49,8 +48,7 @@ const GroupProfile: React.FC = () => {
 		await getPartyThumb(
 			url,
 			opt,
-			(res) => {console.log(res)
-      },
+			() => {},
 			(err) => { console.log(err); },
 		);
 	};

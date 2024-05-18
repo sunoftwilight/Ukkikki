@@ -10,9 +10,7 @@ const Group: React.FC = () => {
   // 그룹 Pk 호출 완료.
   // 이 Pk로 그룹 관련 API들을 사용할 생각
   const { groupPk } = useParams();
-  console.log(groupPk)
   const { setCurrentGroup } = useStore(currentGroupStore)
-  
 
   useEffect(() => {
     setCurrentGroup(Number(groupPk))

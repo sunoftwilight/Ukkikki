@@ -47,7 +47,6 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
     setIsIng(true)
     await downloadFile(
       groupKey[Number(groupPk)],
-      // 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
       {
         fileId: currentId,
         prefix: prefix
@@ -128,7 +127,6 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
         }
       },
       (res) => {
-        console.log(res)
         doneHandler()
         setNeedUpdate()
         navigate(`/album/${groupPk}`)

@@ -24,7 +24,6 @@ const ListComponent: React.FC = () => {
 					checkStateAndImg(item)
 				});
 				setPartList(res.data.data);
-				console.log(res.data.data)
 			},
 			(err) => {
 				console.log(err);
@@ -37,7 +36,6 @@ const ListComponent: React.FC = () => {
 
 		await changeUploadGroup(id, 
 			(res) => {
-				console.log(res)
 				user.setUploadGroupId(id)
 			},
 			(err) => {

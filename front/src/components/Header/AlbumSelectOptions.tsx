@@ -52,7 +52,7 @@ const AlbumSelectOptions: React.FC = () => {
     setIsIng(true)
     await multiDownloadFile(
       groupKey[Number(groupPk)],
-      // 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
+      // 'ㅊ',
       {  
         fileIdList: selectList,
         prefix: prefix,
@@ -82,13 +82,11 @@ const AlbumSelectOptions: React.FC = () => {
       currentDirId,
       { 
         data: {
-          // sseKey: 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=',
           sseKey: groupKey[Number(groupPk)],
           fileIdList: selectListForPk
         }
       },
       (res) => {
-        console.log(res)
         doneHandler('del')
         setNeedUpdate()
       },

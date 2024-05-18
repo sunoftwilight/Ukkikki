@@ -22,7 +22,6 @@ const ThumbnailNav: React.FC = () => {
       (res) => {
         setThumbnailList(res.data.data)
         res.data.data.forEach((item) => {
-          // getImg(item.thumbUrl2, 'XlD0Bazmy98XN59LnysMn0FExeOA6guSmMsC69j/5RE=')
           getImg(item.thumbUrl2, groupKey[Number(groupPk)])
         })
       },

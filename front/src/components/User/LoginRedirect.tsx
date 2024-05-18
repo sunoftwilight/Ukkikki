@@ -36,7 +36,6 @@ const LoginRedirect: React.FC = () => {
       await userInfo(
         (response) => {
           const userData = response.data.data;
-          console.log(userData)
           user.setUserId(userData.userId);
           user.setUserName(userData.userName);
           user.setUserProfile(userData.profileUrl);

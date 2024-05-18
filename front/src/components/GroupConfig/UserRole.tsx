@@ -17,12 +17,8 @@ const UserRole: React.FC = () => {
 		}
 		
 		await changePartyGrant(Number(groupPk), memberInfo.data?.userId, param,
-			(res) => {
-				console.log(Number(groupPk), memberInfo.data?.userId, selectedRole)
-				console.log(res)
-			},
+			() => {},
 			(err) => {
-				console.log(Number(groupPk), memberInfo.data?.userId, selectedRole)
 				console.error(err)
 			}
 	)

@@ -22,7 +22,6 @@ const GroupAttend:React.FC = () => {
   const checkPass = async () => {
     await checkPartyPass(Number(groupPk), password, user.simplePass,
       (res) => {
-        console.log(res.data.data)
         if(guest.isGuest) {
 
           const sse = res.data.data.sseKey
