@@ -74,15 +74,21 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 
 	// 대댓글 추가
 	const createReply = () => {
-		setReply([...reply,{
-			userId : -1,
-			content : "",
-			userName : "",
-			profileUrl : "",
-			createdDate : "",
-			isDelete : false,
-			tag : [],
-		}])
+
+		// 하나만 생성하기 위해 조건을 걸어주었따.
+		if(reply == null || (reply.length > 0 && reply[reply.length - 1].userId !== -1)) {
+
+			setReply([...reply,{
+				userId : -1,
+				content : "",
+				userName : "",
+				profileUrl : "",
+				createdDate : "",
+				isDelete : false,
+				tag : [],
+			}])
+		}
+
 	}
 
 	const createReplyCancel = () => {

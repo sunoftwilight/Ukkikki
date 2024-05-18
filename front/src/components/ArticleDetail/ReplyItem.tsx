@@ -120,7 +120,7 @@ const ReplyItem: React.FC<ReplyItemInterface> = ({
 							<img src={reply.profileUrl} className="w-9 h-9 rounded-full" />
 							<div className="flex flex-col gap-2 w-full">
 								<ReplyTop key={replyIdx} reply={reply} commentDelete={replyDelete} switchIsModify={switchIsModify} isModify={isModify}/>
-								<ReplyBottom key={reply.userId} idx={replyIdx} isModify={isModify} reply={reply} replyModify={replyModify} switchIsModify={switchIsModify}/>
+								<ReplyBottom key={reply.userId + "reply"} idx={replyIdx} isModify={isModify} reply={reply} replyModify={replyModify} switchIsModify={switchIsModify}/>
 							</div>
 						</div>
 					)}

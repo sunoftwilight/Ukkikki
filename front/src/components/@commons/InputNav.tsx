@@ -126,21 +126,13 @@ const InputNav: React.FC<{getCommentList : () => void;}> = ({getCommentList}) =>
 	// 값이 변하면 저장.
 	const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInputValue(e.target.value);
-	};
 
-	// 키 값을 체크하여 @과 esc는 다르게 한다.
-	const checkValue = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		setInputValue(e.currentTarget.value);
-		if (e.key === "@") {
+		
+		if (e.target.value.endsWith("@")) {
 			setIsShowUserList(true);
-			setTagIndex(e.currentTarget.value.length);
+			setTagIndex(e.target.value.length);
 		}
-
-		if (e.key === "Escape") {
-			setIsShowUserList(false);
-			setTagIndex(0);
-			setTagValue("");
-		}
+		
 	};
 
 	// 처음 입력이 시작되면.
@@ -176,7 +168,6 @@ const InputNav: React.FC<{getCommentList : () => void;}> = ({getCommentList}) =>
 					className="font-pre-M text-base border-point-gray text-black w-full h-full outline-none"
 					value={inputValue}
 					onChange={changeValue}
-					onKeyUp={checkValue}
 					onCompositionStart={inputStart}
 					onCompositionEnd={inputEnd}
 				/>

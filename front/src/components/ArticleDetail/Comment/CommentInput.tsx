@@ -98,21 +98,11 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 
 	// 값이 변하면 저장.
 	const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setInputValue(e.target.value);
-	};
+		setInputValue(e.target.value);	
 
-	// 키 값을 체크하여 @과 esc는 다르게 한다.
-	const checkValue = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		setInputValue(e.currentTarget.value);
-		if (e.key === "@") {
+		if (e.target.value.endsWith("@")) {
 			setIsShowUserList(true);
-			setTagIndex(e.currentTarget.value.length);
-		}
-
-		if (e.key === "Escape") {
-			setIsShowUserList(false);
-			setTagIndex(0);
-			setTagValue("");
+			setTagIndex(e.target.value.length);
 		}
 	};
 
@@ -193,7 +183,6 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 					className="py-3 px-2 w-[calc(100%-66px)] font-pre-L text-sm text-black h-5 outline-none border-b border-point-gray border-gray-300 mr-4"
 					value={inputValue}
 					onChange={changeValue}
-					onKeyUp={checkValue}
 					onCompositionStart={inputStart}
 					onCompositionEnd={inputEnd}
 				/>
