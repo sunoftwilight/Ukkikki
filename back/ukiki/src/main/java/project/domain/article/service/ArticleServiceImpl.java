@@ -290,9 +290,22 @@ public class ArticleServiceImpl implements ArticleService{
         }
 
         // Device 사진 추가하기
-        if(multipartFiles!= null){
-            List<String> uploadFileIds = fileUploadDownloadService.uploadProcess(multipartFiles, FileUploadDto.builder()
+        List<String> deviceFileList = new ArrayList<>();
+        if(multipartFiles != null){
+            deviceFileList = fileUploadDownloadService.uploadProcess(multipartFiles, FileUploadDto.builder()
                 .partyId(partyId).key(articleUpdateDto.getPassword()).build());
+        }
+        for (String filePk : deviceFileList) {
+            // 파일 찾기
+            File file = fileRepository.findById(filePk)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+            // 파일로 사진 찾기
+            Photo photo = photoRepository.findById(file.getPhotoDto().getId())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
+            // ArticlePhoto 생성
+            ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
+            // 리스트에 넣고 저장
+            article.getArticlePhotoList().add(articlePhotoRepository.save(articlePhoto));
         }
 
         // 폴더 사진 추가 여부
