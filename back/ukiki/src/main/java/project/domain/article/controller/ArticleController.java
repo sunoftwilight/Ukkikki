@@ -50,7 +50,7 @@ public class ArticleController implements ArticleDocs{
     }
     @Override
     @PatchMapping("/update/{partyId}/{articleId}")
-    public ResponseEntity<SimpleArticleDto> updateArticle(@PathVariable(name = "partyId")Long partyId, @PathVariable(name = "articleId") Long articleId, @RequestPart ArticleUpdateDto articleUpdateDto, @RequestPart List<MultipartFile> multipartFiles) {
+    public ResponseEntity<SimpleArticleDto> updateArticle(@PathVariable(name = "partyId")Long partyId, @PathVariable(name = "articleId") Long articleId, @RequestPart ArticleUpdateDto articleUpdateDto, @RequestPart(required = false) List<MultipartFile> multipartFiles) {
         SimpleArticleDto res = articleService.updateArticle(partyId, articleId, articleUpdateDto, multipartFiles);
         return ResponseEntity.ok(res);
     }
