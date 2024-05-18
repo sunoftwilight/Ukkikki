@@ -66,7 +66,7 @@ public class AlarmServiceImpl implements AlarmService {
         Profile profile = profileRepository.findByMemberIdAndPartyId(writerId, partyId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
 
-        List<String> identifier = new ArrayList<>();
+        String identifier = "";
 
         switch (type){
             case MEMO -> {

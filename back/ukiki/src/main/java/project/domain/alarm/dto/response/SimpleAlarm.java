@@ -26,7 +26,7 @@ public class SimpleAlarm {
     String partyName;
     String partyUrl;
     LocalDateTime createDate;
-    List<String> identifier;     // LIST 형태안에 API를 넣어주자
+    String identifier;
     boolean read;
 
 }

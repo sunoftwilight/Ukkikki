@@ -51,7 +51,7 @@ public class Alarm {
     AlarmType alarmType;
     String content;
     String createDate;
-    List<String> identifier;
+    String identifier;
     @Builder.Default
     Boolean isRead = false;
 
