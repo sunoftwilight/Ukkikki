@@ -86,7 +86,7 @@ const AlbumSelectOptions: React.FC = () => {
           fileIdList: selectListForPk
         }
       },
-      (res) => {
+      () => {
         doneHandler('del')
         setNeedUpdate()
       },

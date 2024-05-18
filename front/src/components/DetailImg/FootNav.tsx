@@ -126,7 +126,7 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
           fileIdList: [currentImg]
         }
       },
-      (res) => {
+      () => {
         doneHandler()
         setNeedUpdate()
         navigate(`/album/${groupPk}`)

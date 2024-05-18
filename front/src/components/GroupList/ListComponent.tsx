@@ -35,7 +35,7 @@ const ListComponent: React.FC = () => {
 		if (id === user.uploadGroupId) return;
 
 		await changeUploadGroup(id, 
-			(res) => {
+			() => {
 				user.setUploadGroupId(id)
 			},
 			(err) => {
