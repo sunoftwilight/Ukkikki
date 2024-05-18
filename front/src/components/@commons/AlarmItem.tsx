@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AlarmItemProps } from "../../types/AlarmType";
 import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
@@ -11,6 +11,7 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
 	const { groupKey } = useStore(userStore);
   const { setAlarmOpen } = useStore(headerStore)
 
+  const [blobUrl, setBlobURl] = useState('')
 
   useEffect(() => {
     const opt = {
@@ -19,7 +20,10 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
 		getPartyThumb(
 			alarmItem.partyUrl,
 			opt,
-			() => {},
+			(res) => {
+        const blob = new Blob([res.data], {type: 'image/png'})
+        setBlobURl(URL.createObjectURL(blob))
+      },
 			(err) => { console.log(err); },
 		);
   }, [alarmItem])
@@ -94,7 +98,7 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
 
 	return (
     <div onClick={() => clickHandler()} className={`flex gap-2 w-full ${alarmItem.read ? 'bg-gray' : 'bg-white'}`}>
-      <img src={alarmItem.partyUrl} className="rounded-full w-12 h-12 border-[0.1px] border-point-gray object-cover" />
+      <img src={blobUrl} className="rounded-full w-12 h-12 border-[0.1px] border-point-gray object-cover" />
       <div className="flex w-[calc(100%-56px)] flex-col gap-2">
         <div className="flex justify-between w-full">
           <div className="font-gtr-B text-xs">{alarmItem.partyName}</div>
