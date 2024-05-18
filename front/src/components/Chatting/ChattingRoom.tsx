@@ -69,7 +69,7 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
 
   return (
     <div ref={chatContainerRef} className="flex flex-col w-full h-full overflow-scroll scrollbar-hide z-10">
-      <div id='observer' className="h-[30px] mb-2 w-full flex justify-center">
+      <div id='observer' className="h-[5px] mb-2 w-full flex justify-center">
         {(isLoading && !isLast) && <LoadingGif /> }
       </div>
       { msgList.map((item, idx) => (
