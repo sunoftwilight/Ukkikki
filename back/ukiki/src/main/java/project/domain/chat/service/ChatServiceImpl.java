@@ -102,11 +102,13 @@ public class ChatServiceImpl implements ChatService{
 //        StringEncryptor encryptor = jasyptUtil.getPartyEncryptor(partyId, chatDto.getPassword());
         StringEncryptor encryptor = jasyptUtil.customEncryptor(chatDto.getPassword());
         System.out.println(chatDto.getPassword());
+        String encryptChat = encryptor.encrypt(chatDto.getContent());
+        System.out.println("encryptChat = " + encryptChat);
 //        System.out.println("채팅 보내기 sseKey : " + chatDto.getPassword());
         // 채팅 만들기
         Chat chat = Chat.customBuilder()
             .chatType(ChatType.CHAT)
-            .content(encryptor.encrypt(chatDto.getContent()))
+            .content(encryptChat)
 //            .content(chatDto.getContent())
             .member(member)
             .party(party)
