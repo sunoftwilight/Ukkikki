@@ -137,10 +137,12 @@ public class CommentServiceImpl implements CommentService{
         // 알림 보내기
         Long receiverId = article.getMember().getId();
         Integer commentSize = cc.getComment().size() - 1;
-        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.CHAT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, commentDto.getContent()), receiverId);
-        alarmRedisRepository.save(alarm);
-        SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
-        alarmService.sendAlarm(emitter, receiverId, alarm);
+        Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.COMMENT, article.getParty().getId(), articleId, Long.valueOf(commentSize), memberId, commentDto.getContent()), receiverId);
+        if(!article.getMember().getId().equals(memberId)){
+            alarmRedisRepository.save(alarm);
+            SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
+            alarmService.sendAlarm(emitter, receiverId, alarm);
+        }
 
         // 태그가 있을 때
         if(!newComment.getTag().isEmpty()){
@@ -289,9 +291,11 @@ public class CommentServiceImpl implements CommentService{
 
         Long receiverId = cc.getComment().get(commentIdx).getUserId();
         Alarm alarm = new Alarm(alarmService.createAlarm(AlarmType.REPLY, article.getParty().getId(), articleId, Long.valueOf(commentIdx), memberId, commentDto.getContent()), receiverId);
-        alarmRedisRepository.save(alarm);
-        SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
-        alarmService.sendAlarm(emitter, receiverId, alarm);
+        if(!receiverId.equals(memberId)){
+            alarmRedisRepository.save(alarm);
+            SseEmitter emitter = alarmService.findEmitterByUserId(receiverId);
+            alarmService.sendAlarm(emitter, receiverId, alarm);
+        }
 
         // 태그가 있을 때
         if(!newReply.getTag().isEmpty()){
@@ -310,7 +314,7 @@ public class CommentServiceImpl implements CommentService{
                     });
                 Alarm tagAlarm = new Alarm(alarm, receiverPk);
                 tagAlarm.setWriterNick(tagNick);
-                tagAlarm.setAlarmType(AlarmType.REPLY);
+                tagAlarm.setAlarmType(AlarmType.MENTION);
                 alarmRedisRepository.save(tagAlarm);
                 SseEmitter tagEmitter = alarmService.findEmitterByUserId(receiverId);
                 alarmService.sendAlarm(tagEmitter, receiverPk, tagAlarm);
