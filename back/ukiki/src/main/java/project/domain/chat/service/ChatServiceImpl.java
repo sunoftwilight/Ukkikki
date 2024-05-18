@@ -75,7 +75,7 @@ public class ChatServiceImpl implements ChatService{
     @Transactional
     @Override
     public void sendChat(String token, Long partyId, ChatDto chatDto) {
-
+        System.out.println("chatDto = " + chatDto.toString());
         Long memberId = jwtUtil.getId(token.substring(7 ));
 
         Member member = memberRepository.findById(memberId)
