@@ -176,7 +176,7 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 				</ul>
 			)}
 			<div className="flex items-center">
-				{userId === -1 && (<img src={ReplyImg} alt="reply" className="w-4 h-4 mr-3" />)}
+				{userId === -1 && (<img src={ReplyImg} alt="reply" className="w-4 mr-2" />)}
 				{tagUserList.map((tag, index) => (
 					<div className="flex items-center justify-center mr-1 rounded-lg px-1 text-xs bg-blue-200 w-auto text-nowrap">
 						{tag.userName}
@@ -190,7 +190,7 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 				))}
 				<input
 					placeholder={content}
-					className="py-3 px-3 w-[calc(100%-66px)] text-base text-black h-5 outline-none border-b border-gray-300 mr-4"
+					className="py-3 px-2 w-[calc(100%-66px)] font-pre-L text-sm text-black h-5 outline-none border-b border-point-gray border-gray-300 mr-4"
 					value={inputValue}
 					onChange={changeValue}
 					onKeyUp={checkValue}
@@ -198,13 +198,13 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 					onCompositionEnd={inputEnd}
 				/>
 				<button
-					className="bg-main-blue text-white font-pre-M text-base w-12 rounded-xl"
+					className="bg-main-blue text-white font-pre-M text-sm w-12 h-6 flex items-center justify-center rounded-lg px-1 py-1"
 					onClick={inputCancel}
 				>
 					취소
 				</button>
 				<button
-					className="ml-2 bg-main-blue text-white font-pre-M text-base w-12 rounded-xl"
+					className="ml-2 bg-main-blue text-white font-pre-M text-sm w-12 h-6 flex items-center justify-center rounded-lg px-1 py-1"
 					onClick={inputModify}
 				>
 					{userId === -1 ? <>등록</> : <>수정</>}

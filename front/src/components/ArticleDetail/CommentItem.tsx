@@ -122,7 +122,7 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 				</div>
 			)}
 
-			<div>
+			<div className="w-full">
 				{reply.map((item, replyIdx) => (
 					<ReplyItem key={replyIdx} commentIdx={idx} replyIdx={replyIdx} reply={item} createReplyCancel={createReplyCancel} getCommentList={getCommentList}/>
 				))}

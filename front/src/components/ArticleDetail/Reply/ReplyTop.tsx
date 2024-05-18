@@ -5,8 +5,8 @@ import { ReplyTopInterface } from "../../../types/Comment/CommentInterface";
 
 const ReplyTop: React.FC<ReplyTopInterface> = ({ reply, isModify, commentDelete, switchIsModify}) => {
 	return (
-		<div className="flex justify-between">
-			<div className="flex gap-2">
+		<div className="flex w-full justify-between">
+			<div className="flex gap-2 w-full">
 				<div className="font-pre-SB text-black text-xs">{reply.userName}</div>
 				<div className="font-pre-L text-point-gray text-[10px]">
 					{reply.createdDate}
