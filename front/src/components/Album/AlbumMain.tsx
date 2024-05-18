@@ -73,6 +73,12 @@ const AlbumMain: React.FC = () => {
     setCurrentDirName(name)
   }
 
+  const renderHandler = (url: string) => {
+    if (url) {
+      return <SecureImg url={url} />
+    }
+  }
+
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
       { parentDirId!= '' && 
@@ -113,7 +119,7 @@ const AlbumMain: React.FC = () => {
                     </div>
                     : <></>
                   }
-                  <SecureImg url={item.url} />
+                  {renderHandler(item.url)}
                 </div>
               </Link>
         ))))}
