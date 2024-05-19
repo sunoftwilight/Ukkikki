@@ -48,7 +48,7 @@ const GroupProfileConfig: React.FC = () => {
 		await changePartyProfile(
 			formData,
       Number(groupPk),
-			() => {},
+			() => { navi(`/group/${groupPk}/main`)},
 			(error) => {
 				console.error(error);
 			},
