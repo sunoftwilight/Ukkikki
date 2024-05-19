@@ -3,7 +3,7 @@ import { getGroupDetail, getPartyThumb } from "../../api/party";
 import { useParams } from "react-router-dom";
 import { imgGroupStore } from "../../stores/AlbumStore";
 import { userStore } from "../../stores/UserStore";
-
+import SecureImg from "../Album/SecureImg";
 
 const GroupAlbum: React.FC = () => {
 
@@ -49,7 +49,9 @@ const GroupAlbum: React.FC = () => {
   return (
     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide ">
       {imgList.map((item, idx) => (
-        (<img src={item.thumbnailUrl} key={idx} />)
+        <div className="flex justify-center">
+          <SecureImg url={item.thumbnailUrl} key={idx}/>
+        </div>
       ))}
     </div>
   )

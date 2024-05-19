@@ -81,8 +81,6 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
   }
 
   const itemClickHandler = (data: ImgListProps) => {
-    console.log(data)
-    console.log(albumList)
     data.isSelect = !data.isSelect
     setSelectImgList((prevList) => {
       const index = prevList.findIndex((item) => item.photoId === data.pk);
@@ -121,9 +119,9 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <div className="z-20 w-11/12 h-4/6 bg-white rounded-[15px] p-1 py-5 flex flex-wrap content-between border border-disabled-gray drop-shadow-2xl">
-                
-                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide">
+              <div className="z-20 w-11/12 h-4/6 bg-white rounded-[15px] p-1 py-5 flex flex-col content-between border border-disabled-gray drop-shadow-2xl">
+
+                <div className="py-3 grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 px-4 gap-1 overflow-scroll scrollbar-hide w-full h-full">
                   { parentDirId!= '' && 
                     <div
                       key={parentDirId}
@@ -144,7 +142,7 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
                         <div className="font-pre-R text-center text-xs">{item.name}</div>
                       </div>
                       :(
-                        <div className="relative">
+                        <div className="relative flex justify-center">
                           {item.isSelect && (
                             <img src={check} className="z-10 w-10 h-10 object-cover absolute top-1/4 left-1/4"  onClick={() => itemClickHandler(item)}/>
                           )}
@@ -156,7 +154,7 @@ const ImgModal: React.FC<ImgModalProps> = ({onChoiceDoneBtn, onCancelBtn}) => {
                   ))}
                 </div>
 
-                <div className="flex gap-4 w-full justify-end">
+                <div className="h-10 flex gap-4 w-full justify-end items-center p-4">
                   <button 
                     className={`h-[35px] font-gtr-B text-lg text-white rounded-[15px] w-[70px] bg-disabled-gray`} 
                     onClick={() => {cancelBtnHandler()}}

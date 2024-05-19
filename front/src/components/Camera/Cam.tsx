@@ -10,12 +10,11 @@ import selectedTimer3s from "@/assets/Camera/selectedTimer3s.png";
 import selectedTimer5s from "@/assets/Camera/selectedTimer5s.png";
 import selectedTimer10s from "@/assets/Camera/selectedTimer10s.png";
 import changeView from "@/assets/Camera/changeCamera.png";
-import singleShot from "@/assets/Camera/singleShot.png";
-import multiShot from "@/assets/Camera/multiShot.png";
-import photo from "@/assets/Camera/photo.png";
+import backWord from "@/assets/Camera/backward.png";
 // import video from "@/assets/Camera/video.png"
 import { useStore } from 'zustand';
 import { userStore } from '../../stores/UserStore';
+import { useNavigate } from 'react-router-dom';
 
 
 const Cam: React.FC = () => {
@@ -25,12 +24,10 @@ const Cam: React.FC = () => {
   const [openTimerList, setOpenTimerList] = useState<boolean>(false);
   const [openScaleList, setOpenScaleList] = useState<boolean>(false);
   const [openOptList, setOpenOptList] = useState<boolean>(true);
-  const [selectedQuan, setSelectedQuan] = useState<boolean>(true);
-  const [selectedPV, setSelectedPV] = useState<boolean>(true);
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
   const [cameras, setCameras] = useState<string[]>([]);
   const user = useStore(userStore);
-
+  const navi = useNavigate()
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const qualities: Record<string, {width:number, height:number}> = {
@@ -68,12 +65,9 @@ const Cam: React.FC = () => {
     setOpenOptList(true);
   };
 
-  const changeQuan = () => {
-    setSelectedQuan(!selectedQuan);
-  };
 
-  const changePV = () => {
-    setSelectedPV(!selectedPV)
+  const goBack = () => {
+    navi(-1)
   };
 
   const changeCamera = () => {
@@ -198,9 +192,6 @@ const Cam: React.FC = () => {
             <div className='w-6 h-6 font-pre-B text-white'>
               <p onClick={() => openList('scale')}>{selectedScale}</p>
             </div>
-            <div className='w-6 h-6 font-pre-B text-white' >
-              <img src={selectedQuan ? singleShot : multiShot} onClick={changeQuan} />
-            </div>
           </div>
         )}
         
@@ -228,7 +219,7 @@ const Cam: React.FC = () => {
 
       <div className='min-h-40 max-h-40 min-w-full max-w-full fixed bottom-0 flex justify-evenly items-center bg-black/50'>
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
-          <img src={!selectedPV ? photo : photo} className='object-cover w-6 h-6' onClick={changePV}/>
+          <img src={backWord} className='object-cover w-6 h-6' onClick={goBack}/>
         </div>
         <div className='w-20 h-20 bg-white rounded-full flex items-center justify-center' onClick={testLogic}>
         </div>
