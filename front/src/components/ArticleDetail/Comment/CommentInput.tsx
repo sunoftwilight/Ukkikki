@@ -6,6 +6,7 @@ import { currentGroupStore } from "../../../stores/GroupStore";
 import { useStore } from "zustand";
 
 import ReplyImg from "@/assets/ArticleDetail/lucide_reply.png"
+import { userStore } from "../../../stores/UserStore";
 
 const CommentInput: React.FC<CommentInputInterface> = ({
 	userId,
@@ -32,6 +33,9 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 	const [tagUserList, setTagUserList] = useState<
 		{ userId: number; userName: string }[]
 	>(tag);
+	// 개인 id
+	const my = useStore(userStore);
+
 
 	// 처음 한번 유저 리스트를 불러온다.
 	useEffect(() => {
@@ -146,6 +150,7 @@ const CommentInput: React.FC<CommentInputInterface> = ({
 			{isShowUserList && (
 				<ul className="left-4 w-[calc(100%-85px)] mb-2 bg-white border border-gray-200 rounded-lg">
 					{userList
+						.filter((user) => user.userId !== Number(my.userId))
 						.filter(
 							(user) => tagValue === "" || user.userName.includes(tagValue),
 						)
