@@ -12,8 +12,7 @@ import { logOut } from "../api/user";
 const Setting: React.FC = () => {
   const navi = useNavigate();
 
-  const { startPageOpen, setStartPageOpen } = useStore(optionStore);
-  const { logoutOpen, setLogoutOpen } = useStore(optionStore);
+  const { startPageOpen, setStartPageOpen, logoutOpen, setLogoutOpen, startPage, setStartPage } = useStore(optionStore);
 
 	const closeHandler = () => {
 		if (startPageOpen) {
@@ -33,10 +32,14 @@ const Setting: React.FC = () => {
     )
   }
 
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStartPage(event.target.id);
+  };
+
   return (
     <AnimatePresence>
       <div className="p-4 w-full h-[calc(100%-48px)] flex flex-col gap-2 relative font-pre-R text-xl">
-        <div className="px-4 w-full h-[60px] bg-soft-gray rounded-xl flex items-center" onClick={() => navi('/grouplist')}>
+        <div className="px-4 w-full h-[60px] bg-soft-gray rounded-xl flex items-center" onClick={() => navi('/group/list')}>
           <img src={uploadImg} className="w-6 h-6 me-4"/>
           <p>업로드 그룹 설정</p>
         </div>
@@ -53,11 +56,21 @@ const Setting: React.FC = () => {
               >
               <div className="px-4 py-4 w-full bg-soft-blue rounded-[15px] flex flex-col justify-evenly text-base gap-2">
                 <div className="px-2 flex items-center gap-4">
-                  <input type="radio" name="startPage" id="camera" />
+                  <input
+                    type="radio"
+                    name="startPage"
+                    id="camera"
+                    checked={startPage === "camera"} 
+                    onChange={handleRadioChange}/>
                   <label htmlFor="camera">카메라</label>
                 </div>
                 <div className="px-2 flex items-center gap-4">
-                  <input type="radio" name="startPage" id="home" />
+                  <input
+                    type="radio"
+                    name="startPage"
+                    id="home"
+                    checked={startPage === "home"} 
+                    onChange={handleRadioChange}/>
                   <label htmlFor="home">홈 화면</label>
                 </div>
               </div>

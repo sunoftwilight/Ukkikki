@@ -5,7 +5,7 @@ import { httpStatusCode } from "./http-status";
 axios.defaults.withCredentials = true;
 
 const baseURL: string = "https://k10d202.p.ssafy.io/api";
-// const baseURL: string = "http://localhost:5000/api";
+
 
 // 새 토큰 저장
 const newAccess = (header:string) => {
@@ -80,7 +80,6 @@ export const formDataApi: AxiosInstance = axios.create({
 // privateInterceptors
 privateApi.interceptors.request.use(
   (config) => {
-    console.log('here')
 		const stored = localStorage.getItem('USER_STORE');
 		if (stored){
 			const obj = JSON.parse(stored)
@@ -109,7 +108,6 @@ privateApi.interceptors.response.use(
           if (res.status === httpStatusCode.OK && res.headers.authorization) {
             
             newAccess(res.headers.authorization)
-            console.log('doit')
             axios.defaults.headers.authorization = `${res.headers.authorization}`;
             originRequest.headers.authorization = `${res.headers.authorization}`;
 

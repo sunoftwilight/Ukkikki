@@ -60,10 +60,10 @@ const ListComponent: React.FC = () => {
 			await getPartyThumb(
 				data.partyProfile,
 				opt,
-        (res) => {
-          const blob = new Blob([res.data], {type: 'image/png'})
-          setBlobURl(URL.createObjectURL(blob))
-        },
+				(res) => { 
+					const blob = new Blob([res.data], {type: 'image/png'})
+					data.partyProfile = (URL.createObjectURL(blob))
+				},
 				(err) => { console.log(err); },
 			);
 		}

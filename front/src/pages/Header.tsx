@@ -31,14 +31,6 @@ const Header: React.FC = () => {
 	const backPath = ["/setting", "/feed", "/chat", ...groupBackPath];
 	const albumPath = ["/album", "/trash"];
 
-	// const toastHandler = (e: MessageEvent) => {
-	// 	const alarmObject = JSON.parse(e.data);
-	// 	const partyName = alarmObject.partyName;
-	// 	const writerNick = alarmObject.writerNick;
-	// 	const alarmId = alarmObject.alarmId;
-	// 	const redirectUrl = alarmObject.identifier[0];
-	// }
-
 	useEffect(() => {
 		const stored = localStorage.getItem('USER_STORE');
 
@@ -127,7 +119,8 @@ const Header: React.FC = () => {
 		location.pathname.startsWith("/album/detail") ||
 		location.pathname.startsWith("/feed/") ||
 		location.pathname.startsWith("/chat/") ||
-		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend') && !location.pathname.includes('list'))
+		(location.pathname.startsWith("/group/") && !location.pathname.includes('attend') && !location.pathname.includes('list')) ||
+		location.pathname.startsWith("/imagegroup")
 	)
 		return <BackHeader />;
 	else if (
@@ -136,7 +129,12 @@ const Header: React.FC = () => {
 	)
 		return <LogoHeader />;
 	else if (location.pathname.startsWith("/feed/img/")) return <SaveHeader />;
-	else if (albumPath.includes(location.pathname) || location.pathname.startsWith("/album")  || location.pathname.startsWith("/trash")) return <AlbumHeader />;
+	else if (
+		albumPath.includes(location.pathname) || 
+		location.pathname.startsWith("/album") ||
+		 location.pathname.startsWith("/trash")
+		) 
+		return <AlbumHeader />;
 
 	return(
 		<Toaster

@@ -38,11 +38,13 @@ import ErrorRedirect from './pages/ErrorRedirect';
 import { userStore } from './stores/UserStore';
 import { guestStore } from './stores/GuestStore';
 import { useEffect } from 'react';
+import { optionStore } from './stores/OptionStore';
 
 export default function Router() {
   const { currentImg } = useStore(DetailImgStore)
   const user = useStore(userStore);
-  const guest = useStore(guestStore)
+  const guest = useStore(guestStore);
+  const opt = useStore(optionStore);
   const navi = useNavigate();
 
   useEffect(() => {
@@ -51,7 +53,11 @@ export default function Router() {
     }
   }, [location.pathname, navi])
 
-
+  useEffect(() => {
+    if(user.uploadGroupId && opt.startPage === 'camera') {
+      navi('/camera')
+    }
+  },[])
 
   return (
     <Routes location={location} key={location.pathname}>
