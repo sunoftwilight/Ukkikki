@@ -679,7 +679,7 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
 
         // 파티에 남아있는 유저 수
-        int partyMemberCount = memberpartyRepository.countAllByPartyIdAndMemberRoleIsNot(partyId, MemberRole.VIEWER);
+        int partyMemberCount = memberpartyRepository.countAllByPartyIdAndMemberRoleIsNot(partyId, MemberRole.BLOCK);
 
         // 1명 이상이 존재하고 마스터라면 불가능
         if (partyMemberCount != 1 && memberParty.getMemberRole().equals(MemberRole.MASTER)) {
