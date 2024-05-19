@@ -129,7 +129,7 @@ public class PartyServiceImpl implements PartyService {
             .build();
 
         // 이미지 저장 해야함
-        if (photo != null){
+        if (!photo.isEmpty()){
             // s3Util.fileUpload = 저장 후 url 반환
             String partyThumbnailImg = s3Util.fileUpload(photo, sseKey);
             party.setThumbnail(partyThumbnailImg);
