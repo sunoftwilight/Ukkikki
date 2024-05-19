@@ -1007,6 +1007,7 @@ public class PartyServiceImpl implements PartyService {
         List<Chat> myChatList = chatRepository.findAllByPartyIdAndMemberId(partyId, profile.getId());
         for (Chat chat : myChatList) {
             chat.setProfile(profile);
+            chat.setUserName(profile.getNickname());
             chatRepository.save(chat);
         }
         return profile;
