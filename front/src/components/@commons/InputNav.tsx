@@ -5,6 +5,7 @@ import { useStore } from "zustand";
 import { currentGroupStore } from "../../stores/GroupStore";
 import { createComment } from "../../api/Article/comment";
 import { useParams } from "react-router-dom";
+import { userStore } from "../../stores/UserStore";
 
 const InputNav: React.FC<{getCommentList : () => void;}> = ({getCommentList}) => {
 	// 게시판 번호
@@ -27,6 +28,8 @@ const InputNav: React.FC<{getCommentList : () => void;}> = ({getCommentList}) =>
 	const [tagUserList, setTagUserList] = useState<
 		{ userId: number; userName: string }[]
 	>([]);
+	// 유저 정보
+	const my = useStore(userStore);
 
 	// 처음 한번 유저 리스트를 불러온다.
 	useEffect(() => {
@@ -179,6 +182,7 @@ const InputNav: React.FC<{getCommentList : () => void;}> = ({getCommentList}) =>
 			{isShowUserList && (
 				<ul className="absolute bottom-9 left-4 w-[calc(100%-85px)] mb-2 bg-white border border-gray-200 rounded-lg">
 					{userList
+						.filter((user) => user.userId !== Number(my.userId))
 						.filter(
 							(user) => tagValue === "" || user.userName.includes(tagValue),
 						)
