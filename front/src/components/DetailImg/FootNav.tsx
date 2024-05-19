@@ -5,8 +5,6 @@ import noHeart from '@/assets/DetailImg/noHeart.png'
 import heart from '@/assets/DetailImg/heart.png'
 import memo from '@/assets/DetailImg/memo.png'
 import download from '@/assets/DetailImg/download.png'
-import article from '@/assets/DetailImg/article.png'
-import ArticleList from "./ArticleList";
 import Memo from "./Memo";
 import { downloadFile } from "../../api/file";
 import { useStore } from "zustand";
