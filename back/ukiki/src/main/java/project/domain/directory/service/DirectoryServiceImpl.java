@@ -2,16 +2,8 @@ package project.domain.directory.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -212,6 +204,9 @@ public class DirectoryServiceImpl implements DirectoryService {
         List<String> fileIdList = dir.getFileIdList();
         if (!fileIdList.isEmpty()) {
             List<File> fileList = fileRepository.findAllById(fileIdList);
+            fileList.sort(Comparator.<File, Long>comparing(file -> file.getPhotoDto().getId()).reversed());
+
+
             // 썸네일을 줘야됨
             for (File file : fileList) {
                 Photo photo = photoRepository.findById(file.getPhotoDto().getId())
