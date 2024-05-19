@@ -159,7 +159,7 @@ const SimplePass: React.FC<SimplePassProps> = ({ type }) => {
 					}
 				></div>
 			</div>
-			<div className="w-full h-[calc(100%-416px)] grid grid-rows-4 text-2xl font-pre-SB text-black">
+			<div className="w-full h-[calc(100%-416px)] pb-8 grid grid-rows-4 text-2xl font-pre-SB text-black">
 				<div className={gridCols}>
 					<div onClick={() => handleInput(numbers[0])} className={colOpt}>
 						{numbers[0]}
