@@ -70,7 +70,7 @@ const UserList: React.FC<ListType> = (listType) => {
 							<img src={item.profileUrl} className="w-12 h-12 rounded-full"/>
 							<p>{item.userName}</p>
 							<div className="absolute right-3 flex text-base text-main-blue items-center gap-3">
-								<p>{item.memberRole === 'MASTER' ? '호스트' : '뷰어'}</p>
+								<p>{item.memberRole === 'MASTER' ? '호스트' : (item.memberRole === 'EDITOR' ? '에디터' : '뷰어')}</p>
 								<img src={clickBtn} className="w-3 h-4" onClick={() => {memberInfo.setData(item); navi(`/group/${groupPk}/userdetail`);}}/>
 							</div>
 						</div>
