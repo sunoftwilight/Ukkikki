@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,10 @@ import project.domain.alarm.redis.AlarmType;
 
 import project.domain.alarm.repository.AlarmRedisRepository;
 import project.domain.alarm.service.AlarmService;
+import project.domain.chat.dto.response.SimpleChatDto;
 import project.domain.chat.entity.Chat;
 import project.domain.chat.entity.ChatType;
+import project.domain.chat.mapper.ChatMapper;
 import project.domain.chat.redis.ChatMember;
 import project.domain.chat.repository.ChatMemberRedisRepository;
 import project.domain.chat.repository.ChatRepository;
@@ -90,13 +93,16 @@ public class PartyServiceImpl implements PartyService {
     private final ProfileMapper profileMapper;
     private final MemberPartyMapper memberPartyMapper;
     private final PartyMapper partyMapper;
+    private final ChatMapper chatMapper;
 
     private final S3Util s3Util;
     private final JasyptUtil jasyptUtil;
     private final BcryptUtil bcryptUtil;
 
     private final RedisTemplate redisTemplate;
+    private final SimpMessageSendingOperations template;
     private final JWTUtil jwtUtil;
+
 
     @Override
     @Transactional
@@ -390,7 +396,8 @@ public class PartyServiceImpl implements PartyService {
             memberRepository.findById(chatMember.getMemberId())
                 .ifPresent(member1 -> {saveChat.getReadMember().add(member1);});
         }
-
+        SimpleChatDto resChat = chatMapper.toSimpleChatDto(saveChat);
+        template.convertAndSend("/sub/chats/party/" + partyId, resChat);
         return checkPasswordDto;
     }
 
@@ -664,6 +671,9 @@ public class PartyServiceImpl implements PartyService {
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Party party = partyRepository.findById(partyId)
+            .orElseThrow(()-> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
         // 파티 권한 조회
         MemberParty memberParty = memberpartyRepository.findByMemberIdAndPartyId(member.getId(), partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_EXIST_PARTY_USER));
@@ -679,6 +689,18 @@ public class PartyServiceImpl implements PartyService {
         // 자신 파티에서 삭제
         memberpartyRepository.delete(memberParty);
 
+        // 나가기 채팅 보내기
+        Chat chat = Chat.builder()
+            .chatType(ChatType.ENTER)
+            .userName(member.getUserName())
+            .content(member.getUserName() + " 님이 방을 나갔습니다.")
+            .party(party)
+            .member(member)
+            .build();
+        SimpleChatDto resChat = chatMapper.toSimpleChatDto(chat);
+        template.convertAndSend("/sub/chats/party/" + partyId, resChat);
+
+
 
         // 자신 키그룹에서 파티 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, memberParty.getParty())
@@ -688,9 +710,6 @@ public class PartyServiceImpl implements PartyService {
 
         // 자신 밖에 없을 때 party 데이터 삭제
         if (partyMemberCount == 1) {
-
-            Party party = partyRepository.findById(partyId)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
 
             // 파티 썸네일 삭제
             String thumbnail = party.getThumbnail();
