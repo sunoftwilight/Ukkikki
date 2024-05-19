@@ -12,6 +12,7 @@ import { DetailImgStore } from "../../stores/DetailImgStore";
 import { useStore } from "zustand";
 import SelectModeImg from "../Album/SelectModeImg";
 import { contentListData } from "../../types/AlbumType";
+import { pageStore } from "../../stores/PageStore";
 const GroupAlbum: React.FC = () => {
   const { setCurrentImg } = useStore(DetailImgStore)
   const { selectMode } = useStore(selectModeStore)
@@ -20,7 +21,7 @@ const GroupAlbum: React.FC = () => {
   const { type, groupName } = imgGroupStore();
   const [ albumList, setAlbumList ] = useState<contentListData[]>([]);
   const isInitialRender = useRef(true);
-
+  const { setIsComeGroup } = pageStore();
   useEffect(() => {
     getImgDetail(type, groupName);
   }, []);
@@ -56,7 +57,9 @@ const GroupAlbum: React.FC = () => {
         :
           <Link 
             to={`/album/detail/${item.pk}/${groupPk}`} state={{url: item.url}}
-            key={idx} onClick={() => setCurrentImg(item.photoId, item.pk, item.url)}
+            key={idx} onClick={() => {
+              setIsComeGroup(true)
+              setCurrentImg(item.photoId, item.pk, item.url)}}
             className="flex justify-center items-center"
           >
             <div className="relative">
