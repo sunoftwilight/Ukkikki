@@ -9,16 +9,21 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useStore } from "zustand";
 import { currentGroupStore } from "../../stores/GroupStore";
 import { AlarmOccuredStore } from "../../stores/AlarmStore";
-
+import { pageStore } from "../../stores/PageStore";
 const BackHeader: React.FC = () => {
 	const navigate = useNavigate();
   const location = useLocation();
   const { currentGroup } = useStore(currentGroupStore);
   const { isAlarmOccured } = useStore(AlarmOccuredStore)
-	
+	const { isComeGroup, setIsComeGroup } = pageStore();
 
 	const goBackHandler = () => {
     if (location.pathname.startsWith('/album/detail/')) {
+			if (isComeGroup) {
+				setIsComeGroup(false)
+				navigate(-1);
+				return;
+			}
       navigate(`/album/${currentGroup}`)
       return
     }

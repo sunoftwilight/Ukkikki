@@ -13,7 +13,6 @@ import TrashOptions from "./TrashOptions";
 import { useStore } from "zustand";
 import { currentGroupStore } from "../../stores/GroupStore";
 import { selectTrashStore } from "../../stores/TrashStore";
-import { pageStore } from "../../stores/PageStore";
 
 const AlbumHeader: React.FC = () => {
 	const btnStyle = "w-14 h-8 rounded-[10px] font-pre-SB text-white flex justify-center items-center";
@@ -33,13 +32,8 @@ const AlbumHeader: React.FC = () => {
 	const { setSelectList, setSelectListForPk } = useStore(selectStore)
   const { setSelectTrash } = useStore(selectTrashStore)
   const { currentGroup } = useStore(currentGroupStore);
-	const { isComeGroup, setIsComeGroup } = pageStore();
 	const navigate = useNavigate();
 	const goBackHandler = () => {
-		if (isComeGroup) {
-			setIsComeGroup(false)
-			navigate(-1);
-		}
 		navigate(`/group/${currentGroup}/main`);
 	};
 
