@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import project.domain.directory.collection.File;
+import project.domain.directory.repository.FileRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
 import project.domain.member.repository.MemberRepository;
@@ -38,6 +40,8 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
     private final FaceRepository faceRepository;
     private final MemberRepository memberRepository;
     private final LikesRepository likesRepository;
+    private final FileRepository fileRepository;
+
 
     @Override
     public List<GroupbrieflyDto> getGroups(Long partyId) {
@@ -108,8 +112,11 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
             List<Photo> photoList = photoRepository.findByMetaCode(party, metaCode);
 
             for (Photo photo : photoList) {
+                File photoFile = fileRepository.findByPhotoDtoId(photo.getId())
+                    .orElse(null);
                 GroupDetailResDto groupDetail = new GroupDetailResDto();
                 groupDetail.setPhotoId(photo.getId());
+                groupDetail.setFileId(photoFile.getId());
                 groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
                 groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
                 groups.add(groupDetail);
@@ -130,6 +137,9 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
                 GroupDetailResDto groupDetail = new GroupDetailResDto();
                 Photo photo = photoRepository.findById(face.getPhotoId())
                         .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+                File photoFile = fileRepository.findByPhotoDtoId(photo.getId())
+                    .orElse(null);
+                groupDetail.setFileId(photoFile.getId());
                 groupDetail.setPhotoId(photo.getId());
                 groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
                 groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
@@ -147,6 +157,9 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
             List<Photo> likePhotoList = photoRepository.findByLike(party, member);
             for (Photo photo : likePhotoList) {
                 GroupDetailResDto groupDetail = new GroupDetailResDto();
+                File photoFile = fileRepository.findByPhotoDtoId(photo.getId())
+                    .orElse(null);
+                groupDetail.setFileId(photoFile.getId());
                 groupDetail.setPhotoId(photo.getId());
                 groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
                 groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
