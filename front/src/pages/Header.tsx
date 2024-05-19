@@ -135,7 +135,6 @@ const Header: React.FC = () => {
 		 location.pathname.startsWith("/imagegroup")
 		) 
 		return <AlbumHeader />;
-
 	return(
 		<Toaster
 			position="top-center"

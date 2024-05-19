@@ -1,3 +1,4 @@
+import { contentListData } from "./AlbumType";
 // Props Type
 export interface CreatePartyData {
   partyName: string;
@@ -125,5 +126,5 @@ export interface ImgGroupListResponse {
 
 export interface ImgGroupResponse {
   resultCode: string;
-  data: {photoId:number, photoUrl:string, thumbnailUrl:string, fileId:string}[];
+  data: contentListData[];
 }

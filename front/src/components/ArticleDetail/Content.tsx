@@ -12,9 +12,9 @@ const Content: React.FC = () => {
   const { groupPk, feedPk } = useParams();
   const [articleInfo, setArticleInfo] = useState<ArticleProps>();
   const {groupKey, userName} = useStore(userStore)
-  const goImgDetailHandler = (imgPk:number) => {
-    navigate(`/feed/${groupPk}/${feedPk}/${imgPk}`)
-  }
+  // const goImgDetailHandler = (imgPk:number) => {
+  //   // navigate(`/feed/${groupPk}/detail/${feedPk}/${imgPk}`)
+  // }
 
   useEffect(() => {
     getArticle();
@@ -102,7 +102,7 @@ const Content: React.FC = () => {
 
         <div className="flex gap-[6px] overflow-x-scroll scrollbar-hide">
           { articleInfo?.photoList.map((item, idx) => (
-            <img key={idx} src={item.photoUrl} onClick={() => {goImgDetailHandler(item.photoId)}} className="w-full h-60 rounded-xl object-cover" />
+            <img key={idx} src={item.photoUrl} onClick={() => {}} className="w-full h-60 rounded-xl object-cover" />
           ))}
         </div>
       </div>
