@@ -57,7 +57,7 @@ export const deleteAritcle = async(
 export const getArticleImg = async (
   thumbUrl: string,
   headerOpt: Record<string,string>,
-  Response: (Response: AxiosResponse<ResponseData>) => void,
+  Response: (Response: AxiosResponse<BlobPart>) => void,
   Error: (Error: AxiosResponse<ResponseData>) => void) => {
     await imgApi.get(`${thumbUrl}`,{headers: {...headerOpt}})
     .then(Response)

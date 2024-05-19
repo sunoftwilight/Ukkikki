@@ -7,7 +7,6 @@ import download from "@/assets/Header/AlbumSelectOptions/download.png";
 import move from "@/assets/Header/AlbumSelectOptions/move.png";
 import copy from "@/assets/Header/AlbumSelectOptions/copy.png";
 import trash from "@/assets/Header/AlbumEditOptions/trash.png";
-import edit from "@/assets/Header/AlbumEditOptions/edit.png";
 import Modal from "../@commons/Modal";
 import { multiDownloadFile } from "../../api/file";
 import { useStore } from "zustand";
@@ -168,11 +167,6 @@ const AlbumSelectOptions: React.FC = () => {
         <div className={`${optionStyle}`} onClick={() => openHandler('delete')}>
           <img src={trash} className="w-4" />
           삭제
-        </div>
-
-        <div className={`${optionStyle}`} onClick={() => openHandler('')}>
-          <img src={edit} className="w-4" />
-          게시글 작성
         </div>
       </div>
     </AnimatePresence>

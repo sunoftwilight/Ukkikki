@@ -3,7 +3,7 @@ import editBtn from "@/assets/ArticleDetail/edit.png";
 import deleteBtn from "@/assets/ArticleDetail/delete.png";
 import { useNavigate, useParams } from "react-router-dom";
 import { getArticleDetail, getArticleImg, deleteAritcle } from "../../api/article";
-import { ArticleProps } from "../../types/ArticleType";
+import { ArticleProps, ArticlePhotoProps } from "../../types/ArticleType";
 import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
 
@@ -30,7 +30,7 @@ const Content: React.FC = () => {
         setArticleInfo(data)
         if (data.photoList.length > 0){
           data.photoList.forEach(item => {
-            getImg(data.partyId, item.photoUrl)
+            getImg(item, data.partyId, item.photoUrl)
           })
         }
       },  
@@ -40,7 +40,7 @@ const Content: React.FC = () => {
     )
   }
 
-  const getImg = async (pk: number, url: string) => {
+  const getImg = async (data:ArticlePhotoProps, pk: number, url: string) => {
 		const key = groupKey[pk]
     const opt = {
       "x-amz-server-side-encryption-customer-key": key,
@@ -48,7 +48,10 @@ const Content: React.FC = () => {
     await getArticleImg(
       url,
       opt,
-      () => {},
+      (res) => {
+        const blob = new Blob([res.data], {type: 'image/png'})
+        data.photoUrl = (URL.createObjectURL(blob))
+      },
       (err) => { console.log(err); },
     );
 	}

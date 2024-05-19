@@ -4,7 +4,7 @@ import etc from "@/assets/GroupMain/etc.png"
 import { memberStore } from "../../stores/ModalStore";
 import { Link, useParams } from "react-router-dom";
 import { getPartyDetail, getPartyThumb } from "../../api/party";
-import { PartyDetailData } from "../../types/GroupType";
+import { PartyDetailData, MemberData } from "../../types/GroupType";
 import { userStore } from "../../stores/UserStore";
 
 
@@ -25,7 +25,7 @@ const GroupProfile: React.FC = () => {
       res.data.data.partyMembers.forEach((item) => {
         if (item.type === 'S3') {
           const key = groupKey[Number(groupPk)];
-          getImg(item.profileUrl, key)
+          getImg(item, key)
         }
       });
       setGroupInfo({
@@ -40,14 +40,17 @@ const GroupProfile: React.FC = () => {
     })
   }
 
-  const getImg = async (url: string, key: string) => {
+  const getImg = async (data:MemberData, key:string) => {
 		const opt = {
 			"x-amz-server-side-encryption-customer-key": key,
 		};
 		await getPartyThumb(
-			url,
+			data.profileUrl,
 			opt,
-      () => {},
+      (res) => {
+        const blob = new Blob([res.data], {type: 'image/png'})
+        data.profileUrl = (URL.createObjectURL(blob))
+      },
 			(err) => { console.log(err); },
 		);
 	};
