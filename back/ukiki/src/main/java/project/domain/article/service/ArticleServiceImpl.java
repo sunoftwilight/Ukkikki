@@ -321,6 +321,11 @@ public class ArticleServiceImpl implements ArticleService{
                         .orElseThrow(() -> new BusinessLogicException(ErrorCode.PHOTO_FILE_NOT_FOUND));
                     // ArticlePhoto 생성
                     ArticlePhoto articlePhoto = ArticlePhoto.create(photo, article);
+                    articlePhotoRepository.findByArticleIdAndPhotoId(articleId, photo.getId())
+                        .ifPresentOrElse(
+                            articlePhoto1 -> article.getArticlePhotoList().add(articlePhoto1),
+                            () -> article.getArticlePhotoList().add(articlePhotoRepository.save(articlePhoto))
+                        );
                     // 리스트에 넣고 저장
                     article.getArticlePhotoList().add(articlePhotoRepository.save(articlePhoto));
                 }

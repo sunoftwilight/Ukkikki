@@ -691,7 +691,7 @@ public class PartyServiceImpl implements PartyService {
 
         // 나가기 채팅 보내기
         Chat chat = Chat.builder()
-            .chatType(ChatType.ENTER)
+            .chatType(ChatType.EXIT)
             .userName(member.getUserName())
             .content(member.getUserName() + " 님이 방을 나갔습니다.")
             .party(party)
