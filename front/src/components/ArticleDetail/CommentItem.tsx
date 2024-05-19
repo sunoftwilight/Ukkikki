@@ -76,7 +76,7 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 	const createReply = () => {
 
 		// 하나만 생성하기 위해 조건을 걸어주었따.
-		if(reply == null || (reply.length > 0 && reply[reply.length - 1].userId !== -1)) {
+		if(reply.length === 0 || (reply.length > 0 && reply[reply.length - 1].userId !== -1)) {
 
 			setReply([...reply,{
 				userId : -1,
