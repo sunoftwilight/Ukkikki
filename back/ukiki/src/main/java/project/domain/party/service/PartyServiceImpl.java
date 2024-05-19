@@ -773,17 +773,18 @@ public class PartyServiceImpl implements PartyService {
         // 상대방 찾기
         MemberParty targetParty = memberpartyRepository.findByMemberIdAndPartyId(targetId, partyId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+        // 추방 멤버의 키그룹에서 키 삭제
+        KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
+
+        keyGroupRepository.delete(keyGroup);
+
         // 상대방 프로필 찾기
         Profile targetProfile = profileRepository.findByMemberIdAndPartyId(targetId, partyId)
             .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
         // 상대방 삭제
         memberpartyRepository.delete(targetParty);
         profileRepository.delete(targetProfile);
-        // 추방 멤버의 키그룹에서 키 삭제
-        KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
-
-        keyGroupRepository.delete(keyGroup);
     }
 
     @Override
