@@ -745,6 +745,7 @@ public class PartyServiceImpl implements PartyService {
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
         // 멤버 차단 시켜 버리기
         targetParty.setMemberRole(MemberRole.BLOCK);
+        memberpartyRepository.save(targetParty);
 
         // 차단 멤버의 키그룹에서 키 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(targetParty.getMember(), targetParty.getParty())
