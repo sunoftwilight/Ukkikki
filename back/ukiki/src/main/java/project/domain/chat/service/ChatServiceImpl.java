@@ -121,6 +121,7 @@ public class ChatServiceImpl implements ChatService{
             memberRepository.findById(chatMember.getMemberId())
                 .ifPresent(raedMember -> chat.getReadMember().add(raedMember));
         }
+        log.info("읽은사람 " + chat.getReadMember());
         chatRepository.save(chat);
 
         SimpleChatDto simpleChatDto = chatMapper.toSimpleChatDto(chat);
@@ -166,10 +167,13 @@ public class ChatServiceImpl implements ChatService{
                 List<Long> readMembers = chat.getReadMember().stream()
                     .map(Member::getId)
                     .toList();
+
                 if (!readMembers.contains(memberId)) {
                     List<Member> readMemberList = chat.getReadMember();
+                    log.info(readMemberList.toString());
                     readMemberList.add(member);
                     chat.setReadMember(readMemberList);
+                    log.info(chat.getReadMember().toString());
                     chatRepository.save(chat);
                 }
                 SimpleChatDto chatDto = chatMapper.toSimpleChatDto(chat);
