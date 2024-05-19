@@ -69,7 +69,7 @@ const UpdateArticle: React.FC = () => {
       title: titleRef.current.value,
       content: contentRef.current.value,
       password: groupKey[Number(groupPk)],
-      articlePhotoList: addAlbumList.map((item) => String(item.photoId)),
+      articlePhotoList: [],
       addPhoto: true
     }
 
