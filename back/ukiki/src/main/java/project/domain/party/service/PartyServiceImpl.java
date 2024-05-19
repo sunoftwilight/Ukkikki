@@ -416,13 +416,15 @@ public class PartyServiceImpl implements PartyService {
         MemberParty memberParty = memberpartyRepository.findByMemberAndParty(member, party)
             .orElseGet(() -> {
                 // 신규유저 프로필 저장
-                Profile profile = Profile.builder()
-                    .nickname(member.getUserName())
-                    .type(ProfileType.KAKAO)
-                    .profileUrl(member.getProfileUrl())
-                    .party(party)
-                    .member(member)
-                    .build();
+                Profile profile = profileRepository.findByMemberIdAndPartyId(memberId, partyId)
+                    .orElseGet(() ->  Profile.builder()
+                        .nickname(member.getUserName())
+                        .type(ProfileType.KAKAO)
+                        .profileUrl(member.getProfileUrl())
+                        .party(party)
+                        .member(member)
+                        .build());
+
                 profileRepository.save(profile);
 
 
@@ -674,18 +676,9 @@ public class PartyServiceImpl implements PartyService {
             throw new BusinessLogicException(ErrorCode.MASTER_CANT_EXIT);
         }
 
-        // 자신 프로필 조회
-        Profile profile = profileRepository.findByMemberIdAndPartyId(memberId, partyId)
-            .orElseThrow(()-> new BusinessLogicException(ErrorCode.MEMBER_NOT_PROFILE));
-
-        // TODO 자신 프로필 사진 삭제해야함
-        String myProfileUrl = profile.getProfileUrl();
-        String myProfileFileName = myProfileUrl.split("/")[3];
-        s3Util.fileDelete(myProfileFileName);
-
         // 자신 파티에서 삭제
         memberpartyRepository.delete(memberParty);
-        profileRepository.delete(profile);
+
 
         // 자신 키그룹에서 파티 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, memberParty.getParty())
@@ -721,6 +714,16 @@ public class PartyServiceImpl implements PartyService {
 
             // TODO directory[O], comment[X], Chat[O] 삭제 코드 추가해야함
             chatRepository.deleteAllByPartyId(partyId);
+
+            // 모든 프로필
+            List<Profile> profileList = profileRepository.findAllByPartyId(partyId);
+            for (Profile profile : profileList) {
+                String myProfileUrl = profile.getProfileUrl();
+                String myProfileFileName = myProfileUrl.split("/")[3];
+                s3Util.fileDelete(myProfileFileName);
+                profileRepository.delete(profile);
+            }
+
         }
 
     }
