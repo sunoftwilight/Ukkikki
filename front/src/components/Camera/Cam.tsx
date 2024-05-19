@@ -11,7 +11,7 @@ import selectedTimer5s from "@/assets/Camera/selectedTimer5s.png";
 import selectedTimer10s from "@/assets/Camera/selectedTimer10s.png";
 import changeView from "@/assets/Camera/changeCamera.png";
 import backWord from "@/assets/Camera/backward.png";
-// import video from "@/assets/Camera/video.png"
+import soundFile from "@/assets/Camera/soundFile.mp3";
 import { useStore } from 'zustand';
 import { userStore } from '../../stores/UserStore';
 import { useNavigate } from 'react-router-dom';
@@ -26,10 +26,12 @@ const Cam: React.FC = () => {
   const [openOptList, setOpenOptList] = useState<boolean>(true);
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
   const [cameras, setCameras] = useState<string[]>([]);
+  const [flash, setFlash] = useState<boolean>(false);
+
   const user = useStore(userStore);
   const navi = useNavigate()
   const videoRef = useRef<HTMLVideoElement>(null);
-
+  const audioRef = useRef<HTMLAudioElement>(null);
   const qualities: Record<string, {width:number, height:number}> = {
     '3:4': { width: 3600, height: 2700 },
     '9:16': { width: 4000, height: 2252 },
@@ -88,7 +90,7 @@ const Cam: React.FC = () => {
     }
   };
 
-  const testLogic = () => {
+  const captureBtnHandler = () => {
     capturePhoto();
   }
 
@@ -120,6 +122,13 @@ const Cam: React.FC = () => {
                 () => {}, 
                 ()=> {}
               )
+
+              if (audioRef.current) {
+                audioRef.current.play();
+              }
+              setFlash(true);
+              setTimeout(() => setFlash(false), 100);
+
             }
           }, 'image/jpeg', 1)
         }, selectedTimer)
@@ -183,6 +192,10 @@ const Cam: React.FC = () => {
 
   return (
     <div className='min-h-screen max-h-screen min-w-full max-w-full bg-black relative'>
+      {flash && ( // 사진 촬영 중일 때 깜박거리는 효과 표시
+        <div className="absolute inset-0 bg-disabled-gray opacity-50 w-full h-full top-0 left-0"></div>
+      )}
+      <audio ref={audioRef} src={soundFile} />
       <div className='min-h-14 max-h-14 min-w-full max-w-full flex items-center'>
         {openOptList && (
           <div className='w-full h-full flex justify-evenly items-center'>
@@ -221,7 +234,7 @@ const Cam: React.FC = () => {
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
           <img src={backWord} className='object-cover w-6 h-6' onClick={goBack}/>
         </div>
-        <div className='w-20 h-20 bg-white rounded-full flex items-center justify-center' onClick={testLogic}>
+        <div className='w-20 h-20 bg-white rounded-full flex items-center justify-center' onClick={captureBtnHandler}>
         </div>
         <div className='w-12 h-12 bg-point-gray rounded-full flex justify-center items-center'>
           <img src={changeView} className='object-cover w-6 h-6' onClick={changeCamera}/>

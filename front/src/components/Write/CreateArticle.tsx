@@ -132,7 +132,7 @@ const CreateArticle: React.FC = () => {
                 </div>
                 <div className={`${optionStyle} pt-3 pb-4`}>
                   <label htmlFor="fromDevice">디바이스에서 첨부하기</label>
-                  <input id="fromDevice" accept="image/*" type="file" className="hidden" onChange={handleImageChange}/>
+                  <input id="fromDevice" multiple accept="image/*" type="file" className="hidden" onChange={handleImageChange}/>
                 </div>
               </div>            
             </motion.div>
