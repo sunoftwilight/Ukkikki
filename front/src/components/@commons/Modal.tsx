@@ -29,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({ modalItems, onSubmitBtnClick, onCancelBtn
 				return (
 					<div className={`${containClass} gap-5`}>
 						<img src={warn} />
-						<div className={`${contentClass} h-[70px] flex-col`}>
+						<div className="flex w-full h-[70px] flex-col">
 							{modalItems?.title}
               <div className="w-full font-pre-R text-sm text-black">{modalItems.content}</div>
 						</div>

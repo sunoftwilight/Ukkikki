@@ -116,7 +116,7 @@ const AlbumSelectOptions: React.FC = () => {
       { isPrefixOpen && (
         <Modal 
           key='isPrefixOpen'
-          modalItems={{ title: '파일명 수정', content: '', modalType: 'input', btn: 2 }}
+          modalItems={{ title: '파일명 설정', content: '', modalType: 'input', btn: 2 }}
           onSubmitBtnClick={() => prefixHandler()}
           onCancelBtnClick={() => setIsPrefixOpen(false)}
         />
@@ -148,7 +148,7 @@ const AlbumSelectOptions: React.FC = () => {
         />
       )}
 
-      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[186px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
+      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[156px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
         <div className={`${optionStyle}`} onClick={() => openHandler('down')}>
           <img src={download} className="w-4" />
           다운로드

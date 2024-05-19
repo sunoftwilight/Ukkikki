@@ -165,7 +165,7 @@ const AlbumEditOptions: React.FC = () => {
       { isOkOpen && 
         <Modal 
         key='isOkOpen'
-        modalItems={{ title: '현재 폴더와 사진을 모두 삭제합니다', content: '삭제된 사진은 휴지통에 2주간 보관되며 기간 내 복구 가능합니다', modalType: 'warn', btn: 2 }}
+        modalItems={{ title: '폴더 및 파일 삭제', content: '삭제된 사진은 2주간 보관 및 복구 가능합니다', modalType: 'warn', btn: 2 }}
         onSubmitBtnClick={() => deleteFolderHandler()}
         onCancelBtnClick={() => setIsOkOpen(false)}
         />
@@ -186,7 +186,7 @@ const AlbumEditOptions: React.FC = () => {
         onCancelBtnClick={() => setIsEditNameOpen(false)}
         />
       }
-      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[200px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
+      <div className="flex flex-col px-2 py-[10px] gap-[5px] fixed top-14 right-4 w-40 h-[190px] bg-zinc bg-opacity-30 rounded-xl shadow-inner backdrop-blur-[50px]">
         <label className={`${optionStyle}`} htmlFor='files'>
           <img src={upload} className="w-4" />
           업로드

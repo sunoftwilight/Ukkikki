@@ -89,16 +89,15 @@ const ChattingRoom: React.FC<ChattingRoomProps> = ({ msgList }) => {
         </div>
         :
         <div key={idx} className="w-full mb-[10px] rounded-[15px] bg-soft-gray opacity-80 flex py-2 px-[10px] gap-[10px]">
-          <img src={blobUrl} className="rounded-full w-[50px] h-[50px]" />
-
+          {item.profileType === 'S3' ?
+            <img src={blobUrl} className="rounded-full w-[50px] h-[50px]" />
+            : 
+            <img src={item.profileUrl} className="rounded-full w-[50px] h-[50px]" />
+          }
           <div className="flex flex-col w-[calc(100%-60px)] gap-2">
-            <div className="flex w-full justify-between items-center">
-              <div className="flex gap-2 items-center mt-[2px]">
-                <div className="font-pre-SB text-black text-xs">{item.memberName}</div>
-                <div className="font-pre-L text-point-gray text-[10px]">{dateHandler(item.createDate)} &nbsp; {timeHandler(item.createDate)}</div>
-              </div>
-
-              <div className="font-pre-L text-point-gray text-[10px]">{item.readNum}명 읽음</div>
+            <div className="flex gap-2 items-center mt-[2px]">
+              <div className="font-pre-SB text-black text-xs">{item.memberName}</div>
+              <div className="font-pre-L text-point-gray text-[10px]">{dateHandler(item.createDate)} &nbsp; {timeHandler(item.createDate)}</div>
             </div>
             <div className="font-pre-L text-black text-sm">{item.content}</div>
           </div>
