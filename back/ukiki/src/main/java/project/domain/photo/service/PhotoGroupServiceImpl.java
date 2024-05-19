@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import project.domain.directory.collection.DataType;
 import project.domain.directory.collection.File;
+import project.domain.directory.dto.response.GetDirInnerDtov2;
 import project.domain.directory.repository.FileRepository;
 import project.domain.member.dto.request.CustomUserDetails;
 import project.domain.member.entity.Member;
@@ -17,16 +19,15 @@ import project.domain.photo.entity.Face;
 import project.domain.photo.entity.FaceGroup;
 import project.domain.photo.entity.MetaCode;
 import project.domain.photo.entity.Photo;
-import project.domain.photo.repository.FaceGroupRepository;
-import project.domain.photo.repository.FaceRepository;
-import project.domain.photo.repository.LikesRepository;
-import project.domain.photo.repository.PhotoRepository;
+import project.domain.photo.entity.mediatable.Likes;
+import project.domain.photo.repository.*;
 import project.global.exception.BusinessLogicException;
 import project.global.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +42,7 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
     private final MemberRepository memberRepository;
     private final LikesRepository likesRepository;
     private final FileRepository fileRepository;
-
+    private final DownloadLogRepository downloadLogRepository;
 
     @Override
     public List<GroupbrieflyDto> getGroups(Long partyId) {
@@ -102,24 +103,47 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
     }
 
     @Override
-    public List<GroupDetailResDto> getGroupDetail(int type, String groupName, Long partyId) {
+    public List<GetDirInnerDtov2> getGroupDetail(int type, String groupName, Long partyId) {
         //metaCode 그룹인 경우
-        List<GroupDetailResDto> groups = new ArrayList<>();
+//        List<GroupDetailResDto> groups = new ArrayList<>();
+        List<GetDirInnerDtov2> groups = new ArrayList<>();
         Party party = partyRepository.findById(partyId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.PARTY_NOT_FOUND));
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = userDetails.getId();
+
+        Member member = memberRepository.findById(userId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
+
         if (type == 1) {
             MetaCode metaCode = MetaCode.valueOf(groupName);
             List<Photo> photoList = photoRepository.findByMetaCode(party, metaCode);
 
             for (Photo photo : photoList) {
-                File photoFile = fileRepository.findByPhotoDtoId(photo.getId())
+                File file = fileRepository.findByPhotoDtoId(photo.getId())
                     .orElse(null);
-                GroupDetailResDto groupDetail = new GroupDetailResDto();
-                groupDetail.setPhotoId(photo.getId());
-                groupDetail.setFileId(photoFile.getId());
-                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
-                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
-                groups.add(groupDetail);
+
+                Boolean isExistDownloadLog = downloadLogRepository.existsByMemberAndPhoto(
+                    member, photo);
+                Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
+                    photo);
+
+                GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
+                    .type(DataType.FILE)
+                    .pk(file.getId())
+                    .photoId(file.getPhotoDto().getId())
+                    .url(file.getPhotoDto().getThumbUrl1())
+                    .isDownload(isExistDownloadLog)
+                    .isLikes(opLikes.isPresent())
+                    .build();
+                groups.add(fileType);
+
+//                GroupDetailResDto groupDetail = new GroupDetailResDto();
+//                groupDetail.setPhotoId(photo.getId());
+//                groupDetail.setFileId(photoFile.getId());
+//                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
+//                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
+//                groups.add(groupDetail);
             }
         }
         //face 그룹인 경우
@@ -139,31 +163,62 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
                         .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
                 File photoFile = fileRepository.findByPhotoDtoId(photo.getId())
                     .orElse(null);
-                groupDetail.setFileId(photoFile.getId());
-                groupDetail.setPhotoId(photo.getId());
-                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
-                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
-                groups.add(groupDetail);
+
+
+
+                File file = fileRepository.findByPhotoDtoId(photo.getId())
+                    .orElse(null);
+
+                Boolean isExistDownloadLog = downloadLogRepository.existsByMemberAndPhoto(
+                    member, photo);
+                Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
+                    photo);
+
+                GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
+                    .type(DataType.FILE)
+                    .pk(file.getId())
+                    .photoId(file.getPhotoDto().getId())
+                    .url(file.getPhotoDto().getThumbUrl1())
+                    .isDownload(isExistDownloadLog)
+                    .isLikes(opLikes.isPresent())
+                    .build();
+                groups.add(fileType);
+
+//                groupDetail.setFileId(photoFile.getId());
+//                groupDetail.setPhotoId(photo.getId());
+//                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
+//                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
+//                groups.add(groupDetail);
             }
         }
         // 좋아요한 사진인 경우
         if (type == 3) {
-            CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Long userId = userDetails.getId();
-
-            Member member = memberRepository.findById(userId)
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND));
-
             List<Photo> likePhotoList = photoRepository.findByLike(party, member);
             for (Photo photo : likePhotoList) {
                 GroupDetailResDto groupDetail = new GroupDetailResDto();
-                File photoFile = fileRepository.findByPhotoDtoId(photo.getId())
+                File file = fileRepository.findByPhotoDtoId(photo.getId())
                     .orElse(null);
-                groupDetail.setFileId(photoFile.getId());
-                groupDetail.setPhotoId(photo.getId());
-                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
-                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
-                groups.add(groupDetail);
+
+                Boolean isExistDownloadLog = downloadLogRepository.existsByMemberAndPhoto(
+                    member, photo);
+                Optional<Likes> opLikes = likesRepository.findByMemberAndPhoto(member,
+                    photo);
+
+                GetDirInnerDtov2 fileType = GetDirInnerDtov2.builder()
+                    .type(DataType.FILE)
+                    .pk(file.getId())
+                    .photoId(file.getPhotoDto().getId())
+                    .url(file.getPhotoDto().getThumbUrl1())
+                    .isDownload(isExistDownloadLog)
+                    .isLikes(opLikes.isPresent())
+                    .build();
+                groups.add(fileType);
+
+//                groupDetail.setFileId(photoFile.getId());
+//                groupDetail.setPhotoId(photo.getId());
+//                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
+//                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
+//                groups.add(groupDetail);
             }
         }
 
