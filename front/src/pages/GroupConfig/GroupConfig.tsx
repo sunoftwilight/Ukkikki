@@ -50,7 +50,10 @@ const GroupConfig: React.FC = () => {
 		<div className="p-4 w-full h-[calc(100%-48px)] flex flex-col gap-2 relative font-pre-R text-xl">
         <div className="px-4 w-full h-[60px] bg-soft-gray rounded-xl flex items-center" onClick={() => navi(`/group/${groupPk}/profile`)}>
           <img src={profile} className="w-6 h-6 me-4"/>
-          <p>그룹 프로필 변경</p>
+          <div className="flex flex-col gap-1">
+            <p className="font-pre-R text-xl">개인 프로필 변경</p>
+            <p className="font-pre-L text-xs text-point-gray">해당 프로필은 현재 그룹에서만 적용됩니다.</p>
+          </div>
         </div>
       {(grant === 'MASTER') && (
         <div className="px-4 w-full h-[60px] bg-soft-gray rounded-xl flex items-center" onClick={() => navi(`/group/${groupPk}/env`)}>
