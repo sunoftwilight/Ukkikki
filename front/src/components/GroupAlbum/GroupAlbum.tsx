@@ -18,7 +18,7 @@ const GroupAlbum: React.FC = () => {
 
   useEffect(() => {
     imgList.forEach((item) => {
-      getImg(item.thumbnailUrl, groupKey[Number(groupPk)])
+      getImg(item)
     })
   }, [imgList])
 
@@ -33,14 +33,16 @@ const GroupAlbum: React.FC = () => {
       })
   }
 
-  const getImg = async (url: string, key: string) => {
+  const getImg = async (data:{photoId:number, photoUrl:string, thumbnailUrl:string}) => {
 		const opt = {
-			"x-amz-server-side-encryption-customer-key": key,
+			"x-amz-server-side-encryption-customer-key": groupKey[Number(groupPk)],
 		};
 		await getPartyThumb(
-			url,
+			data.thumbnailUrl,
 			opt,
-			() => {console.log()
+			(res) => {
+        const blob = new Blob([res.data], {type: 'image/png'})
+        data.thumbnailUrl = (URL.createObjectURL(blob))
       },
 			(err) => { console.log(err); },
 		);
