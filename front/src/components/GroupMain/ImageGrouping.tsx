@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ImgGroupListData } from "../../types/GroupType";
 import { userStore } from "../../stores/UserStore";
 import { imgGroupStore } from "../../stores/AlbumStore";
+import ImageGroupThumb from "./ImageGroupThumb";
 
 
 const ImageGrouping: React.FC = () => {
@@ -109,7 +110,7 @@ const ImageGrouping: React.FC = () => {
         { groupingList.map((item, idx) => (
           <div className="flex flex-col items-center justify-center gap-1">
             <div key={idx} className="w-[52px] h-[52px] rounded-full border-disabled-gray border-[1px] flex justify-center items-center hover:scale-125" onClick={()=> linkHandler(item.type, item.groupName)}>
-              <img src={item.thumbnailUrl} className="w-12 h-12 object-cover rounded-full" />
+              <ImageGroupThumb url={item.thumbnailUrl} />
             </div>
             <div className="font-pre-L text-xs text-black">
               {nameHandler(item.type, item.groupName)}

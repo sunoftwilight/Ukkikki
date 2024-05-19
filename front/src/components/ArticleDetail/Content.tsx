@@ -6,6 +6,9 @@ import { getArticleDetail, getArticleImg, deleteAritcle } from "../../api/articl
 import { ArticleProps, ArticlePhotoProps } from "../../types/ArticleType";
 import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
+import ContentImg from "./ContentImg";
+import WriterImg from "./WriterImg";
+import logo from '../../../icons/512.png'
 
 const Content: React.FC = () => {
   const navigate = useNavigate()
@@ -74,9 +77,16 @@ const Content: React.FC = () => {
     <div className="flex flex-col w-full bg-white gap-1">
       {/* 작성자 프로필 */}
       <div className="w-full h-16 px-5 py-2 flex gap-[14px]">
-        <img src={articleInfo?.writerUrl} className="w-12 h-12 rounded-full" />
+        {articleInfo?.writerUrl ? 
+          articleInfo?.writerUrl.startsWith('http://k.kakaocdn.net/') ?
+            <img src={articleInfo?.writerUrl} className="w-12 h-12 rounded-full" />
+          :
+            <WriterImg url={articleInfo?.writerUrl} />
+          :
+            <img src={logo} className="w-12 h-12 rounded-full" />
+        }
 
-        <div className="w-full flex flex-col gap-1">
+        <div className="w-[calc(100%-52px)] flex flex-col gap-1">
           <div className="w-full flex justify-between items-center">
             <div className="font-pre-SB text-black text-base">{articleInfo?.writer}</div>
             <div className="flex gap-2">
@@ -105,7 +115,8 @@ const Content: React.FC = () => {
 
         <div className="flex gap-[6px] overflow-x-scroll scrollbar-hide">
           { articleInfo?.photoList.map((item, idx) => (
-            <img key={idx} src={item.photoUrl} onClick={() => {}} className="w-full h-60 rounded-xl object-cover" />
+            // <img key={idx} src={item.photoUrl} className="w-full h-60 rounded-xl object-cover" />
+            <ContentImg key={idx} url={item.photoUrl} />
           ))}
         </div>
       </div>

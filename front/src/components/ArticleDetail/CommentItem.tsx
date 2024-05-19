@@ -12,6 +12,7 @@ import bb from "@/assets/ArticleDetail/bb.png"
 import CommentTop from "./Comment/CommentTop";
 import CommentBottom from "./Comment/CommentBottom";
 import ReplyItem from "./ReplyItem";
+import CommentImg from "./CommentImg";
 
 const CommentItem: React.FC<CommentItemInterface> = ({
 	idx,
@@ -24,6 +25,8 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 	const { feedPk } = useParams();
 
 	const [reply,setReply] = useState(comment.reply);
+
+  console.log(comment)
 
 	useEffect(() => {
 		createReplyCancel();
@@ -99,8 +102,12 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 		<div className="flex flex-col">
 			{!comment.isDelete ? (
 				<div className="w-full py-2 px-5 flex gap-3 bg-white">
-					<img src={comment.profileUrl} className="w-9 h-9 rounded-full" />
-					<div className="flex flex-col gap-2 w-full">
+          { comment.profileUrl.startsWith('http://k.kakaocdn.net/') ?
+            <img src={comment.profileUrl} className="w-9 h-9 rounded-full" />
+            :
+            <CommentImg url={comment.profileUrl} />
+          }
+					<div className="flex flex-col gap-2 w-[calc(100%-40px)]">
 						<CommentTop
 							key={idx}
 							comment={comment}

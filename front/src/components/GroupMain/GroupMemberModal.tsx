@@ -3,9 +3,11 @@ import ModalBackground from "../@commons/ModalBackground";
 import { memberStore } from "../../stores/ModalStore";
 import close from '@/assets/Hamburger/close.png'
 import { motion, AnimatePresence } from "framer-motion"
+import MemeberImg from "./MemberImg";
 
 const GroupMemberModal: React.FC = () => {
   const { members, memberOpen, setMemberOpen } = memberStore()
+  console.log(members)
 	return (
     <AnimatePresence>
       { memberOpen &&
@@ -27,7 +29,11 @@ const GroupMemberModal: React.FC = () => {
             <div className="flex flex-col p-2">
               {members && members.map((item, idx) => (
                 <div key={idx} className="flex w-full h-14 gap-3 items-center">
-                  <img src={item.profileUrl} className=" w-10 h-10 rounded-full" />
+                  { item.profileUrl.startsWith('blob') ?
+                    <MemeberImg url={item.profileUrl} />
+                    :
+                    <img src={item.profileUrl} className=" w-10 h-10 rounded-full" />
+                  }
                   <div className="font-pre-R text-base text-black">{item.nickname}</div>
                 </div>
               ))}

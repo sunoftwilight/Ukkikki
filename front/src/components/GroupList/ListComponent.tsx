@@ -7,6 +7,7 @@ import { PartyListData } from "../../types/GroupType";
 import { userStore } from "../../stores/UserStore";
 import { useStore } from "zustand";
 import { useNavigate } from "react-router-dom";
+import GroupThumb from "./GroupThumb";
 
 const ListComponent: React.FC = () => {
 	const [partyList, setPartList] = useState<PartyListData[]>([]);
@@ -83,10 +84,7 @@ const ListComponent: React.FC = () => {
 					key={item.id}
 					className="relative w-100 h-20 rounded-2xl flex items-center border border-disabled-gray">
 					<div className="h-full w-4/5 flex items-center" onClick={() => clickHandler(item.id, item.expired)}>
-						<img
-							src={item.partyProfile}
-							className="w-14 h-14 rounded-full ms-4 me-5"
-						/>
+            <GroupThumb info={item} />
 						<p className="text-xl font-pre-R">{item.partyName}</p>
 					</div>
 					<div className="h-full w-1/5 flex items-center justify-center">

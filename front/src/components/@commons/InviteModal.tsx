@@ -62,7 +62,7 @@ const InviteModal: React.FC = () => {
 
                   {/* 가입 코드  */}
                   <div className="flex gap-3 justify-end items-center">
-                    <div className="flex items-center justify-center w-20 h-8 rounded-[10px] bg-main-blue text-white text-base font-pre-M" onClick={() => copyUrlHandler()} >초대하기</div>
+                    <div className="flex items-center justify-center w-20 h-8 rounded-[10px] bg-main-blue text-white text-base font-pre-M" onClick={() => copyUrlHandler()} >복사하기</div>
                   </div>
                 </div>
               </div>

@@ -5,6 +5,7 @@ import { ArticleProps } from "../../types/ArticleType";
 import { getArticleList, getArticleImg } from "../../api/article";
 import { useStore } from "zustand";
 import { userStore } from "../../stores/UserStore";
+import FeedItemThumb from "./FeedItemThumb";
 
 const FeedMain: React.FC = () => {
   const { groupPk }= useParams();
@@ -65,7 +66,7 @@ const FeedMain: React.FC = () => {
               <div className="line-clamp-4 font-pre-R text-sm text-black">{item.content}</div>
             </div>
             {item.photoList.length > 0 && (
-              <img src={item.photoList[0].photoUrl} className="rounded-xl h-52 object-cover" />
+              <FeedItemThumb url={item.photoList[0].photoUrl} />
             )}
           </div>
         </Link>

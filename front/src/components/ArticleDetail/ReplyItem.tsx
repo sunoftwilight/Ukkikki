@@ -12,6 +12,7 @@ import ReplyTop from "./Reply/ReplyTop";
 import ReplyBottom from "./Reply/ReplyBottom";
 
 import bb from "@/assets/ArticleDetail/bb.png"
+import CommentImg from "./CommentImg";
 
 const ReplyItem: React.FC<ReplyItemInterface> = ({
 	commentIdx,
@@ -117,8 +118,13 @@ const ReplyItem: React.FC<ReplyItemInterface> = ({
 						</div>
 					) : (
 						<div className="w-full py-2 px-5 flex gap-3 bg-white pl-16">
-							<img src={reply.profileUrl} className="w-9 h-9 rounded-full" />
-							<div className="flex flex-col gap-2 w-full">
+              { reply.profileUrl.startsWith('http://k.kakaocdn.net/') ?
+                <img src={reply.profileUrl} className="w-9 h-9 rounded-full" />
+                :
+                <CommentImg url={reply.profileUrl} />
+              }
+							{/* <img src={reply.profileUrl} className="w-9 h-9 rounded-full" /> */}
+							<div className="flex flex-col gap-2 w-[calc(100%-40px)]">
 								<ReplyTop key={replyIdx} reply={reply} commentDelete={replyDelete} switchIsModify={switchIsModify} isModify={isModify}/>
 								<ReplyBottom key={reply.userId + "reply"} idx={replyIdx} isModify={isModify} reply={reply} replyModify={replyModify} switchIsModify={switchIsModify}/>
 							</div>

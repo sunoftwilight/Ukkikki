@@ -6,7 +6,9 @@ import { Link, useParams } from "react-router-dom";
 import { getPartyDetail, getPartyThumb } from "../../api/party";
 import { PartyDetailData, MemberData } from "../../types/GroupType";
 import { userStore } from "../../stores/UserStore";
-
+import GroupThumbNail from "./GropThumbNail";
+import logo from '../../../icons/512.png'
+import MiniImg from "./MiniImg";
 
 const GroupProfile: React.FC = () => { 
   const { setMembers, setMemberOpen } = memberStore()
@@ -32,7 +34,7 @@ const GroupProfile: React.FC = () => {
         partyMembers: data.partyMembers,
         partyName: data.partyName,
         rootDirId: data.rootDirId,
-        thumbnail: data.thumbnail})
+        thumbnail: data.thumbnail ? data.thumbnail : logo })
       setMembers(data.partyMembers)
     },
     (err) => {
@@ -40,6 +42,7 @@ const GroupProfile: React.FC = () => {
     })
   }
 
+  
   const getImg = async (data:MemberData, key:string) => {
 		const opt = {
 			"x-amz-server-side-encryption-customer-key": key,
@@ -56,16 +59,21 @@ const GroupProfile: React.FC = () => {
 	};
 
   const memberThumb = () => {
-    const memberThumbs = groupInfo.partyMembers.map((data) => (
-      <img key={data.memberId} src={data.profileUrl} className="rounded-full object-cover w-8 h-8 border-white border-2 -mr-2"/>
-    ));
+    console.log(groupInfo.partyMembers)
+    const memberThumbs = groupInfo.partyMembers.map((data) => {
+      if (data.type === 'S3') {
+        return <MiniImg url={data.profileUrl} />
+      } else {
+        return <img key={data.memberId} src={data.profileUrl} className="rounded-full object-cover w-8 h-8 border-white border-2 -mr-2"/>
+      }
+    });
     return memberThumbs;
   }
 
   return (
     <div className="flex flex-col justify-center items-center gap-4">
       <div className="w-[90px] h-[90px] rounded-full border-disabled-gray border-[1px] flex justify-center items-center">
-        <img src={groupInfo.thumbnail} className="w-[84px] h-[84px] rounded-full" />
+        <GroupThumbNail url={groupInfo.thumbnail} />
       </div>
 
       <div className="flex items-center gap-3">

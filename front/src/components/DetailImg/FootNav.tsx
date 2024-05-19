@@ -26,7 +26,6 @@ interface NavPropsType {
   updateLikes : (isLike : boolean) => void
 }
 const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
-  const [isArticle, setIsArticle] = useState<boolean>(false)
   const [isMemo, setIsMemo] = useState<boolean>(false)
   const [isPrefixOpen, setIsPrefixOpen] = useState(false)
   const [isIng, setIsIng] = useState(false)
@@ -141,17 +140,6 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
   return (
     <>
       <AnimatePresence>
-        { isArticle && (
-          <motion.div
-            key='isArticle'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <ArticleList />
-          </motion.div>
-        )}
-
         { isMemo && (
           <motion.div
             key='isMemo'
@@ -166,7 +154,7 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
         { isPrefixOpen && (
           <Modal
             key='isPrefixOpen'
-            modalItems={{ title: '파일명 수정', content: '', modalType: 'input', btn: 2 }}
+            modalItems={{ title: '파일명 설정', content: '', modalType: 'input', btn: 2 }}
             onSubmitBtnClick={() => prefixHandler()}
             onCancelBtnClick={() => setIsPrefixOpen(false)}
           />
@@ -209,8 +197,6 @@ const FootNav: React.FC<NavPropsType> = ({ info,updateLikes }) => {
         <img src={memo} onClick={() => setIsMemo(!isMemo)} className="w-6" />
 
         <img src={download} onClick={() => setIsPrefixOpen(true)} className="w-5" />
-
-        <img src={article} onClick={() => setIsArticle(!isArticle)} className="w-6" />
       </div>
     </>
   )

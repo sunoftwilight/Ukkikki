@@ -6,6 +6,7 @@ import { getPartyThumb } from "../../api/party";
 import { redirectAlarm } from "../../api/alarm";
 import { useNavigate } from "react-router-dom";
 import { headerStore } from "../../stores/HeaderStateStore";
+import logo from '../../../icons/512.png'
 
 const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
 	const { groupKey } = useStore(userStore);
@@ -103,7 +104,7 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
 
 	return (
     <div onClick={() => clickHandler()} className={`flex gap-2 w-full ${alarmItem.read ? 'bg-gray' : 'bg-white'}`}>
-      <img src={blobUrl} className="rounded-full w-12 h-12 border-[0.1px] border-point-gray object-cover" />
+      <img src={alarmItem.partyUrl? blobUrl : logo} className="rounded-full w-12 h-12 border-[0.1px] border-point-gray object-cover" />
       <div className="flex w-[calc(100%-56px)] flex-col gap-2">
         <div className="flex justify-between w-full">
           <div className="font-gtr-B text-xs">{alarmItem.partyName}</div>
