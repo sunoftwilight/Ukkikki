@@ -24,7 +24,7 @@ public interface FileUploadDownloadDocs {
     @Operation(summary = "파일 업로드")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResultResponse> fileUpload(@RequestPart("files") List<MultipartFile> files,
-                                                     @RequestPart("key") @Valid FileUploadDto fileUploadDto) throws Exception;
+                                                       @RequestPart("key") @Valid FileUploadDto fileUploadDto) throws Exception;
 
     @Operation(summary = "단일 파일 다운로드")
     @GetMapping("/download")

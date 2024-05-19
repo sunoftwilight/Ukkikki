@@ -1004,6 +1004,11 @@ public class PartyServiceImpl implements PartyService {
         profile.setProfileUrl(partyThumbnailImg);
         profileRepository.save(profile);
 
+        List<Chat> myChatList = chatRepository.findAllByPartyIdAndMemberId(partyId, profile.getId());
+        for (Chat chat : myChatList) {
+            chat.setProfile(profile);
+            chatRepository.save(chat);
+        }
         return profile;
     }
 
