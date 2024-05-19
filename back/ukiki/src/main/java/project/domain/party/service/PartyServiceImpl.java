@@ -705,7 +705,7 @@ public class PartyServiceImpl implements PartyService {
         // 자신 키그룹에서 파티 삭제
         KeyGroup keyGroup = keyGroupRepository.findByMemberAndParty(member, memberParty.getParty())
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.KEY_GROUP_NOT_FOUND));
-
+        keyGroup.setParty(null);
         keyGroupRepository.delete(keyGroup);
 
         // 자신 밖에 없을 때 party 데이터 삭제
