@@ -73,6 +73,9 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
         //FACE Group 검색
         List<FaceGroup> faceGroupList = faceGroupRepository.findByPartyId(partyId);
         for (FaceGroup faceGroup : faceGroupList) {
+            if(faceGroup.getFaceGroupNumber() == 0){
+                continue;
+            }
             String faceList = faceGroup.getFaceList();
             if (faceList.equals("[]")){
                 continue;
@@ -138,12 +141,6 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
                     .build();
                 groups.add(fileType);
 
-//                GroupDetailResDto groupDetail = new GroupDetailResDto();
-//                groupDetail.setPhotoId(photo.getId());
-//                groupDetail.setFileId(photoFile.getId());
-//                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
-//                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
-//                groups.add(groupDetail);
             }
         }
         //face 그룹인 경우
@@ -164,8 +161,6 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
                 File photoFile = fileRepository.findByPhotoDtoId(photo.getId())
                     .orElse(null);
 
-
-
                 File file = fileRepository.findByPhotoDtoId(photo.getId())
                     .orElse(null);
 
@@ -184,11 +179,6 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
                     .build();
                 groups.add(fileType);
 
-//                groupDetail.setFileId(photoFile.getId());
-//                groupDetail.setPhotoId(photo.getId());
-//                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
-//                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
-//                groups.add(groupDetail);
             }
         }
         // 좋아요한 사진인 경우
@@ -214,11 +204,6 @@ public class PhotoGroupServiceImpl implements PhotoGroupService {
                     .build();
                 groups.add(fileType);
 
-//                groupDetail.setFileId(photoFile.getId());
-//                groupDetail.setPhotoId(photo.getId());
-//                groupDetail.setPhotoUrl(photo.getPhotoUrl().getPhotoUrl());
-//                groupDetail.setThumbnailUrl(photo.getPhotoUrl().getThumb_url1());
-//                groups.add(groupDetail);
             }
         }
 
