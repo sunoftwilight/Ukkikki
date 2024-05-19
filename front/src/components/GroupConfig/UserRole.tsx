@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useStore } from "zustand";
 import { memberInfoStore } from "../../stores/MemberInfoStore";
 import { changePartyGrant } from "../../api/party";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const UserRole: React.FC = () => {
 	const memberInfo = useStore(memberInfoStore)
 	const [selectedRole, setSelectedRole] = useState<string | null>(memberInfo.data?.memberRole || null)
 	const {groupPk} = useParams()
-
+	const navi = useNavigate();
 
 	const changeGrant = async() => {
 		if (!selectedRole || !memberInfo.data) return;
@@ -17,7 +17,9 @@ const UserRole: React.FC = () => {
 		}
 		
 		await changePartyGrant(Number(groupPk), memberInfo.data?.userId, param,
-			() => {},
+			() => {
+				navi(`/group/${groupPk}/user`)
+			},
 			(err) => {
 				console.error(err)
 			}
