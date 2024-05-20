@@ -46,16 +46,13 @@
 <div align="middle">
   <table>
     <tr>
-      <th colspan='3'>Front-End</th>
-      <th colspan='2'>Back-End</th>
-      <th colspan='1'>AI</th>
+      <th colspan='2'>Front-End</th>
+      <th colspan='3'>Back-End</th>
+      <th colspan='1'>Full-Stack</th>
     </tr>
     <tr>
       <td height="140px" align="center"> 
         <img src="README_image/joe.png" width="120px"/>
-      </td>
-      <td height="140px" align="center"> 
-          <img src="README_image/positive.png" width="120px" />
       </td>
       <td height="140px" align="center"> 
           <img src="README_image/sun.png" width="110px" />
@@ -69,13 +66,13 @@
       <td height="140px" align="center"> 
           <img src="README_image/blue.png" width="120px" />
       </td>
+      <td height="140px" align="center"> 
+          <img src="README_image/positive.png" width="120px" />
+      </td>
     </tr>
     <tr>
       <td align='center'>
         <a href="https://github.com/ByeongJo-Park">👑 박병조 (Leader)</a>
-      </td>
-      <td align='center'>
-        <a href="https://github.com/Gyu-S">📸 양성규</a>
       </td>
       <td align='center'>
         <a href="https://github.com/sunoftwilight">📊 이해진</a>
@@ -89,6 +86,9 @@
       <td align='center'>
         <a href="https://github.com/twoconstant">🤖 이상수</a>
       </td>
+      <td align='center'>
+        <a href="https://github.com/Gyu-S">📸 양성규</a>
+      </td>
     </tr>
     <tr>
       <td align='center'>
@@ -100,14 +100,6 @@
         2차 로그인 UI/UX <br/>
         카메라 UI/UX <br/>
         이미지 그룹 앨범 UI/UX
-      </td>
-      <td align='center'>
-        Oauth2 로그인 <br/>
-        회원 관리 API <br/>
-        댓글, 대댓글 UI/UX <br/>
-        댓글, 대댓글 API <br/>
-        댓글 언급 UI/UX <br/>
-        커스텀 메시지 큐 서버 개발
       </td>
       <td align='center'>
         그룹 앨범 UI/UX <br/>
@@ -130,6 +122,14 @@
         파일 관리 API <br/>
         ERD 설계 및 구현 <br/>
         OpenAI 연동
+      </td>
+      <td align='center'>
+        Oauth2 로그인 <br/>
+        회원 관리 API <br/>
+        댓글, 대댓글 UI/UX <br/>
+        댓글, 대댓글 API <br/>
+        댓글 언급 UI/UX <br/>
+        커스텀 메시지 큐 서버 개발
       </td>
     </tr>
   </table>
