@@ -14,6 +14,7 @@ const InsertPassword: React.FC<InsertPasswordProps> = ({
 	const [password, setPassword] = useState<string>("");
 	const [confirmPassword, setConfirmPassword] = useState<string>("");
 	const inputsRefs = useRef<(HTMLInputElement | null)[]>(Array(12).fill(null));
+	const [isCreate, setIsCreate] = useState(false);
 	const user = useStore(userStore);
 
 	useEffect(() => {
@@ -27,8 +28,9 @@ const InsertPassword: React.FC<InsertPasswordProps> = ({
 	};
 
 	const handleNextBtnClick = () => {
-		if (password === confirmPassword) {
+		if (password === confirmPassword && !isCreate) {
 			createData.partyPass = password;
+			setIsCreate(true);
 			createRequest();
 		} else {
 			alert("다시 입력해주세요.");
@@ -85,10 +87,12 @@ const InsertPassword: React.FC<InsertPasswordProps> = ({
 		await createParty(
 			formData,
 			(response) => {
+				setIsCreate(false);
 				const data = response.data.data;
 				dataSetUp(data);
 			},
 			(error) => {
+				setIsCreate(false);
 				console.error(error);
 			},
 		);
