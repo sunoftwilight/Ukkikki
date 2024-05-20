@@ -468,10 +468,10 @@
   </tr>
   <tr>
     <td width="240px" height="400px">
-      <img src='README_image/mapCollectLoc.gif'>
+      <img src='README_image/그룹참여.gif'>
     </td>
     <td width="240px" height="400px">
-      <img src='README_image/mapUserLoc.gif'>
+      <img src='README_image/로그인방식선택.PNG'>
     </td>
   </tr>
 </table>
@@ -502,7 +502,7 @@
       <img src='README_image/멤버차단.gif'>
     </td>
     <td width="240px" height="400px">
-      <img src='README_image/commuGallery.gif'>
+      <img src='README_image/호스트권한위임.gif'>
     </td>
   </tr>
 </table>
@@ -548,15 +548,11 @@
 - 해당 화면에서 사용자가 좋아요 누른 사진의 모음도 확인할 수 있습니다.
 <table>
   <tr>
-    <td width="240px" height="60px">자동 분류 목록</td>
-    <td width="240px" height="60px">자동 분류 상세</td>
+    <td width="240px" height="60px">자동 분류 목록 및 상세</td>
   </tr>
   <tr>
     <td width="240px" height="400px">
       <img src='README_image/AI자동분류.gif'>
-    </td>
-      <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
     </td>
   </tr>
 </table>
@@ -577,7 +573,7 @@
   </tr>
   <tr>
     <td width="240px" height="400px">
-      <img src='README_image/qwexx`.gif'>
+      <img src='README_image/그룹앨범`.gif'>
     </td>
     <td width="240px" height="400px">
       <img src='README_image/다운로드좋아요이력.gif'>
@@ -605,10 +601,10 @@
       <img src='README_image/파일이동.gif'>
     </td>
     <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
+      <img src='README_image/사진복제.gif'>
     </td>
     <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
+      <img src='README_image/폴더삭제.gif'>
     </td>
   </tr>
 </table>
@@ -632,7 +628,7 @@
       <img src='README_image/메모남기기.gif'>
     </td>
     <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
+      <img src='README_image/사진좋아요.gif'>
     </td>
   </tr>
 </table>
@@ -648,7 +644,7 @@
   </tr>
   <tr>
     <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
+      <img src='README_image/피드.gif'>
     </td>
       <td width="240px" height="400px">
       <img src='README_image/게시글작성.gif'>
@@ -663,13 +659,9 @@
 - 댓글에 언급 기능을 통해 특정 대상에게 알람을 보낼 수 있습니다.
 <table>
   <tr>
-    <td width="240px" height="60px">게시글 상세</td>
-        <td width="240px" height="60px">댓글 및 언급</td>
+    <td width="240px" height="60px">게시글 상세 및 댓글</td>
   </tr>
   <tr>
-    <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
-    </td>
       <td width="240px" height="400px">
       <img src='README_image/댓글언급.gif'>
     </td>
@@ -739,7 +731,7 @@
   </tr>
   <tr>
     <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
+      <img src='README_image/홈화면설정.gif'>
     </td>
   </tr>
 </table>
