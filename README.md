@@ -383,14 +383,14 @@
 
 
 ## 💡 시스템 아키텍처
-<img src="README_image/architecture.png">
+<img src="README_image/undefined__5_.png">
 
 <br/>
 <br/>
 
 
 ## 📐 ERD
-<img src="README_image/ERD.png">
+<img src="README_image/wookiki.png">
 
 <br/>
 <br/>
