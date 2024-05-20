@@ -694,7 +694,7 @@
   </tr>
   <tr>
     <td width="240px" height="400px">
-      <img src='README_image/communSub.gif'>
+      <img src='README_image/완전삭제.gif'>
     </td>
       <td width="240px" height="400px">
       <img src='README_image/사진복구.gif'>
