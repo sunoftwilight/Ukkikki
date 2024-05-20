@@ -754,7 +754,7 @@
 </tr>
     <tr>
 <td>
-      <img src="README_image/그룹 비밀번호 설정.drawio.png"
+      <img src="README_image/그룹_비밀번호_설정.drawio.png"
     </td>
 </tr>
     
@@ -769,7 +769,7 @@
 </tr>
     <tr>
 <td>
-      <img src="README_image/그룹 참여.drawio.png"
+      <img src="README_image/그룹_참여.drawio.png"
     </td>
 </tr>
     
@@ -783,7 +783,7 @@
 </tr>
     <tr>
 <td>
-      <img src="README_image/로그인 키그룹 조회.drawio.png"
+      <img src="README_image/로그인_키그룹_조회.drawio.png"
     </td>
 </tr>
     
@@ -797,7 +797,7 @@
 </tr>
     <tr>
 <td>
-      <img src="README_image/이미지 업로드.drawio.png"
+      <img src="README_image/이미지_업로드.drawio.png"
     </td>
 </tr>
     
@@ -811,7 +811,7 @@
 </tr>
     <tr>
 <td>
-      <img src="README_image/이미지 조회.drawio.png"
+      <img src="README_image/이미지_조회.drawio.png"
     </td>
 </tr>
     
