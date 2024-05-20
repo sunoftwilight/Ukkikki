@@ -86,42 +86,52 @@
         <a href="https://github.com/eat-alone">🎥 박지훈</a>
       </td>
       <td align='center'>
-        <a href="https://github.com/sondongcheon">💾 손동천</a>
+        <a href="https://github.com/TutiTuti">💾 최용수</a>
       </td>
       <td align='center'>
-        <a href="https://github.com/Non-duality">🤖 이준희</a>
+        <a href="https://github.com/twoconstant">🤖 이상수</a>
       </td>
     </tr>
     <tr>
       <td align='center'>
         PM <br/>
-        지도 UI/UX <br/>
-        AI 데이터셋 수집
+        로그인 및 유저 정보 관리 UI/UX <br/>
+        Axios 인터셉터 처리 <br/>
+        파티 관련 UI/UX <br/>
+        게시판 관련 UI/UX <br/>
+        2차 로그인 UI/UX <br/>
+        카메라 UI/UX <br/>
+        이미지 그룹 앨범 UI/UX
       </td>
       <td align='center'>
-        AI 카메라 UI/UX <br/>
-        회원 관리 UI/UX <br/>
-      </td>
-      <td align='center'>
-        차트 UI/UX <br/>
-        도감 UI/UX <br/>
-        SNS UI/UX
-      </td>
-      <td align='center'>
-        AI 프레임 보간 <br/>
-        AI 데이터셋 수집 <br/>
-        차트 API
-      </td>
-      <td align='center'>
+        Oauth2 로그인 <br/>
         회원 관리 API <br/>
-        도감 API <br/>
-        지도 API <br/>
-        SNS API
+        댓글, 대댓글 UI/UX <br/>
+        댓글, 대댓글 API <br/>
+        댓글 언급 UI/UX <br/>
+        커스텀 메시지 큐 서버 개발
       </td>
       <td align='center'>
-        AI 모델 딥러닝 <br/>
-        오토 라벨링 <br/>
-        AI 데이터셋 수집
+        그룹 앨범 UI/UX <br/>
+        파일 관리 UI/UX <br/>
+        사진 좋아요, 메모 UI/UX
+      </td>
+      <td align='center'>
+        AI 인물 분류 서버 개발 <br/>
+        S3 암호화 로직 구현 <br/>
+        S3 파일 업로드 다운로드 API 개발 <br/>
+        그룹화 목록 / 상세 API 개발
+      </td>
+      <td align='center'>
+        그룹 관리 API <br/>
+        알람 API <br/>
+        채팅 API
+      </td>
+      <td align='center'>
+        디렉토리 관리 API <br/>
+        파일 관리 API <br/>
+        ERD 설계 및 구현 <br/>
+        OpenAI 연동
       </td>
     </tr>
   </table>
@@ -354,7 +364,7 @@
 해당 키는 상단의 간편비밀번호를 통해 로그인 시에 사용자가 속한 모든 그룹키를 받아온다.</td>
   </tr>
   <tr>
-    <td width="120px" height="60px">보안</td>
+    <td width="120px" height="60px"><b>보안<b/></td>
     <td width="120px" height="60px">암호화</td>
     <td width="700" height="60px">파티키를 이용하여 파티내 컨텐츠를 암호화하여 저장 합니다.</td>
   </tr>
@@ -369,13 +379,13 @@
 ## 📚 명세서
 
 
-- <a href='https://indecisive-radius-a20.notion.site/61d4473d638e458dbd8ec8d17dd28217?pvs=4'>요구사항 명세</a>
+- <a href='https://www.notion.so/sunoftwilight/bd09a6d856cd4753a8d912d990895419?pvs=4'>요구사항 명세</a>
 
-- <a href='https://indecisive-radius-a20.notion.site/ed365d2d764d431cbbbedf922e6cddfa?pvs=4'>기능 명세</a>
+- <a href='https://www.notion.so/sunoftwilight/031994e3d1d94e89901f65ba2af9da8d?pvs=4'>기능 명세</a>
 
-- <a href='https://indecisive-radius-a20.notion.site/API-245ce0adc0ab4b84bcd1f7cea3a0c372?pvs=4'>API 명세</a>
+- <a href='https://www.notion.so/sunoftwilight/API-2e8196d1fdfd456b83a2b12887d6fcb5?pvs=4'>API 명세</a>
 
-- <a href='https://www.figma.com/file/l4nPbmoEjD0D2KDnB6Y5o3/S10P22D104?type=design&node-id=315%3A2&mode=design&t=VJPuUdMgenJ2bDZL-1'>Figma</a>
+- <a href='https://www.figma.com/file/ylJLtIuPKDbnJ2GB7gQQ14/D202-Figma?type=design&node-id=0%3A1&mode=design&t=6fw9t7T0EAJgBM2A-1'>Figma</a>
 
 - <a href='https://indecisive-radius-a20.notion.site/32c5b997a9b84f4d8c64a06274f3cc54?pvs=4'>시퀀스 다이어그램</a>
 
