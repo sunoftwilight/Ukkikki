@@ -573,7 +573,7 @@
   </tr>
   <tr>
     <td width="240px" height="400px">
-      <img src='README_image/그룹앨범`.gif'>
+      <img src='README_image/그룹앨범.gif'>
     </td>
     <td width="240px" height="400px">
       <img src='README_image/다운로드좋아요이력.gif'>
