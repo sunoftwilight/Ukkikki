@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9653c221-caea-440b-ae00-277fecdc3aea" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/back.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/ukiki.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/UkikiApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/AlarmIdentifier.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/controller/AlarmController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/controller/AlarmDocs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/dto/request/AlarmPageableDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/dto/response/AlarmPageDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/dto/response/SimpleAlarm.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/mapper/AlarmMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/redis/Alarm.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/redis/AlarmType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/repository/AlarmRedisRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/repository/EmitterRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/service/AlarmService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/alarm/service/AlarmServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/controller/ChatController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/controller/ChatDocs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/dto/request/ChatDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/dto/response/SimpleChatDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/entity/Chat.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/entity/ChatType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/mapper/ChatMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/redis/ChatMember.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/repository/ChatMemberRedisRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/repository/ChatRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/service/ChatService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/chat/service/ChatServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/collection/DataType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/collection/Directory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/collection/File.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/collection/Trash.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/collection/TrashBin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/controller/directory/DirectoryController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/controller/directory/DirectoryDocs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/controller/trashbin/TrashBinController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/controller/trashbin/TrashBinControllerImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/PhotoDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/TrashFileDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/TrashPhotoDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/request/CreateDirDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/request/MoveDirDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/request/RenameDirDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/DirDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/DirWithChildsNameDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/GetDirDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/GetDirDtov2.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/GetDirInnerDtov2.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/GetDirListDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/GetFileDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/GetTrashBinDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/GetTrashDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/InitDirDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/dto/response/RenameDirDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/mapper/DirMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/mapper/GetDirMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/mapper/GetFileMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/mapper/GetTrashBinMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/mapper/IntiDirMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/mapper/RenameDirMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/mapper/TrashFileMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/repository/DirectoryRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/repository/FileRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/repository/TrashBinRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/repository/TrashRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/DirectoryService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/DirectoryServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/FileService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/FileServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/TrashBinService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/TrashBinServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/TrashService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/directory/service/TrashServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/controller/MemberController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/controller/MemberDocs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/request/CustomOAuth2User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/request/CustomUserDetails.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/request/GetKeyGroup.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/request/KakaoResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/request/OAuth2Response.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/request/SetPasswordDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/response/InfoDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/response/KeyGroupDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/dto/response/MemberDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/entity/KeyGroup.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/entity/Member.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/entity/MemberRole.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/entity/Profile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/entity/ProfileType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/mapper/KeyGroupMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/redis/MemberToken.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/repository/KeyGroupRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/repository/MemberRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/repository/MemberTokenRedisRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/repository/ProfileRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/service/CustomOAuth2UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/service/MemberService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/member/service/MemberServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/controller/PartyController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/controller/PartyDocs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/dto/request/ChangeThumbDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/dto/request/CreatePartyDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/dto/request/EnterPartyDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/dto/request/PartyPasswordDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/dto/response/PartyEnterDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/dto/response/PartyLinkDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/dto/response/SimpleMemberPartyDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/entity/Article.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/entity/ArticlePhoto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/entity/MemberParty.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/entity/Party.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/mapper/MemberPartyMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/mapper/PartyLinkMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/redis/PartyLink.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/repository/MemberpartyRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/repository/PartyLinkRedisRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/repository/PartyRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/service/PartyService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/party/service/PartyServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/controller/FileUploadDownloadController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/controller/FileUploadDownloadDocs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/dto/request/FileDownloadDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/dto/request/FileUploadDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/dto/request/MultiFileDownloadDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/Meta.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/MetaCode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/Photo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/PhotoUrl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/mediatable/DownloadLog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/mediatable/Favorite.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/mediatable/Likes.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/entity/mediatable/Memo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/repository/MetaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/repository/PhotoRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/service/FIleUploadDownloadServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/photo/service/FileUploadDownloadService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/domain/test/TestController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/baseEntity/BaseEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/JasyptConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/RedisConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/S3Config.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/SchedulingConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/SecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/WebClientConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/config/WebSocketConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/controlleradvice/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/controlleradvice/dto/ExceptionResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/exception/BusinessLogicException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/exception/ErrorCode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/jwt/CustomSuccessHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/jwt/JWTFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/jwt/JWTUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/result/ResultCode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/result/ResultResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/swagger/LocalConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/swagger/ServerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/BcryptUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/FileUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/ImageUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/JasyptUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/MultipartJackson2HttpMessageConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/S3Util.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/Scheduler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/gptutil/GptUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/gptutil/GptUtilImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/java/project/global/util/gptutil/enums/EndPoints.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/main/resources/application.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ukiki/src/test/java/project/UkikiApplicationTests.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2gDo0XQgCHaikYQPiXY9HIlgWXC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "MQ",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/ssafy/자유프로젝트MQ/MQ",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9653c221-caea-440b-ae00-277fecdc3aea" name="Changes" comment="" />
+      <created>1715241286478</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1715241286478</updated>
+      <workItem from="1715241287513" duration="670000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -1,13 +1,17 @@
-package project.config;
+package project.global.config;
 
 import io.netty.channel.ChannelOption;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.codec.LoggingCodecSupport;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
@@ -20,22 +24,22 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @Slf4j
 public class WebClientConfig {
-<<<<<<<< HEAD:BE/back/ukiki/src/main/java/project/global/config/WebClientConfig.java
     @Value("${webClient.baseUrl}")
     private String url;
-========
->>>>>>>> origin/MQ:MQ/ukkikki/src/main/java/project/config/WebClientConfig.java
 
     @Bean
     public WebClient webClient() {
 
+        /**
+         * 통신시 timeout 세팅
+         * - connect, read, write 를 모두 5000ms
+         */
         HttpClient httpClient = HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,5000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .responseTimeout(Duration.ofMillis(5000))
                 .doOnConnected(conn ->
                         conn.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-                                .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-                );
+                                .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)));
 
         return WebClient.builder()
                 .baseUrl(url)

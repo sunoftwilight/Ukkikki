@@ -53,7 +53,7 @@ public class MemberController implements MemberDocs{
         String token = memberService.reissue(cookies);
 
         response.setHeader("authorization","Bearer " + token);
-//        response.addHeader("Access-Control-Expose-Headers", "authorization");
+        response.addHeader("Access-Control-Expose-Headers", "authorization");
 
         return new ResponseEntity<>(HttpStatus.OK);
 

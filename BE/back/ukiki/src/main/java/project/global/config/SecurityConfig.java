@@ -1,4 +1,4 @@
-package project.config;
+package project.global.config;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-<<<<<<<< HEAD:BE/back/ukiki/src/main/java/project/global/config/SecurityConfig.java
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -20,15 +19,12 @@ import project.global.jwt.JWTUtil;
 
 import java.util.Arrays;
 import java.util.List;
-========
->>>>>>>> origin/MQ:MQ/ukkikki/src/main/java/project/config/SecurityConfig.java
 
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfig {
 
-<<<<<<<< HEAD:BE/back/ukiki/src/main/java/project/global/config/SecurityConfig.java
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
 
@@ -36,8 +32,6 @@ public class SecurityConfig {
 //    private final CorsFilter corsFilter;
 
 
-========
->>>>>>>> origin/MQ:MQ/ukkikki/src/main/java/project/config/SecurityConfig.java
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -54,11 +48,21 @@ public class SecurityConfig {
         // http basic 인증 방식 disable
         http
             .httpBasic(AbstractHttpConfigurer::disable);
+        // oauth2
+        http
+            .oauth2Login((oauth2) -> oauth2
+                .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
+                    .userService(customOAuth2UserService)))
+                .successHandler(customSuccessHandler));
+        // JWT 필터 추가
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/oauth2/**","/member/reissue","/swagger-ui/**" ,"/**").permitAll()
                         .anyRequest().authenticated());
+
 
         http
                 .sessionManagement((session) -> session

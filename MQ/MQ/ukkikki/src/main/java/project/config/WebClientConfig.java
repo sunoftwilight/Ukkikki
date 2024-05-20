@@ -11,8 +11,6 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-import org.springframework.beans.factory.annotation.Value;
-
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -20,11 +18,6 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @Slf4j
 public class WebClientConfig {
-<<<<<<<< HEAD:BE/back/ukiki/src/main/java/project/global/config/WebClientConfig.java
-    @Value("${webClient.baseUrl}")
-    private String url;
-========
->>>>>>>> origin/MQ:MQ/ukkikki/src/main/java/project/config/WebClientConfig.java
 
     @Bean
     public WebClient webClient() {
@@ -38,7 +31,7 @@ public class WebClientConfig {
                 );
 
         return WebClient.builder()
-                .baseUrl(url)
+                .baseUrl("http://180.64.174.78:5001/uploader")
                 .clientConnector(new ReactorClientHttpConnector(httpClient)) //생성한 HttpClient 연결
                 //Request Header 로깅 필터
                 .filter(

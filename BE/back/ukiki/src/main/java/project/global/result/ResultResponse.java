@@ -1,4 +1,4 @@
-package project.result;
+package project.global.result;
 
 public record ResultResponse(ResultCode resultCode, Object data) {
 

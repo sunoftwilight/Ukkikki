@@ -5,6 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### yaml ####
+src/main/resources/application-key.yaml
+
 ### STS ###
 .apt_generated
 .classpath
