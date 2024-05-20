@@ -1,0 +1,48 @@
+{
+  "name": "우끼끼 (Ukkikki)",
+  "short_name": "우끼끼",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#007bff",
+  "theme_color": "#ffffff",
+  "description": "우리끼리, 끼리끼리 공유하는 추억. 우끼끼",
+  "icons": [
+    {
+      "src": "icons/16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
