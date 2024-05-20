@@ -23,7 +23,6 @@ const GroupProfile: React.FC = () => {
     await getPartyDetail(Number(groupPk),
     (res) => {
       const data = res.data.data;
-      console.log(data)
       res.data.data.partyMembers.forEach((item) => {
         if (item.type === 'S3') {
           const key = groupKey[Number(groupPk)];
@@ -59,7 +58,6 @@ const GroupProfile: React.FC = () => {
 	};
 
   const memberThumb = () => {
-    console.log(groupInfo.partyMembers)
     const memberThumbs = groupInfo.partyMembers.map((data) => {
       if (data.type === 'S3') {
         return <MiniImg url={data.profileUrl} />

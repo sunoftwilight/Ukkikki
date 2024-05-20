@@ -15,7 +15,6 @@ const GroupThumb: React.FC<ImgProps> = ({ info }) => {
 
   useEffect(() => {
     checkStateAndImg(info)
-    console.log(info)
   }, [info])
 
   const [blobUrl, setBlobURl] = useState('')

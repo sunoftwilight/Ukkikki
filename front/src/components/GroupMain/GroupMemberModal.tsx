@@ -7,7 +7,6 @@ import MemeberImg from "./MemberImg";
 
 const GroupMemberModal: React.FC = () => {
   const { members, memberOpen, setMemberOpen } = memberStore()
-  console.log(members)
 	return (
     <AnimatePresence>
       { memberOpen &&

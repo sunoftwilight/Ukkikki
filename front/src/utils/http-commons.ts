@@ -125,7 +125,6 @@ privateApi.interceptors.response.use(
 // formDataInterceptors
 formDataApi.interceptors.request.use(
   (config) => {
-    console.log('here')
 		const stored = localStorage.getItem('USER_STORE');
 		if (stored){
 			const obj = JSON.parse(stored)
@@ -154,7 +153,6 @@ formDataApi.interceptors.response.use(
           if (res.status === httpStatusCode.OK && res.headers.authorization) {
             
             newAccess(res.headers.authorization)
-            console.log('doit')
             axios.defaults.headers.authorization = `${res.headers.authorization}`;
             originRequest.headers.authorization = `${res.headers.authorization}`;
 

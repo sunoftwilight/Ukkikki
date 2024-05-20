@@ -22,7 +22,6 @@ const ImageGrouping: React.FC = () => {
     const key = Number(groupPk)
     await getGroup(key,
     (res) => {
-      console.log(res.data.data)
       const data = res.data.data
       data.forEach((item) => (
         getImg(item.thumbnailUrl, groupKey[key])

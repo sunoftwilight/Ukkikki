@@ -29,7 +29,6 @@ const GroupConfig: React.FC = () => {
   const loadUserList = async () => {
 		await getPartyUserList(Number(groupPk),
 			(res) => {
-				console.log(res.data)
         const data = res.data.data;
         data.forEach(item => {
           if(item.userId === Number(userId)){

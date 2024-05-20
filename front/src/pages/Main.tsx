@@ -21,9 +21,6 @@ const Main: React.FC = () => {
 		await getPartyList(
 			(res) => {
         if(res.data.data.length > 0) {
-          console.log(1)
-          console.log(user.uploadGroupId)
-          console.log(res.data.data)
           const data = res.data.data.find(item => item.id === user.uploadGroupId)
           if(data)
             setNamePlate(data.partyName)

@@ -53,7 +53,6 @@ const CreateArticle: React.FC = () => {
 
     addDeviceList.forEach((file) => { // 변경 3: URL 대신 실제 파일을 FormData에 추가
       formData.append(`multipartFiles`, file, file.name);
-      console.log(file)
     });
 
 
@@ -78,7 +77,6 @@ const CreateArticle: React.FC = () => {
           updatedList.push(item);
         }
       });
-      console.log(updatedList)
       return updatedList;
     });
   }, [addDeviceList, addAlbumList])

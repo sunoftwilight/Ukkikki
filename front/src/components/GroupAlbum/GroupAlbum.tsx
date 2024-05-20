@@ -30,7 +30,6 @@ const GroupAlbum: React.FC = () => {
     const key = Number(groupPk)
     await getGroupDetail(type, groupName, key,
       (res) => {
-        console.log(res.data.data)
         setAlbumList(res.data.data)
       },
       (err) => {

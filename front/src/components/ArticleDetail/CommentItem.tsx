@@ -26,7 +26,6 @@ const CommentItem: React.FC<CommentItemInterface> = ({
 
 	const [reply,setReply] = useState(comment.reply);
 
-  console.log(comment)
 
 	useEffect(() => {
 		createReplyCancel();

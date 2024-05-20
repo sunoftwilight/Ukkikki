@@ -28,7 +28,6 @@ const Content: React.FC = () => {
     const ap = Number(feedPk)
     await getArticleDetail(gp, ap,
       (res) => {
-        console.log(res.data.data)
         const data = res.data.data
         setArticleInfo(data)
         if (data.photoList.length > 0){

@@ -22,10 +22,8 @@ const AlarmItem: React.FC<AlarmItemProps> = ({ alarmItem }) => {
       alarmItem.partyUrl,
       opt,
       (res) => {
-        console.log(alarmItem)
         const blob = new Blob([res.data], {type: 'image/png'})
         setBlobURl(URL.createObjectURL(blob))
-        console.log(blob)
       },
       (err) => { console.log(err); },
     );
