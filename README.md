@@ -1,12 +1,12 @@
 <div align="center">
   <br/>
-  <img src="README_image/GrabPicLogo.png" width='60%'/>
+  <img src="README_image/Ukkikki.png" width='60%'/>
   <br />
   <br />
   <br />
-  <h1>GrabPic 📸</h1>
-  <h3>작지만 가장 똑똑한, 나만의 생태 도감</h3> 
-  <p>2024. 02. 19  ~  2024. 04. 05</p>
+  <h1>Ukkikki 📸</h1>
+  <h3>우리끼리, 사진 공유 SNS</h3> 
+  <p>2024. 04. 12  ~  2024. 06. 20</p>
   <br/><br/>
 </div>
 
@@ -20,6 +20,7 @@
 - [시스템 아키텍처](#-시스템-아키텍처)
 - [ERD](#erd)
 - [서비스 실사용 화면](#-서비스-실사용-화면)
+- [시퀀스 다이어그램](#-SequenceDiagram)
 
 <br/>
 <br/>
@@ -53,22 +54,22 @@
     </tr>
     <tr>
       <td height="140px" align="center"> 
-        <img src="README_image/joe.jpg" width="120px"/>
+        <img src="README_image/joe.png" width="120px"/>
       </td>
       <td height="140px" align="center"> 
-          <img src="README_image/kyu.jpg" width="120px" />
+          <img src="README_image/positive.png" width="120px" />
       </td>
       <td height="140px" align="center"> 
-          <img src="README_image/jin.jpg" width="110px" />
+          <img src="README_image/sun.png" width="110px" />
       </td>
       <td height="140px" align="center"> 
-          <img src="README_image/hun.jpg" width="120px" />
+          <img src="README_image/eddy.png" width="120px" />
       </td>
       <td height="140px" align="center"> 
-          <img src="README_image/son.jpg" width="120px" />
+          <img src="README_image/spring.png" width="120px" />
       </td>
       <td height="140px" align="center"> 
-          <img src="README_image/jun.jpg" width="120px" />
+          <img src="README_image/blue.png" width="120px" />
       </td>
     </tr>
     <tr>
@@ -736,7 +737,8 @@
   </tr>
 </table>
 
-<h1>SequenceDiagram</h1>
+## SequenceDiagram
+
 <table>
 <tr>
 <td>
