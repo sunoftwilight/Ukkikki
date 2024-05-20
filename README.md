@@ -407,7 +407,7 @@
   </tr>
   <tr>
     <td width="240px" height="400px">
-      <img src='README_IMAGE/로그인및메인화면진입.gif'>
+      <img src='README_image/로그인및메인화면진입.gif'>
     </td>
   </tr>
 </table>
@@ -427,7 +427,7 @@
       <img src='README_image/사진촬영.gif'>
     </td>
     <td width="240px" height="400px">
-      <img src='README_image/itemLabel.gif'>
+      <img src='README_image/업로딩그룹변경.gif'>
     </td>
   </tr>
 </table>
